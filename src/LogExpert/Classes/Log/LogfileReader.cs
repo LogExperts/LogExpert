@@ -58,26 +58,59 @@ namespace LogExpert.Classes.Log
         #endregion
 
         #region cTor
-
         public LogfileReader(string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
         {
             if (fileName == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             _fileName = fileName;
-            EncodingOptions = encodingOptions;
-            IsMultiFile = multiFile;
             _MAX_BUFFERS = bufferCount;
             _MAX_LINES_PER_BUFFER = linesPerBuffer;
             _multiFileOptions = multiFileOptions;
             _logLineFx = GetLogLineInternal;
+            IsMultiFile = multiFile;
+
+            InitializeReader(encodingOptions, null);
+        }
+
+        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
+        {
+            if (fileNames == null || fileNames.Length < 1)
+            {
+                throw new ArgumentNullException(nameof(fileNames));
+            }
+
+            _fileName = fileNames[0];
+            _MAX_BUFFERS = bufferCount;
+            _MAX_LINES_PER_BUFFER = linesPerBuffer;
+            _multiFileOptions = multiFileOptions;
+            _logLineFx = GetLogLineInternal;
+            IsMultiFile = true;
+
+            InitializeReader(encodingOptions, fileNames);
+        }
+
+        private void InitializeReader(EncodingOptions encodingOptions, string[]? additionalFiles)
+        {
+            EncodingOptions = encodingOptions;
             InitLruBuffers();
 
-            if (multiFile)
+            if (additionalFiles != null)
             {
-                ILogFileInfo info = GetLogFileInfo(fileName);
+                // Handle array constructor case
+                ILogFileInfo fileInfo = null;
+                foreach (string name in additionalFiles)
+                {
+                    fileInfo = AddFile(name);
+                }
+                _watchedILogFileInfo = fileInfo;
+            }
+            else if (IsMultiFile)
+            {
+                // Handle single file multiFile case
+                ILogFileInfo info = GetLogFileInfo(_fileName);
                 RolloverFilenameHandler rolloverHandler = new(info, _multiFileOptions);
                 LinkedList<string> nameList = rolloverHandler.GetNameList();
 
@@ -86,45 +119,16 @@ namespace LogExpert.Classes.Log
                 {
                     fileInfo = AddFile(name);
                 }
-
                 _watchedILogFileInfo = fileInfo; // last added file in the list is the watched file
             }
             else
             {
-                _watchedILogFileInfo = AddFile(fileName);
+                // Handle single file case
+                _watchedILogFileInfo = AddFile(_fileName);
             }
 
             StartGCThread();
         }
-
-        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
-        {
-            if (fileNames == null || fileNames.Length < 1)
-            {
-                return;
-            }
-
-            EncodingOptions = encodingOptions;
-            IsMultiFile = true;
-            _MAX_BUFFERS = bufferCount;
-            _MAX_LINES_PER_BUFFER = linesPerBuffer;
-            _multiFileOptions = multiFileOptions;
-            _logLineFx = GetLogLineInternal;
-
-            InitLruBuffers();
-
-            ILogFileInfo fileInfo = null;
-            foreach (string name in fileNames)
-            {
-                fileInfo = AddFile(name);
-            }
-
-            _watchedILogFileInfo = fileInfo;
-            _fileName = fileInfo.FullName;
-
-            StartGCThread();
-        }
-
         #endregion
 
         #region Delegates
