@@ -140,7 +140,7 @@ namespace LogExpert.Classes
 
                         if (instance is IColumnizerConfigurator configurator)
                         {
-                            configurator.LoadConfig(ConfigManager.Settings.preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
+                            configurator.LoadConfig(ConfigManager.Settings.Preferences.PortableMode ? ConfigManager.PortableModeDir : ConfigManager.ConfigDir);
                         }
 
                         if (instance is ILogExpertPlugin plugin)
@@ -154,9 +154,20 @@ namespace LogExpert.Classes
                 }
                 else
                 {
-                    if (TryAsContextMenu(type)) continue;
-                    if (TryAsKeywordAction(type)) continue;
-                    if (TryAsFileSystem(type)) continue;
+                    if (TryAsContextMenu(type))
+                    {
+                        continue;
+                    }
+
+                    if (TryAsKeywordAction(type))
+                    {
+                        continue;
+                    }
+
+                    if (TryAsFileSystem(type))
+                    {
+                        continue;
+                    }
                 }
             }
         }

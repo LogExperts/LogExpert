@@ -103,6 +103,8 @@ namespace LogExpert.Config
 
         public bool ShowErrorMessageAllowOnlyOneInstances { get; set; }
 
+        public int MaxLineLength { get; set; } = 20000;
+
         #endregion
     }
 }

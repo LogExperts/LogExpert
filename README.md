@@ -1,4 +1,4 @@
-# LogExpert [![Build status](https://ci.appveyor.com/api/projects/status/hxwxyyxy81l4tee8/branch/master?svg=true)](https://ci.appveyor.com/project/Zarunbal/logexpert/branch/master)
+# LogExpert [![.NET](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml/badge.svg)](https://github.com/LogExperts/LogExpert/actions/workflows/test_dotnet.yml)
 
 This is a clone from (no longer exists) https://logexpert.codeplex.com/
 

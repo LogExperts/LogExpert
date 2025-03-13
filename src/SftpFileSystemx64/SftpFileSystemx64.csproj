@@ -5,6 +5,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SftpFileSystem</RootNamespace>
     <AssemblyName>SftpFileSystem</AssemblyName>
+	<IsTestProject>false</IsTestProject>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>

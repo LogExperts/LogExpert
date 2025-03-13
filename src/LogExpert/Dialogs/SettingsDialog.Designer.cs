@@ -32,6 +32,9 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
             tabControlSettings = new System.Windows.Forms.TabControl();
             tabPageViewSettings = new System.Windows.Forms.TabPage();
+            labelWarningMaximumLineLenght = new System.Windows.Forms.Label();
+            upDownMaximumLineLength = new System.Windows.Forms.NumericUpDown();
+            labelMaximumLineLength = new System.Windows.Forms.Label();
             upDownMaximumFilterEntriesDisplayed = new System.Windows.Forms.NumericUpDown();
             labelMaximumFilterEntriesDisplayed = new System.Windows.Forms.Label();
             upDownMaximumFilterEntries = new System.Windows.Forms.NumericUpDown();
@@ -155,6 +158,7 @@
             dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             tabControlSettings.SuspendLayout();
             tabPageViewSettings.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).BeginInit();
             ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntriesDisplayed).BeginInit();
             ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntries).BeginInit();
             groupBoxMisc.SuspendLayout();
@@ -210,6 +214,9 @@
             // 
             // tabPageViewSettings
             // 
+            tabPageViewSettings.Controls.Add(labelWarningMaximumLineLenght);
+            tabPageViewSettings.Controls.Add(upDownMaximumLineLength);
+            tabPageViewSettings.Controls.Add(labelMaximumLineLength);
             tabPageViewSettings.Controls.Add(upDownMaximumFilterEntriesDisplayed);
             tabPageViewSettings.Controls.Add(labelMaximumFilterEntriesDisplayed);
             tabPageViewSettings.Controls.Add(upDownMaximumFilterEntries);
@@ -228,9 +235,39 @@
             tabPageViewSettings.Text = "View settings";
             tabPageViewSettings.UseVisualStyleBackColor = true;
             // 
+            // labelWarningMaximumLineLenght
+            // 
+            labelWarningMaximumLineLenght.AutoSize = true;
+            labelWarningMaximumLineLenght.Location = new System.Drawing.Point(446, 118);
+            labelWarningMaximumLineLenght.Name = "labelWarningMaximumLineLenght";
+            labelWarningMaximumLineLenght.Size = new System.Drawing.Size(482, 15);
+            labelWarningMaximumLineLenght.TabIndex = 16;
+            labelWarningMaximumLineLenght.Text = "! Changing the Maximum Line Length can impact performance and is not recommended !";
+            // 
+            // upDownMaximumLineLength
+            // 
+            upDownMaximumLineLength.Location = new System.Drawing.Point(762, 138);
+            upDownMaximumLineLength.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            upDownMaximumLineLength.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
+            upDownMaximumLineLength.Minimum = new decimal(new int[] { 20000, 0, 0, 0 });
+            upDownMaximumLineLength.Name = "upDownMaximumLineLength";
+            upDownMaximumLineLength.Size = new System.Drawing.Size(106, 23);
+            upDownMaximumLineLength.TabIndex = 15;
+            upDownMaximumLineLength.Value = new decimal(new int[] { 20000, 0, 0, 0 });
+            // 
+            // labelMaximumLineLength
+            // 
+            labelMaximumLineLength.AutoSize = true;
+            labelMaximumLineLength.Location = new System.Drawing.Point(467, 140);
+            labelMaximumLineLength.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            labelMaximumLineLength.Name = "labelMaximumLineLength";
+            labelMaximumLineLength.Size = new System.Drawing.Size(217, 15);
+            labelMaximumLineLength.TabIndex = 14;
+            labelMaximumLineLength.Text = "Maximum Line Length (restart required)";
+            // 
             // upDownMaximumFilterEntriesDisplayed
             // 
-            upDownMaximumFilterEntriesDisplayed.Location = new System.Drawing.Point(762, 114);
+            upDownMaximumFilterEntriesDisplayed.Location = new System.Drawing.Point(762, 86);
             upDownMaximumFilterEntriesDisplayed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             upDownMaximumFilterEntriesDisplayed.Maximum = new decimal(new int[] { 30, 0, 0, 0 });
             upDownMaximumFilterEntriesDisplayed.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
@@ -242,7 +279,7 @@
             // labelMaximumFilterEntriesDisplayed
             // 
             labelMaximumFilterEntriesDisplayed.AutoSize = true;
-            labelMaximumFilterEntriesDisplayed.Location = new System.Drawing.Point(462, 117);
+            labelMaximumFilterEntriesDisplayed.Location = new System.Drawing.Point(467, 88);
             labelMaximumFilterEntriesDisplayed.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             labelMaximumFilterEntriesDisplayed.Name = "labelMaximumFilterEntriesDisplayed";
             labelMaximumFilterEntriesDisplayed.Size = new System.Drawing.Size(179, 15);
@@ -251,7 +288,7 @@
             // 
             // upDownMaximumFilterEntries
             // 
-            upDownMaximumFilterEntries.Location = new System.Drawing.Point(762, 71);
+            upDownMaximumFilterEntries.Location = new System.Drawing.Point(762, 59);
             upDownMaximumFilterEntries.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             upDownMaximumFilterEntries.Minimum = new decimal(new int[] { 10, 0, 0, 0 });
             upDownMaximumFilterEntries.Name = "upDownMaximumFilterEntries";
@@ -262,7 +299,7 @@
             // labelMaximumFilterEntries
             // 
             labelMaximumFilterEntries.AutoSize = true;
-            labelMaximumFilterEntries.Location = new System.Drawing.Point(462, 74);
+            labelMaximumFilterEntries.Location = new System.Drawing.Point(467, 61);
             labelMaximumFilterEntries.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             labelMaximumFilterEntries.Name = "labelMaximumFilterEntries";
             labelMaximumFilterEntries.Size = new System.Drawing.Size(126, 15);
@@ -272,7 +309,7 @@
             // labelDefaultEncoding
             // 
             labelDefaultEncoding.AutoSize = true;
-            labelDefaultEncoding.Location = new System.Drawing.Point(462, 34);
+            labelDefaultEncoding.Location = new System.Drawing.Point(467, 34);
             labelDefaultEncoding.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             labelDefaultEncoding.Name = "labelDefaultEncoding";
             labelDefaultEncoding.Size = new System.Drawing.Size(98, 15);
@@ -283,7 +320,7 @@
             // 
             comboBoxEncoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             comboBoxEncoding.FormattingEnabled = true;
-            comboBoxEncoding.Location = new System.Drawing.Point(688, 29);
+            comboBoxEncoding.Location = new System.Drawing.Point(691, 26);
             comboBoxEncoding.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             comboBoxEncoding.Name = "comboBoxEncoding";
             comboBoxEncoding.Size = new System.Drawing.Size(177, 23);
@@ -1626,6 +1663,7 @@
             tabControlSettings.ResumeLayout(false);
             tabPageViewSettings.ResumeLayout(false);
             tabPageViewSettings.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).EndInit();
             ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntriesDisplayed).EndInit();
             ((System.ComponentModel.ISupportInitialize)upDownMaximumFilterEntries).EndInit();
             groupBoxMisc.ResumeLayout(false);
@@ -1801,5 +1839,8 @@
         private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
         private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
         private System.Windows.Forms.CheckBox checkBoxDarkMode;
+        private System.Windows.Forms.NumericUpDown upDownMaximumLineLength;
+        private System.Windows.Forms.Label labelMaximumLineLength;
+        private System.Windows.Forms.Label labelWarningMaximumLineLenght;
     }
 }

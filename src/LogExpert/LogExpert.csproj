@@ -8,6 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <DocumentationFile>$(SolutionDir)..\bin\Docs\LogExpert.xml</DocumentationFile>
+	<IsTestProject>false</IsTestProject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <SignAssembly>true</SignAssembly>

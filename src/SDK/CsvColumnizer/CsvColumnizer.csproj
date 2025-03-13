@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2563526E-4566-40CB-AA27-587B904FD25B}</ProjectGuid>
     <OutputType>Library</OutputType>
+	<IsTestProject>false</IsTestProject>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CsvColumnizer</RootNamespace>
     <AssemblyName>CsvColumnizer</AssemblyName>

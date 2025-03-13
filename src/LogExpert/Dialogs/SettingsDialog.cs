@@ -142,6 +142,8 @@ namespace LogExpert.Dialogs
                 radioButtonSessionApplicationStartupDir.Checked = true;
             }
 
+            upDownMaximumLineLength.Value = Preferences.MaxLineLength;
+
             upDownMaximumFilterEntriesDisplayed.Value = Preferences.maximumFilterEntriesDisplayed;
             upDownMaximumFilterEntries.Value = Preferences.maximumFilterEntries;
 

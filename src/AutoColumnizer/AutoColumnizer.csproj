@@ -6,6 +6,7 @@
     <AssemblyTitle>AutoColumnizer</AssemblyTitle>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+	<IsTestProject>false</IsTestProject>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
   </PropertyGroup>
