@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\FileLockFinder\FileLockFinder.csproj" />
     <ProjectReference Include="..\LogexpertgRPCService\LogexpertgRPCService.csproj" />
     <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
   </ItemGroup>

@@ -1,4 +1,5 @@
-﻿using LogExpert.Classes;
+﻿using FileLockFinder;
+using LogExpert.Classes;
 using LogExpert.Classes.Bookmark;
 using LogExpert.Classes.Columnizer;
 using LogExpert.Classes.Filter;
@@ -8,7 +9,6 @@ using LogExpert.Classes.Persister;
 using LogExpert.Config;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,7 +16,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using System.Linq;
 
 namespace LogExpert.Controls.LogWindow
 {
@@ -578,6 +577,26 @@ namespace LogExpert.Controls.LogWindow
                     SelectLine(dataGridView.RowCount - 1, false, true);
                 }
                 dataGridView.Focus();
+            }
+        }
+
+        public void TryToTruncate()
+        {
+            try
+            {
+                if (LockFinder.CheckIfFileIsLocked(Title))
+                {
+                    var name = LockFinder.FindLockedProcessName(Title);
+                    var status = string.Format("Truncate failed: file is locked by {0}", name);
+                    StatusLineText(status);
+                    return;
+                }
+
+                File.WriteAllText(Title, "");
+            }catch(Exception E)
+            {
+                StatusLineText("Unexpected issue truncating file");
+                throw E;
             }
         }
 
