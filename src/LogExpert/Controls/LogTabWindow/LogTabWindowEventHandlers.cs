@@ -811,6 +811,11 @@ namespace LogExpert.Controls.LogTabWindow
             explorer.Start();
         }
 
+        private void truncateFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CurrentLogWindow?.TryToTruncate();
+        }
+
         private void OnExportBookmarksToolStripMenuItemClick(object sender, EventArgs e)
         {
             CurrentLogWindow?.ExportBookmarkList();
