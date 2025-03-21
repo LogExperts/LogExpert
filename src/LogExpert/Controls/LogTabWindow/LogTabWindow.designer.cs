@@ -36,7 +36,6 @@ namespace LogExpert.Controls.LogTabWindow
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            DockPanelSkin dockPanelSkin1 = new DockPanelSkin();
             AutoHideStripSkin autoHideStripSkin1 = new AutoHideStripSkin();
             DockPanelGradient dockPanelGradient1 = new DockPanelGradient();
             TabGradient tabGradient1 = new TabGradient();
@@ -849,7 +848,6 @@ namespace LogExpert.Controls.LogTabWindow
             tabGradient1.TextColor = System.Drawing.SystemColors.ControlText;
             autoHideStripSkin1.TabGradient = tabGradient1;
             autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
-            dockPanelSkin1.AutoHideStripSkin = autoHideStripSkin1;
             tabGradient2.EndColor = System.Drawing.SystemColors.Control;
             tabGradient2.StartColor = System.Drawing.SystemColors.Control;
             tabGradient2.TextColor = System.Drawing.SystemColors.ControlText;
@@ -885,8 +883,9 @@ namespace LogExpert.Controls.LogTabWindow
             tabGradient7.TextColor = System.Drawing.SystemColors.Control;
             dockPaneStripToolWindowGradient1.InactiveTabGradient = tabGradient7;
             dockPaneStripSkin1.ToolWindowGradient = dockPaneStripToolWindowGradient1;
-            dockPanelSkin1.DockPaneStripSkin = dockPaneStripSkin1;
-            dockPanel.Skin = dockPanelSkin1;
+            dockPanel.Theme = new VS2015LightTheme();
+            dockPanel.Theme.Skin.DockPaneStripSkin = dockPaneStripSkin1;
+            dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
             dockPanel.TabIndex = 14;
             dockPanel.ActiveContentChanged += OnDockPanelActiveContentChanged;
             // 

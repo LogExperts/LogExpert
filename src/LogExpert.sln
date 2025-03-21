@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlassfishColumnizer", "Glas
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashIconHighlighter", "FlashIconHighlighter\FlashIconHighlighter.csproj", "{F5E81EBE-3E6F-409F-B510-918E97F59072}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsUI", "WinFormsUI\WinFormsUI.csproj", "{C75532C4-765B-418E-B09B-46D36B2ABDB1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}"
 	ProjectSection(SolutionItems) = preProject
 		Solution Items\AssemblyVersion.cs = Solution Items\AssemblyVersion.cs
@@ -93,10 +91,6 @@ Global
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5E81EBE-3E6F-409F-B510-918E97F59072}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C75532C4-765B-418E-B09B-46D36B2ABDB1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4C899885-E361-410A-B6AC-C2F236C436FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4C899885-E361-410A-B6AC-C2F236C436FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C899885-E361-410A-B6AC-C2F236C436FA}.Release|Any CPU.ActiveCfg = Release|Any CPU

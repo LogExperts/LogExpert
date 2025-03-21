@@ -8,7 +8,6 @@ using LogExpert.Classes.Persister;
 using LogExpert.Config;
 using LogExpert.Entities;
 using LogExpert.Entities.EventArgs;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,7 +15,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-//using System.Linq;
 
 namespace LogExpert.Controls.LogWindow
 {
