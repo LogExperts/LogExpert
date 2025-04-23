@@ -33,7 +33,6 @@ namespace LogExpert.Classes.Log
 
         private IList<LogBuffer> _bufferList;
         private ReaderWriterLock _bufferListLock;
-        private IList<LogBuffer> _bufferLru;
         private bool _contentDeleted;
         private int _currLineCount;
         private ReaderWriterLock _disposeLock;
@@ -49,9 +48,8 @@ namespace LogExpert.Classes.Log
         private bool _isFastFailOnGetLogLine;
         private bool _isLineCountDirty = true;
         private IList<ILogFileInfo> _logFileInfoList = [];
-        private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
 
-        private ReaderWriterLock _lruCacheDictLock;
+        private LruCacheManager _lruCacheManager;
 
 
         private bool _shouldStop;
@@ -60,26 +58,60 @@ namespace LogExpert.Classes.Log
         #endregion
 
         #region cTor
-
         public LogfileReader(string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
         {
             if (fileName == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             _fileName = fileName;
-            EncodingOptions = encodingOptions;
-            IsMultiFile = multiFile;
             _MAX_BUFFERS = bufferCount;
             _MAX_LINES_PER_BUFFER = linesPerBuffer;
             _multiFileOptions = multiFileOptions;
             _logLineFx = GetLogLineInternal;
+            IsMultiFile = multiFile;
+
+            InitializeReader(encodingOptions, null);
+        }
+
+        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
+        {
+            if (fileNames == null || fileNames.Length < 1)
+            {
+                throw new ArgumentNullException(nameof(fileNames));
+            }
+
+            _fileName = fileNames[0];
+            _MAX_BUFFERS = bufferCount;
+            _MAX_LINES_PER_BUFFER = linesPerBuffer;
+            _multiFileOptions = multiFileOptions;
+            _logLineFx = GetLogLineInternal;
+            IsMultiFile = true;
+
+            InitializeReader(encodingOptions, fileNames);
+        }
+
+        private void InitializeReader(EncodingOptions encodingOptions, string[]? additionalFiles)
+        {
+            EncodingOptions = encodingOptions;
+            _lruCacheManager = new LruCacheManager(_MAX_BUFFERS);
             InitLruBuffers();
 
-            if (multiFile)
+            if (additionalFiles != null)
             {
-                ILogFileInfo info = GetLogFileInfo(fileName);
+                // Handle array constructor case
+                ILogFileInfo fileInfo = null;
+                foreach (string name in additionalFiles)
+                {
+                    fileInfo = AddFile(name);
+                }
+                _watchedILogFileInfo = fileInfo;
+            }
+            else if (IsMultiFile)
+            {
+                // Handle single file multiFile case
+                ILogFileInfo info = GetLogFileInfo(_fileName);
                 RolloverFilenameHandler rolloverHandler = new(info, _multiFileOptions);
                 LinkedList<string> nameList = rolloverHandler.GetNameList();
 
@@ -88,45 +120,16 @@ namespace LogExpert.Classes.Log
                 {
                     fileInfo = AddFile(name);
                 }
-
                 _watchedILogFileInfo = fileInfo; // last added file in the list is the watched file
             }
             else
             {
-                _watchedILogFileInfo = AddFile(fileName);
+                // Handle single file case
+                _watchedILogFileInfo = AddFile(_fileName);
             }
 
             StartGCThread();
         }
-
-        public LogfileReader(string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions)
-        {
-            if (fileNames == null || fileNames.Length < 1)
-            {
-                return;
-            }
-
-            EncodingOptions = encodingOptions;
-            IsMultiFile = true;
-            _MAX_BUFFERS = bufferCount;
-            _MAX_LINES_PER_BUFFER = linesPerBuffer;
-            _multiFileOptions = multiFileOptions;
-            _logLineFx = GetLogLineInternal;
-
-            InitLruBuffers();
-
-            ILogFileInfo fileInfo = null;
-            foreach (string name in fileNames)
-            {
-                fileInfo = AddFile(name);
-            }
-
-            _watchedILogFileInfo = fileInfo;
-            _fileName = fileInfo.FullName;
-
-            StartGCThread();
-        }
-
         #endregion
 
         #region Delegates
@@ -226,7 +229,8 @@ namespace LogExpert.Classes.Log
             //this.lastReturnedLineNum = -1;
             //this.lastReturnedLineNumForBuffer = -1;
             _isDeleted = false;
-            ClearLru();
+            _lruCacheManager.ClearLru();
+            
             AcquireBufferListWriterLock();
             _bufferList.Clear();
             ReleaseBufferListWriterLock();
@@ -359,14 +363,13 @@ namespace LogExpert.Classes.Log
                         }
                     }
 
-                    _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
+                    _lruCacheManager.Lock.EnterWriteLock(); 
                     _logger.Info("Adjusting StartLine values in {0} buffers by offset {1}", _bufferList.Count, offset);
                     foreach (LogBuffer buffer in _bufferList)
                     {
-                        SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
+                        _lruCacheManager.SetNewStartLineForBuffer(buffer, buffer.StartLine - offset);
                     }
-
-                    _lruCacheDictLock.ReleaseWriterLock();
+                    _lruCacheManager.Lock.ExitWriteLock();
 #if DEBUG
                     if (_bufferList.Count > 0)
                     {
@@ -638,7 +641,6 @@ namespace LogExpert.Classes.Log
 
             _logger.Info("Deleting all log buffers for {0}. Used mem: {1:N0}", Util.GetNameFromPath(_fileName), GC.GetTotalMemory(true)); //TODO [Z] uh GC collect calls creepy
             AcquireBufferListWriterLock();
-            _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
             _disposeLock.AcquireWriterLock(Timeout.Infinite);
 
             foreach (LogBuffer logBuffer in _bufferList)
@@ -649,11 +651,9 @@ namespace LogExpert.Classes.Log
                 }
             }
 
-            _lruCacheDict.Clear();
             _bufferList.Clear();
-
             _disposeLock.ReleaseWriterLock();
-            _lruCacheDictLock.ReleaseWriterLock();
+            _lruCacheManager.ClearLru();
             ReleaseBufferListWriterLock();
             GC.Collect();
             _contentDeleted = true;
@@ -669,7 +669,7 @@ namespace LogExpert.Classes.Log
             CurrentEncoding = encoding;
             EncodingOptions.Encoding = encoding;
             ResetBufferCache();
-            ClearLru();
+            _lruCacheManager.ClearLru();
         }
 
         /// <summary>
@@ -722,10 +722,8 @@ namespace LogExpert.Classes.Log
         public void LogBufferDiagnostic()
         {
             _logger.Info("-------- Buffer diagnostics -------");
-            _lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
-            int cacheCount = _lruCacheDict.Count;
+            int cacheCount  = _lruCacheManager.Count;
             _logger.Info("LRU entries: {0}", cacheCount);
-            _lruCacheDictLock.ReleaseReaderLock();
 
             AcquireBufferListReaderLock();
             _logger.Info("File: {0}\r\nBuffer count: {1}\r\nDisposed buffers: {2}", _fileName, _bufferList.Count, _bufferList.Count - cacheCount);
@@ -811,10 +809,7 @@ namespace LogExpert.Classes.Log
         private void InitLruBuffers()
         {
             _bufferList = [];
-            _bufferLru = new List<LogBuffer>(_MAX_BUFFERS + 1);
             //this.lruDict = new Dictionary<int, int>(this.MAX_BUFFERS + 1);  // key=startline, value = index in bufferLru
-            _lruCacheDict = new Dictionary<int, LogBufferCacheEntry>(_MAX_BUFFERS + 1);
-            _lruCacheDictLock = new ReaderWriterLock();
             _bufferListLock = new ReaderWriterLock();
             _disposeLock = new ReaderWriterLock();
         }
@@ -875,41 +870,31 @@ namespace LogExpert.Classes.Log
 
         private LogBuffer DeleteBuffersForInfo(ILogFileInfo ILogFileInfo, bool matchNamesOnly)
         {
-            _logger.Info("Deleting buffers for file {0}", ILogFileInfo.FullName);
             LogBuffer lastRemovedBuffer = null;
             IList<LogBuffer> deleteList = [];
+            _logger.Info("Deleting buffers for file {0}", ILogFileInfo.FullName);
+            Func<LogBuffer, bool> matchPredicate = matchNamesOnly
+            ? buffer => buffer.FileInfo.FullName.Equals(ILogFileInfo.FullName, StringComparison.OrdinalIgnoreCase)
+            : buffer => buffer.FileInfo == ILogFileInfo;
+
             AcquireBufferListWriterLock();
-            _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-            if (matchNamesOnly)
+            for (int i = _bufferList.Count - 1; i >= 0; i--)
             {
-                foreach (LogBuffer buffer in _bufferList)
+                LogBuffer buffer = _bufferList[i];
+                if (matchPredicate(buffer))
                 {
-                    if (buffer.FileInfo.FullName.ToLower().Equals(ILogFileInfo.FullName.ToLower()))
-                    {
-                        lastRemovedBuffer = buffer;
-                        deleteList.Add(buffer);
-                    }
+                    lastRemovedBuffer = buffer;
+                    Util.AssertTrue(_bufferListLock.IsWriterLockHeld, "No writer lock for buffer list");
+					deleteList.Add(buffer);
+                    _bufferList.RemoveAt(i);
                 }
             }
-            else
-            {
-                foreach (LogBuffer buffer in _bufferList)
-                {
-                    if (buffer.FileInfo == ILogFileInfo)
-                    {
-                        lastRemovedBuffer = buffer;
-                        deleteList.Add(buffer);
-                    }
-                }
-            }
-
-            foreach (LogBuffer buffer in deleteList)
-            {
-                RemoveFromBufferList(buffer);
-            }
-
-            _lruCacheDictLock.ReleaseWriterLock();
             ReleaseBufferListWriterLock();
+
+
+
+            _lruCacheManager.RemoveBuffers(deleteList);
+
             if (lastRemovedBuffer == null)
             {
                 _logger.Info("lastRemovedBuffer is null");
@@ -920,18 +905,6 @@ namespace LogExpert.Classes.Log
             }
 
             return lastRemovedBuffer;
-        }
-
-        /// <summary>
-        /// The caller must have writer locks for lruCache and buffer list!
-        /// </summary>
-        /// <param name="buffer"></param>
-        private void RemoveFromBufferList(LogBuffer buffer)
-        {
-            Util.AssertTrue(_lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
-            Util.AssertTrue(_bufferListLock.IsWriterLockHeld, "No writer lock for buffer list");
-            _lruCacheDict.Remove(buffer.StartLine);
-            _bufferList.Remove(buffer);
         }
 
         private void ReadToBufferList(ILogFileInfo logFileInfo, long filePos, int startLine)
@@ -1062,133 +1035,7 @@ namespace LogExpert.Classes.Log
 #endif
             _bufferList.Add(logBuffer);
             //UpdateLru(logBuffer);
-            UpdateLruCache(logBuffer);
-        }
-
-        private void UpdateLruCache(LogBuffer logBuffer)
-        {
-            _lruCacheDictLock.AcquireReaderLock(Timeout.Infinite);
-            if (_lruCacheDict.TryGetValue(logBuffer.StartLine, out LogBufferCacheEntry cacheEntry))
-            {
-                cacheEntry.Touch();
-            }
-            else
-            {
-                LockCookie cookie = _lruCacheDictLock.UpgradeToWriterLock(Timeout.Infinite);
-                if (!_lruCacheDict.TryGetValue(logBuffer.StartLine, out cacheEntry)
-                ) // #536: re-test, because multiple threads may have been waiting for writer lock
-                {
-                    cacheEntry = new LogBufferCacheEntry();
-                    cacheEntry.LogBuffer = logBuffer;
-                    try
-                    {
-                        _lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
-                    }
-                    catch (ArgumentException e)
-                    {
-                        _logger.Error(e, "Error in LRU cache: " + e.Message);
-#if DEBUG // there seems to be a bug with double added key
-
-                        _logger.Info("Added buffer:");
-                        DumpBufferInfos(logBuffer);
-                        if (_lruCacheDict.TryGetValue(logBuffer.StartLine, out LogBufferCacheEntry existingEntry))
-                        {
-                            _logger.Info("Existing buffer: ");
-                            DumpBufferInfos(existingEntry.LogBuffer);
-                        }
-                        else
-                        {
-                            _logger.Warn("Ooops? Cannot find the already existing entry in LRU.");
-                        }
-#endif
-                        _lruCacheDictLock.ReleaseLock();
-                        throw;
-                    }
-                }
-
-                _lruCacheDictLock.DowngradeFromWriterLock(ref cookie);
-            }
-
-            _lruCacheDictLock.ReleaseReaderLock();
-        }
-
-        /// <summary>
-        /// Sets a new start line in the given buffer and updates the LRU cache, if the buffer
-        /// is present in the cache. The caller must have write lock for 'lruCacheDictLock';
-        /// </summary>
-        /// <param name="logBuffer"></param>
-        /// <param name="newLineNum"></param>
-        private void SetNewStartLineForBuffer(LogBuffer logBuffer, int newLineNum)
-        {
-            Util.AssertTrue(_lruCacheDictLock.IsWriterLockHeld, "No writer lock for lru cache");
-            if (_lruCacheDict.ContainsKey(logBuffer.StartLine))
-            {
-                _lruCacheDict.Remove(logBuffer.StartLine);
-                logBuffer.StartLine = newLineNum;
-                LogBufferCacheEntry cacheEntry = new();
-                cacheEntry.LogBuffer = logBuffer;
-                _lruCacheDict.Add(logBuffer.StartLine, cacheEntry);
-            }
-            else
-            {
-                logBuffer.StartLine = newLineNum;
-            }
-        }
-
-        private void GarbageCollectLruCache()
-        {
-#if DEBUG
-            long startTime = Environment.TickCount;
-#endif
-            _logger.Debug("Starting garbage collection");
-            int threshold = 10;
-            _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-            int diff = 0;
-            if (_lruCacheDict.Count - (_MAX_BUFFERS + threshold) > 0)
-            {
-                diff = _lruCacheDict.Count - _MAX_BUFFERS;
-#if DEBUG
-                if (diff > 0)
-                {
-                    _logger.Info("Removing {0} entries from LRU cache for {1}", diff, Util.GetNameFromPath(_fileName));
-                }
-#endif
-                SortedList<long, int> useSorterList = [];
-                // sort by usage counter
-                foreach (LogBufferCacheEntry entry in _lruCacheDict.Values)
-                {
-                    if (!useSorterList.ContainsKey(entry.LastUseTimeStamp))
-                    {
-                        useSorterList.Add(entry.LastUseTimeStamp, entry.LogBuffer.StartLine);
-                    }
-                }
-
-                // remove first <diff> entries (least usage)
-                _disposeLock.AcquireWriterLock(Timeout.Infinite);
-                for (int i = 0; i < diff; ++i)
-                {
-                    if (i >= useSorterList.Count)
-                    {
-                        break;
-                    }
-
-                    int startLine = useSorterList.Values[i];
-                    LogBufferCacheEntry entry = _lruCacheDict[startLine];
-                    _lruCacheDict.Remove(startLine);
-                    entry.LogBuffer.DisposeContent();
-                }
-
-                _disposeLock.ReleaseWriterLock();
-            }
-
-            _lruCacheDictLock.ReleaseWriterLock();
-#if DEBUG
-            if (diff > 0)
-            {
-                long endTime = Environment.TickCount;
-                _logger.Info("Garbage collector time: " + (endTime - startTime) + " ms.");
-            }
-#endif
+            _lruCacheManager.UpdateLruCache(logBuffer);
         }
 
         private void GarbageCollectorThreadProc()
@@ -1202,39 +1049,11 @@ namespace LogExpert.Classes.Log
                 catch (Exception)
                 {
                 }
-
-                GarbageCollectLruCache();
+                _lruCacheManager.GarbageCollectLruCache();
             }
         }
 
-        //    private void UpdateLru(LogBuffer logBuffer)
-        //    {
-        //      lock (this.monitor)
-        //      {
-        //        int index;
-        //        if (this.lruDict.TryGetValue(logBuffer.StartLine, out index))
-        //        {
-        //          RemoveBufferFromLru(logBuffer, index);
-        //          AddBufferToLru(logBuffer);
-        //        }
-        //        else
-        //        {
-        //          if (this.bufferLru.Count > MAX_BUFFERS - 1)
-        //          {
-        //            LogBuffer looser = this.bufferLru[0];
-        //            if (looser != null)
-        //            {
-        //#if DEBUG
-        //              _logger.logDebug("Disposing buffer: " + looser.StartLine + "/" + looser.LineCount + "/" + looser.FileInfo.FileName);
-        //#endif
-        //              looser.DisposeContent();
-        //              RemoveBufferFromLru(looser);
-        //            }
-        //          }
-        //          AddBufferToLru(logBuffer);
-        //        }
-        //      }
-        //    }
+    
 
         ///// <summary>
         ///// Removes a LogBuffer from the LRU. Note that the LogBuffer is searched in the lruDict
@@ -1283,30 +1102,6 @@ namespace LogExpert.Classes.Log
         //  }
         //}
 
-        private void ClearLru()
-        {
-            //lock (this.monitor)
-            //{
-            //  foreach (LogBuffer buffer in this.bufferLru)
-            //  {
-            //    buffer.DisposeContent();
-            //  }
-            //  this.bufferLru.Clear();
-            //  this.lruDict.Clear();
-            //}
-            _logger.Info("Clearing LRU cache.");
-            _lruCacheDictLock.AcquireWriterLock(Timeout.Infinite);
-            _disposeLock.AcquireWriterLock(Timeout.Infinite);
-            foreach (LogBufferCacheEntry entry in _lruCacheDict.Values)
-            {
-                entry.LogBuffer.DisposeContent();
-            }
-
-            _lruCacheDict.Clear();
-            _disposeLock.ReleaseWriterLock();
-            _lruCacheDictLock.ReleaseWriterLock();
-            _logger.Info("Clearing done.");
-        }
 
         private void ReReadBuffer(LogBuffer logBuffer)
         {
@@ -1411,7 +1206,7 @@ namespace LogExpert.Classes.Log
                 if (lineNum >= logBuffer.StartLine && lineNum < logBuffer.StartLine + logBuffer.LineCount)
                 {
                     //UpdateLru(logBuffer);
-                    UpdateLruCache(logBuffer);
+                    _lruCacheManager.UpdateLruCache(logBuffer);
                     //this.lastReturnedLineNumForBuffer = lineNum;
                     //this.lastReturnedBuffer = logBuffer;
                     break;
