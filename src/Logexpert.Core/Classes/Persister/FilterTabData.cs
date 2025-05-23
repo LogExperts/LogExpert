@@ -4,11 +4,8 @@ namespace LogExpert.Core.Classes.Persister
 {
     public class FilterTabData
     {
-        #region Fields
+        public FilterParams FilterParams { get; set; } = new();
 
-        public FilterParams filterParams;
-        public PersistenceData persistenceData;
-
-        #endregion
+        public PersistenceData PersistenceData { get; set; } = new();
     }
 }

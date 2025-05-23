@@ -25,7 +25,7 @@ namespace LogExpert.UI.Dialogs
 
             columnListBox.ItemHeight = columnListBox.Font.Height;
 
-            _columnizer = filterParams.currentColumnizer;
+            _columnizer = filterParams.CurrentColumnizer;
             _filterParams = filterParams;
 
             Init();
@@ -42,13 +42,13 @@ namespace LogExpert.UI.Dialogs
 
             for (int i = 0; i < count; ++i)
             {
-                columnListBox.Items.Add(names[i], _filterParams.columnList.Contains(i));
+                columnListBox.Items.Add(names[i], _filterParams.ColumnList.Contains(i));
             }
 
-            emptyColumnUsePrevRadioButton.Checked = _filterParams.emptyColumnUsePrev;
-            emptyColumnHitRadioButton.Checked = _filterParams.emptyColumnHit;
-            emptyColumnNoHitRadioButton.Checked = _filterParams.emptyColumnHit == false && _filterParams.emptyColumnUsePrev == false;
-            checkBoxExactMatch.Checked = _filterParams.exactColumnMatch;
+            emptyColumnUsePrevRadioButton.Checked = _filterParams.EmptyColumnUsePrev;
+            emptyColumnHitRadioButton.Checked = _filterParams.EmptyColumnHit;
+            emptyColumnNoHitRadioButton.Checked = _filterParams.EmptyColumnHit == false && _filterParams.EmptyColumnUsePrev == false;
+            checkBoxExactMatch.Checked = _filterParams.ExactColumnMatch;
         }
 
         #endregion
@@ -57,16 +57,16 @@ namespace LogExpert.UI.Dialogs
 
         private void OnOkButtonClick(object sender, EventArgs e)
         {
-            _filterParams.columnList.Clear();
+            _filterParams.ColumnList.Clear();
 
             foreach (int colNum in columnListBox.CheckedIndices)
             {
-                _filterParams.columnList.Add(colNum);
+                _filterParams.ColumnList.Add(colNum);
             }
 
-            _filterParams.emptyColumnUsePrev = emptyColumnUsePrevRadioButton.Checked;
-            _filterParams.emptyColumnHit = emptyColumnHitRadioButton.Checked;
-            _filterParams.exactColumnMatch = checkBoxExactMatch.Checked;
+            _filterParams.EmptyColumnUsePrev = emptyColumnUsePrevRadioButton.Checked;
+            _filterParams.EmptyColumnHit = emptyColumnHitRadioButton.Checked;
+            _filterParams.ExactColumnMatch = checkBoxExactMatch.Checked;
         }
 
         #endregion

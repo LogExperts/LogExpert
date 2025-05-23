@@ -352,7 +352,7 @@ namespace LogExpert.Dialogs
             //TODO Remove if not necessary
             DataGridViewTextBoxColumn textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
 
-            foreach (HilightGroup group in (IList<HilightGroup>)_logTabWin.HilightGroupList)
+            foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
                 comboColumn.Items.Add(group.GroupName);
             }
@@ -363,7 +363,7 @@ namespace LogExpert.Dialogs
                 row.Cells.Add(new DataGridViewTextBoxCell());
                 DataGridViewComboBoxCell cell = new();
 
-                foreach (HilightGroup group in (IList<HilightGroup>)_logTabWin.HilightGroupList)
+                foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
                 {
                     cell.Items.Add(group.GroupName);
                 }
@@ -371,9 +371,9 @@ namespace LogExpert.Dialogs
                 row.Cells.Add(cell);
                 row.Cells[0].Value = maskEntry.mask;
 
-                HilightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.highlightGroupName);
-                currentGroup ??= ((IList<HilightGroup>)_logTabWin.HilightGroupList)[0];
-                currentGroup ??= new HilightGroup();
+                HighlightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.highlightGroupName);
+                currentGroup ??= ((IList<HighlightGroup>)_logTabWin.HighlightGroupList)[0];
+                currentGroup ??= new HighlightGroup();
 
                 row.Cells[1].Value = currentGroup.GroupName;
                 dataGridViewHighlightMask.Rows.Add(row);
@@ -1006,7 +1006,7 @@ namespace LogExpert.Dialogs
         /// <param name="e"></param>
         private void OnBtnImportClick(object sender, EventArgs e)
         {
-            ImportSettingsDialog dlg = new();
+            ImportSettingsDialog dlg = new(ExportImportFlags.All);
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {

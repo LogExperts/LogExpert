@@ -21,21 +21,24 @@
 
         public string[] GetColumnNames()
         {
-            return new string[] { "Text" };
+            return ["Text"];
         }
 
         public IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line)
         {
-            ColumnizedLogLine cLogLine = new();
-            cLogLine.LogLine = line;
-            cLogLine.ColumnValues = new IColumn[]
+            ColumnizedLogLine cLogLine = new()
             {
+                LogLine = line
+            };
+
+            cLogLine.ColumnValues =
+            [
                 new Column
                 {
                     FullValue = line.FullLine,
                     Parent = cLogLine
                 }
-            };
+            ];
 
 
             return cLogLine;

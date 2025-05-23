@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using LogExpert.Controls.LogTabWindow;
 
-using LogExpert.Controls.LogTabWindow;
+using System;
+using System.Windows.Forms;
 
 namespace LogExpert.Classes
 {

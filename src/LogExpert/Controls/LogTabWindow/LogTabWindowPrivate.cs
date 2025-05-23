@@ -341,7 +341,7 @@ namespace LogExpert.Controls.LogTabWindow
                 KeywordActionList = PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions,
                 Owner = this,
                 TopMost = TopMost,
-                HighlightGroupList = HilightGroupList,
+                HighlightGroupList = HighlightGroupList,
                 PreSelectedGroupName = groupsComboBoxHighlightGroups.Text
             };
 
@@ -349,9 +349,9 @@ namespace LogExpert.Controls.LogTabWindow
 
             if (res == DialogResult.OK)
             {
-                HilightGroupList = dlg.HighlightGroupList;
+                HighlightGroupList = dlg.HighlightGroupList;
                 FillHighlightComboBox();
-                ConfigManager.Settings.hilightGroupList = HilightGroupList;
+                ConfigManager.Settings.Preferences.HighlightGroupList = HighlightGroupList;
                 ConfigManager.Save(SettingsFlags.HighlightSettings);
                 OnHighlightSettingsChanged();
             }
@@ -361,7 +361,7 @@ namespace LogExpert.Controls.LogTabWindow
         {
             string currentGroupName = groupsComboBoxHighlightGroups.Text;
             groupsComboBoxHighlightGroups.Items.Clear();
-            foreach (HilightGroup group in HilightGroupList)
+            foreach (HighlightGroup group in HighlightGroupList)
             {
                 groupsComboBoxHighlightGroups.Items.Add(group.GroupName);
                 if (group.GroupName.Equals(currentGroupName))
@@ -956,7 +956,7 @@ namespace LogExpert.Controls.LogTabWindow
 
             _bookmarkWindow.PreferencesChanged(ConfigManager.Settings.Preferences, false, flags);
 
-            HilightGroupList = ConfigManager.Settings.hilightGroupList;
+            HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
             if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
             {
                 OnHighlightSettingsChanged();

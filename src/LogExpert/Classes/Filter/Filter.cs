@@ -70,7 +70,7 @@ namespace LogExpert.Classes.Filter
             try
             {
                 filterParams.Reset();
-                while ((count++ < maxCount || filterParams.isInRange) && !ShouldCancel)
+                while ((count++ < maxCount || filterParams.IsInRange) && !ShouldCancel)
                 {
                     if (lineNum >= _callback.GetLineCount())
                     {
@@ -140,14 +140,14 @@ namespace LogExpert.Classes.Filter
         {
             IList<int> resultList = [];
 
-            if (filterParams.spreadBefore == 0 && filterParams.spreadBehind == 0)
+            if (filterParams.SpreadBefore == 0 && filterParams.SpreadBehind == 0)
             {
                 resultList.Add(lineNum);
                 return resultList;
             }
 
             // back spread
-            for (int i = filterParams.spreadBefore; i > 0; --i)
+            for (int i = filterParams.SpreadBefore; i > 0; --i)
             {
                 if (lineNum - i > 0)
                 {
@@ -163,7 +163,7 @@ namespace LogExpert.Classes.Filter
                 resultList.Add(lineNum);
             }
             // after spread
-            for (int i = 1; i <= filterParams.spreadBehind; ++i)
+            for (int i = 1; i <= filterParams.SpreadBehind; ++i)
             {
                 if (lineNum + i < _callback.GetLineCount())
                 {

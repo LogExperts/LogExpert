@@ -2,10 +2,6 @@
 {
     public class DebugOptions
     {
-        #region Fields
-
-        public static bool disableWordHighlight = false;
-
-        #endregion
+        public static bool DisableWordHighlight { get; set; } = false;
     }
 }

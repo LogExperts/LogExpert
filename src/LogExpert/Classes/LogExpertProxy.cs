@@ -1,5 +1,4 @@
 ﻿using LogExpert.Controls.LogTabWindow;
-using LogExpert.Grpc;
 using LogExpert.Interface;
 
 using NLog;
@@ -10,11 +9,11 @@ using System.Windows.Forms;
 
 namespace LogExpert.Classes
 {
-    internal class LogExpertProxy : LogExpertService.LogExpertServiceBase, ILogExpertProxy
+    internal class LogExpertProxy : ILogExpertProxy
     {
         #region Fields
 
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         [NonSerialized] private readonly List<LogTabWindow> _windowList = [];
 
@@ -113,7 +112,7 @@ namespace LogExpert.Classes
         public void NewWindowWorker(string[] fileNames)
         {
             _logger.Info("Creating new LogTabWindow");
-            LogTabWindow logWin = new(fileNames.Length > 0 ? fileNames : null, _logWindowIndex++, true)
+            LogTabWindow logWin = new(fileNames?.Length > 0 ? fileNames : null, _logWindowIndex++, true)
             {
                 LogExpertProxy = this
             };

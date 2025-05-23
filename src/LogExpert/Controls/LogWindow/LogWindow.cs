@@ -92,7 +92,7 @@ namespace LogExpert.Controls.LogWindow
         private ILogLineColumnizer _currentColumnizer;
 
         //List<HilightEntry> currentHilightEntryList = new List<HilightEntry>();
-        private HilightGroup _currentHighlightGroup = new();
+        private HighlightGroup _currentHighlightGroup = new();
 
         private SearchParams _currentSearchParams;
 
@@ -131,7 +131,7 @@ namespace LogExpert.Controls.LogWindow
         private bool _shouldCancel;
         private bool _shouldTimestampDisplaySyncingCancel;
         private bool _showAdvanced;
-        private List<HilightEntry> _tempHighlightEntryList = [];
+        private List<HighlightEntry> _tempHighlightEntryList = [];
         private int _timeShiftSyncLine = 0;
 
         private bool _waitingForClose;
@@ -203,9 +203,9 @@ namespace LogExpert.Controls.LogWindow
             filterComboBox.DropDownHeight = filterComboBox.ItemHeight * ConfigManager.Settings.Preferences.maximumFilterEntriesDisplayed;
             AutoResizeFilterBox();
 
-            filterRegexCheckBox.Checked = _filterParams.isRegex;
-            filterCaseSensitiveCheckBox.Checked = _filterParams.isCaseSensitive;
-            filterTailCheckBox.Checked = _filterParams.isFilterTail;
+            filterRegexCheckBox.Checked = _filterParams.IsRegex;
+            filterCaseSensitiveCheckBox.Checked = _filterParams.IsCaseSensitive;
+            filterTailCheckBox.Checked = _filterParams.IsFilterTail;
 
             splitContainerLogWindow.Panel2Collapsed = true;
             advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;

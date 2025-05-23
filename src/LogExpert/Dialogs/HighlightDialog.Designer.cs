@@ -379,7 +379,6 @@ namespace LogExpert.Dialogs
             colorBoxForeground.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             colorBoxForeground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             colorBoxForeground.FormattingEnabled = true;
-            colorBoxForeground.Items.AddRange(new object[] { Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow });
             colorBoxForeground.Location = new Point(8, 63);
             colorBoxForeground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             colorBoxForeground.Name = "colorBoxForeground";
@@ -394,7 +393,6 @@ namespace LogExpert.Dialogs
             colorBoxBackground.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             colorBoxBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             colorBoxBackground.FormattingEnabled = true;
-            colorBoxBackground.Items.AddRange(new object[] { Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow });
             colorBoxBackground.Location = new Point(9, 140);
             colorBoxBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             colorBoxBackground.Name = "colorBoxBackground";

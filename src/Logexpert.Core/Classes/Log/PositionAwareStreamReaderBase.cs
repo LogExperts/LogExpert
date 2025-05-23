@@ -157,7 +157,9 @@ namespace LogExpert.Core.Classes.Log
             */
 
             byte[] readPreamble = new byte[4];
+
             int readLen = _stream.Read(readPreamble, 0, 4);
+
             if (readLen >= 2)
             {
                 foreach (Encoding encoding in _preambleEncodings)
@@ -183,6 +185,7 @@ namespace LogExpert.Core.Classes.Log
 
             // not found or less than 2 byte read
             detectedEncoding = null;
+
             return 0;
         }
 

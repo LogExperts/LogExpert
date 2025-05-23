@@ -3,6 +3,7 @@
  *
  */
 
+//TODO Replace with https://github.com/commandlineparser/commandline
 namespace LogExpert.Core.Classes
 {
     /// <summary>
@@ -32,29 +33,14 @@ namespace LogExpert.Core.Classes
     /// Parameters are words in the command line beginning with a hyphen (-).
     /// The value of the parameter is the next word in
     /// </summary>
-    public class CmdLineParameter
+    /// <remarks>
+    /// Creates a new instance of this class.
+    /// </remarks>
+    /// <param name="name">Name of parameter.</param>
+    /// <param name="required">Require that the parameter is present in the command line.</param>
+    /// <param name="helpMessage">The explanation of the parameter to add to the help screen.</param>
+    public class CmdLineParameter(string name, bool required, string helpMessage)
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
-
-        /// <summary>
-        /// Creates a new instance of this class.
-        /// </summary>
-        /// <param name="name">Name of parameter.</param>
-        /// <param name="required">Require that the parameter is present in the command line.</param>
-        /// <param name="helpMessage">The explanation of the parameter to add to the help screen.</param>
-        public CmdLineParameter(string name, bool required, string helpMessage)
-        {
-            Name = name;
-            Required = required;
-            Help = helpMessage;
-        }
-
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -65,7 +51,7 @@ namespace LogExpert.Core.Classes
         /// <summary>
         /// Returns the help message associated with the parameter.
         /// </summary>
-        public string Help { get; } = "";
+        public string Help { get; } = helpMessage;
 
         /// <summary>
         /// Returns true if the parameter was found in the command line.
@@ -75,12 +61,12 @@ namespace LogExpert.Core.Classes
         /// <summary>
         /// Returns true if the parameter is required in the command line.
         /// </summary>
-        public bool Required { get; } = false;
+        public bool Required { get; } = required;
 
         /// <summary>
         /// Returns the name of the parameter.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; } = name;
 
         #endregion
 
@@ -195,16 +181,8 @@ namespace LogExpert.Core.Classes
     /// <summary>
     /// Represents an string command line parameter.
     /// </summary>
-    public class CmdLineString : CmdLineParameter
+    public class CmdLineString(string name, bool required, string helpMessage) : CmdLineParameter(name, required, helpMessage)
     {
-        #region cTor
-
-        public CmdLineString(string name, bool required, string helpMessage)
-            : base(name, required, helpMessage)
-        {
-        }
-
-        #endregion
 
         #region Public methods
 
@@ -250,11 +228,11 @@ namespace LogExpert.Core.Classes
         {
             get
             {
-                if (!parameters.ContainsKey(name))
+                if (parameters.TryGetValue(name, out CmdLineParameter? value) == false)
                 {
                     throw new CmdLineException(name, "Not a registered parameter.");
                 }
-                return parameters[name];
+                return value;
             }
         }
 
@@ -304,8 +282,8 @@ namespace LogExpert.Core.Classes
                 if (args[i].Length > 1 && args[i][0] == '-')
                 {
                     // The current string is a parameter name
-                    string key = args[i].Substring(1, args[i].Length - 1).ToLower();
-                    string value = "";
+                    string key = args[i][1..].ToLower();
+                    string argsValue = string.Empty;
                     i++;
                     if (i < args.Length)
                     {
@@ -316,21 +294,21 @@ namespace LogExpert.Core.Classes
                         else
                         {
                             // The next string is a value, read the value and move forward
-                            value = args[i];
+                            argsValue = args[i];
                             i++;
                         }
                     }
-                    if (!parameters.ContainsKey(key))
+                    if (parameters.TryGetValue(key, out CmdLineParameter? cmdLineParameter) == false)
                     {
                         throw new CmdLineException(key, "Parameter is not allowed.");
                     }
 
-                    if (parameters[key].Exists)
+                    if (cmdLineParameter.Exists)
                     {
                         throw new CmdLineException(key, "Parameter is specified more than once.");
                     }
 
-                    parameters[key].SetValue(value);
+                    cmdLineParameter.SetValue(argsValue);
                 }
                 else
                 {
@@ -343,7 +321,7 @@ namespace LogExpert.Core.Classes
             // Check that required parameters are present in the command line.
             foreach (string key in parameters.Keys)
             {
-                if (parameters[key].Required && !parameters[key].Exists)
+                if (parameters[key].Required && parameters[key].Exists == false)
                 {
                     throw new CmdLineException(key, "Required parameter is not found.");
                 }
@@ -400,9 +378,9 @@ namespace LogExpert.Core.Classes
 
         public new string[] Parse(string[] args)
         {
-            string[] ret = null;
+            string[] ret = [];
 
-            string error = "";
+            string error = string.Empty;
 
             try
             {
@@ -415,13 +393,11 @@ namespace LogExpert.Core.Classes
 
             if (this["help"].Exists)
             {
-                //foreach(string s in base.HelpScreen().Split('\n'))
-                //    Console.WriteLine(s);
                 Console.WriteLine(HelpScreen());
                 Environment.Exit(0);
             }
 
-            if (error != "")
+            if (error != string.Empty)
             {
                 Console.WriteLine(error);
                 Console.WriteLine("Use -help for more information.");

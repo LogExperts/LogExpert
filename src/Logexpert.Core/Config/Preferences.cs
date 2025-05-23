@@ -34,6 +34,8 @@ namespace LogExpert.Core.Config
 
         public List<HighlightMaskEntry> highlightMaskList = [];
 
+        public List<HighlightGroup> HighlightGroupList { get; set; } = [];
+
         public bool isAutoHideFilterList = false;
 
         public bool isFilterOnLoad;

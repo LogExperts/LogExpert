@@ -382,13 +382,11 @@ namespace LogExpert.Controls.LogWindow
 
             if (line != null)
             {
-                HilightEntry entry = FindFirstNoWordMatchHilightEntry(line);
+                HighlightEntry entry = FindFirstNoWordMatchHilightEntry(line);
                 e.Graphics.SetClip(e.CellBounds);
                 if ((e.State & DataGridViewElementStates.Selected) == DataGridViewElementStates.Selected)
                 {
-                    Color backColor = e.CellStyle.SelectionBackColor;
                     Brush brush;
-
                     if (gridView.Focused)
                     {
                         brush = new SolidBrush(e.CellStyle.SelectionBackColor);
@@ -410,7 +408,7 @@ namespace LogExpert.Controls.LogWindow
                     //{
                     //  bgColor = Color.FromArgb(255, 220, 220, 220);
                     //}
-                    if (!DebugOptions.disableWordHighlight)
+                    if (!DebugOptions.DisableWordHighlight)
                     {
                         if (entry != null)
                         {
@@ -429,7 +427,7 @@ namespace LogExpert.Controls.LogWindow
                     e.PaintBackground(e.ClipBounds, false);
                 }
 
-                if (DebugOptions.disableWordHighlight)
+                if (DebugOptions.DisableWordHighlight)
                 {
                     e.PaintContent(e.CellBounds);
                 }
@@ -448,16 +446,20 @@ namespace LogExpert.Controls.LogWindow
                         Brush brush = new SolidBrush(BookmarkColor);
                         e.Graphics.FillRectangle(brush, r);
                         brush.Dispose();
+
                         Bookmark bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
+
                         if (bookmark.Text.Length > 0)
                         {
-                            StringFormat format = new();
-                            format.LineAlignment = StringAlignment.Center;
-                            format.Alignment = StringAlignment.Center;
+                            StringFormat format = new()
+                            {
+                                LineAlignment = StringAlignment.Center,
+                                Alignment = StringAlignment.Center
+                            };
+
                             Brush brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0));
                             Font font = new("Verdana", Preferences.fontSize, FontStyle.Bold);
-                            e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height),
-                                format);
+                            e.Graphics.DrawString("!", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), format);
                             font.Dispose();
                             brush2.Dispose();
                         }
@@ -781,9 +783,11 @@ namespace LogExpert.Controls.LogWindow
                                                                 &&
                                                                 GetTimestampForLine(ref refLineNum, false) !=
                                                                 DateTime.MinValue;
+
             locateLineInOriginalFileToolStripMenuItem.Enabled = IsTempFile &&
                                                                 FilterPipe != null &&
                                                                 FilterPipe.GetOriginalLineNum(lineNum) != -1;
+
             markEditModeToolStripMenuItem.Enabled = !dataGridView.CurrentCell.ReadOnly;
 
             // Remove all "old" plugin entries
@@ -801,15 +805,12 @@ namespace LogExpert.Controls.LogWindow
             bool isAdded = false;
             if (PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins.Count > 0)
             {
-                //string line = this.logFileReader.GetLogLine(lineNum);
                 IList<int> lines = GetSelectedContent();
                 foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
                 {
                     LogExpertCallback callback = new(this);
-                    ContextMenuPluginEventArgs evArgs = new(entry, lines, CurrentColumnizer, callback);
-                    EventHandler ev = OnHandlePluginContextMenu;
-                    //MenuItem item = this.dataGridView.ContextMenu.MenuItems.Add(entry.GetMenuText(line, this.CurrentColumnizer, callback), ev);
-                    string menuText = entry.GetMenuText(lines, CurrentColumnizer, callback);
+                    string menuText = entry.GetMenuText(lines.Count, CurrentColumnizer, callback.GetLogLine(lines[0]));
+
                     if (menuText != null)
                     {
                         bool disabled = menuText.StartsWith('_');
@@ -818,8 +819,8 @@ namespace LogExpert.Controls.LogWindow
                             menuText = menuText[1..];
                         }
 
-                        ToolStripItem item = dataGridContextMenuStrip.Items.Add(menuText, null, ev);
-                        item.Tag = evArgs;
+                        ToolStripItem item = dataGridContextMenuStrip.Items.Add(menuText, null, OnHandlePluginContextMenu);
+                        item.Tag = new ContextMenuPluginEventArgs(entry, lines, CurrentColumnizer, callback);
                         item.Enabled = !disabled;
                         isAdded = true;
                     }
@@ -872,7 +873,8 @@ namespace LogExpert.Controls.LogWindow
             if (sender is ToolStripItem item)
             {
                 ContextMenuPluginEventArgs menuArgs = item.Tag as ContextMenuPluginEventArgs;
-                menuArgs.Entry.MenuSelected(menuArgs.LogLines, menuArgs.Columnizer, menuArgs.Callback);
+                var logLines = menuArgs.LogLines;
+                menuArgs.Entry.MenuSelected(logLines.Count, menuArgs.Columnizer, menuArgs.Callback.GetLogLine(logLines[0]));
             }
         }
 
@@ -960,7 +962,7 @@ namespace LogExpert.Controls.LogWindow
             if (columnRestrictCheckBox.Checked) // disable when nothing to filter
             {
                 columnNamesLabel.Visible = true;
-                _filterParams.columnRestrict = true;
+                _filterParams.ColumnRestrict = true;
                 columnNamesLabel.Text = CalculateColumnNames(_filterParams);
             }
             else
@@ -973,7 +975,7 @@ namespace LogExpert.Controls.LogWindow
 
         private void OnColumnButtonClick(object sender, EventArgs e)
         {
-            _filterParams.currentColumnizer = _currentColumnizer;
+            _filterParams.CurrentColumnizer = _currentColumnizer;
             FilterColumnChooser chooser = new(_filterParams);
             if (chooser.ShowDialog() == DialogResult.OK)
             {
@@ -1033,9 +1035,9 @@ namespace LogExpert.Controls.LogWindow
             Control ctl = columnContextMenuStrip.SourceControl;
             BufferedDataGridView gridView = ctl as BufferedDataGridView;
             bool frozen = false;
-            if (_freezeStateMap.ContainsKey(ctl))
+            if (_freezeStateMap.TryGetValue(ctl, out bool value))
             {
-                frozen = _freezeStateMap[ctl];
+                frozen = value;
             }
 
             freezeLeftColumnsUntilHereToolStripMenuItem.Checked = frozen;
@@ -1105,15 +1107,14 @@ namespace LogExpert.Controls.LogWindow
             Control ctl = columnContextMenuStrip.SourceControl;
             bool frozen = false;
 
-            if (_freezeStateMap.ContainsKey(ctl))
+            if (_freezeStateMap.TryGetValue(ctl, out bool value))
             {
-                frozen = _freezeStateMap[ctl];
+                frozen = value;
             }
 
             frozen = !frozen;
             _freezeStateMap[ctl] = frozen;
 
-            DataGridViewColumn senderCol = sender as DataGridViewColumn;
             if (ctl is BufferedDataGridView gridView)
             {
                 ApplyFrozenState(gridView);
@@ -1180,7 +1181,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
             {
-                var he = new HilightEntry()
+                var he = new HighlightEntry()
                 {
                     SearchText = ctl.SelectedText,
                     ForegroundColor = Color.Red,
@@ -1209,7 +1210,7 @@ namespace LogExpert.Controls.LogWindow
         {
             if (dataGridView.EditingControl is DataGridViewTextBoxEditingControl ctl)
             {
-                HilightEntry he = new()
+                HighlightEntry he = new()
                 {
                     SearchText = ctl.SelectedText,
                     ForegroundColor = Color.Red,
@@ -1257,7 +1258,7 @@ namespace LogExpert.Controls.LogWindow
             {
                 lock (_currentHighlightGroupLock)
                 {
-                    _currentHighlightGroup.HilightEntryList.AddRange(_tempHighlightEntryList);
+                    _currentHighlightGroup.HighlightEntryList.AddRange(_tempHighlightEntryList);
                     RemoveTempHighlights();
                     OnCurrentHighlightListChanged();
                 }
@@ -1342,8 +1343,8 @@ namespace LogExpert.Controls.LogWindow
 
         private void OnSaveFilterButtonClick(object sender, EventArgs e)
         {
-            FilterParams newParams = _filterParams.CreateCopy();
-            newParams.color = Color.FromKnownColor(KnownColor.Black);
+            FilterParams newParams = _filterParams.Clone();
+            newParams.Color = Color.FromKnownColor(KnownColor.Black);
             ConfigManager.Settings.filterList.Add(newParams);
             OnFilterListChanged(this);
         }
@@ -1401,7 +1402,7 @@ namespace LogExpert.Controls.LogWindow
             if (filterListBox.SelectedIndex >= 0)
             {
                 FilterParams filterParams = (FilterParams)filterListBox.Items[filterListBox.SelectedIndex];
-                FilterParams newParams = filterParams.CreateCopy();
+                FilterParams newParams = filterParams.Clone();
                 //newParams.historyList = ConfigManager.Settings.filterHistoryList;
                 this._filterParams = newParams;
                 ReInitFilterParams(this._filterParams);
@@ -1438,10 +1439,10 @@ namespace LogExpert.Controls.LogWindow
                 }
                 else
                 {
-                    brush = new SolidBrush(filterParams.color);
+                    brush = new SolidBrush(filterParams.Color);
                 }
 
-                e.Graphics.DrawString(filterParams.searchText, e.Font, brush,
+                e.Graphics.DrawString(filterParams.SearchText, e.Font, brush,
                     new PointF(rectangle.Left, rectangle.Top));
                 e.DrawFocusRectangle();
                 brush.Dispose();
@@ -1456,11 +1457,11 @@ namespace LogExpert.Controls.LogWindow
             {
                 FilterParams filterParams = (FilterParams)filterListBox.Items[i];
                 ColorDialog dlg = new();
-                dlg.CustomColors = new[] { filterParams.color.ToArgb() };
-                dlg.Color = filterParams.color;
+                dlg.CustomColors = new[] { filterParams.Color.ToArgb() };
+                dlg.Color = filterParams.Color;
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    filterParams.color = dlg.Color;
+                    filterParams.Color = dlg.Color;
                     filterListBox.Refresh();
                 }
             }
@@ -1558,9 +1559,9 @@ namespace LogExpert.Controls.LogWindow
         private void OnMarkFilterHitsInLogViewToolStripMenuItemClick(object sender, EventArgs e)
         {
             SearchParams p = new();
-            p.searchText = _filterParams.searchText;
-            p.isRegex = _filterParams.isRegex;
-            p.isCaseSensitive = _filterParams.isCaseSensitive;
+            p.SearchText = _filterParams.SearchText;
+            p.IsRegex = _filterParams.IsRegex;
+            p.IsCaseSensitive = _filterParams.IsCaseSensitive;
             AddSearchHitHighlightEntry(p);
         }
 

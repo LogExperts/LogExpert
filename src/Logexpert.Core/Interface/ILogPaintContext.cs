@@ -27,7 +27,7 @@ namespace LogExpert.Core.Interface
 
         Bookmark GetBookmarkForLine(int lineNum);
 
-        HilightEntry FindHighlightEntry(ITextValue line, bool noWordMatches);
+        HighlightEntry FindHighlightEntry(ITextValue line, bool noWordMatches);
 
         IList<HilightMatchEntry> FindHighlightMatches(ITextValue line);
 

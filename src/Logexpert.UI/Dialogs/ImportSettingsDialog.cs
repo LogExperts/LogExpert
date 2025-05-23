@@ -7,19 +7,33 @@ namespace LogExpert.UI.Dialogs
     [SupportedOSPlatform("windows")]
     public partial class ImportSettingsDialog : Form
     {
-        #region Fields
-
-        #endregion
-
         #region cTor
 
-        public ImportSettingsDialog()
+        public ImportSettingsDialog(ExportImportFlags importFlags)
         {
             InitializeComponent();
-
+            SuspendLayout();
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
 
+            ImportFlags = importFlags;
+            FileName = string.Empty;
+
+            if (ImportFlags == ExportImportFlags.HighlightSettings)
+            {
+                checkBoxHighlightSettings.Checked = true;
+                checkBoxHighlightSettings.Enabled = false;
+                checkBoxHighlightFileMasks.Checked = false;
+                checkBoxHighlightFileMasks.Enabled = false;
+                checkBoxColumnizerFileMasks.Checked = false;
+                checkBoxColumnizerFileMasks.Enabled = false;
+                checkBoxExternalTools.Checked = false;
+                checkBoxExternalTools.Enabled = false;
+                checkBoxOther.Checked = false;
+                checkBoxOther.Enabled = false;
+            }
+
+            ResumeLayout();
         }
 
         #endregion
@@ -56,17 +70,26 @@ namespace LogExpert.UI.Dialogs
 
         private void OnOkButtonClick(object sender, EventArgs e)
         {
-            ImportFlags = ExportImportFlags.None;
             FileName = textBoxFileName.Text;
 
-            foreach (Control ctl in groupBoxImportOptions.Controls)
+            if (ImportFlags != ExportImportFlags.HighlightSettings)
             {
-                if (ctl.Tag != null)
+                foreach (Control ctl in groupBoxImportOptions.Controls)
                 {
-                    if (((CheckBox)ctl).Checked)
+                    if (ctl.Tag != null)
                     {
-                        ImportFlags |= (ExportImportFlags)long.Parse(ctl.Tag as string ?? string.Empty);
+                        if (((CheckBox)ctl).Checked)
+                        {
+                            ImportFlags |= (ExportImportFlags)long.Parse(ctl.Tag as string ?? string.Empty);
+                        }
                     }
+                }
+            }
+            else
+            {
+                if (checkBoxKeepExistingSettings.Checked)
+                {
+                    ImportFlags |= ExportImportFlags.KeepExisting;
                 }
             }
         }

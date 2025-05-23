@@ -149,7 +149,7 @@ namespace LogExpert.Classes.Filter
             _logger.Info("Started Filter worker [{0}] for line {1}", Environment.CurrentManagedThreadId, startLine);
 
             // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
-            FilterParams threadFilterParams = filterParams.CreateCopy2();
+            FilterParams threadFilterParams = filterParams.CloneWithCurrentColumnizer();
             ColumnizerCallback threadColumnizerCallback = _callback.CreateCopy();
 
             Filter filter = new(threadColumnizerCallback);

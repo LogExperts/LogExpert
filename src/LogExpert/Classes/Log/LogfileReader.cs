@@ -53,7 +53,6 @@ namespace LogExpert.Classes.Log
 
         private ReaderWriterLock _lruCacheDictLock;
 
-
         private bool _shouldStop;
         private ILogFileInfo _watchedILogFileInfo;
 

@@ -56,8 +56,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogexpertgRPCService", "LogexpertgRPCService\LogexpertgRPCService.csproj", "{D31D1721-9DEA-45A4-B813-D5023B2EC2CC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Core", "Logexpert.Core\LogExpert.Core.csproj", "{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Resources", "Logexpert.Resources\LogExpert.Resources.csproj", "{578CC5D5-1DCD-47C2-8BD3-B32C14635BEC}"
@@ -138,10 +136,6 @@ Global
 		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D31D1721-9DEA-45A4-B813-D5023B2EC2CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D31D1721-9DEA-45A4-B813-D5023B2EC2CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D31D1721-9DEA-45A4-B813-D5023B2EC2CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D31D1721-9DEA-45A4-B813-D5023B2EC2CC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -2,27 +2,13 @@
 
 namespace LogExpert.Core.Entities
 {
-    public class FileViewContext
+    public class FileViewContext(ILogPaintContext logPaintContext, ILogView logView)
     {
-        #region Fields
-
-        #endregion
-
-        #region cTor
-
-        public FileViewContext(ILogPaintContext logPaintContext, ILogView logView)
-        {
-            LogPaintContext = logPaintContext;
-            LogView = logView;
-        }
-
-        #endregion
-
         #region Properties
 
-        public ILogPaintContext LogPaintContext { get; }
+        public ILogPaintContext LogPaintContext { get; } = logPaintContext;
 
-        public ILogView LogView { get; }
+        public ILogView LogView { get; } = logView;
 
         #endregion
     }

@@ -4,7 +4,7 @@
 namespace LogExpert
 {
     /// <summary>
-    /// Implement this interface to add a menu entry to the context menu of LogExpert. 
+    /// Implement this interface to add a menu entry to the context menu of LogExpert.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -17,12 +17,12 @@ namespace LogExpert
         #region Public methods
 
         /// <summary>
-        /// This function is called from LogExpert if the context menu is about to be displayed. 
+        /// This function is called from LogExpert if the context menu is about to be displayed.
         /// Your implementation can control whether LogExpert will show a menu entry by returning
         /// an appropriate value.<br></br>
         /// </summary>
         /// <param name="lines">A list containing all selected line numbers.</param>
-        /// <param name="columnizer">The currently selected Columnizer. You can use it to split log lines, 
+        /// <param name="columnizer">The currently selected Columnizer. You can use it to split log lines,
         ///     if necessary.</param>
         /// <param name="callback">The callback interface implemented by LogExpert. You can use the functions
         ///     for retrieving log lines or pass it along to functions of the Columnizer if needed.</param>
@@ -37,17 +37,21 @@ namespace LogExpert
         /// </returns>
         string GetMenuText(IList<int> lines, ILogLineColumnizer columnizer, ILogExpertCallback callback);
 
+        string GetMenuText(int linesCount, ILogLineColumnizer columnizer, ILogLine line);
+
 
         /// <summary>
         /// This function is called from LogExpert if the menu entry is choosen by the user. <br></br>
         /// Note that this function is called from the GUI thread. So try to avoid time consuming operations.
         /// </summary>
         /// <param name="lines">A list containing all selected line numbers.</param>
-        /// <param name="columnizer">The currently selected Columnizer. You can use it to split log lines, 
+        /// <param name="columnizer">The currently selected Columnizer. You can use it to split log lines,
         ///     if necessary.</param>
         /// <param name="callback">The callback interface implemented by LogExpert. You can use the functions
         ///     for retrieving log lines or pass it along to functions of the Columnizer if needed.</param>
         void MenuSelected(IList<int> lines, ILogLineColumnizer columnizer, ILogExpertCallback callback);
+
+        void MenuSelected(int linesCount, ILogLineColumnizer columnizer, ILogLine line);
 
         #endregion
     }

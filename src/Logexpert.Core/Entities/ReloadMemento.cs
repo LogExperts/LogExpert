@@ -2,11 +2,8 @@
 {
     public class ReloadMemento
     {
-        #region Fields
+        public int CurrentLine { get; set; }
 
-        public int currentLine;
-        public int firstDisplayedLine;
-
-        #endregion
+        public int FirstDisplayedLine { get; set; }
     }
 }

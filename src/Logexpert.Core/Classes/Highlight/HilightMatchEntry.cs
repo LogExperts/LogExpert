@@ -7,7 +7,7 @@
     {
         #region Properties
 
-        public HilightEntry HilightEntry { get; set; }
+        public HighlightEntry HilightEntry { get; set; }
 
         public int StartPos { get; set; }
 

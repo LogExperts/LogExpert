@@ -3,13 +3,13 @@ using LogExpert.Core.Entities;
 
 namespace LogExpert.Entities.EventArgs
 {
-    public class CurrentHighlightGroupChangedEventArgs(LogWindow logWindow, HilightGroup currentGroup)
+    public class CurrentHighlightGroupChangedEventArgs(LogWindow logWindow, HighlightGroup currentGroup)
     {
         #region Properties
 
         public LogWindow LogWindow { get; } = logWindow;
 
-        public HilightGroup CurrentGroup { get; } = currentGroup;
+        public HighlightGroup CurrentGroup { get; } = currentGroup;
 
         #endregion
     }

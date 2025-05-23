@@ -5,131 +5,164 @@ using System.Text.RegularExpressions;
 namespace LogExpert.Core.Classes.Filter
 {
     [Serializable]
-    public class FilterParams
+    public class FilterParams : ICloneable
     {
         #region Fields
 
-        public string _rangeSearchText = "";
-        public string _searchText = "";
-
-        public Color color = Color.Black;
+        private string _rangeSearchText = string.Empty;
+        private string _searchText = string.Empty;
 
         //public List<string> historyList = new List<string>();
         //public List<string> rangeHistoryList = new List<string>();
-        public List<int> columnList = []; // list of columns in which to search
-
-        public bool columnRestrict = false;
-
-        [NonSerialized] public ILogLineColumnizer currentColumnizer;
-
-        public bool emptyColumnHit;
-        public bool emptyColumnUsePrev;
-
-        public bool exactColumnMatch = false;
-
-        //public bool isFuzzy;
-        public int fuzzyValue = 0;
-
-        public bool isCaseSensitive;
-        public bool isFilterTail;
-
-        [NonSerialized] public bool isInRange = false; // false=looking for start, true=looking for end
-
-        public bool isInvert;
-        public bool isRangeSearch = false;
-        public bool isRegex;
-
-        [NonSerialized] public string lastLine = "";
-
-        [NonSerialized] public Hashtable lastNonEmptyCols = [];
-
-        [NonSerialized] public bool lastResult;
-
-        [NonSerialized] public string lowerRangeSearchText = "";
-
-        // transient members:
-        [NonSerialized] public string lowerSearchText = "";
-
-        [NonSerialized] public Regex rangeRex;
-
-        [NonSerialized] public Regex rex;
-
-        public int spreadBefore;
-        public int spreadBehind;
 
         #endregion
 
         #region Properties
 
-        public string searchText
+        public string SearchText
         {
             get => _searchText;
             set
             {
                 _searchText = value;
-                lowerSearchText = _searchText.ToLower();
+                LowerSearchText = _searchText.ToLowerInvariant();
             }
         }
 
-        public string rangeSearchText
+        public string RangeSearchText
         {
             get => _rangeSearchText;
             set
             {
                 _rangeSearchText = value;
-                lowerRangeSearchText = _rangeSearchText.ToLower();
+                LowerRangeSearchText = _rangeSearchText.ToLowerInvariant();
             }
         }
 
-        public bool SpreadEnabled => spreadBefore > 0 || spreadBehind > 0;
+        public bool SpreadEnabled => SpreadBefore > 0 || SpreadBehind > 0;
+
+        public bool IsCaseSensitive { get; set; }
+
+        public bool IsFilterTail { get; set; }
+
+        public int FuzzyValue { get; set; }
+
+        public bool EmptyColumnUsePrev { get; set; }
+
+        public bool EmptyColumnHit { get; set; }
+
+        public bool ExactColumnMatch { get; set; } = false;
+
+        public bool ColumnRestrict { get; set; }
+
+        public Color Color { get; set; } = Color.Black;
+
+        public int SpreadBefore { get; set; }
+
+        public int SpreadBehind { get; set; }
+
+        public bool IsInvert { get; set; }
+
+        public bool IsRangeSearch { get; set; } = false;
+
+        public bool IsRegex { get; set; }
+
+        // list of columns in which to search
+        public List<int> ColumnList { get; set; } = [];
+
+        [field: NonSerialized]
+        public ILogLineColumnizer CurrentColumnizer { get; set; }
+
+        /// <summary>
+        /// false=looking for start
+        /// true=looking for end
+        /// </summary>
+        [field: NonSerialized]
+        public bool IsInRange { get; set; } = false;
+
+        [field: NonSerialized]
+        public string LastLine { get; set; } = string.Empty;
+
+        [field: NonSerialized]
+        public Hashtable LastNonEmptyCols { get; set; } = [];
+
+        [field: NonSerialized]
+        public bool LastResult { get; set; }
+
+        [field: NonSerialized]
+        public string LowerRangeSearchText { get; set; } = string.Empty;
+
+        [field: NonSerialized]
+        public string LowerSearchText { get; set; } = string.Empty;
+
+        [field: NonSerialized]
+        public Regex RangeRex { get; set; }
+
+        [field: NonSerialized]
+        public Regex Rex { get; set; }
 
         #endregion
 
         #region Public methods
 
-        public FilterParams CreateCopy2()
+        /// <summary>
+        /// Returns a new FilterParams object with the current columnizer set to the one used in this object.
+        /// </summary>
+        /// <returns></returns>
+        public FilterParams CloneWithCurrentColumnizer()
         {
-            FilterParams newParams = CreateCopy();
+            FilterParams newParams = Clone();
             newParams.Init();
             // removed cloning of columnizer for filtering, because this causes issues with columnizers that hold internal states (like CsvColumnizer)
             // newParams.currentColumnizer = Util.CloneColumnizer(this.currentColumnizer);
-            newParams.currentColumnizer = currentColumnizer;
+            newParams.CurrentColumnizer = CurrentColumnizer;
             return newParams;
         }
 
         // call after deserialization!
         public void Init()
         {
-            lastNonEmptyCols = [];
-            lowerRangeSearchText = _rangeSearchText.ToLower();
-            lowerSearchText = _searchText.ToLower();
-            lastLine = "";
+            LastNonEmptyCols = [];
+            LowerRangeSearchText = RangeSearchText.ToLower();
+            LowerSearchText = SearchText.ToLower();
+            LastLine = string.Empty;
         }
 
         // Reset before a new search
         public void Reset()
         {
-            lastNonEmptyCols.Clear();
-            isInRange = false;
+            LastNonEmptyCols.Clear();
+            IsInRange = false;
         }
 
         public void CreateRegex()
         {
-            if (_searchText != null)
+            if (SearchText != null)
             {
-                rex = new Regex(_searchText,
-                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                Rex = new Regex(SearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             }
-            if (_rangeSearchText != null && isRangeSearch)
+            if (RangeSearchText != null && IsRangeSearch)
             {
-                rangeRex = new Regex(_rangeSearchText,
-                    isCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+                RangeRex = new Regex(RangeSearchText, IsCaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
             }
         }
 
-        public FilterParams CreateCopy()
+        /// <summary>
+        /// Shallow Copy
+        /// </summary>
+        /// <returns></returns>
+        public FilterParams Clone()
         {
             return (FilterParams)MemberwiseClone();
+        }
+
+        /// <summary>
+        /// Shallow Copy
+        /// </summary>
+        /// <returns></returns>
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         #endregion

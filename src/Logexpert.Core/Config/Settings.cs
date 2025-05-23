@@ -1,9 +1,6 @@
 using LogExpert.Core.Classes.Filter;
-using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
 
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace LogExpert.Core.Config
@@ -34,10 +31,6 @@ namespace LogExpert.Core.Config
         public List<string> filterRangeHistoryList = [];
 
         public bool hideLineColumn;
-
-        public List<HilightEntry> hilightEntryList = []; // legacy. is automatically converted to highlight groups on settings load
-
-        public List<HilightGroup> hilightGroupList = []; // should be in Preferences but is here for mistake. Maybe I migrate it some day.
 
         public bool isMaximized;
 

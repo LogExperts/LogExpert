@@ -481,7 +481,7 @@ namespace LogExpert.Controls.LogTabWindow
         private void OnLogWindowCurrentHighlightGroupChanged(object sender, CurrentHighlightGroupChangedEventArgs e)
         {
             OnHighlightSettingsChanged();
-            ConfigManager.Settings.hilightGroupList = HilightGroupList;
+            ConfigManager.Settings.Preferences.HighlightGroupList = HighlightGroupList;
             ConfigManager.Save(SettingsFlags.HighlightSettings);
         }
 
@@ -934,7 +934,7 @@ namespace LogExpert.Controls.LogTabWindow
 
         private void OnDisableWordHighlightModeToolStripMenuItemClick(object sender, EventArgs e)
         {
-            DebugOptions.disableWordHighlight = disableWordHighlightModeToolStripMenuItem.Checked;
+            DebugOptions.DisableWordHighlight = disableWordHighlightModeToolStripMenuItem.Checked;
             CurrentLogWindow?.RefreshAllGrids();
         }
 

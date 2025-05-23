@@ -41,7 +41,7 @@ public partial class SearchDialog : Form
     {
         if (SearchParams != null)
         {
-            if (SearchParams.isFromTop)
+            if (SearchParams.IsFromTop)
             {
                 radioButtonFromTop.Checked = true;
             }
@@ -50,7 +50,7 @@ public partial class SearchDialog : Form
                 radioButtonFromSelected.Checked = true;
             }
 
-            if (SearchParams.isForward)
+            if (SearchParams.IsForward)
             {
                 radioButtonForward.Checked = true;
             }
@@ -59,9 +59,9 @@ public partial class SearchDialog : Form
                 radioButtonBackward.Checked = true;
             }
 
-            checkBoxRegex.Checked = SearchParams.isRegex;
-            checkBoxCaseSensitive.Checked = SearchParams.isCaseSensitive;
-            foreach (string item in SearchParams.historyList)
+            checkBoxRegex.Checked = SearchParams.IsRegex;
+            checkBoxCaseSensitive.Checked = SearchParams.IsCaseSensitive;
+            foreach (string item in SearchParams.HistoryList)
             {
                 comboBoxSearchFor.Items.Add(item);
             }
@@ -109,17 +109,17 @@ public partial class SearchDialog : Form
                 Regex.IsMatch("", comboBoxSearchFor.Text);
             }
 
-            SearchParams.searchText = comboBoxSearchFor.Text;
-            SearchParams.isCaseSensitive = checkBoxCaseSensitive.Checked;
-            SearchParams.isForward = radioButtonForward.Checked;
-            SearchParams.isFromTop = radioButtonFromTop.Checked;
-            SearchParams.isRegex = checkBoxRegex.Checked;
-            SearchParams.historyList.Remove(comboBoxSearchFor.Text);
-            SearchParams.historyList.Insert(0, comboBoxSearchFor.Text);
+            SearchParams.SearchText = comboBoxSearchFor.Text;
+            SearchParams.IsCaseSensitive = checkBoxCaseSensitive.Checked;
+            SearchParams.IsForward = radioButtonForward.Checked;
+            SearchParams.IsFromTop = radioButtonFromTop.Checked;
+            SearchParams.IsRegex = checkBoxRegex.Checked;
+            SearchParams.HistoryList.Remove(comboBoxSearchFor.Text);
+            SearchParams.HistoryList.Insert(0, comboBoxSearchFor.Text);
 
-            if (SearchParams.historyList.Count > MAX_HISTORY)
+            if (SearchParams.HistoryList.Count > MAX_HISTORY)
             {
-                SearchParams.historyList.RemoveAt(SearchParams.historyList.Count - 1);
+                SearchParams.HistoryList.RemoveAt(SearchParams.HistoryList.Count - 1);
             }
         }
         catch (Exception ex)

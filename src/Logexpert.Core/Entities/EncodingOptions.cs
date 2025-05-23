@@ -7,10 +7,6 @@ namespace LogExpert.Core.Entities
     /// </summary>
     public class EncodingOptions
     {
-        #region Fields
-
-        #endregion
-
         #region Properties
 
         /// <summary>

@@ -3,21 +3,23 @@
     [Serializable]
     public class SearchParams
     {
-        #region Fields
+        public int CurrentLine { get; set; }
 
-        public int currentLine;
-        public List<string> historyList = [];
-        public bool isCaseSensitive = false;
-        public bool isFindNext;
+        public List<string> HistoryList { get; set; } = [];
 
-        public bool isForward = true;
-        public bool isFromTop = false;
-        public bool isRegex = false;
+        public bool IsCaseSensitive { get; set; } = false;
 
-        [NonSerialized] public bool isShiftF3Pressed = false;
+        public bool IsFindNext { get; set; }
 
-        public string searchText = string.Empty;
+        public bool IsForward { get; set; } = true;
 
-        #endregion
+        public bool IsFromTop { get; set; } = false;
+
+        public bool IsRegex { get; set; } = false;
+
+        public string SearchText { get; set; } = string.Empty;
+
+        [field: NonSerialized]
+        public bool IsShiftF3Pressed { get; set; }
     }
 }

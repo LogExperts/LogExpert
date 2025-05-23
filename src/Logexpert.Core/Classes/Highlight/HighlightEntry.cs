@@ -7,7 +7,7 @@ namespace LogExpert.Core.Classes.Highlight
 {
     [Serializable]
     [method: JsonConstructor]
-    public class HilightEntry() : ICloneable
+    public class HighlightEntry() : ICloneable
     {
         #region Fields
 
@@ -80,7 +80,7 @@ namespace LogExpert.Core.Classes.Highlight
 
         public object Clone()
         {
-            var highLightEntry = new HilightEntry
+            var highLightEntry = new HighlightEntry
             {
                 SearchText = SearchText,
                 ForegroundColor = ForegroundColor,

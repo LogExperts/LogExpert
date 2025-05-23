@@ -68,21 +68,21 @@ namespace LogExpert.Core.Classes
         public static bool TestFilterCondition(FilterParams filterParams, ILogLine line,
             LogExpert.ILogLineColumnizerCallback columnizerCallback)
         {
-            if (filterParams.lastLine.Equals(line.FullLine))
+            if (filterParams.LastLine.Equals(line.FullLine))
             {
-                return filterParams.lastResult;
+                return filterParams.LastResult;
             }
 
             bool match = TestFilterMatch(filterParams, line, columnizerCallback);
-            filterParams.lastLine = line.FullLine;
+            filterParams.LastLine = line.FullLine;
 
-            if (filterParams.isRangeSearch)
+            if (filterParams.IsRangeSearch)
             {
-                if (!filterParams.isInRange)
+                if (!filterParams.IsInRange)
                 {
                     if (match)
                     {
-                        filterParams.isInRange = true;
+                        filterParams.IsInRange = true;
                     }
                 }
                 else
@@ -93,15 +93,15 @@ namespace LogExpert.Core.Classes
                     }
                     else
                     {
-                        filterParams.isInRange = false;
+                        filterParams.IsInRange = false;
                     }
                 }
             }
-            if (filterParams.isInvert)
+            if (filterParams.IsInvert)
             {
                 match = !match;
             }
-            filterParams.lastResult = match;
+            filterParams.LastResult = match;
             return match;
         }
 
@@ -465,17 +465,17 @@ namespace LogExpert.Core.Classes
             string searchText;
             Regex rex;
 
-            if (filterParams.isInRange)
+            if (filterParams.IsInRange)
             {
-                lowerSearchText = filterParams.lowerRangeSearchText;
-                searchText = filterParams.rangeSearchText;
-                rex = filterParams.rangeRex;
+                lowerSearchText = filterParams.LowerRangeSearchText;
+                searchText = filterParams.RangeSearchText;
+                rex = filterParams.RangeRex;
             }
             else
             {
-                lowerSearchText = filterParams.lowerSearchText;
-                searchText = filterParams.searchText;
-                rex = filterParams.rex;
+                lowerSearchText = filterParams.LowerSearchText;
+                searchText = filterParams.SearchText;
+                rex = filterParams.Rex;
             }
 
             if (searchText == null || lowerSearchText == null || searchText.Length == 0)
@@ -483,40 +483,40 @@ namespace LogExpert.Core.Classes
                 return false;
             }
 
-            if (filterParams.columnRestrict)
+            if (filterParams.ColumnRestrict)
             {
-                IColumnizedLogLine columns = filterParams.currentColumnizer.SplitLine(columnizerCallback, line);
+                IColumnizedLogLine columns = filterParams.CurrentColumnizer.SplitLine(columnizerCallback, line);
                 bool found = false;
-                foreach (int colIndex in filterParams.columnList)
+                foreach (int colIndex in filterParams.ColumnList)
                 {
                     if (colIndex < columns.ColumnValues.Length
                     ) // just to be sure, maybe the columnizer has changed anyhow
                     {
                         if (columns.ColumnValues[colIndex].FullValue.Trim().Length == 0)
                         {
-                            if (filterParams.emptyColumnUsePrev)
+                            if (filterParams.EmptyColumnUsePrev)
                             {
-                                string prevValue = (string)filterParams.lastNonEmptyCols[colIndex];
+                                string prevValue = (string)filterParams.LastNonEmptyCols[colIndex];
                                 if (prevValue != null)
                                 {
                                     if (TestMatchSub(filterParams, prevValue, lowerSearchText, searchText, rex,
-                                        filterParams.exactColumnMatch))
+                                        filterParams.ExactColumnMatch))
                                     {
                                         found = true;
                                     }
                                 }
                             }
-                            else if (filterParams.emptyColumnHit)
+                            else if (filterParams.EmptyColumnHit)
                             {
                                 return true;
                             }
                         }
                         else
                         {
-                            filterParams.lastNonEmptyCols[colIndex] = columns.ColumnValues[colIndex].FullValue;
+                            filterParams.LastNonEmptyCols[colIndex] = columns.ColumnValues[colIndex].FullValue;
                             if (TestMatchSub(filterParams, columns.ColumnValues[colIndex].FullValue, lowerSearchText,
                                 searchText, rex,
-                                filterParams.exactColumnMatch))
+                                filterParams.ExactColumnMatch))
                             {
                                 found = true;
                             }
@@ -533,7 +533,7 @@ namespace LogExpert.Core.Classes
 
         private static bool TestMatchSub(FilterParams filterParams, string line, string lowerSearchText, string searchText, Regex rex, bool exactMatch)
         {
-            if (filterParams.isRegex)
+            if (filterParams.IsRegex)
             {
                 if (rex.IsMatch(line))
                 {
@@ -542,7 +542,7 @@ namespace LogExpert.Core.Classes
             }
             else
             {
-                if (!filterParams.isCaseSensitive)
+                if (!filterParams.IsCaseSensitive)
                 {
                     if (exactMatch)
                     {
@@ -553,7 +553,7 @@ namespace LogExpert.Core.Classes
                     }
                     else
                     {
-                        if (line.ToLower().Contains(lowerSearchText))
+                        if (line.Contains(lowerSearchText, StringComparison.CurrentCultureIgnoreCase))
                         {
                             return true;
                         }
@@ -577,7 +577,7 @@ namespace LogExpert.Core.Classes
                     }
                 }
 
-                if (filterParams.fuzzyValue > 0)
+                if (filterParams.FuzzyValue > 0)
                 {
                     int range = line.Length - searchText.Length;
                     if (range > 0)
@@ -585,14 +585,15 @@ namespace LogExpert.Core.Classes
                         for (int i = 0; i < range; ++i)
                         {
                             string src = line.Substring(i, searchText.Length);
-                            if (!filterParams.isCaseSensitive)
+
+                            if (!filterParams.IsCaseSensitive)
                             {
                                 src = src.ToLower();
                             }
-                            string dest = filterParams.isCaseSensitive ? searchText : lowerSearchText;
+
                             int dist = DamerauLevenshteinDistance(src, searchText);
-                            if ((searchText.Length + 1) / (float)(dist + 1) >=
-                                11F / (float)(filterParams.fuzzyValue + 1F))
+
+                            if ((searchText.Length + 1) / (float)(dist + 1) >= 11F / (float)(filterParams.FuzzyValue + 1F))
                             {
                                 return true;
                             }

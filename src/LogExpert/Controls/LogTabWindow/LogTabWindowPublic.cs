@@ -31,13 +31,13 @@ namespace LogExpert.Controls.LogTabWindow
         public LogWindow.LogWindow AddFilterTab(FilterPipe pipe, string title, ILogLineColumnizer preProcessColumnizer)
         {
             LogWindow.LogWindow logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
-            if (pipe.FilterParams.searchText.Length > 0)
+            if (pipe.FilterParams.SearchText.Length > 0)
             {
                 ToolTip tip = new(components);
                 tip.SetToolTip(logWin,
-                    "Filter: \"" + pipe.FilterParams.searchText + "\"" +
-                    (pipe.FilterParams.isInvert ? " (Invert match)" : "") +
-                    (pipe.FilterParams.columnRestrict ? "\nColumn restrict" : "")
+                    "Filter: \"" + pipe.FilterParams.SearchText + "\"" +
+                    (pipe.FilterParams.IsInvert ? " (Invert match)" : "") +
+                    (pipe.FilterParams.ColumnRestrict ? "\nColumn restrict" : "")
                 );
                 tip.AutomaticDelay = 10;
                 tip.AutoPopDelay = 5000;
@@ -156,13 +156,13 @@ namespace LogExpert.Controls.LogTabWindow
             SearchDialog dlg = new();
             AddOwnedForm(dlg);
             dlg.TopMost = TopMost;
-            SearchParams.historyList = ConfigManager.Settings.searchHistoryList;
+            SearchParams.HistoryList = ConfigManager.Settings.searchHistoryList;
             dlg.SearchParams = SearchParams;
             DialogResult res = dlg.ShowDialog();
-            if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.searchText))
+            if (res == DialogResult.OK && dlg.SearchParams != null && !string.IsNullOrWhiteSpace(dlg.SearchParams.SearchText))
             {
                 SearchParams = dlg.SearchParams;
-                SearchParams.isFindNext = false;
+                SearchParams.IsFindNext = false;
                 CurrentLogWindow.StartSearch();
             }
         }
@@ -259,7 +259,7 @@ namespace LogExpert.Controls.LogTabWindow
             return null;
         }
 
-        public HilightGroup FindHighlightGroupByFileMask(string fileName)
+        public HighlightGroup FindHighlightGroupByFileMask(string fileName)
         {
             foreach (HighlightMaskEntry entry in ConfigManager.Settings.Preferences.highlightMaskList)
             {
@@ -269,7 +269,7 @@ namespace LogExpert.Controls.LogTabWindow
                     {
                         if (Regex.IsMatch(fileName, entry.mask))
                         {
-                            HilightGroup group = FindHighlightGroup(entry.highlightGroupName);
+                            HighlightGroup group = FindHighlightGroup(entry.highlightGroupName);
                             return group;
                         }
                     }
@@ -333,9 +333,9 @@ namespace LogExpert.Controls.LogTabWindow
             }
         }
 
-        public void NotifySettingsChanged(object cookie, SettingsFlags flags)
+        public void NotifySettingsChanged(object sender, SettingsFlags flags)
         {
-            if (cookie != this)
+            if (sender != this)
             {
                 NotifyWindowsForChangedPrefs(flags);
             }

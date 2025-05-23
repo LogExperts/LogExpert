@@ -4,32 +4,23 @@ using System.Collections.Generic;
 
 namespace LogExpert.Classes.ILogLineColumnizerCallback
 {
-    internal class LogExpertCallback : ColumnizerCallback, ILogExpertCallback
+    internal class LogExpertCallback(LogWindow logWindow) : ColumnizerCallback(logWindow), ILogExpertCallback
     {
-        #region cTor
-
-        public LogExpertCallback(LogWindow logWindow)
-            : base(logWindow)
-        {
-        }
-
-        #endregion
-
         #region Public methods
 
         public void AddTempFileTab(string fileName, string title)
         {
-            logWindow.AddTempFileTab(fileName, title);
+            _logWindow.AddTempFileTab(fileName, title);
         }
 
         public void AddPipedTab(IList<LineEntry> lineEntryList, string title)
         {
-            logWindow.WritePipeTab(lineEntryList, title);
+            _logWindow.WritePipeTab(lineEntryList, title);
         }
 
         public string GetTabTitle()
         {
-            return logWindow.Text;
+            return _logWindow.Text;
         }
 
         #endregion

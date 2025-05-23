@@ -17,7 +17,7 @@ namespace LogExpert
         /// <param name="fileName">Path of the file to be loaded.</param>
         /// <param name="title">Title shown on the tab.</param>
         /// <remarks>
-        /// The file tab is internally handled like the temp file tabs which LogExpert uses for 
+        /// The file tab is internally handled like the temp file tabs which LogExpert uses for
         /// FilterTabs or clipboard copy tabs.
         /// This has some implications:
         /// <ul>
@@ -29,24 +29,23 @@ namespace LogExpert
         /// </remarks>
         void AddTempFileTab(string fileName, string title);
 
-
         /// <summary>
         /// With this function you can create a new tab and add a bunch of text lines to it.
         /// </summary>
-        /// <param name="lineEntryList">A list with LineEntry items containing text and an 
+        /// <param name="lineEntryList">A list with LineEntry items containing text and an
         ///     optional reference to the original file location.</param>
         /// <param name="title">The title for the new tab.</param>
         /// <remarks>
         /// <para>
         /// The lines are given by a list of <see cref="LineEntry"/>. If you set the lineNumber field
-        /// in each LineEntry to a lineNumber of the original logfile (the logfile for which the context 
+        /// in each LineEntry to a lineNumber of the original logfile (the logfile for which the context
         /// menu is called for), you can create a 'link' from the line of your 'target output' to a line
         /// in the 'source tab'.
         /// </para>
         /// <para>
         /// The user can then navigate from the line in the new tab to the referenced
         /// line in the original file (by using "locate in original file" from the context menu).
-        /// This is especially useful for plugins that generate output lines which are directly associated 
+        /// This is especially useful for plugins that generate output lines which are directly associated
         /// to the selected input lines.
         /// </para>
         /// <para>
@@ -55,7 +54,6 @@ namespace LogExpert
         /// </para>
         /// </remarks>
         void AddPipedTab(IList<LineEntry> lineEntryList, string title);
-
 
         /// <summary>
         /// Returns the title of the current tab (the tab for which the context menu plugin was called for).

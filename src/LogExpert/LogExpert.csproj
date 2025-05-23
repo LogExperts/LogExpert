@@ -61,10 +61,6 @@
   <ItemGroup>
     <PackageReference Include="DockPanelSuite" />
     <PackageReference Include="DockPanelSuite.ThemeVS2015" />
-    <PackageReference Include="Grpc.AspNetCore" />
-    <PackageReference Include="Google.Protobuf" />
-    <PackageReference Include="Grpc.Core" />
-    <PackageReference Include="Grpc.Tools" PrivateAssets="All" />
     <PackageReference Include="System.Text.Encoding" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NLog" />
@@ -72,7 +68,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\Logexpert.UI\LogExpert.UI.csproj" />
-    <ProjectReference Include="..\LogexpertgRPCService\LogexpertgRPCService.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
   <ItemGroup>

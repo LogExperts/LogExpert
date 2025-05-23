@@ -4,16 +4,12 @@ namespace LogExpert.Core.Entities
 {
     public class Bookmark
     {
-        #region Fields
-
-        #endregion
-
         #region cTor
 
         public Bookmark(int lineNum)
         {
             LineNum = lineNum;
-            Text = "";
+            Text = string.Empty;
             Overlay = new BookmarkOverlay();
         }
 

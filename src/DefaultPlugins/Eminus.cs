@@ -17,8 +17,10 @@ namespace LogExpert
         #region Fields
 
         private const string CFG_FILE_NAME = "eminus.json";
-        private const string dot = ".";
-        private const string doubleDot = ":";
+        private const string DOT = ".";
+        private const string DOUBLE_DOT = ":";
+        private const string DISABLED = "_";
+
         private EminusConfig _config = new();
         private EminusConfigDlg dlg;
         private EminusConfig tmpConfig = new();
@@ -27,7 +29,7 @@ namespace LogExpert
 
         #region Properties
 
-        public string Text => "eminus";
+        public static string Text => "eminus";
 
         #endregion
 
@@ -35,40 +37,42 @@ namespace LogExpert
 
         private XmlDocument BuildParam(ILogLine line)
         {
-            string temp = line.FullLine;
+            string fullLogLine = line.FullLine;
             // no Java stacktrace but some special logging of our applications at work:
-            if (temp.Contains("Exception of type", StringComparison.CurrentCulture) || temp.Contains("Nested:", StringComparison.CurrentCulture))
+            if (fullLogLine.Contains("Exception of type", StringComparison.CurrentCulture) ||
+                fullLogLine.Contains("Nested:", StringComparison.CurrentCulture))
             {
-                int pos = temp.IndexOf("created in ");
+                int pos = fullLogLine.IndexOf("created in ");
+
                 if (pos == -1)
                 {
                     return null;
                 }
 
                 pos += "created in ".Length;
-                int endPos = temp.IndexOf(dot, pos);
+                int endPos = fullLogLine.IndexOf(DOT, pos);
 
                 if (endPos == -1)
                 {
                     return null;
                 }
 
-                string className = temp[pos..endPos];
-                pos = temp.IndexOf(doubleDot, pos);
+                string className = fullLogLine[pos..endPos];
+                pos = fullLogLine.IndexOf(DOUBLE_DOT, pos);
 
                 if (pos == -1)
                 {
                     return null;
                 }
 
-                string lineNum = temp[(pos + 1)..];
+                string lineNum = fullLogLine[(pos + 1)..];
                 XmlDocument doc = BuildXmlDocument(className, lineNum);
                 return doc;
             }
 
-            if (temp.Contains("at ", StringComparison.CurrentCulture))
+            if (fullLogLine.Contains("at ", StringComparison.CurrentCulture))
             {
-                string str = temp.Trim();
+                string str = fullLogLine.Trim();
                 string className = null;
                 string lineNum = null;
                 int pos = str.IndexOf("at ") + 3;
@@ -83,7 +87,7 @@ namespace LogExpert
                     }
                     else
                     {
-                        pos = str.LastIndexOf('.', idx);
+                        pos = str.LastIndexOf(DOT, idx);
                         if (pos == -1)
                         {
                             return null;
@@ -91,7 +95,7 @@ namespace LogExpert
                         className = str[..pos];
                     }
 
-                    idx = str.LastIndexOf(':');
+                    idx = str.LastIndexOf(DOUBLE_DOT);
 
                     if (idx == -1)
                     {
@@ -150,24 +154,36 @@ namespace LogExpert
 
         public string GetMenuText(IList<int> logLines, ILogLineColumnizer columnizer, ILogExpertCallback callback)
         {
-            if (logLines.Count == 1 && BuildParam(callback.GetLogLine(logLines[0])) != null)
+            //not used
+            return string.Empty;
+        }
+
+        public string GetMenuText(int logLinesCount, ILogLineColumnizer columnizer, ILogLine logline)
+        {
+            if (logLinesCount == 1 && BuildParam(logline) != null)
             {
                 return "Load class in Eclipse";
             }
             else
             {
-                return "_Load class in Eclipse";
+                return $"{DISABLED}Load class in Eclipse";
             }
         }
 
         public void MenuSelected(IList<int> logLines, ILogLineColumnizer columnizer, ILogExpertCallback callback)
         {
-            if (logLines.Count != 1)
+            //Not used
+        }
+
+        public void MenuSelected(int logLinesCount, ILogLineColumnizer columnizer, ILogLine logline)
+        {
+            if (logLinesCount != 1)
             {
                 return;
             }
 
-            XmlDocument doc = BuildParam(callback.GetLogLine(logLines[0]));
+            XmlDocument doc = BuildParam(logline);
+
             if (doc == null)
             {
                 MessageBox.Show("Cannot parse Java stack trace line", "LogExpert");

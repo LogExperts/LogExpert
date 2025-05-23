@@ -54,7 +54,6 @@ namespace LogExpert.PluginRegistry.FileSystem
 
         public Uri Uri { get; }
 
-
         public long Length
         {
             get
@@ -63,7 +62,9 @@ namespace LogExpert.PluginRegistry.FileSystem
                 {
                     return -1;
                 }
+
                 int retry = RETRY_COUNT;
+
                 while (retry > 0)
                 {
                     try
@@ -81,6 +82,7 @@ namespace LogExpert.PluginRegistry.FileSystem
                         Thread.Sleep(RETRY_SLEEP);
                     }
                 }
+
                 return -1;
             }
         }
@@ -161,6 +163,7 @@ namespace LogExpert.PluginRegistry.FileSystem
             }
         }
 
+        //TODO Replace with Event from FileSystemWatcher
         public bool FileHasChanged()
         {
             if (LengthWithoutRetry != lastLength)
@@ -170,7 +173,6 @@ namespace LogExpert.PluginRegistry.FileSystem
             }
             return false;
         }
-
 
         public override string ToString()
         {

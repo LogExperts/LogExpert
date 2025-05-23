@@ -2,10 +2,6 @@
 {
     public class RowHeightEntry
     {
-        #region Fields
-
-        #endregion
-
         #region cTor
 
         public RowHeightEntry()

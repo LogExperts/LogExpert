@@ -4,10 +4,6 @@ namespace LogExpert.Core.Entities
 {
     public class BookmarkOverlay
     {
-        #region Fields
-
-        #endregion
-
         #region Properties
 
         public Bookmark Bookmark { get; set; }

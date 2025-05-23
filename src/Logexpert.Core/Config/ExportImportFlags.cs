@@ -1,5 +1,3 @@
-using System;
-
 namespace LogExpert.Core.Config
 {
     [Flags]

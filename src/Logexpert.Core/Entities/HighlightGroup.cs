@@ -3,24 +3,24 @@
 namespace LogExpert.Core.Entities
 {
     [Serializable]
-    public class HilightGroup : ICloneable
+    public class HighlightGroup : ICloneable
     {
         #region Properties
 
         public string GroupName { get; set; } = string.Empty;
 
-        public List<HilightEntry> HilightEntryList { get; set; } = [];
+        public List<HighlightEntry> HighlightEntryList { get; set; } = [];
 
         public object Clone()
         {
-            HilightGroup clone = new()
+            HighlightGroup clone = new()
             {
                 GroupName = GroupName
             };
 
-            foreach (HilightEntry entry in HilightEntryList)
+            foreach (HighlightEntry entry in HighlightEntryList)
             {
-                clone.HilightEntryList.Add((HilightEntry)entry.Clone());
+                clone.HighlightEntryList.Add((HighlightEntry)entry.Clone());
             }
 
             return clone;
