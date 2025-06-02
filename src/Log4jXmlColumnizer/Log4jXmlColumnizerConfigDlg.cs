@@ -25,7 +25,7 @@ public partial class Log4jXmlColumnizerConfigDlg : Form
         _config = config;
         InitializeComponent();
         FillListBox();
-        localTimeCheckBox.Checked = _config.localTimestamps;
+        localTimeCheckBox.Checked = _config.LocalTimestamps;
         ResumeLayout();
     }
 
@@ -39,7 +39,7 @@ public partial class Log4jXmlColumnizerConfigDlg : Form
         var nameColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[1];
         var lenColumn = (DataGridViewTextBoxColumn)columnGridView.Columns[2];
 
-        foreach (Log4jColumnEntry entry in _config.columnList)
+        foreach (Log4jColumnEntry entry in _config.ColumnList)
         {
             DataGridViewRow row = new();
             row.Cells.Add(new DataGridViewCheckBoxCell());
@@ -64,19 +64,19 @@ public partial class Log4jXmlColumnizerConfigDlg : Form
         //  }
         for (var i = 0; i < columnGridView.Rows.Count; ++i)
         {
-            _config.columnList[i].Visible = (bool)columnGridView.Rows[i].Cells[0].Value;
+            _config.ColumnList[i].Visible = (bool)columnGridView.Rows[i].Cells[0].Value;
             var sLen = (string)columnGridView.Rows[i].Cells[2].Value;
 
             if (int.TryParse(sLen, out var len))
             {
-                _config.columnList[i].MaxLen = len;
+                _config.ColumnList[i].MaxLen = len;
             }
             else
             {
-                _config.columnList[i].MaxLen = 0;
+                _config.ColumnList[i].MaxLen = 0;
             }
         }
-        _config.localTimestamps = localTimeCheckBox.Checked;
+        _config.LocalTimestamps = localTimeCheckBox.Checked;
     }
 
     #endregion

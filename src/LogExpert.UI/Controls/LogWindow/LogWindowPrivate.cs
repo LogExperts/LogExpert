@@ -2772,7 +2772,7 @@ partial class LogWindow
         pipe.OpenFile();
         foreach (LineEntry entry in lineEntryList)
         {
-            pipe.WriteToPipe(entry.logLine, entry.lineNum);
+            pipe.WriteToPipe(entry.LogLine, entry.LineNum);
         }
 
         pipe.CloseFile();

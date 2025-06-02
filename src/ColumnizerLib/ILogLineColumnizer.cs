@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace LogExpert;
 
@@ -6,7 +6,7 @@ namespace LogExpert;
 /// This interface defines a so-called 'Columnizer' for LogExpert.
 /// A columnizer splits a single text line into well defined columns. These columns
 /// are used in the data grid view of LogExpert.
-/// <br></br><br></br> 
+/// <br></br><br></br>
 /// Optionally a columnizer can parse the log line to determine the date/time of
 /// the log line (assuming that all log lines have a timestamp). This is needed for
 /// some of the features of LogExpert (see user documentation for more information).
@@ -20,30 +20,30 @@ public interface ILogLineColumnizer
     /// <summary>
     /// Returns the name for the columnizer. This name is used for the columnizer selection dialog.
     /// </summary>
-    string GetName();
+    string GetName ();
 
     /// <summary>
     /// Returns the description of the columnizer. This text is used in the columnizer selection dialog.
     /// </summary>
-    string GetDescription();
+    string GetDescription ();
 
     /// <summary>
-    /// Returns the number of columns the columnizer will split lines into. 
+    /// Returns the number of columns the columnizer will split lines into.
     /// </summary>
     /// <remarks>
-    /// This value does not include the column for displaying the line number. The line number column 
+    /// This value does not include the column for displaying the line number. The line number column
     /// is added by LogExpert and is not handled by columnizers.
     /// </remarks>
-    int GetColumnCount();
+    int GetColumnCount ();
 
     /// <summary>
     /// Returns the names of the columns. The returned names are used by LogExpert for the column headers in the data grid view.
-    /// The names are expected in order from left to right. 
+    /// The names are expected in order from left to right.
     /// </summary>
-    string[] GetColumnNames();
+    string[] GetColumnNames ();
 
     /// <summary>
-    /// Given a single line of the logfile this function splits the line content into columns. The function returns 
+    /// Given a single line of the logfile this function splits the line content into columns. The function returns
     /// a string array containing the splitted content.
     /// </summary>
     /// <remarks>
@@ -51,14 +51,14 @@ public interface ILogLineColumnizer
     /// handles the splitting, the faster LogExpert can draw the grid view content.<br></br>
     /// <br></br>
     /// Notes about timeshift handling:<br></br>
-    /// If your columnizer implementation supports timeshift (see <see cref="IsTimeshiftImplemented">IsTimeshiftImplemented</see>) 
+    /// If your columnizer implementation supports timeshift (see <see cref="IsTimeshiftImplemented">IsTimeshiftImplemented</see>)
     /// you have to add the timestamp offset to the columns representing the timestamp (e.g. columns like 'date' and 'time').
-    /// In practice this means you have to parse the date/time value of your log line (see <see cref="GetTimestamp">GetTimestamp</see>) 
+    /// In practice this means you have to parse the date/time value of your log line (see <see cref="GetTimestamp">GetTimestamp</see>)
     /// add the offset and convert the timestamp back to string value(s).
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
     /// <param name="line">The line content to be splitted</param>
-    IColumnizedLogLine SplitLine(ILogLineColumnizerCallback callback, ILogLine line);
+    IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line);
 
     /// <summary>
     /// Returns true, if the columnizer supports timeshift handling.
@@ -67,23 +67,23 @@ public interface ILogLineColumnizer
     /// If you return true, you also have to implement the function SetTimeOffset(), GetTimeOffset() and GetTimestamp().
     /// You also must handle PushValue() for the column(s) that displays the timestamp.
     /// </remarks>
-    bool IsTimeshiftImplemented();
+    bool IsTimeshiftImplemented ();
 
     /// <summary>
-    /// Sets an offset to be used for displaying timestamp values. You have to implement this function, if 
+    /// Sets an offset to be used for displaying timestamp values. You have to implement this function, if
     /// your IsTimeshiftImplemented() function return true.
     /// </summary>
     /// <remarks>
-    /// You have to store the given value in the Columnizer instance and add this offset to the timestamp column(s) returned by SplitLine() 
+    /// You have to store the given value in the Columnizer instance and add this offset to the timestamp column(s) returned by SplitLine()
     /// (e.g. in the date and time columns).
     /// </remarks>
     /// <param name="msecOffset">The timestamp offset in milliseconds.</param>
-    void SetTimeOffset(int msecOffset);
+    void SetTimeOffset (int msecOffset);
 
     /// <summary>
     /// Returns the current stored timestamp offset (set by SetTimeOffset()).
     /// </summary>
-    int GetTimeOffset();
+    int GetTimeOffset ();
 
     /// <summary>
     /// Returns the timestamp value of the given line as a .NET DateTime object. If there's no valid timestamp in the
@@ -99,7 +99,7 @@ public interface ILogLineColumnizer
     /// </remarks>
     /// <param name="callback">Callback interface with functions which can be used by the columnizer</param>
     /// <param name="line">The line content which timestamp has to be returned.</param>
-    DateTime GetTimestamp(ILogLineColumnizerCallback callback, ILogLine line);
+    DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line);
 
     /// <summary>
     /// This function is called if the user changes a value in a column (edit mode in the log view).
@@ -114,7 +114,7 @@ public interface ILogLineColumnizer
     /// <param name="column">The column number which value has changed.</param>
     /// <param name="value">The new value.</param>
     /// <param name="oldValue">The old value.</param>
-    void PushValue(ILogLineColumnizerCallback callback, int column, string value, string oldValue);
+    void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue);
 
     #endregion
 }

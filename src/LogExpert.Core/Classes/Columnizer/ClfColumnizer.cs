@@ -1,26 +1,25 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
+﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace LogExpert.Core.Classes.Columnizer;
 
 public class ClfColumnizer : ILogLineColumnizer
 {
+    private const string DateTimeFormat = "dd/MMM/yyyy:HH:mm:ss zzz";
     #region Fields
 
-    private readonly Regex lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
+    private readonly Regex _lineRegex = new("(.*) (-) (.*) (\\[.*\\]) (\".*\") (.*) (.*) (\".*\") (\".*\")");
 
-    protected CultureInfo cultureInfo = new("de-DE");
-    protected int timeOffset;
+    private readonly CultureInfo _culture = new("en-US");
+    private int _timeOffset;
 
     #endregion
 
     #region cTor
 
-    // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
+    // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
 
-    public ClfColumnizer()
+    public ClfColumnizer ()
     {
     }
 
@@ -28,22 +27,22 @@ public class ClfColumnizer : ILogLineColumnizer
 
     #region Public methods
 
-    public bool IsTimeshiftImplemented()
+    public bool IsTimeshiftImplemented ()
     {
         return true;
     }
 
-    public void SetTimeOffset(int msecOffset)
+    public void SetTimeOffset (int msecOffset)
     {
-        timeOffset = msecOffset;
+        _timeOffset = msecOffset;
     }
 
-    public int GetTimeOffset()
+    public int GetTimeOffset ()
     {
-        return timeOffset;
+        return _timeOffset;
     }
 
-    public DateTime GetTimestamp(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
+    public DateTime GetTimestamp (ILogLineColumnizerCallback callback, ILogLine line)
     {
         IColumnizedLogLine cols = SplitLine(callback, line);
         if (cols == null || cols.ColumnValues.Length < 8)
@@ -58,8 +57,7 @@ public class ClfColumnizer : ILogLineColumnizer
 
         try
         {
-            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, "dd/MMM/yyyy:HH:mm:ss zzz",
-                new CultureInfo("en-US"));
+            var dateTime = DateTime.ParseExact(cols.ColumnValues[2].FullValue, DateTimeFormat, _culture);
             return dateTime;
         }
         catch (Exception)
@@ -68,19 +66,17 @@ public class ClfColumnizer : ILogLineColumnizer
         }
     }
 
-    public void PushValue(LogExpert.ILogLineColumnizerCallback callback, int column, string value, string oldValue)
+    public void PushValue (ILogLineColumnizerCallback callback, int column, string value, string oldValue)
     {
         if (column == 2)
         {
             try
             {
-                var newDateTime =
-                    DateTime.ParseExact(value, "dd/MMM/yyyy:HH:mm:ss zzz", new CultureInfo("en-US"));
-                var oldDateTime =
-                    DateTime.ParseExact(oldValue, "dd/MMM/yyyy:HH:mm:ss zzz", new CultureInfo("en-US"));
+                var newDateTime = DateTime.ParseExact(value, DateTimeFormat, _culture);
+                var oldDateTime = DateTime.ParseExact(oldValue, DateTimeFormat, _culture);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
-                timeOffset = (int)(mSecsNew - mSecsOld);
+                _timeOffset = (int)(mSecsNew - mSecsOld);
             }
             catch (FormatException)
             {
@@ -88,27 +84,27 @@ public class ClfColumnizer : ILogLineColumnizer
         }
     }
 
-    public string GetName()
+    public string GetName ()
     {
         return "Webserver CLF Columnizer";
     }
 
-    public string GetDescription()
+    public string GetDescription ()
     {
         return "Common Logfile Format used by webservers.";
     }
 
-    public int GetColumnCount()
+    public int GetColumnCount ()
     {
         return 8;
     }
 
-    public string[] GetColumnNames()
+    public string[] GetColumnNames ()
     {
         return ["IP", "User", "Date/Time", "Request", "Status", "Bytes", "Referrer", "User agent"];
     }
 
-    public IColumnizedLogLine SplitLine(LogExpert.ILogLineColumnizerCallback callback, ILogLine line)
+    public IColumnizedLogLine SplitLine (ILogLineColumnizerCallback callback, ILogLine line)
     {
         ColumnizedLogLine cLogLine = new()
         {
@@ -132,17 +128,17 @@ public class ClfColumnizer : ILogLineColumnizer
         var temp = line.FullLine;
         if (temp.Length > 1024)
         {
-            // spam 
-            temp = temp.Substring(0, 1024);
+            // spam
+            temp = temp[..1024];
             columns[3].FullValue = temp;
             return cLogLine;
         }
         // 0         1         2         3         4         5         6         7         8         9         10        11        12        13        14        15        16
-        // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html" 
+        // anon-212-34-174-126.suchen.de - - [08/Mar/2008:00:41:10 +0100] "GET /wiki/index.php?title=Bild:Poster_small.jpg&printable=yes&printable=yes HTTP/1.1" 304 0 "http://www.captain-kloppi.de/wiki/index.php?title=Bild:Poster_small.jpg&printable=yes" "gonzo1[P] +http://www.suchen.de/faq.html"
 
-        if (lineRegex.IsMatch(temp))
+        if (_lineRegex.IsMatch(temp))
         {
-            Match match = lineRegex.Match(temp);
+            Match match = _lineRegex.Match(temp);
             GroupCollection groups = match.Groups;
             if (groups.Count == 10)
             {
@@ -159,15 +155,13 @@ public class ClfColumnizer : ILogLineColumnizer
                 // dirty probing of date/time format (much faster than DateTime.ParseExact()
                 if (dateTimeStr[2] == '/' && dateTimeStr[6] == '/' && dateTimeStr[11] == ':')
                 {
-                    if (timeOffset != 0)
+                    if (_timeOffset != 0)
                     {
                         try
                         {
-                            var dateTime = DateTime.ParseExact(dateTimeStr, "dd/MMM/yyyy:HH:mm:ss zzz",
-                                new CultureInfo("en-US"));
-                            dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, timeOffset));
-                            var newDate = dateTime.ToString("dd/MMM/yyyy:HH:mm:ss zzz",
-                                new CultureInfo("en-US"));
+                            var dateTime = DateTime.ParseExact(dateTimeStr, DateTimeFormat, _culture);
+                            dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
+                            var newDate = dateTime.ToString(DateTimeFormat, _culture);
                             columns[2].FullValue = newDate;
                         }
                         catch (Exception)

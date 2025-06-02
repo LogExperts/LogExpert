@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Log4jXmlColumnizer;
@@ -6,16 +6,9 @@ namespace Log4jXmlColumnizer;
 [Serializable]
 public class Log4jXmlColumnizerConfig
 {
-    #region Fields
-
-    public List<Log4jColumnEntry> columnList = [];
-    public bool localTimestamps = true;
-
-    #endregion
-
     #region cTor
 
-    public Log4jXmlColumnizerConfig(string[] columnNames)
+    public Log4jXmlColumnizerConfig (string[] columnNames)
     {
         FillDefaults(columnNames);
     }
@@ -33,7 +26,7 @@ public class Log4jXmlColumnizerConfig
         get
         {
             var count = 0;
-            foreach (Log4jColumnEntry entry in columnList)
+            foreach (Log4jColumnEntry entry in ColumnList)
             {
                 if (entry.Visible)
                 {
@@ -53,27 +46,32 @@ public class Log4jXmlColumnizerConfig
         {
             var names = new string[ActiveColumnCount];
             var index = 0;
-            foreach (Log4jColumnEntry entry in columnList)
+            foreach (Log4jColumnEntry entry in ColumnList)
             {
                 if (entry.Visible)
                 {
                     names[index++] = entry.ColumnName;
                 }
             }
+
             return names;
         }
     }
+
+    public List<Log4jColumnEntry> ColumnList { get; set; }
+
+    public bool LocalTimestamps { get; set; }
 
     #endregion
 
     #region Public methods
 
-    public void FillDefaults(string[] columnNames)
+    public void FillDefaults (string[] columnNames)
     {
-        columnList.Clear();
+        ColumnList.Clear();
         for (var i = 0; i < columnNames.Length; ++i)
         {
-            columnList.Add(new Log4jColumnEntry(columnNames[i], i, 0));
+            ColumnList.Add(new Log4jColumnEntry(columnNames[i], i, 0));
         }
     }
 
