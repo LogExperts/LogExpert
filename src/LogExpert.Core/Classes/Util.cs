@@ -28,9 +28,10 @@ public class Util
         return fileName[(i + 1)..];
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
+   
     public static string StripExtension (string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName);
         var i = fileName.LastIndexOf('.');
 
         if (i < 0)
@@ -41,9 +42,10 @@ public class Util
         return fileName[..i];
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
+    
     public static string GetExtension (string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName);
         var i = fileName.LastIndexOf('.');
 
         return i < 0 || i >= fileName.Length - 1
@@ -102,9 +104,11 @@ public class Util
         return match;
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
     public static int DamerauLevenshteinDistance (string src, string dest)
     {
+        ArgumentNullException.ThrowIfNull(src);
+        ArgumentNullException.ThrowIfNull(dest);
+        
         var d = new int[src.Length + 1, dest.Length + 1];
         int i, j, cost;
         var str1 = src.ToCharArray();
@@ -142,9 +146,12 @@ public class Util
         return d[str1.Length, str2.Length];
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
+  
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
+        
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
         {
@@ -409,10 +416,13 @@ public class Util
         }
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
     [SupportedOSPlatform("windows")]
     public string? GetWordFromPos (int xPos, string text, Graphics g, Font font)
     {
+        if (text is null) return null;
+        ArgumentNullException.ThrowIfNull(g);
+        ArgumentNullException.ThrowIfNull(font);
+        
         var words = text.Split([' ', '.', ':', ';']);
 
         var index = 0;
