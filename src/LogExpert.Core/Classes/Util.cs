@@ -122,8 +122,8 @@ public class Util
 
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
-        ArgumentNullException.ThrowIfNull(s1);
-        ArgumentNullException.ThrowIfNull(s2);
+        s1 ??= string.Empty;
+        s2 ??= string.Empty;
 
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
