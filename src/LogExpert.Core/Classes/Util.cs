@@ -11,47 +11,14 @@ public class Util
 {
     #region Public methods
 
-    public static string GetNameFromPath (string fileName)
-    {
-        var i = fileName.LastIndexOf('\\');
+    public static string GetNameFromPath (string fileName) => fileName is null ? string.Empty : Path.GetFileName(fileName);
 
-        if (i < 0)
-        {
-            i = fileName.LastIndexOf('/');
-        }
 
-        if (i < 0)
-        {
-            i = -1;
-        }
+    public static string StripExtension (string fileName) => fileName is null ? string.Empty : Path.GetFileNameWithoutExtension(fileName);
 
-        return fileName[(i + 1)..];
-    }
 
-   
-    public static string StripExtension (string fileName)
-    {
-        ArgumentNullException.ThrowIfNull(fileName);
-        var i = fileName.LastIndexOf('.');
+    public static string GetExtension (string fileName) => fileName is null ? string.Empty : Path.GetExtension(fileName).TrimStart('.');
 
-        if (i < 0)
-        {
-            i = fileName.Length - 1;
-        }
-
-        return fileName[..i];
-    }
-
-    
-    public static string GetExtension (string fileName)
-    {
-        ArgumentNullException.ThrowIfNull(fileName);
-        var i = fileName.LastIndexOf('.');
-
-        return i < 0 || i >= fileName.Length - 1
-            ? string.Empty
-            : fileName[(i + 1)..];
-    }
 
 
     public static string GetFileSizeAsText (long size)
@@ -106,9 +73,15 @@ public class Util
 
     public static int DamerauLevenshteinDistance (string src, string dest)
     {
-        ArgumentNullException.ThrowIfNull(src);
-        ArgumentNullException.ThrowIfNull(dest);
-        
+        if (dest is null || dest.Length == 0)
+        {
+            return 0;
+        }
+        if (src is null || src.Length == 0)
+        {
+            return int.MaxValue;
+        }
+
         var d = new int[src.Length + 1, dest.Length + 1];
         int i, j, cost;
         var str1 = src.ToCharArray();
@@ -146,12 +119,12 @@ public class Util
         return d[str1.Length, str2.Length];
     }
 
-  
+
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
         ArgumentNullException.ThrowIfNull(s1);
         ArgumentNullException.ThrowIfNull(s2);
-        
+
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
         {
@@ -419,10 +392,12 @@ public class Util
     [SupportedOSPlatform("windows")]
     public string? GetWordFromPos (int xPos, string text, Graphics g, Font font)
     {
-        if (text is null) return null;
+        if (text is null)
+            return null;
+        //todo check for null in referenced objects
         ArgumentNullException.ThrowIfNull(g);
         ArgumentNullException.ThrowIfNull(font);
-        
+
         var words = text.Split([' ', '.', ':', ';']);
 
         var index = 0;
