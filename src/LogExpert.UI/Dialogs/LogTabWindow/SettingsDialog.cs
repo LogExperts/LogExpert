@@ -165,7 +165,7 @@ internal partial class SettingsDialog : Form
         FillMultifileSettings();
         FillEncodingList();
 
-        var temp = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        //var temp = Encoding.GetEncoding(Preferences.DefaultEncoding);//TODO: Delete
 
         comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
         checkBoxMaskPrio.Checked = Preferences.MaskPrio;

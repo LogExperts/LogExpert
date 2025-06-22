@@ -597,7 +597,6 @@ partial class LogWindow
         dataGridView.SuspendLayout();
         dataGridView.RowCount = _logFileReader.LineCount;
         dataGridView.CurrentCellChanged += OnDataGridViewCurrentCellChanged;
-        dataGridView.Enabled = true;
         dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
         dataGridView.ResumeLayout();
         _progressEventArgs.Visible = false;
@@ -621,6 +620,7 @@ partial class LogWindow
 
         PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.All);
         //LoadPersistenceData();
+        dataGridView.Enabled = true;
     }
 
     private void LogEventWorker ()

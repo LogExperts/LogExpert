@@ -14,9 +14,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
-    private readonly GetLogLineFx _logLineFx;
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly string _fileName;
     private readonly int _max_buffers;
@@ -68,7 +66,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _maxLinesPerBuffer = linesPerBuffer;
         _multiFileOptions = multiFileOptions;
         _pluginRegistry = pluginRegistry;
-        _logLineFx = GetLogLineInternal;
         _disposed = false;
 
         InitLruBuffers();
@@ -108,7 +105,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         _maxLinesPerBuffer = linesPerBuffer;
         _multiFileOptions = multiFileOptions;
         _pluginRegistry = pluginRegistry;
-        _logLineFx = GetLogLineInternal;
         _disposed = false;
 
         InitLruBuffers();
@@ -124,12 +120,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
         StartGCThread();
     }
-
-    #endregion
-
-    #region Delegates
-
-    private delegate Task<ILogLine> GetLogLineFx (int lineNum);
 
     #endregion
 
@@ -396,7 +386,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     public ILogLine GetLogLine (int lineNum)
     {
-        return GetLogLineInternal(lineNum).Result;
+        return GetLogLineInternal(lineNum, _cts.Token).Result; //TODO: Is this token correct?
     }
 
     /// <summary>
@@ -416,36 +406,70 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// <returns></returns>
     public async Task<ILogLine> GetLogLineWithWait (int lineNum)
     {
-        const int WAIT_TIME = 1000;
+        const int WAIT_MS = 1000;
 
-        ILogLine result = null;
-
+        // If we’re not in fast-fail mode, try once with timeout
         if (!_isFastFailOnGetLogLine)
         {
-            var task = Task.Run(() => _logLineFx(lineNum));
-            if (task.Wait(WAIT_TIME))
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(WAIT_MS);
+
+            try
             {
-                result = task.Result;
+                // Offload the read so UI never blocks
+                var line = await GetLogLineInternal(lineNum, cts.Token).ConfigureAwait(false);
+
+                // Completed successfully in time
                 _isFastFailOnGetLogLine = false;
+                return line;
             }
-            else
+            catch (OperationCanceledException)
             {
+                // Timed out
                 _isFastFailOnGetLogLine = true;
-                _logger.Debug(CultureInfo.InvariantCulture, "No result after {0}ms. Returning <null>.", WAIT_TIME);
+                _logger.Debug(CultureInfo.InvariantCulture, "Timeout after {0}ms. Returning <null>.", WAIT_MS);
+                TriggerBackgroundRecovery(lineNum);
+                return null;
             }
-        }
-        else
-        {
-            _logger.Debug(CultureInfo.InvariantCulture, "Fast failing GetLogLine()");
-            if (!_isFailModeCheckCallPending)
+            catch (Exception ex)
             {
-                _isFailModeCheckCallPending = true;
-                var logLine = await _logLineFx(lineNum);
-                GetLineFinishedCallback(logLine);
+                // Real error—flip fast-fail and rethrow
+                _isFastFailOnGetLogLine = true;
+                _logger.Error(ex, "Exception in GetLogLineInternal for line {0}.", lineNum);
+                throw;
             }
         }
 
-        return result;
+        // Fast-fail path: immediate null, kick off a background refresh
+        _logger.Debug(CultureInfo.InvariantCulture, "Fast failing GetLogLine()");
+        TriggerBackgroundRecovery(lineNum);
+        return null;
+    }
+
+    private void TriggerBackgroundRecovery (int lineNum)
+    {
+        if (_isFailModeCheckCallPending)
+            return;
+
+        _isFailModeCheckCallPending = true;
+
+        // Fire-and-forget check (no UI thread marshalling needed)
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var line = await GetLogLineInternal(lineNum, CancellationToken.None).ConfigureAwait(false);
+                GetLineFinishedCallback(line);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Deferred GetLogLineInternal failed.");
+            }
+            finally
+            {
+                _isFailModeCheckCallPending = false;
+            }
+        });
     }
 
     /// <summary>
@@ -755,43 +779,74 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         return info;
     }
 
-    private Task<ILogLine> GetLogLineInternal (int lineNum)
+    private Task<ILogLine> GetLogLineInternal (int lineNum, CancellationToken ct)
     {
+        // Run all the heavy work off the UI thread,
+        // and honor the cancellation token
+        return Task.Run(() => GetLogLineInternalCore(lineNum, ct), ct);
+    }
+
+    private ILogLine GetLogLineInternalCore (int lineNum, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
         if (_isDeleted)
         {
-            _logger.Debug(CultureInfo.InvariantCulture, "Returning null for line {0} because file is deleted.", lineNum);
+            _logger.Debug(
+                CultureInfo.InvariantCulture,
+                "Returning null for line {0} because file is deleted.",
+                lineNum);
 
-            // fast fail if dead file was detected. Prevents repeated lags in GUI thread caused by callbacks from control (e.g. repaint)
             return null;
         }
 
-        AcquireBufferListReaderLock();
-        LogBuffer logBuffer = GetBufferForLine(lineNum);
-        if (logBuffer == null)
+        AcquireBufferListReaderLock();    // blocking call off UI
+        try
         {
-            ReleaseBufferListReaderLock();
-            _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
-            return null;
-        }
+            ct.ThrowIfCancellationRequested();
 
-        // disposeLock prevents that the garbage collector is disposing just in the moment we use the buffer
-        _disposeLock.AcquireReaderLock(Timeout.Infinite);
-        if (logBuffer.IsDisposed)
-        {
-            LockCookie cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
-            lock (logBuffer.FileInfo)
+            var logBuffer = GetBufferForLine(lineNum);
+            if (logBuffer == null)
             {
-                ReReadBuffer(logBuffer);
+                _logger.Error("Cannot find buffer for line {0}, file: {1}{2}", lineNum, _fileName, IsMultiFile ? " (MultiFile)" : "");
+                return null;
             }
 
-            _disposeLock.DowngradeFromWriterLock(ref cookie);
+            _disposeLock.AcquireReaderLock(Timeout.Infinite);
+            try
+            {
+                ct.ThrowIfCancellationRequested();
+
+                if (logBuffer.IsDisposed)
+                {
+                    var cookie = _disposeLock.UpgradeToWriterLock(Timeout.Infinite);
+                    try
+                    {
+                        lock (logBuffer.FileInfo)
+                        {
+                            ReReadBuffer(logBuffer);
+                        }
+
+                        ct.ThrowIfCancellationRequested();
+                    }
+                    finally
+                    {
+                        _disposeLock.DowngradeFromWriterLock(ref cookie);
+                    }
+                }
+
+                // Actual line extraction
+                return logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
+            }
+            finally
+            {
+                _disposeLock.ReleaseReaderLock();
+            }
         }
-
-        ILogLine line = logBuffer.GetLineOfBlock(lineNum - logBuffer.StartLine);
-        _disposeLock.ReleaseReaderLock();
-        ReleaseBufferListReaderLock();
-
-        return Task.FromResult(line);
+        finally
+        {
+            ReleaseBufferListReaderLock();
+        }
     }
 
     private void InitLruBuffers ()
@@ -1785,13 +1840,13 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #endregion
 
-    public void Dispose()
+    public void Dispose ()
     {
         Dispose(true);
         GC.SuppressFinalize(this); // Suppress finalization (not needed but best practice)
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual void Dispose (bool disposing)
     {
         if (!_disposed)
         {
@@ -1808,7 +1863,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     //TODO: Seems that this can be deleted. Need to verify.
     ~LogfileReader ()
     {
-        Dispose (false);
+        Dispose(false);
     }
 
     protected virtual void OnFileSizeChanged (LogEventArgs e)

@@ -404,11 +404,11 @@ partial class LogWindow
         if (rowIndex < 0 || e.ColumnIndex < 0)
         {
             e.Handled = false;
-            return;
+            //return;
         }
 
-        ILogLine line = _logFileReader.GetLogLineWithWait(rowIndex).Result;
-
+        //ILogLine line = _logFileReader.GetLogLineWithWait(rowIndex).Result;
+        ILogLine line = null;
         if (line != null)
         {
             HighlightEntry entry = FindFirstNoWordMatchHilightEntry(line);
