@@ -222,8 +222,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
         markEditModeToolStripMenuItem.Enabled = true;
 
-        _panelOpenButtonImage = Resources.Resources.Arrow_menu_open;
-        _panelCloseButtonImage = Resources.Resources.Arrow_menu_close;
+        _panelOpenButtonImage = Resources.Arrow_menu_open;
+        _panelCloseButtonImage = Resources.Arrow_menu_close;
 
         Settings settings = configManager.Settings;
 

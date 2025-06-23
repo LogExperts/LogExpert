@@ -2,27 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <Nullable>enable</Nullable>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs" Link="AssemblyVersion.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NLog" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
   </ItemGroup>
 
 </Project>

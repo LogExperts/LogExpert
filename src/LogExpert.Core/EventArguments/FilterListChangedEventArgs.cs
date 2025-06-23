@@ -1,13 +1,10 @@
-﻿
+
 using LogExpert.Core.Interface;
 
 namespace LogExpert.Core.EventArguments;
 
-public class FilterListChangedEventArgs(ILogWindow logWindow)
+//TODO: Move to UI
+public class FilterListChangedEventArgs (ILogWindow logWindow) : EventArgs
 {
-    #region Properties
-
     public ILogWindow LogWindow { get; } = logWindow;
-
-    #endregion
 }

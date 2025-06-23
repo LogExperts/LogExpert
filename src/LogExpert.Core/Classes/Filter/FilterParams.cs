@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -9,10 +10,6 @@ namespace LogExpert.Core.Classes.Filter;
 public class FilterParams : ICloneable
 {
     #region Fields
-
-    private string _rangeSearchText = string.Empty;
-    private string _searchText = string.Empty;
-
     //public List<string> historyList = new List<string>();
     //public List<string> rangeHistoryList = new List<string>();
 
@@ -20,27 +17,11 @@ public class FilterParams : ICloneable
 
     #region Properties
 
-    public string SearchText
-    {
-        get => _searchText;
-        set
-        {
-            _searchText = value;
-            LowerSearchText = _searchText.ToLowerInvariant();
-        }
-    }
+    public string SearchText { get; set; }
 
-    public string RangeSearchText
-    {
-        get => _rangeSearchText;
-        set
-        {
-            _rangeSearchText = value;
-            LowerRangeSearchText = _rangeSearchText.ToLowerInvariant();
-        }
-    }
+    public string RangeSearchText { get; set; }
 
-    public bool SpreadEnabled => SpreadBefore > 0 || SpreadBehind > 0;
+    //public bool SpreadEnabled => SpreadBefore > 0 || SpreadBehind > 0;
 
     public bool IsCaseSensitive { get; set; }
 
@@ -69,7 +50,7 @@ public class FilterParams : ICloneable
     public bool IsRegex { get; set; }
 
     // list of columns in which to search
-    public List<int> ColumnList { get; set; } = [];
+    public Collection<int> ColumnList { get; } = [];
 
     [JsonIgnore]
     [field: NonSerialized]
@@ -91,11 +72,13 @@ public class FilterParams : ICloneable
     [field: NonSerialized]
     public bool LastResult { get; set; }
 
-    [field: NonSerialized]
-    public string LowerRangeSearchText { get; set; } = string.Empty;
+    ///Returns RangeSearchText.ToUpperInvariant
+    [JsonIgnore]
+    internal string NormalizedRangeSearchText => RangeSearchText.ToUpperInvariant();
 
-    [field: NonSerialized]
-    public string LowerSearchText { get; set; } = string.Empty;
+    ///Returns SearchText.ToUpperInvariant
+    [JsonIgnore]
+    internal string NormalizedSearchText => SearchText.ToUpperInvariant();
 
     [field: NonSerialized]
     public Regex RangeRex { get; set; }
@@ -125,8 +108,6 @@ public class FilterParams : ICloneable
     public void Init ()
     {
         LastNonEmptyCols = [];
-        LowerRangeSearchText = RangeSearchText.ToLowerInvariant();
-        LowerSearchText = SearchText.ToLowerInvariant();
         LastLine = string.Empty;
     }
 

@@ -1,9 +1,9 @@
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Filter;
+
 using NLog;
 
-namespace LogExpert.Classes.Filter;
+namespace LogExpert.Core.Classes.Filter;
 
 internal delegate void FilterFx (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterResultLines, List<int> filterHitList);
 
@@ -13,7 +13,7 @@ internal class Filter
 
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int SPREAD_MAX = 50;
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly ColumnizerCallback _callback;
 
@@ -35,11 +35,8 @@ internal class Filter
     #region Properties
 
     public List<int> FilterResultLines { get; }
-
     public List<int> LastFilterLinesList { get; }
-
     public List<int> FilterHitList { get; }
-
     public bool ShouldCancel { get; set; }
 
     #endregion
@@ -72,7 +69,7 @@ internal class Filter
                     return count;
                 }
 
-                ILogLine line = _callback.GetLogLine(lineNum);
+                var line = _callback.GetLogLine(lineNum);
 
                 if (line == null)
                 {
@@ -83,7 +80,7 @@ internal class Filter
 
                 if (Util.TestFilterCondition(filterParams, line, _callback))
                 {
-                    AddFilterLine(lineNum, false, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
+                    AddFilterLine(lineNum, filterParams, filterResultLines, lastFilterLinesList, filterHitList);
                 }
 
                 lineNum++;
@@ -99,6 +96,7 @@ internal class Filter
         catch (Exception ex)
         {
             _logger.Error(ex, "Exception while filtering. Please report to developer");
+            throw;
             //TODO: This information should be handled from the LogExpert project and not from LogExpert.Core.
             //MessageBox.Show(null,
             //    "Exception while filtering. Please report to developer: \n\n" + ex + "\n\n" + ex.StackTrace,
@@ -108,10 +106,10 @@ internal class Filter
         return count;
     }
 
-    private void AddFilterLine (int lineNum, bool immediate, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
+    private void AddFilterLine (int lineNum, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
     {
         filterHitList.Add(lineNum);
-        IList<int> filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+        var filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
 
         filterResultLines.AddRange(filterResult);
 
@@ -122,7 +120,6 @@ internal class Filter
             lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
         }
     }
-
 
     /// <summary>
     ///  Returns a list with 'additional filter results'. This is the given line number
@@ -170,6 +167,7 @@ internal class Filter
                 }
             }
         }
+
         return resultList;
     }
 

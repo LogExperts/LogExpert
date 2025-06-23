@@ -6,5 +6,33 @@
     <InformationalVersion>2.0.0.0-rc1</InformationalVersion>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
     <Company>Log Expert</Company>
-    </PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <PublishAot>false</PublishAot>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LogExpert</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!--<OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>--><!--TODO: Normalize this across solution-->
+    <SignAssembly>true</SignAssembly>
+    <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
+    <Product>LogExpert</Product>
+    <Copyright>Copyright © LogExpert 2025</Copyright>
+    <IsTestProject>false</IsTestProject>
+    <UseWindowsForms>false</UseWindowsForms>
+    <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+
+    <AssemblyTitle>FIX ME - AssemblyTitle!</AssemblyTitle>
+    <Description>FIX ME - Description!</Description>
+  </PropertyGroup>
+
+  <ItemGroup Label="Links">
+    <Compile Include="..\Solution Items\AssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
+    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+  </ItemGroup>
+
 </Project>
+

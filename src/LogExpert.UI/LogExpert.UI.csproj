@@ -1,28 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <PublishAot>false</PublishAot>
-    <SignAssembly>True</SignAssembly>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
-    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
-    <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Remove="Dialogs\LogTabWindow\LogTabWindowEventHandlers.resx" />
@@ -30,6 +14,12 @@
     <EmbeddedResource Remove="Controls\LogWindow\LogWindowEventHandlers.resx" />
     <EmbeddedResource Remove="Controls\LogWindow\LogWindowPrivate.resx" />
     <EmbeddedResource Remove="Controls\LogWindow\LogWindowPublic.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
+    <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
 
   <ItemGroup>

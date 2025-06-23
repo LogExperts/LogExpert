@@ -241,7 +241,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // openToolStripMenuItem
             // 
             openToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
-            openToolStripMenuItem.Image = LogExpert.Resources.Resources.File_open;
+            openToolStripMenuItem.Image = LogExpert.Resources.File_open;
             openToolStripMenuItem.Name = "openToolStripMenuItem";
             openToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.O;
             openToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -259,7 +259,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // closeFileToolStripMenuItem
             // 
-            closeFileToolStripMenuItem.Image = LogExpert.Resources.Resources.Close;
+            closeFileToolStripMenuItem.Image = LogExpert.Resources.Close;
             closeFileToolStripMenuItem.Name = "closeFileToolStripMenuItem";
             closeFileToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.F4;
             closeFileToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -268,7 +268,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // reloadToolStripMenuItem
             // 
-            reloadToolStripMenuItem.Image = LogExpert.Resources.Resources.Restart_alt;
+            reloadToolStripMenuItem.Image = LogExpert.Resources.Restart_alt;
             reloadToolStripMenuItem.Name = "reloadToolStripMenuItem";
             reloadToolStripMenuItem.ShortcutKeys = Keys.F5;
             reloadToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -360,7 +360,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // exitToolStripMenuItem
             // 
-            exitToolStripMenuItem.Image = LogExpert.Resources.Resources.Exit;
+            exitToolStripMenuItem.Image = LogExpert.Resources.Exit;
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             exitToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
             exitToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -392,7 +392,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // filterToolStripMenuItem
             // 
-            filterToolStripMenuItem.Image = LogExpert.Resources.Resources.Filter;
+            filterToolStripMenuItem.Image = LogExpert.Resources.Filter;
             filterToolStripMenuItem.Name = "filterToolStripMenuItem";
             filterToolStripMenuItem.ShortcutKeys = Keys.F4;
             filterToolStripMenuItem.Size = new System.Drawing.Size(189, 30);
@@ -410,7 +410,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             toggleBookmarkToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             toggleBookmarkToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            toggleBookmarkToolStripMenuItem.Image = LogExpert.Resources.Resources.Bookmark_add;
+            toggleBookmarkToolStripMenuItem.Image = LogExpert.Resources.Bookmark_add;
             toggleBookmarkToolStripMenuItem.Name = "toggleBookmarkToolStripMenuItem";
             toggleBookmarkToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.F2;
             toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -421,7 +421,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             jumpToNextToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             jumpToNextToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            jumpToNextToolStripMenuItem.Image = LogExpert.Resources.Resources.ArrowDown;
+            jumpToNextToolStripMenuItem.Image = LogExpert.Resources.ArrowDown;
             jumpToNextToolStripMenuItem.Name = "jumpToNextToolStripMenuItem";
             jumpToNextToolStripMenuItem.ShortcutKeys = Keys.F2;
             jumpToNextToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -432,7 +432,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             jumpToPrevToolStripMenuItem.BackColor = System.Drawing.SystemColors.Control;
             jumpToPrevToolStripMenuItem.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            jumpToPrevToolStripMenuItem.Image = LogExpert.Resources.Resources.ArrowUp;
+            jumpToPrevToolStripMenuItem.Image = LogExpert.Resources.ArrowUp;
             jumpToPrevToolStripMenuItem.Name = "jumpToPrevToolStripMenuItem";
             jumpToPrevToolStripMenuItem.ShortcutKeys = Keys.Shift | Keys.F2;
             jumpToPrevToolStripMenuItem.Size = new System.Drawing.Size(253, 30);
@@ -586,7 +586,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // settingsToolStripMenuItem
             // 
-            settingsToolStripMenuItem.Image = LogExpert.Resources.Resources.Settings;
+            settingsToolStripMenuItem.Image = LogExpert.Resources.Settings;
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new System.Drawing.Size(224, 30);
             settingsToolStripMenuItem.Text = "Settings...";
@@ -916,7 +916,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonOpen
             // 
             toolStripButtonOpen.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonOpen.Image = LogExpert.Resources.Resources.File_open;
+            toolStripButtonOpen.Image = LogExpert.Resources.File_open;
             toolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonOpen.Name = "toolStripButtonOpen";
             toolStripButtonOpen.Size = new System.Drawing.Size(28, 28);
@@ -932,7 +932,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonSearch
             // 
             toolStripButtonSearch.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonSearch.Image = LogExpert.Resources.Resources.Search;
+            toolStripButtonSearch.Image = LogExpert.Resources.Search;
             toolStripButtonSearch.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonSearch.Name = "toolStripButtonSearch";
             toolStripButtonSearch.Size = new System.Drawing.Size(28, 28);
@@ -943,7 +943,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonFilter
             // 
             toolStripButtonFilter.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonFilter.Image = LogExpert.Resources.Resources.Filter;
+            toolStripButtonFilter.Image = LogExpert.Resources.Filter;
             toolStripButtonFilter.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonFilter.Name = "toolStripButtonFilter";
             toolStripButtonFilter.Size = new System.Drawing.Size(28, 28);
@@ -960,7 +960,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonBookmark
             // 
             toolStripButtonBookmark.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonBookmark.Image = LogExpert.Resources.Resources.Bookmark_add;
+            toolStripButtonBookmark.Image = LogExpert.Resources.Bookmark_add;
             toolStripButtonBookmark.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonBookmark.Name = "toolStripButtonBookmark";
             toolStripButtonBookmark.Size = new System.Drawing.Size(28, 28);
@@ -971,7 +971,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonUp
             // 
             toolStripButtonUp.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonUp.Image = LogExpert.Resources.Resources.ArrowUp;
+            toolStripButtonUp.Image = LogExpert.Resources.ArrowUp;
             toolStripButtonUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonUp.Name = "toolStripButtonUp";
             toolStripButtonUp.Size = new System.Drawing.Size(28, 28);
@@ -982,7 +982,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonDown
             // 
             toolStripButtonDown.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonDown.Image = LogExpert.Resources.Resources.ArrowDown;
+            toolStripButtonDown.Image = LogExpert.Resources.ArrowDown;
             toolStripButtonDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonDown.Name = "toolStripButtonDown";
             toolStripButtonDown.Size = new System.Drawing.Size(28, 28);
@@ -999,7 +999,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             toolStripButtonBubbles.CheckOnClick = true;
             toolStripButtonBubbles.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            toolStripButtonBubbles.Image = LogExpert.Resources.Resources.bookmark_bubbles;
+            toolStripButtonBubbles.Image = LogExpert.Resources.bookmark_bubbles;
             toolStripButtonBubbles.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             toolStripButtonBubbles.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripButtonBubbles.Name = "toolStripButtonBubbles";

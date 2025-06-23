@@ -2,16 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs" Link="AssemblyVersion.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\Solution Items\usedComponents.json" Link="files\json\usedComponents.json">
@@ -24,10 +15,6 @@
     <Folder Include="strings\de\" />
     <Folder Include="strings\en\" />
     <Folder Include="strings\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
   </ItemGroup>
 
   <ItemGroup>

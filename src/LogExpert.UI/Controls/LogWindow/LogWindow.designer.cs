@@ -576,7 +576,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // pnlProFilterLabel
             // 
-            pnlProFilterLabel.BackgroundImage = LogExpert.Resources.Resources.Pro_Filter;
+            pnlProFilterLabel.BackgroundImage = LogExpert.Resources.Pro_Filter;
             pnlProFilterLabel.BackgroundImageLayout = ImageLayout.Center;
             pnlProFilterLabel.Location = new Point(5, 7);
             pnlProFilterLabel.Name = "pnlProFilterLabel";
@@ -653,7 +653,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // btnToggleHighlightPanel
             // 
             btnToggleHighlightPanel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnToggleHighlightPanel.Image = LogExpert.Resources.Resources.Arrow_menu_open;
+            btnToggleHighlightPanel.Image = LogExpert.Resources.Arrow_menu_open;
             btnToggleHighlightPanel.Location = new Point(1832, 1);
             btnToggleHighlightPanel.Name = "btnToggleHighlightPanel";
             btnToggleHighlightPanel.Size = new Size(20, 21);
@@ -783,7 +783,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterDownButton
             // 
-            filterDownButton.BackgroundImage = LogExpert.Resources.Resources.ArrowDown;
+            filterDownButton.BackgroundImage = LogExpert.Resources.ArrowDown;
             filterDownButton.BackgroundImageLayout = ImageLayout.Stretch;
             filterDownButton.Location = new Point(296, 85);
             filterDownButton.Name = "filterDownButton";
@@ -796,7 +796,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterUpButton
             // 
-            filterUpButton.BackgroundImage = LogExpert.Resources.Resources.ArrowUp;
+            filterUpButton.BackgroundImage = LogExpert.Resources.ArrowUp;
             filterUpButton.BackgroundImageLayout = ImageLayout.Stretch;
             filterUpButton.Location = new Point(258, 85);
             filterUpButton.Name = "filterUpButton";

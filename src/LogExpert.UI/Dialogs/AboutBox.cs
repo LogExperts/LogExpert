@@ -49,7 +49,7 @@ internal partial class AboutBox : Form
 
     private void LoadResources()
     {
-        logoPictureBox.Image = Resources.Resources.LogLover;
+        logoPictureBox.Image = Resources.LogLover;
     }
 
     #endregion

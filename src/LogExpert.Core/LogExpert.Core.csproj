@@ -2,22 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
-    <PublishAot>false</PublishAot>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs" Link="AssemblyVersion.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" />

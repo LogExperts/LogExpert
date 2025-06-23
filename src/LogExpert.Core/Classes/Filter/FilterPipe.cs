@@ -72,8 +72,11 @@ public class FilterPipe : IDisposable
         }
     }
 
+    //TOOD: check if the callers are checking for null before calling
     public bool WriteToPipe (ILogLine textLine, int orgLineNum)
     {
+        ArgumentNullException.ThrowIfNull(textLine, nameof(textLine));
+
         try
         {
             lock (_fileNameLock)

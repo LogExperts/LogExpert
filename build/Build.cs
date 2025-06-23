@@ -245,9 +245,9 @@ partial class Build : NukeBuild
         {
             Log.Information($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
 
-            AbsolutePath assemblyVersion = SourceDirectory / "Solution Items" / "AssemblyVersion.cs";
+            AbsolutePath assemblyInfo = SourceDirectory / "Solution Items" / "AssemblyInfo.cs";
 
-            string text = assemblyVersion.ReadAllText();
+            string text = assemblyInfo.ReadAllText();
             Regex configurationRegex = AssemblyConfiguration();
             Regex assemblyVersionRegex = AssemblyVersion();
             Regex assemblyFileVersionRegex = AssemblyFileVersion();
@@ -258,11 +258,11 @@ partial class Build : NukeBuild
             text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
             text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
 
-            Log.Verbose("Content of AssemblyVersion file");
+            Log.Verbose("Content of AssemblyInfo.cs file");
             Log.Verbose(text);
             Log.Verbose("End of Content");
 
-            assemblyVersion.WriteAllText(text);
+            assemblyInfo.WriteAllText(text);
 
             SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
             {

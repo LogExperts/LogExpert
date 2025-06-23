@@ -1,11 +1,10 @@
 using System.Globalization;
 
 using LogExpert.Core.Callback;
-using LogExpert.Core.Classes.Filter;
 
 using NLog;
 
-namespace LogExpert.Classes.Filter;
+namespace LogExpert.Core.Classes.Filter;
 
 public delegate void ProgressCallback (int lineCount);
 
@@ -86,7 +85,6 @@ public class FilterStarter
         }
 
         var workStartLine = startLine;
-        List<WaitHandle> handleList = [];
         _progressLineCount = 0;
         _progressCallback = progressCallback;
         while (workStartLine < startLine + maxCount)
@@ -101,15 +99,9 @@ public class FilterStarter
             }
             _logger.Info(CultureInfo.InvariantCulture, "FilterStarter starts worker for line {0}, lineCount {1}", workStartLine, interval);
 
-            await Task.Run(() => DoWork(filterParams, workStartLine, interval, ThreadProgressCallback)).ContinueWith(FilterDoneCallback);
+            var filter = await Task.Run(() => DoWork(filterParams, workStartLine, interval, ThreadProgressCallback)).ConfigureAwait(false);
+            FilterDoneCallback(filter);
             workStartLine += interval;
-        }
-
-        WaitHandle[] handles = [.. handleList];
-        // wait for worker threads completion
-        if (handles.Length > 0)
-        {
-            WaitHandle.WaitAll(handles);
         }
 
         MergeResults();
@@ -147,46 +139,40 @@ public class FilterStarter
         _logger.Info(CultureInfo.InvariantCulture, "Started Filter worker [{0}] for line {1}", Environment.CurrentManagedThreadId, startLine);
 
         // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
-        FilterParams threadFilterParams = filterParams.CloneWithCurrentColumnizer();
+        var threadFilterParams = filterParams.CloneWithCurrentColumnizer();
         Filter filter = new((ColumnizerCallback)_callback.Clone());
         lock (_filterWorkerList)
         {
             _filterWorkerList.Add(filter);
         }
 
-        if (_shouldStop)
+        if (!_shouldStop)
         {
-            return filter;
-        }
 
-        _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
-        _logger.Info(CultureInfo.InvariantCulture, "Filter worker [{0}] for line {1} has completed.", Environment.CurrentManagedThreadId, startLine);
-
-        lock (_filterReadyList)
-        {
-            _filterReadyList.Add(filter);
-        }
-
-        return filter;
-    }
-
-    private void FilterDoneCallback (Task<Filter> filterTask)
-    {
-        if (filterTask.IsCompleted)
-        {
-            Filter filter = filterTask.Result;
+            _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
+            _logger.Info(CultureInfo.InvariantCulture, "Filter worker [{0}] for line {1} has completed.", Environment.CurrentManagedThreadId, startLine);
 
             lock (_filterReadyList)
             {
                 _filterReadyList.Add(filter);
             }
         }
+
+        return filter;
+    }
+
+    private void FilterDoneCallback (Filter filter)
+    {
+        lock (_filterReadyList)
+        {
+            _filterReadyList.Add(filter);
+        }
     }
 
     private void MergeResults ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "Merging filter results.");
-        foreach (Filter filter in _filterReadyList)
+        foreach (var filter in _filterReadyList)
         {
             foreach (var lineNum in filter.FilterHitList)
             {
@@ -195,6 +181,7 @@ public class FilterStarter
                     _filterHitDict.Add(lineNum, lineNum);
                 }
             }
+
             foreach (var lineNum in filter.FilterResultLines)
             {
                 if (!_filterResultDict.ContainsKey(lineNum))
@@ -202,6 +189,7 @@ public class FilterStarter
                     _filterResultDict.Add(lineNum, lineNum);
                 }
             }
+
             foreach (var lineNum in filter.LastFilterLinesList)
             {
                 if (!_lastFilterLinesDict.ContainsKey(lineNum))
@@ -210,6 +198,7 @@ public class FilterStarter
                 }
             }
         }
+
         FilterHitList.AddRange(_filterHitDict.Keys);
         FilterResultLines.AddRange(_filterResultDict.Keys);
         LastFilterLinesList.AddRange(_lastFilterLinesDict.Keys);

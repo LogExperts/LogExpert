@@ -580,7 +580,7 @@ dotnet_code_quality.CA1001.excluded_type_names_with_derived_types =
 
 # CA1002: Do not expose generic lists
 dotnet_diagnostic.CA1002.severity = suggestion
-dotnet_code_quality.CA1002.api_surface = public, internal
+dotnet_code_quality.CA1002.api_surface = public
 
 # CA1003: Use generic event handler instances
 dotnet_diagnostic.CA1003.severity = warning

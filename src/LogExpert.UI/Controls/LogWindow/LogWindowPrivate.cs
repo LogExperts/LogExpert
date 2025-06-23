@@ -3,7 +3,6 @@ using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using LogExpert.Classes.Filter;
 using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
 using LogExpert.Core.Classes.Columnizer;
@@ -800,7 +799,8 @@ partial class LogWindow
             var filterLineAdded = false;
             for (var i = filterStart; i < e.LineCount; ++i)
             {
-                ILogLine line = _logFileReader.GetLogLine(i);
+                var line = _logFileReader.GetLogLine(i);
+                //TODO: Why line can be equal null here? Need to understand all the situations and handle them correctlly. Prevent this from happening and replace the check with an exception throw
                 if (line == null)
                 {
                     return;
@@ -1977,7 +1977,6 @@ partial class LogWindow
         if (filterComboBox.Text.Length == 0)
         {
             _filterParams.SearchText = string.Empty;
-            _filterParams.LowerSearchText = string.Empty;
             _filterParams.IsRangeSearch = false;
             ClearFilterList();
             filterSearchButton.Image = null;
@@ -1995,7 +1994,6 @@ partial class LogWindow
         FireCancelHandlers(); // make sure that there's no other filter running (maybe from filter restore)
 
         _filterParams.SearchText = text;
-        _filterParams.LowerSearchText = text.ToLowerInvariant();
         ConfigManager.Settings.FilterHistoryList.Remove(text);
         ConfigManager.Settings.FilterHistoryList.Insert(0, text);
         var maxHistory = ConfigManager.Settings.Preferences.MaximumFilterEntries;

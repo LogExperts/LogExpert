@@ -2,23 +2,15 @@
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <OutputType>Library</OutputType>
+
     <RootNamespace>SftpFileSystem</RootNamespace>
     <AssemblyName>SftpFileSystem</AssemblyName>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
-	<IsTestProject>false</IsTestProject>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <AssemblyTitle>SftpFileSystemx86</AssemblyTitle>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\pluginsx86</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\SftpFileSystemx64\ConfigData.cs">
       <Link>ConfigData.cs</Link>
@@ -46,25 +38,20 @@
     <Compile Include="..\SftpFileSystemx64\SftpLogFileInfo.cs">
       <Link>SftpLogFileInfo.cs</Link>
     </Compile>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs">
-      <Link>Properties\AssemblyVersion.cs</Link>
-    </Compile>
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="..\SftpFileSystemx64\ConfigDialog.resx" Link="ConfigDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\FailedKeyDialog.resx" Link="FailedKeyDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\LoginDialog.resx" Link="LoginDialog.resx" />
     <EmbeddedResource Include="..\SftpFileSystemx64\PrivateKeyPasswordDialog.resx" Link="PrivateKeyPasswordDialog.resx" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
     <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="SSH.NET" />
   </ItemGroup>

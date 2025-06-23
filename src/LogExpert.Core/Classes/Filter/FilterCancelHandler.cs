@@ -4,7 +4,7 @@ using LogExpert.Core.Interface;
 
 using NLog;
 
-namespace LogExpert.Classes.Filter;
+namespace LogExpert.Core.Classes.Filter;
 
 public class FilterCancelHandler : IBackgroundProcessCancelHandler
 {

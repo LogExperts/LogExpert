@@ -1,34 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <OutputType>Library</OutputType>
+
     <IsTestProject>true</IsTestProject>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
     <AssemblyTitle>LogExpert.Tests</AssemblyTitle>
-    <Product>LogExpert.Tests</Product>
-    <Copyright>Copyright ©  2018</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
+    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
+    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
+    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
+    <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit3TestAdapter" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
   </ItemGroup>
-  <ItemGroup>
+
+  <ItemGroup Label="Data">
     <Content Include="Data\50 MB UTF16.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -38,6 +38,9 @@
     <Content Include="Data\50 MB.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup Label="Test Data">
     <Content Include="TestData\JsonColumnizerTest_01.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -59,16 +62,6 @@
     <Content Include="TestData\XmlTest_01.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
-    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
-    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
-    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
-    <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="TestData\JsonCompactColumnizerTest_01.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -78,16 +71,9 @@
     <Content Include="TestData\JsonCompactColumnizerTest_03.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="TestData\CsvTest_01.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Solution Items\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
     <None Update="TestData\organizations-1000.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -98,4 +84,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 </Project>

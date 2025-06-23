@@ -11,7 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Columnizer Lib for Logexpert plugins</description>
     <releaseNotes>See https://github.com/zarunbal/LogExpert/releases/tag/v$version$</releaseNotes>
-    <copyright>Copyright 2019</copyright>
+    <copyright>Copyright 2025</copyright>
     <tags>LogExpert Columnizer</tags>
   </metadata>
 </package>

@@ -1,39 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>logexpert.ico</ApplicationIcon>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
     <DocumentationFile>$(SolutionDir)..\bin\Docs\LogExpert.xml</DocumentationFile>
     <EnableWindowsTargeting>True</EnableWindowsTargeting>
     <ForceDesignerDPIUnaware>True</ForceDesignerDPIUnaware>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <IsTestProject>False</IsTestProject>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
     <OutputType>WinExe</OutputType>
-    <SignAssembly>True</SignAssembly>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs">
-      <Link>Properties\AssemblyVersion.cs</Link>
-    </Compile>
-    <None Include="..\Solution Items\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
     <None Update="Start.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -24,7 +24,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		Solution Items\AssemblyVersion.cs = Solution Items\AssemblyVersion.cs
+		Solution Items\AssemblyInfo.cs = Solution Items\AssemblyInfo.cs
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 		Solution Items\usedComponents.json = Solution Items\usedComponents.json
 	EndProjectSection
 EndProject
