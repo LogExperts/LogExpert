@@ -15,6 +15,10 @@
     <PackageVersion Include="Grpc.AspNetCore" Version="2.70.0" />
     <PackageVersion Include="Grpc.Core" Version="2.46.6" />
     <PackageVersion Include="Grpc.Tools" Version="2.71.0" />
+    <PackageVersion Include="Krypton.Docking" Version="95.25.6.174" />
+    <PackageVersion Include="Krypton.Navigator" Version="95.25.6.174" />
+    <PackageVersion Include="Krypton.Toolkit" Version="95.25.6.174" />
+    <PackageVersion Include="Krypton.Workspace" Version="95.25.6.174" />
     <PackageVersion Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
