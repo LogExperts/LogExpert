@@ -14,17 +14,17 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 {
     #region Fields
 
-    private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
-
-    private readonly GetLogLineFx _logLineFx;
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly string _fileName;
     private readonly int _max_buffers;
     private readonly int _maxLinesPerBuffer;
-
     private readonly object _monitor = new();
     private readonly MultiFileOptions _multiFileOptions;
     private readonly IPluginRegistry _pluginRegistry;
+    private readonly CancellationTokenSource _cts = new();
+    private readonly bool _useNewReader;
+
     private IList<LogBuffer> _bufferList;
     private ReaderWriterLock _bufferListLock;
     private bool _contentDeleted;
@@ -32,20 +32,15 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     private ReaderWriterLock _disposeLock;
     private EncodingOptions _encodingOptions;
     private long _fileLength;
-
     private Task _garbageCollectorTask;
     private Task _monitorTask;
-    private readonly CancellationTokenSource _cts = new();
-
     private bool _isDeleted;
     private bool _isFailModeCheckCallPending;
     private bool _isFastFailOnGetLogLine;
     private bool _isLineCountDirty = true;
     private IList<ILogFileInfo> _logFileInfoList = [];
     private Dictionary<int, LogBufferCacheEntry> _lruCacheDict;
-
     private ReaderWriterLock _lruCacheDictLock;
-
     private bool _shouldStop;
     private bool _disposed;
     private ILogFileInfo _watchedILogFileInfo;
@@ -54,82 +49,63 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #region cTor
 
-    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, IPluginRegistry pluginRegistry)
+    /// Public constructor for single file.
+    public LogfileReader (string fileName, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
+    : this([fileName], encodingOptions, multiFile, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry)
     {
-        if (fileName == null)
-        {
-            return;
-        }
-
-        _fileName = fileName;
-        EncodingOptions = encodingOptions;
-        IsMultiFile = multiFile;
-        _max_buffers = bufferCount;
-        _maxLinesPerBuffer = linesPerBuffer;
-        _multiFileOptions = multiFileOptions;
-        _pluginRegistry = pluginRegistry;
-        _logLineFx = GetLogLineInternal;
-        _disposed = false;
-
-        InitLruBuffers();
-
-        if (multiFile)
-        {
-            var info = GetLogFileInfo(fileName);
-            RolloverFilenameHandler rolloverHandler = new(info, _multiFileOptions);
-            var nameList = rolloverHandler.GetNameList(_pluginRegistry);
-
-            ILogFileInfo fileInfo = null;
-            foreach (var name in nameList)
-            {
-                fileInfo = AddFile(name);
-            }
-
-            _watchedILogFileInfo = fileInfo; // last added file in the list is the watched file
-        }
-        else
-        {
-            _watchedILogFileInfo = AddFile(fileName);
-        }
-
-        StartGCThread();
     }
 
-    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, IPluginRegistry pluginRegistry)
+    /// Public constructor for multiple files.
+    public LogfileReader (string[] fileNames, EncodingOptions encodingOptions, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
+        : this(fileNames, encodingOptions, true, bufferCount, linesPerBuffer, multiFileOptions, useNewReader, pluginRegistry)
     {
+        // In this overload, we assume multiFile is always true.
+    }
+
+    // Single private constructor that contains the common initialization logic.
+    private LogfileReader (string[] fileNames, EncodingOptions encodingOptions, bool multiFile, int bufferCount, int linesPerBuffer, MultiFileOptions multiFileOptions, bool useNewReader, IPluginRegistry pluginRegistry)
+    {
+        // Validate input: at least one file must be provided.
         if (fileNames == null || fileNames.Length < 1)
         {
-            return;
+            throw new ArgumentException("Must provide at least one file.", nameof(fileNames));
         }
 
+        _useNewReader = useNewReader;
         EncodingOptions = encodingOptions;
-        IsMultiFile = true;
         _max_buffers = bufferCount;
         _maxLinesPerBuffer = linesPerBuffer;
         _multiFileOptions = multiFileOptions;
         _pluginRegistry = pluginRegistry;
-        _logLineFx = GetLogLineInternal;
         _disposed = false;
 
         InitLruBuffers();
 
         ILogFileInfo fileInfo = null;
-        foreach (var name in fileNames)
+
+        IsMultiFile = multiFile || fileNames.Length == 1;
+        _fileName = fileNames[0];
+
+        IEnumerable<string> names = IsMultiFile
+            // For multi-file rollover mode: get rollover names.
+            ? new RolloverFilenameHandler(GetLogFileInfo(_fileName), _multiFileOptions).GetNameList(_pluginRegistry)
+            : [_fileName];
+
+        foreach (var name in names)
         {
             fileInfo = AddFile(name);
         }
 
+        if (IsMultiFile)
+        {
+            // Use the full name of the last file as _fileName.
+            _fileName = fileInfo.FullName;
+        }
+
         _watchedILogFileInfo = fileInfo;
-        _fileName = fileInfo.FullName;
 
         StartGCThread();
     }
-
-    #endregion
-
-    #region Delegates
-
-    private delegate Task<ILogLine> GetLogLineFx (int lineNum);
 
     #endregion
 
@@ -165,7 +141,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
             return _currLineCount;
         }
-        set => _currLineCount = value;
+        private set => _currLineCount = value;
     }
 
     public bool IsMultiFile { get; }
@@ -174,13 +150,15 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     public long FileSize { get; private set; }
 
+    //TODO: Change to private field. No need for a property.
     public bool IsXmlMode { get; set; }
 
+    //TODO: Change to private field. No need for a property.
     public IXmlLogConfiguration XmlLogConfig { get; set; }
 
     public IPreProcessColumnizer PreProcessColumnizer { get; set; }
 
-    public EncodingOptions EncodingOptions
+    private EncodingOptions EncodingOptions
     {
         get => _encodingOptions;
         set
@@ -195,8 +173,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         }
     }
 
-    public bool UseNewReader { get; set; }
-
     #endregion
 
     #region Public methods
@@ -204,6 +180,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// <summary>
     /// Public for unit test reasons
     /// </summary>
+    //TODO: Make this private
     public void ReadFiles ()
     {
         FileSize = 0;
@@ -254,6 +231,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
     /// Public for unit tests.
     /// </summary>
     /// <returns></returns>
+    //TODO: Make this private
     public int ShiftBuffers ()
     {
         _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() begin for {0}{1}", _fileName, IsMultiFile ? " (MultiFile)" : "");
@@ -335,10 +313,10 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             if (lostILogFileInfoList.Count > 0)
             {
                 _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for lost files");
-                foreach (var ILogFileInfo in lostILogFileInfoList)
+                foreach (var logFileInfo in lostILogFileInfoList)
                 {
-                    //this.ILogFileInfoList.Remove(ILogFileInfo);
-                    var lastBuffer = DeleteBuffersForInfo(ILogFileInfo, false);
+                    //this.ILogFileInfoList.Remove(logFileInfo);
+                    var lastBuffer = DeleteBuffersForInfo(logFileInfo, false);
                     if (lastBuffer != null)
                     {
                         offset += lastBuffer.StartLine + lastBuffer.LineCount;
@@ -366,7 +344,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             foreach (var ILogFileInfo in readNewILogFileInfoList)
             {
                 DeleteBuffersForInfo(ILogFileInfo, true);
-                //this.ILogFileInfoList.Remove(ILogFileInfo);
+                //this.ILogFileInfoList.Remove(logFileInfo);
             }
 
             _logger.Info(CultureInfo.InvariantCulture, "Deleting buffers for the watched file");
@@ -375,9 +353,9 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             _logger.Info(CultureInfo.InvariantCulture, "Re-Reading files");
             foreach (var ILogFileInfo in readNewILogFileInfoList)
             {
-                //ILogFileInfo.OpenFile();
+                //logFileInfo.OpenFile();
                 ReadToBufferList(ILogFileInfo, 0, LineCount);
-                //this.ILogFileInfoList.Add(ILogFileInfo);
+                //this.ILogFileInfoList.Add(logFileInfo);
                 newFileInfoList.Add(ILogFileInfo);
             }
 
@@ -422,7 +400,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
         if (!_isFastFailOnGetLogLine)
         {
-            var task = Task.Run(() => _logLineFx(lineNum));
+            var task = Task.Run(() => GetLogLineInternal(lineNum));
             if (task.Wait(WAIT_TIME))
             {
                 result = task.Result;
@@ -440,7 +418,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             if (!_isFailModeCheckCallPending)
             {
                 _isFailModeCheckCallPending = true;
-                var logLine = await _logLineFx(lineNum);
+                var logLine = await GetLogLineInternal(lineNum);
                 GetLineFinishedCallback(logLine);
             }
         }
@@ -927,7 +905,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
             using var fileStream = logFileInfo.OpenStream();
             try
             {
-                using var reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                using var reader = GetLogStreamReader(fileStream, EncodingOptions, _useNewReader);
                 reader.Position = filePos;
                 _fileLength = logFileInfo.Length;
 
@@ -980,7 +958,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
                 while (ReadLine(reader, logBuffer.StartLine + logBuffer.LineCount, logBuffer.StartLine + logBuffer.LineCount + droppedLines, out var line))
                 {
-                    LogLine logLine = new();
                     if (_shouldStop)
                     {
                         Monitor.Exit(logBuffer);
@@ -1011,8 +988,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         lineCount = 1;
                     }
 
-                    logLine.FullLine = line;
-                    logLine.LineNumber = logBuffer.StartLine + logBuffer.LineCount;
+                    LogLine logLine = new(line, logBuffer.StartLine + logBuffer.LineCount);
 
                     logBuffer.AddLine(logLine, filePos);
                     filePos = reader.Position;
@@ -1319,7 +1295,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
             try
             {
-                var reader = GetLogStreamReader(fileStream, EncodingOptions, UseNewReader);
+                var reader = GetLogStreamReader(fileStream, EncodingOptions, _useNewReader);
 
                 var filePos = logBuffer.StartPos;
                 reader.Position = logBuffer.StartPos;
@@ -1341,11 +1317,7 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                         continue;
                     }
 
-                    LogLine logLine = new()
-                    {
-                        FullLine = line,
-                        LineNumber = logBuffer.StartLine + logBuffer.LineCount
-                    };
+                    LogLine logLine = new(line, logBuffer.StartLine + logBuffer.LineCount);
 
                     logBuffer.AddLine(logLine, filePos);
                     filePos = reader.Position;
@@ -1578,7 +1550,6 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
                 if (IsMultiFile)
                 {
                     var offset = ShiftBuffers();
-                    //this.currFileSize = newSize;    // removed because ShiftBuffers() calls ReadToBuffer() which will set the actual read size
                     args.FileSize = newSize;
                     args.LineCount = LineCount;
                     args.IsRollover = true;
@@ -1785,6 +1756,8 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
 
     #endregion
 
+    #region IDisposable Support
+
     public void Dispose ()
     {
         Dispose(true);
@@ -1811,6 +1784,9 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         Dispose(false);
     }
 
+    #endregion IDisposable Support
+
+    #region Event Handlers
     protected virtual void OnFileSizeChanged (LogEventArgs e)
     {
         FileSizeChanged?.Invoke(this, e);
@@ -1842,16 +1818,12 @@ public class LogfileReader : IAutoLogLineColumnizerCallback, IDisposable
         Respawned?.Invoke(this, EventArgs.Empty);
     }
 
-    private class LogLine : ILogLine
+    #endregion Event Handlers
+
+    #region Records
+    private record LogLine (string FullLine, int LineNumber) : ILogLine
     {
-        #region Properties
-
-        public string FullLine { get; set; }
-
-        public int LineNumber { get; set; }
-
-        string ITextValue.Text => FullLine;
-
-        #endregion
+        public string Text => FullLine;
     }
+    #endregion Records
 }

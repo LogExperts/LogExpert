@@ -67,7 +67,7 @@ public class ColumnizerPickerTest
         string fileName, Type columnizerType)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), false, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
 
         Mock<ILogLineColumnizer> autoColumnizer = new();
