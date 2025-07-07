@@ -1,10 +1,55 @@
 <Project>
   <PropertyGroup>
-    <Version>8.2.0</Version>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <InformationalVersion>2.0.0.0-rc1</InformationalVersion>
+    <Version>1.20.0.0</Version>
+    <AssemblyVersion>1.20.0.0</AssemblyVersion>
+    <FileVersion>1.20.0.0</FileVersion>
+    <InformationalVersion>1.20.0.0</InformationalVersion>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
     <Company>Log Expert</Company>
-    </PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+    <PublishAot>false</PublishAot>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LogExpert</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <!--<OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>--><!--TODO: Normalize this across solution-->
+    <SignAssembly>true</SignAssembly>
+    <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
+    <Product>LogExpert</Product>
+    <Copyright>Copyright © LogExpert 2025</Copyright>
+    <IsTestProject>false</IsTestProject>
+    <UseWindowsForms>false</UseWindowsForms>
+    <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+
+    <AssemblyTitle>LogExpert</AssemblyTitle>
+    <Description>
+      LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
+
+      Summary of (most) features:
+
+      * Tail mode
+      * MDI-Interface with Tabs
+      * Search function (including RegEx)
+      * Bookmarks
+      * A very flexible filter view and possibility to filter to tab
+      * Highlighting lines via search criteria
+      * Triggers (e.g. create Bookmark or execute a plugin) via search criteria
+      * Columnizers: Plugins which split log lines into columns
+      * Unicode support
+      * log4j XML file support
+      * 3rd party plugin support
+      * Plugin API for more log file data sources
+    </Description>
+  </PropertyGroup>
+
+  <ItemGroup Label="Links">
+    <Compile Include="..\Solution Items\AssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
+    <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+  </ItemGroup>
+
 </Project>
+

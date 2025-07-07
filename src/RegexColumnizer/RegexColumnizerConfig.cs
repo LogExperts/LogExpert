@@ -1,13 +1,12 @@
-﻿namespace RegexColumnizer
+﻿namespace RegexColumnizer;
+
+public class RegexColumnizerConfig
 {
-    public class RegexColumnizerConfig
-    {
-        #region Properties
+    #region Properties
 
-        public string Expression { get; set; } = "(?<text>.*)";
+    public string Expression { get; set; } = "(?<text>.*)";
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

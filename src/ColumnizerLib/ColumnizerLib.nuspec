@@ -4,14 +4,15 @@
     <id>LogExpert.ColumnizerLib</id>
     <version>$version$</version>
     <title>LogExpert ColumnizerLib</title>
-    <authors>Zarunbal Previous:Hagen Raab</authors>
-    <owners>Zarunbal</owners>
-    <license type="expression">MIT</license>
-    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
+    <authors>Zarunbal, Hagen Raab, Hirogen, RandallFlagg and others</authors>
+    <owners>Zarunbal, Hirogen</owners>
+    <license>MIT</license>
+    <projectUrl>https://github.com/LogExperts/LogExpert</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <bugTrackerUrl>https://github.com/LogExperts/LogExpert/issues</bugTrackerUrl>
+    <releaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v$version$</releaseNotes>
     <description>Columnizer Lib for Logexpert plugins</description>
-    <releaseNotes>See https://github.com/zarunbal/LogExpert/releases/tag/v$version$</releaseNotes>
-    <copyright>Copyright 2019</copyright>
+    <copyright>Copyright 2025</copyright>
     <tags>LogExpert Columnizer</tags>
   </metadata>
 </package>

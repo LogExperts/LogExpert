@@ -1,60 +1,57 @@
-﻿using System.Collections.Generic;
+namespace SftpFileSystem;
 
-namespace SftpFileSystem
+internal class CredentialCache
 {
-    internal class CredentialCache
+    #region Private Fields
+
+    private readonly IList<Credentials> _credList = [];
+
+    #endregion
+
+    #region Private Methods
+
+    private void RemoveCredentials (string host, string user)
     {
-        #region Private Fields
-
-        private readonly IList<Credentials> _credList = [];
-
-        #endregion
-
-        #region Private Methods
-
-        private void RemoveCredentials(string host, string user)
+        var credentials = GetCredentials(host, user);
+        if (credentials != null)
         {
-            Credentials credentials = GetCredentials(host, user);
-            if (credentials != null)
+            _credList.Remove(credentials);
+        }
+    }
+
+    #endregion
+
+    internal IList<string> GetUsersForHost (string host)
+    {
+        IList<string> result = [];
+
+        foreach (var cred in _credList)
+        {
+            if (cred.Host.Equals(host, StringComparison.Ordinal))
             {
-                _credList.Remove(credentials);
+                result.Add(cred.UserName);
             }
         }
 
-        #endregion
+        return result;
+    }
 
-        internal IList<string> GetUsersForHost(string host)
+    internal Credentials GetCredentials (string host, string user)
+    {
+        foreach (var cred in _credList)
         {
-            IList<string> result = [];
-
-            foreach (Credentials cred in _credList)
+            if (cred.Host.Equals(host, StringComparison.Ordinal) && cred.UserName.Equals(user, StringComparison.Ordinal))
             {
-                if (cred.Host.Equals(host))
-                {
-                    result.Add(cred.UserName);
-                }
+                return cred;
             }
-
-            return result;
         }
 
-        internal Credentials GetCredentials(string host, string user)
-        {
-            foreach (Credentials cred in _credList)
-            {
-                if (cred.Host.Equals(host) && cred.UserName.Equals(user))
-                {
-                    return cred;
-                }
-            }
+        return null;
+    }
 
-            return null;
-        }
-
-        internal void Add(Credentials cred)
-        {
-            RemoveCredentials(cred.Host, cred.UserName);
-            _credList.Add(cred);
-        }
+    internal void Add (Credentials cred)
+    {
+        RemoveCredentials(cred.Host, cred.UserName);
+        _credList.Add(cred);
     }
 }

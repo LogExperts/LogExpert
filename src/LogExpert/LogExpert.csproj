@@ -1,50 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <OutputType>WinExe</OutputType>
-    <ApplicationIcon>logexpert.ico</ApplicationIcon>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <DocumentationFile>$(SolutionDir)..\bin\Docs\LogExpert.xml</DocumentationFile>
-	<IsTestProject>false</IsTestProject>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
-    <NoWarn>CS1591;</NoWarn>
+    <ApplicationIcon>logexpert.ico</ApplicationIcon>
+    <CopyLocalLockFileAssemblies>True</CopyLocalLockFileAssemblies>
+    <DocumentationFile>$(SolutionDir)..\bin\Docs\LogExpert.xml</DocumentationFile>
+    <EnableWindowsTargeting>True</EnableWindowsTargeting>
+    <ForceDesignerDPIUnaware>True</ForceDesignerDPIUnaware>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)'=='Release|AnyCPU' ">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="..\Solution Items\AssemblyVersion.cs">
-      <Link>Properties\AssemblyVersion.cs</Link>
-    </Compile>
-    <Compile Update="Controls\DateTimeDragControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Controls\TimeSpreadigControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Update="Controls\LogTabPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Update="Dialogs\BufferedDataGridView.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <None Include="..\Solution Items\Key.snk">
-      <Link>Key.snk</Link>
-    </None>
     <None Update="Start.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -53,24 +22,19 @@
     <None Update="Licenses\Nlog.license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="Licenses\WinformsUI.Docking.license.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="logexpert.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DockPanelSuite" />
-    <PackageReference Include="DockPanelSuite.ThemeVS2015" />
-    <PackageReference Include="System.Text.Encoding" />
     <PackageReference Include="Newtonsoft.Json" />
     <PackageReference Include="NLog" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\Logexpert.UI\LogExpert.UI.csproj" />
+    <ProjectReference Include="..\LogExpert.UI\LogExpert.UI.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Controls\LogTabPage.cs" />
     <Compile Remove="DebugWindow.Designer.cs" />
     <Compile Remove="HighlightThread.cs" />
   </ItemGroup>

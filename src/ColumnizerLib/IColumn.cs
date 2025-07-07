@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace LogExpert
+namespace LogExpert;
+
+public interface IColumn : ITextValue
 {
-    public interface IColumn : ITextValue
-    {
-        #region Properties
+    #region Properties
 
-        IColumnizedLogLine Parent { get; }
+    IColumnizedLogLine Parent { get; }
 
-        string FullValue { get; }
+    string FullValue { get; }
 
-        string DisplayValue { get; }
+    string DisplayValue { get; }
 
-        #endregion
-    }
+    #endregion
 }

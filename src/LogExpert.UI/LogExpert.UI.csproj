@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ForceDesignerDPIUnaware>true</ForceDesignerDPIUnaware>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
+    <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
+    <Content Include="..\..\Licenses\WinformsUI.Docking.license.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

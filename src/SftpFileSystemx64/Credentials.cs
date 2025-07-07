@@ -1,26 +1,3 @@
-﻿namespace SftpFileSystem
-{
-    internal class Credentials
-    {
-        #region Ctor
+namespace SftpFileSystem;
 
-        internal Credentials(string host, string userName, string password)
-        {
-            Host = host;
-            UserName = userName;
-            Password = password;
-        }
-
-        #endregion
-
-        #region Properties / Indexers
-
-        public string Host { get; }
-
-        public string Password { get; }
-
-        public string UserName { get; }
-
-        #endregion
-    }
-}
+internal record Credentials (string Host, string UserName, string Password);

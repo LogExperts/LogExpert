@@ -1,17 +1,16 @@
 ﻿using LogExpert;
 
-namespace Log4jXmlColumnizer
+namespace Log4jXmlColumnizer;
+
+internal class Log4JLogLine : ILogLine
 {
-    internal class Log4JLogLine : ILogLine
-    {
-        #region Properties
+    #region Properties
 
-        public string FullLine { get; set; }
+    public string FullLine { get; set; }
 
-        public int LineNumber { get; set; }
+    public int LineNumber { get; set; }
 
-        string ITextValue.Text => FullLine;
+    string ITextValue.Text => FullLine;
 
-        #endregion
-    }
+    #endregion
 }

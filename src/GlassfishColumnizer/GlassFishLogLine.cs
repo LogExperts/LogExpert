@@ -1,17 +1,16 @@
 ﻿using LogExpert;
 
-namespace GlassfishColumnizer
+namespace GlassfishColumnizer;
+
+internal class GlassFishLogLine : ILogLine
 {
-    internal class GlassFishLogLine : ILogLine
-    {
-        #region Properties
+    #region Properties
 
-        public string FullLine { get; set; }
+    public string FullLine { get; set; }
 
-        public int LineNumber { get; set; }
+    public int LineNumber { get; set; }
 
-        string ITextValue.Text => FullLine;
+    string ITextValue.Text => FullLine;
 
-        #endregion
-    }
+    #endregion
 }

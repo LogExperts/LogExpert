@@ -23,7 +23,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashIconHighlighter", "Fla
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}"
 	ProjectSection(SolutionItems) = preProject
-		Solution Items\AssemblyVersion.cs = Solution Items\AssemblyVersion.cs
+		.editorconfig = .editorconfig
+		Solution Items\AssemblyInfo.cs = Solution Items\AssemblyInfo.cs
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		..\GitVersion.yml = ..\GitVersion.yml
 		Solution Items\usedComponents.json = Solution Items\usedComponents.json
 	EndProjectSection
 EndProject
@@ -56,13 +60,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "setup", "setup", "{C625E7C2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RegexColumnizer.UnitTests", "RegexColumnizer.UnitTests\RegexColumnizer.UnitTests.csproj", "{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Core", "Logexpert.Core\LogExpert.Core.csproj", "{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Core", "LogExpert.Core\LogExpert.Core.csproj", "{F49C6738-3F62-4890-8FF2-1F53A0F0A2CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Resources", "Logexpert.Resources\LogExpert.Resources.csproj", "{578CC5D5-1DCD-47C2-8BD3-B32C14635BEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.Resources", "LogExpert.Resources\LogExpert.Resources.csproj", "{578CC5D5-1DCD-47C2-8BD3-B32C14635BEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.UI", "Logexpert.UI\LogExpert.UI.csproj", "{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.UI", "LogExpert.UI\LogExpert.UI.csproj", "{5DB0B0F8-3C3E-4805-93A3-7E69AC45CD40}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogExpert.PluginRegistry", "PluginRegistry\LogExpert.PluginRegistry.csproj", "{E2D8E653-B7DF-4ACE-8314-8059B1E20751}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Columnizers", "Columnizers", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -157,7 +165,17 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{2563526E-4566-40CB-AA27-587B904FD25B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{C41A517B-7502-4B17-9119-55D5716FAD65} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{43B3857D-4341-41A6-9E77-4F3BA4F2C7AB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{4C899885-E361-410A-B6AC-C2F236C436FA} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{B5A7DFA4-48A8-4616-8008-7441699EC946} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{0DBBCBEF-4A91-4031-AEAB-B7EEE802F496} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
+		{1FFB09A8-DAE4-4DEB-AFF6-8BAE6D01C7AC} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
+		{003535EC-4186-4958-9DD9-C641F089AEED} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{B57259A3-4ED7-4F8B-A252-29E799A56B9E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{C625E7C2-AF15-4C40-8C35-3E166D46F939} = {DE6375A4-B4C4-4620-8FFB-B9D5A4E21144}
+		{FBFB598D-B94A-4AD3-A355-0D5A618CEEE3} = {848C24BA-BEBA-48EC-90E6-526ECAB6BB4A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {15924D5F-B90B-4BC7-9E7D-BCCB62EBABAD}

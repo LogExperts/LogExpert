@@ -1,15 +1,14 @@
-﻿namespace SftpFileSystem
+﻿namespace SftpFileSystem;
+
+public class ConfigData
 {
-    public class ConfigData
-    {
-        #region Properties
+    #region Properties
 
-        public string KeyFile { get; set; }
+    public string KeyFile { get; set; }
 
-        public bool UseKeyfile { get; set; }
+    public bool UseKeyfile { get; set; }
 
-        public KeyType KeyType { get; set; }
+    public KeyType KeyType { get; set; }
 
-        #endregion
-    }
+    #endregion
 }

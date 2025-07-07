@@ -1,11 +1,10 @@
-﻿namespace LogExpert
+namespace LogExpert;
+
+public interface ITextValue
 {
-    public interface ITextValue
-    {
-        #region Properties
+    #region Properties
 
-        string Text { get; }
+    string Text { get; }
 
-        #endregion
-    }
+    #endregion
 }

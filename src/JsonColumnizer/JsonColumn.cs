@@ -1,11 +1,10 @@
-﻿namespace JsonColumnizer
+﻿namespace JsonColumnizer;
+
+public class JsonColumn(string name)
 {
-    public class JsonColumn(string name)
-    {
-        #region Properties
+    #region Properties
 
-        public string Name { get; } = name;
+    public string Name { get; } = name;
 
-        #endregion
-    }
+    #endregion
 }

@@ -1,13 +1,12 @@
-﻿namespace LogExpert
+﻿namespace LogExpert;
+
+public interface ILogLine : ITextValue
 {
-    public interface ILogLine : ITextValue
-    {
-        #region Properties
+    #region Properties
 
-        string FullLine { get; }
+    string FullLine { get; }
 
-        int LineNumber { get; }
+    int LineNumber { get; }
 
-        #endregion
-    }
+    #endregion
 }
