@@ -301,6 +301,123 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Config file not found.
+        /// </summary>
+        public static string Program_Error_ConfigFileNotFound {
+            get {
+                return ResourceManager.GetString("Program_Error_ConfigFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0}).
+        /// </summary>
+        public static string Program_Error_InsufficiantRights {
+            get {
+                return ResourceManager.GetString("Program_Error_InsufficiantRights", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IpcClientChannel error, giving up: {0}.
+        /// </summary>
+        public static string Program_Error_IPCChannel_ClientError {
+            get {
+                return ResourceManager.GetString("Program_Error_IPCChannel_ClientError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IpcClientChannel error: {0}.
+        /// </summary>
+        public static string Program_Error_IPCChannel_ClientError_Default {
+            get {
+                return ResourceManager.GetString("Program_Error_IPCChannel_ClientError_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mutex error, giving up: {0}.
+        /// </summary>
+        public static string Program_Error_MutexError {
+            get {
+                return ResourceManager.GetString("Program_Error_MutexError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid payload command: null.
+        /// </summary>
+        public static string Program_Error_Payload_InvalidCommand {
+            get {
+                return ResourceManager.GetString("Program_Error_Payload_InvalidCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot open connection to first instance ({0}).
+        /// </summary>
+        public static string Program_Error_Pipe_CannotConnectToFirstInstance {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_CannotConnectToFirstInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pipe server error: {0}.
+        /// </summary>
+        public static string Program_Error_Pipe_CommonError {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_CommonError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Operation while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Error_Pipe_InvalidOperationException {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_InvalidOperationException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An I/O error occurred while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Error_Pipe_IOException {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_IOException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timeout connecting to pipe server.
+        /// </summary>
+        public static string Program_Error_Pipe_TimeoutException {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_TimeoutException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unauthorized access while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Error_Pipe_UnauthorizedAccessException {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_UnauthorizedAccessException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown IPC Message Type: {0}; with payload: {1}.
+        /// </summary>
+        public static string Program_Error_Pipe_UnkownIPCMessage {
+            get {
+                return ResourceManager.GetString("Program_Error_Pipe_UnkownIPCMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Restart_alt {
@@ -337,6 +454,24 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Star", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert.
+        /// </summary>
+        public static string Title_LogExpert {
+            get {
+                return ResourceManager.GetString("Title_LogExpert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert Error.
+        /// </summary>
+        public static string Title_LogExpert_Error {
+            get {
+                return ResourceManager.GetString("Title_LogExpert_Error", resourceCulture);
             }
         }
     }

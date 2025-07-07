@@ -1,11 +1,19 @@
+using System.Diagnostics;
+using System.Globalization;
+using System.IO.Pipes;
+using System.Reflection;
+using System.Runtime.Versioning;
+using System.Security;
+using System.Security.Principal;
+using System.Text;
+using System.Windows.Forms;
+
 using LogExpert.Classes;
 using LogExpert.Classes.CommandLine;
 using LogExpert.Config;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
-using LogExpert.Core.Interface;
 using LogExpert.Dialogs;
-using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions.LogWindow;
 
@@ -13,15 +21,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using NLog;
-
-using System.Diagnostics;
-using System.Globalization;
-using System.IO.Pipes;
-using System.Reflection;
-using System.Security;
-using System.Security.Principal;
-using System.Text;
-using System.Windows.Forms;
 
 namespace LogExpert;
 
@@ -41,7 +40,8 @@ internal static class Program
     /// The main entry point for the application.
     /// </summary>
     [STAThread]
-    private static void Main(string[] args)
+    [SupportedOSPlatform("windows")]
+    private static void Main (string[] args)
     {
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         Application.ThreadException += Application_ThreadException;
@@ -69,11 +69,11 @@ internal static class Program
                 }
                 else
                 {
-                    MessageBox.Show(@"Config file not found", @"LogExpert");
+                    _ = MessageBox.Show(Resources.Program_Error_ConfigFileNotFound, Resources.Title_LogExpert);
                 }
             }
 
-            PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
+            _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             var pId = Process.GetCurrentProcess().SessionId;
 
@@ -95,7 +95,7 @@ internal static class Program
                     LogExpertProxy proxy = new(logWin);
                     LogExpertApplicationContext context = new(proxy, logWin);
 
-                    Task.Run(() => RunServerLoopAsync(SendMessageToProxy, proxy, cts.Token));
+                    _ = Task.Run(() => RunServerLoopAsync(SendMessageToProxy, proxy, cts.Token));
 
                     Application.Run(context);
                 }
@@ -104,7 +104,7 @@ internal static class Program
                     var counter = 3;
                     Exception errMsg = null;
 
-                    Settings settings = ConfigManager.Instance.Settings;
+                    var settings = ConfigManager.Instance.Settings;
                     while (counter > 0)
                     {
                         try
@@ -114,10 +114,13 @@ internal static class Program
                             SendCommandToServer(command);
                             break;
                         }
-                        catch (Exception e)
+                        catch (Exception ex) when (ex is ArgumentNullException
+                                                       or ArgumentOutOfRangeException
+                                                       or ArgumentException
+                                                       or SecurityException)
                         {
-                            _logger.Warn(e, "IpcClientChannel error: ");
-                            errMsg = e;
+                            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_IPCChannel_ClientError_Default, ex));
+                            errMsg = ex;
                             counter--;
                             Thread.Sleep(500);
                         }
@@ -125,8 +128,8 @@ internal static class Program
 
                     if (counter == 0)
                     {
-                        _logger.Error(errMsg, "IpcClientChannel error, giving up: ");
-                        MessageBox.Show($"Cannot open connection to first instance ({errMsg})", "LogExpert");
+                        _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_IPCChannel_ClientError, errMsg));
+                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.Title_LogExpert);
                     }
 
                     //TODO: Remove this from here? Why is it called from the Main project and not from the main window?
@@ -144,21 +147,29 @@ internal static class Program
                 mutex.Close();
                 cts.Cancel();
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is UnauthorizedAccessException
+                                       or IOException
+                                       or DirectoryNotFoundException
+                                       or PathTooLongException
+                                       or WaitHandleCannotBeOpenedException
+                                       or InvalidOperationException
+                                       or SecurityException
+                                       or ArgumentNullException
+                                       or ArgumentException)
             {
-                _logger.Error(ex, "Mutex error, giving up: ");
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_MutexError, ex));
                 cts.Cancel();
-                MessageBox.Show($"Cannot open connection to first instance ({ex.Message})", "LogExpert");
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.Title_LogExpert);
             }
         }
         catch (SecurityException se)
         {
-            MessageBox.Show("Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n(" + se.Message + ")", "LogExpert Error");
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_InsufficiantRights, se.Message), Resources.Title_LogExpert_Error);
             cts.Cancel();
         }
     }
 
-    private static string SerializeCommandIntoNonFormattedJSON(string[] fileNames, bool allowOnlyOneInstance)
+    private static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance)
     {
         var message = new IpcMessage()
         {
@@ -172,7 +183,7 @@ internal static class Program
     // This loop tries to convert relative file names into absolute file names (assuming that platform file names are given).
     // It tolerates errors, to give file system plugins (e.g. sftp) a change later.
     // TODO: possibly should be moved to LocalFileSystem plugin
-    private static string[] GenerateAbsoluteFilePaths(string[] remainingArgs)
+    private static string[] GenerateAbsoluteFilePaths (string[] remainingArgs)
     {
         List<string> argsList = [];
 
@@ -183,7 +194,12 @@ internal static class Program
                 FileInfo info = new(fileArg);
                 argsList.Add(info.Exists ? info.FullName : fileArg);
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is ArgumentNullException
+                                        or SecurityException
+                                        or ArgumentException
+                                        or UnauthorizedAccessException
+                                        or PathTooLongException
+                                        or NotSupportedException)
             {
                 argsList.Add(fileArg);
             }
@@ -192,7 +208,7 @@ internal static class Program
         return [.. argsList];
     }
 
-    private static void SendMessageToProxy(IpcMessage message, LogExpertProxy proxy)
+    private static void SendMessageToProxy (IpcMessage message, LogExpertProxy proxy)
     {
         var payLoad = message.Payload.ToObject<LoadPayload>();
 
@@ -210,7 +226,7 @@ internal static class Program
                     proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
                     break;
                 default:
-                    _logger.Error($"Unknown IPC Message Type: {message.Type}; with payload: {payLoad}");
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_UnkownIPCMessage, message.Type, payLoad));
                     break;
             }
         }
@@ -220,14 +236,14 @@ internal static class Program
     {
         if (payLoad == null)
         {
-            _logger.Error("Invalid payload command: null");
+            _logger.Error(Resources.Program_Error_Payload_InvalidCommand);
             return false;
         }
 
         return true;
     }
 
-    private static void SendCommandToServer(string command)
+    private static void SendCommandToServer (string command)
     {
         using var client = new NamedPipeClientStream(".", PIPE_SERVER_NAME, PipeDirection.Out);
 
@@ -237,17 +253,22 @@ internal static class Program
         }
         catch (TimeoutException)
         {
-            _logger.Error("Timeout connecting to pipe server");
+            _logger.Error(Resources.Program_Error_Pipe_TimeoutException);
             return;
         }
         catch (IOException ex)
         {
-            _logger.Warn(ex, "An I/O error occurred while connecting to the pipe server.");
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_IOException, ex));
+            return;
+        }
+        catch (InvalidOperationException ioe)
+        {
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_InvalidOperationException, ioe));
             return;
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.Warn(ex, "Unauthorized access while connecting to the pipe server.");
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_UnauthorizedAccessException, ex));
             return;
         }
 
@@ -255,9 +276,10 @@ internal static class Program
         writer.WriteLine(command);
     }
 
-    private static async Task RunServerLoopAsync(Action<IpcMessage, LogExpertProxy> onCommand, LogExpertProxy proxy, CancellationToken cancellationToken)
+    [SupportedOSPlatform("windows")]
+    private static async Task RunServerLoopAsync (Action<IpcMessage, LogExpertProxy> onCommand, LogExpertProxy proxy, CancellationToken cancellationToken)
     {
-        while (cancellationToken.IsCancellationRequested == false)
+        while (!cancellationToken.IsCancellationRequested)
         {
             using var server = new NamedPipeServerStream(
                 PIPE_SERVER_NAME,
@@ -268,9 +290,9 @@ internal static class Program
 
             try
             {
-                await server.WaitForConnectionAsync(cancellationToken);
+                await server.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
                 using var reader = new StreamReader(server, Encoding.UTF8);
-                var line = await reader.ReadLineAsync(cancellationToken);
+                var line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false);
 
                 if (line != null)
                 {
@@ -282,15 +304,24 @@ internal static class Program
             {
                 break;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException
+                                               or ObjectDisposedException
+                                               or TimeoutException
+                                               or InvalidOperationException
+                                               or UnauthorizedAccessException
+                                               or SecurityException
+                                               or ArgumentNullException
+                                               or ArgumentOutOfRangeException
+                                               or ArgumentException)
             {
-                _logger.Warn(ex, "Pipe server error");
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CommonError, ex));
             }
         }
     }
 
     [STAThread]
-    private static void ShowUnhandledException(object exceptionObject)
+    [SupportedOSPlatform("windows")]
+    private static void ShowUnhandledException (object exceptionObject)
     {
         var errorText = string.Empty;
         string stackTrace;
@@ -319,7 +350,8 @@ internal static class Program
 
     #region Events handler
 
-    private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+    [SupportedOSPlatform("windows")]
+    private static void Application_ThreadException (object sender, ThreadExceptionEventArgs e)
     {
         _logger.Fatal(e);
 
@@ -333,7 +365,8 @@ internal static class Program
         thread.Join();
     }
 
-    private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    [SupportedOSPlatform("windows")]
+    private static void CurrentDomain_UnhandledException (object sender, UnhandledExceptionEventArgs e)
     {
         _logger.Fatal(e);
 

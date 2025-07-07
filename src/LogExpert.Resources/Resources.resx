@@ -188,9 +188,19 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Title_LogExpert" xml:space="preserve">
+    <value>LogExpert</value>
+    <comment>LogExpert</comment>
+  </data>
   <data name="LogLover" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\gif\LogLover.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>Logexpert Logo</comment>
+  </data>
+  <data name="Program_Error_ConfigFileNotFound" xml:space="preserve">
+    <value>Config file not found</value>
+  </data>
+  <data name="Program_Error_InsufficiantRights" xml:space="preserve">
+    <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\bmp\Pro_Filter.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -207,5 +217,43 @@
   </data>
   <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Title_LogExpert_Error" xml:space="preserve">
+    <value>LogExpert Error</value>
+    <comment>LogExpert Error Title</comment>
+  </data>
+  <data name="Program_Error_Pipe_TimeoutException" xml:space="preserve">
+    <value>Timeout connecting to pipe server</value>
+    <comment>Timeout Exception thrown from the Named Pipe</comment>
+  </data>
+  <data name="Program_Error_Pipe_IOException" xml:space="preserve">
+    <value>An I/O error occurred while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_UnauthorizedAccessException" xml:space="preserve">
+    <value>Unauthorized access while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_CommonError" xml:space="preserve">
+    <value>Pipe server error: {0}</value>
+  </data>
+  <data name="Program_Error_Payload_InvalidCommand" xml:space="preserve">
+    <value>Invalid payload command: null</value>
+  </data>
+  <data name="Program_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
+    <value>Unknown IPC Message Type: {0}; with payload: {1}</value>
+  </data>
+  <data name="Program_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+    <value>Cannot open connection to first instance ({0})</value>
+  </data>
+  <data name="Program_Error_MutexError" xml:space="preserve">
+    <value>Mutex error, giving up: {0}</value>
+  </data>
+  <data name="Program_Error_IPCChannel_ClientError" xml:space="preserve">
+    <value>IpcClientChannel error, giving up: {0}</value>
+  </data>
+  <data name="Program_Error_IPCChannel_ClientError_Default" xml:space="preserve">
+    <value>IpcClientChannel error: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_InvalidOperationException" xml:space="preserve">
+    <value>Invalid Operation while connecting to the pipe server: {0}</value>
   </data>
 </root>

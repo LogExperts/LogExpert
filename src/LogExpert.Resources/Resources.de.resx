@@ -188,9 +188,18 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Title_LogExpert" xml:space="preserve">
+    <value>LogExpert</value>
+  </data>
   <data name="LogLover" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\gif\LogLover.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>Logexpert Logo</comment>
+  </data>
+  <data name="Program_Error_ConfigFileNotFound" xml:space="preserve">
+    <value>Konfigurationsdatei konnte nicht gefunden werden</value>
+  </data>
+  <data name="Program_Error_InsufficiantRights" xml:space="preserve">
+    <value>LogExpert besitzt nicht alle Systemrechte. Vielleicht wurde LogExpert aus einem Netzwerklaufwerk gestartet. Bitte LogExpert von einem lokalen Laufwerk starten!\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\bmp\Pro_Filter.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -207,5 +216,41 @@
   </data>
   <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Title_LogExpert_Error" xml:space="preserve">
+    <value>LogExpert Fehler</value>
+  </data>
+  <data name="Program_Error_Pipe_TimeoutException" xml:space="preserve">
+    <value>Beim versuch den Pipe-Server zu erreichen kam es zu einem Timeoutfehler</value>
+  </data>
+  <data name="Program_Error_Pipe_IOException" xml:space="preserve">
+    <value>Beim Versuch den Pipe-Server zu erreich kam es zu einem I/O Fehler: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_UnauthorizedAccessException" xml:space="preserve">
+    <value>Beim Versuch den Pipe-Server zu erreich kam es zu einem Zugriffsfehler: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_CommonError" xml:space="preserve">
+    <value>Pipeserver Fehler: {0}</value>
+  </data>
+  <data name="Program_Error_Payload_InvalidCommand" xml:space="preserve">
+    <value>Falsche Payload: null</value>
+  </data>
+  <data name="Program_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
+    <value>Unbekannte IPC Nachricht Type: {0}; mit payload: {1}</value>
+  </data>
+  <data name="Program_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+    <value>Die Verbindung zur ersten Instanz kann nicht geöffnet werden: {0}</value>
+  </data>
+  <data name="Program_Error_MutexError" xml:space="preserve">
+    <value>Problem beim Mutex, Program wird beendet: {0}</value>
+  </data>
+  <data name="Program_Error_IPCChannel_ClientError" xml:space="preserve">
+    <value>Fehler des IPC Client Channels, Program wird beendet: {0}</value>
+  </data>
+  <data name="Program_Error_IPCChannel_ClientError_Default" xml:space="preserve">
+    <value>Fehler des IPC Client Channels: {0}</value>
+  </data>
+  <data name="Program_Error_Pipe_InvalidOperationException" xml:space="preserve">
+    <value>Eine invalide Operation wurde durchgeführt, während des Verbindungsversuches zum Pipeserver: {0}</value>
   </data>
 </root>
