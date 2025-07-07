@@ -94,20 +94,20 @@ public class ConfigManager : IConfigManager
         Instance.Save(fileInfo, Settings);
     }
 
-    public void Export (FileInfo fileInfo, SettingsFlags flags)
+    public void Export (FileInfo fileInfo, SettingsFlags highlightSettings)
     {
-        Instance.Save(fileInfo, Settings, flags);
+        Instance.Save(fileInfo, Settings, highlightSettings);
     }
 
-    public void Import (FileInfo fileInfo, ExportImportFlags flags)
+    public void Import (FileInfo fileInfo, ExportImportFlags importFlags)
     {
-        Instance._settings = Instance.Import(Instance._settings, fileInfo, flags);
+        Instance._settings = Instance.Import(Instance._settings, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
-    public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags flags)
+    public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags)
     {
-        Instance._settings.Preferences.HighlightGroupList = Instance.Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, flags);
+        Instance._settings.Preferences.HighlightGroupList = Instance.Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
@@ -120,7 +120,7 @@ public class ConfigManager : IConfigManager
         _logger.Info(CultureInfo.InvariantCulture, "Loading settings");
 
         string dir;
-        
+
         if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
         {
             _logger.Info(CultureInfo.InvariantCulture, "Load settings standard mode");

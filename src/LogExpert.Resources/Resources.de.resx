@@ -195,10 +195,10 @@
     <value>images\gif\LogLover.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>Logexpert Logo</comment>
   </data>
-  <data name="Program_Error_ConfigFileNotFound" xml:space="preserve">
+  <data name="Program_UI_Error_ConfigFileNotFound" xml:space="preserve">
     <value>Konfigurationsdatei konnte nicht gefunden werden</value>
   </data>
-  <data name="Program_Error_InsufficiantRights" xml:space="preserve">
+  <data name="Program_UI_Error_InsufficiantRights" xml:space="preserve">
     <value>LogExpert besitzt nicht alle Systemrechte. Vielleicht wurde LogExpert aus einem Netzwerklaufwerk gestartet. Bitte LogExpert von einem lokalen Laufwerk starten!\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -220,37 +220,97 @@
   <data name="Title_LogExpert_Error" xml:space="preserve">
     <value>LogExpert Fehler</value>
   </data>
-  <data name="Program_Error_Pipe_TimeoutException" xml:space="preserve">
+  <data name="Program_Logger_Error_Pipe_TimeoutException" xml:space="preserve">
     <value>Beim versuch den Pipe-Server zu erreichen kam es zu einem Timeoutfehler</value>
   </data>
-  <data name="Program_Error_Pipe_IOException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Error_Pipe_IOException" xml:space="preserve">
     <value>Beim Versuch den Pipe-Server zu erreich kam es zu einem I/O Fehler: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_UnauthorizedAccessException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_UnauthorizedAccessException" xml:space="preserve">
     <value>Beim Versuch den Pipe-Server zu erreich kam es zu einem Zugriffsfehler: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_CommonError" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_CommonError" xml:space="preserve">
     <value>Pipeserver Fehler: {0}</value>
   </data>
-  <data name="Program_Error_Payload_InvalidCommand" xml:space="preserve">
+  <data name="Program_Logger_Error_Payload_InvalidCommand" xml:space="preserve">
     <value>Falsche Payload: null</value>
   </data>
-  <data name="Program_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
+  <data name="Program_Logger_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
     <value>Unbekannte IPC Nachricht Type: {0}; mit payload: {1}</value>
   </data>
-  <data name="Program_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+  <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
     <value>Die Verbindung zur ersten Instanz kann nicht geöffnet werden: {0}</value>
   </data>
-  <data name="Program_Error_MutexError" xml:space="preserve">
+  <data name="Program_Logger_Error_MutexError" xml:space="preserve">
     <value>Problem beim Mutex, Program wird beendet: {0}</value>
   </data>
-  <data name="Program_Error_IPCChannel_ClientError" xml:space="preserve">
+  <data name="Program_Logger_Error_IPCChannel_ClientError" xml:space="preserve">
     <value>Fehler des IPC Client Channels, Program wird beendet: {0}</value>
   </data>
-  <data name="Program_Error_IPCChannel_ClientError_Default" xml:space="preserve">
+  <data name="Program_Logger_Error_IPCChannel_ClientError_Default" xml:space="preserve">
     <value>Fehler des IPC Client Channels: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_InvalidOperationException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_InvalidOperationException" xml:space="preserve">
     <value>Eine invalide Operation wurde durchgeführt, während des Verbindungsversuches zum Pipeserver: {0}</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab" xml:space="preserve">
+    <value>Laden der Dateien in einen existierendes LogTabWindow</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne" xml:space="preserve">
+    <value>Erstes Fenster wurde geschlossen. Ein neues wird erstellt</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne" xml:space="preserve">
+    <value>Kein offenes Fenster übrig. Ein neues Fenster wird erstellt es wird als primäres GUI Fenster benutzt</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_CreatingNewWindow" xml:space="preserve">
+    <value>Neues LogTabWindow erstellen</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LastTabWindowClosed" xml:space="preserve">
+    <value>Das letzte LogTabWindow wurde geschlossen</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_AddWindow" xml:space="preserve">
+    <value>Fenster wird zur Liste hinzugefügt</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_RemoveWindow" xml:space="preserve">
+    <value>Fenster wird aus der Liste entfernt</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
+    <value>Settings importiert</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_FileAccessError" xml:space="preserve">
+    <value>Fehler während des Zugriffes auf die Datei: {0}, Fehlermeldung: {1}</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>Settings konnte nicht importiert werden: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>Exportieren der Settings in eine Datei</value>
+  </data>
+  <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
+    <value>Settings (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
+    <value>Kopie von </value>
+  </data>
+  <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
+    <value>Neue Gruppe</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Fehler während des Hinzufügens eines Highlighteintrages: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Fehler während des Hinzufügens eines Highlighteintrages.\r\n{0}</value>
+  </data>
+  <data name="HighlightDialog_RegexError" xml:space="preserve">
+    <value>Die Regex ist "null" oder besteht nur aus Leerzeichen</value>
+  </data>
+  <data name="HighlightDialog_UI_DefaultGroupName" xml:space="preserve">
+    <value>[Default]</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Während des Speichern des Highlighteintrages ist ein Fehler aufgetreten: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Während des Speichern des Highlighteintrages ist ein Fehler aufgetreten: {0}</value>
   </data>
 </root>

@@ -69,7 +69,7 @@ internal static class Program
                 }
                 else
                 {
-                    _ = MessageBox.Show(Resources.Program_Error_ConfigFileNotFound, Resources.Title_LogExpert);
+                    _ = MessageBox.Show(Resources.Program_UI_Error_ConfigFileNotFound, Resources.Title_LogExpert);
                 }
             }
 
@@ -119,7 +119,7 @@ internal static class Program
                                                        or ArgumentException
                                                        or SecurityException)
                         {
-                            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_IPCChannel_ClientError_Default, ex));
+                            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_IPCChannel_ClientError_Default, ex));
                             errMsg = ex;
                             counter--;
                             Thread.Sleep(500);
@@ -128,8 +128,8 @@ internal static class Program
 
                     if (counter == 0)
                     {
-                        _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_IPCChannel_ClientError, errMsg));
-                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.Title_LogExpert);
+                        _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_IPCChannel_ClientError, errMsg));
+                        _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.Title_LogExpert);
                     }
 
                     //TODO: Remove this from here? Why is it called from the Main project and not from the main window?
@@ -157,14 +157,14 @@ internal static class Program
                                        or ArgumentNullException
                                        or ArgumentException)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_MutexError, ex));
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_MutexError, ex));
                 cts.Cancel();
-                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.Title_LogExpert);
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, ex.Message), Resources.Title_LogExpert);
             }
         }
         catch (SecurityException se)
         {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_InsufficiantRights, se.Message), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficiantRights, se.Message), Resources.Title_LogExpert_Error);
             cts.Cancel();
         }
     }
@@ -208,6 +208,7 @@ internal static class Program
         return [.. argsList];
     }
 
+    [SupportedOSPlatform("windows")]
     private static void SendMessageToProxy (IpcMessage message, LogExpertProxy proxy)
     {
         var payLoad = message.Payload.ToObject<LoadPayload>();
@@ -226,7 +227,7 @@ internal static class Program
                     proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
                     break;
                 default:
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_UnkownIPCMessage, message.Type, payLoad));
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_Pipe_UnkownIPCMessage, message.Type, payLoad));
                     break;
             }
         }
@@ -236,7 +237,7 @@ internal static class Program
     {
         if (payLoad == null)
         {
-            _logger.Error(Resources.Program_Error_Payload_InvalidCommand);
+            _logger.Error(Resources.Program_Logger_Error_Payload_InvalidCommand);
             return false;
         }
 
@@ -253,22 +254,22 @@ internal static class Program
         }
         catch (TimeoutException)
         {
-            _logger.Error(Resources.Program_Error_Pipe_TimeoutException);
+            _logger.Error(Resources.Program_Logger_Error_Pipe_TimeoutException);
             return;
         }
         catch (IOException ex)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_IOException, ex));
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Error_Pipe_IOException, ex));
             return;
         }
         catch (InvalidOperationException ioe)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_InvalidOperationException, ioe));
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_InvalidOperationException, ioe));
             return;
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_UnauthorizedAccessException, ex));
+            _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_UnauthorizedAccessException, ex));
             return;
         }
 
@@ -314,7 +315,7 @@ internal static class Program
                                                or ArgumentOutOfRangeException
                                                or ArgumentException)
             {
-                _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Error_Pipe_CommonError, ex));
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Warn_Pipe_CommonError, ex));
             }
         }
     }

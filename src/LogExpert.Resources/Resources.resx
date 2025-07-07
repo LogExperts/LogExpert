@@ -196,10 +196,10 @@
     <value>images\gif\LogLover.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>Logexpert Logo</comment>
   </data>
-  <data name="Program_Error_ConfigFileNotFound" xml:space="preserve">
+  <data name="Program_UI_Error_ConfigFileNotFound" xml:space="preserve">
     <value>Config file not found</value>
   </data>
-  <data name="Program_Error_InsufficiantRights" xml:space="preserve">
+  <data name="Program_UI_Error_InsufficiantRights" xml:space="preserve">
     <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -222,38 +222,98 @@
     <value>LogExpert Error</value>
     <comment>LogExpert Error Title</comment>
   </data>
-  <data name="Program_Error_Pipe_TimeoutException" xml:space="preserve">
+  <data name="Program_Logger_Error_Pipe_TimeoutException" xml:space="preserve">
     <value>Timeout connecting to pipe server</value>
     <comment>Timeout Exception thrown from the Named Pipe</comment>
   </data>
-  <data name="Program_Error_Pipe_IOException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Error_Pipe_IOException" xml:space="preserve">
     <value>An I/O error occurred while connecting to the pipe server: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_UnauthorizedAccessException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_UnauthorizedAccessException" xml:space="preserve">
     <value>Unauthorized access while connecting to the pipe server: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_CommonError" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_CommonError" xml:space="preserve">
     <value>Pipe server error: {0}</value>
   </data>
-  <data name="Program_Error_Payload_InvalidCommand" xml:space="preserve">
+  <data name="Program_Logger_Error_Payload_InvalidCommand" xml:space="preserve">
     <value>Invalid payload command: null</value>
   </data>
-  <data name="Program_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
+  <data name="Program_Logger_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
     <value>Unknown IPC Message Type: {0}; with payload: {1}</value>
   </data>
-  <data name="Program_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+  <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
     <value>Cannot open connection to first instance ({0})</value>
   </data>
-  <data name="Program_Error_MutexError" xml:space="preserve">
+  <data name="Program_Logger_Error_MutexError" xml:space="preserve">
     <value>Mutex error, giving up: {0}</value>
   </data>
-  <data name="Program_Error_IPCChannel_ClientError" xml:space="preserve">
+  <data name="Program_Logger_Error_IPCChannel_ClientError" xml:space="preserve">
     <value>IpcClientChannel error, giving up: {0}</value>
   </data>
-  <data name="Program_Error_IPCChannel_ClientError_Default" xml:space="preserve">
+  <data name="Program_Logger_Error_IPCChannel_ClientError_Default" xml:space="preserve">
     <value>IpcClientChannel error: {0}</value>
   </data>
-  <data name="Program_Error_Pipe_InvalidOperationException" xml:space="preserve">
+  <data name="Program_Logger_Warn_Pipe_InvalidOperationException" xml:space="preserve">
     <value>Invalid Operation while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab" xml:space="preserve">
+    <value>Loading files into existing LogTabWindow</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne" xml:space="preserve">
+    <value>first GUI thread window is disposed. Setting a new one.</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne" xml:space="preserve">
+    <value>No windows left. New created window will be the new 'first' GUI window</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_CreatingNewWindow" xml:space="preserve">
+    <value>Creating new LogTabWindow</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LastTabWindowClosed" xml:space="preserve">
+    <value>Last LogTabWindow was closed</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_AddWindow" xml:space="preserve">
+    <value>Adding window to list</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_RemoveWindow" xml:space="preserve">
+    <value>Removing window from list</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
+    <value>Settings imported</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_FileAccessError" xml:space="preserve">
+    <value>Error while trying to access file: {0}, exception: {1}</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>Settings could not be imported: {exSettings could not be imported: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>Export Settings to file</value>
+  </data>
+  <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
+    <value>Settings (*.json)|*.json|All files (*.*)</value>
+  </data>
+  <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
+    <value>Copy of</value>
+  </data>
+  <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Error during add of highlight entry: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Error during add of entry.\r\n{0}</value>
+  </data>
+  <data name="HighlightDialog_RegexError" xml:space="preserve">
+    <value>Regex value is null or whitespace</value>
+  </data>
+  <data name="HighlightDialog_UI_DefaultGroupName" xml:space="preserve">
+    <value>[Default]</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Error during save of save highlight entry: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Error during save of entry.\r\n{0}</value>
   </data>
 </root>

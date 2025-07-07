@@ -281,6 +281,186 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error during add of highlight entry: {0}.
+        /// </summary>
+        public static string HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry {
+            get {
+                return ResourceManager.GetString("HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during save of save highlight entry: {0}.
+        /// </summary>
+        public static string HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry {
+            get {
+                return ResourceManager.GetString("HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while trying to access file: {0}, exception: {1}.
+        /// </summary>
+        public static string HighlightDialog_Logger_Error_FileAccessError {
+            get {
+                return ResourceManager.GetString("HighlightDialog_Logger_Error_FileAccessError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regex value is null or whitespace.
+        /// </summary>
+        public static string HighlightDialog_RegexError {
+            get {
+                return ResourceManager.GetString("HighlightDialog_RegexError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Default].
+        /// </summary>
+        public static string HighlightDialog_UI_DefaultGroupName {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_DefaultGroupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during add of entry.\r\n{0}.
+        /// </summary>
+        public static string HighlightDialog_UI_ErrorDuringAddOfHighLightEntry {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_ErrorDuringAddOfHighLightEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error during save of entry.\r\n{0}.
+        /// </summary>
+        public static string HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings (*.json)|*.json|All files (*.*).
+        /// </summary>
+        public static string HighlightDialog_UI_Export_Filter {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Export_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New group.
+        /// </summary>
+        public static string HighlightDialog_UI_NewGroup_BaseName {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_NewGroup_BaseName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings could not be imported: {exSettings could not be imported: {0}.
+        /// </summary>
+        public static string HighlightDialog_UI_SettingsCouldNotBeImported {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_SettingsCouldNotBeImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings imported.
+        /// </summary>
+        public static string HighlightDialog_UI_SettingsImported {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_SettingsImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy of.
+        /// </summary>
+        public static string HighlightDialog_UI_Snippet_CopyOf {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Snippet_CopyOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Settings to file.
+        /// </summary>
+        public static string HighlightDialog_UI_Title_ExportSettings {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Title_ExportSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adding window to list.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_AddWindow {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_AddWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating new LogTabWindow.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_CreatingNewWindow {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_CreatingNewWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Last LogTabWindow was closed.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_LastTabWindowClosed {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_LastTabWindowClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading files into existing LogTabWindow.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No windows left. New created window will be the new &apos;first&apos; GUI window.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removing window from list.
+        /// </summary>
+        public static string LogExpertProxy_Logger_Info_RemoveWindow {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Info_RemoveWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to first GUI thread window is disposed. Setting a new one..
+        /// </summary>
+        public static string LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne {
+            get {
+                return ResourceManager.GetString("LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap LogLover {
@@ -301,119 +481,119 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Config file not found.
-        /// </summary>
-        public static string Program_Error_ConfigFileNotFound {
-            get {
-                return ResourceManager.GetString("Program_Error_ConfigFileNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0}).
-        /// </summary>
-        public static string Program_Error_InsufficiantRights {
-            get {
-                return ResourceManager.GetString("Program_Error_InsufficiantRights", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to IpcClientChannel error, giving up: {0}.
         /// </summary>
-        public static string Program_Error_IPCChannel_ClientError {
+        public static string Program_Logger_Error_IPCChannel_ClientError {
             get {
-                return ResourceManager.GetString("Program_Error_IPCChannel_ClientError", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_IPCChannel_ClientError", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to IpcClientChannel error: {0}.
         /// </summary>
-        public static string Program_Error_IPCChannel_ClientError_Default {
+        public static string Program_Logger_Error_IPCChannel_ClientError_Default {
             get {
-                return ResourceManager.GetString("Program_Error_IPCChannel_ClientError_Default", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_IPCChannel_ClientError_Default", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Mutex error, giving up: {0}.
         /// </summary>
-        public static string Program_Error_MutexError {
+        public static string Program_Logger_Error_MutexError {
             get {
-                return ResourceManager.GetString("Program_Error_MutexError", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_MutexError", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Invalid payload command: null.
         /// </summary>
-        public static string Program_Error_Payload_InvalidCommand {
+        public static string Program_Logger_Error_Payload_InvalidCommand {
             get {
-                return ResourceManager.GetString("Program_Error_Payload_InvalidCommand", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Cannot open connection to first instance ({0}).
-        /// </summary>
-        public static string Program_Error_Pipe_CannotConnectToFirstInstance {
-            get {
-                return ResourceManager.GetString("Program_Error_Pipe_CannotConnectToFirstInstance", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Pipe server error: {0}.
-        /// </summary>
-        public static string Program_Error_Pipe_CommonError {
-            get {
-                return ResourceManager.GetString("Program_Error_Pipe_CommonError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Invalid Operation while connecting to the pipe server: {0}.
-        /// </summary>
-        public static string Program_Error_Pipe_InvalidOperationException {
-            get {
-                return ResourceManager.GetString("Program_Error_Pipe_InvalidOperationException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An I/O error occurred while connecting to the pipe server: {0}.
-        /// </summary>
-        public static string Program_Error_Pipe_IOException {
-            get {
-                return ResourceManager.GetString("Program_Error_Pipe_IOException", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_Payload_InvalidCommand", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Timeout connecting to pipe server.
         /// </summary>
-        public static string Program_Error_Pipe_TimeoutException {
+        public static string Program_Logger_Error_Pipe_TimeoutException {
             get {
-                return ResourceManager.GetString("Program_Error_Pipe_TimeoutException", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unauthorized access while connecting to the pipe server: {0}.
-        /// </summary>
-        public static string Program_Error_Pipe_UnauthorizedAccessException {
-            get {
-                return ResourceManager.GetString("Program_Error_Pipe_UnauthorizedAccessException", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_Pipe_TimeoutException", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Unknown IPC Message Type: {0}; with payload: {1}.
         /// </summary>
-        public static string Program_Error_Pipe_UnkownIPCMessage {
+        public static string Program_Logger_Error_Pipe_UnkownIPCMessage {
             get {
-                return ResourceManager.GetString("Program_Error_Pipe_UnkownIPCMessage", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_Pipe_UnkownIPCMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An I/O error occurred while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Logger_Warn_Error_Pipe_IOException {
+            get {
+                return ResourceManager.GetString("Program_Logger_Warn_Error_Pipe_IOException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pipe server error: {0}.
+        /// </summary>
+        public static string Program_Logger_Warn_Pipe_CommonError {
+            get {
+                return ResourceManager.GetString("Program_Logger_Warn_Pipe_CommonError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Operation while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Logger_Warn_Pipe_InvalidOperationException {
+            get {
+                return ResourceManager.GetString("Program_Logger_Warn_Pipe_InvalidOperationException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unauthorized access while connecting to the pipe server: {0}.
+        /// </summary>
+        public static string Program_Logger_Warn_Pipe_UnauthorizedAccessException {
+            get {
+                return ResourceManager.GetString("Program_Logger_Warn_Pipe_UnauthorizedAccessException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Config file not found.
+        /// </summary>
+        public static string Program_UI_Error_ConfigFileNotFound {
+            get {
+                return ResourceManager.GetString("Program_UI_Error_ConfigFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0}).
+        /// </summary>
+        public static string Program_UI_Error_InsufficiantRights {
+            get {
+                return ResourceManager.GetString("Program_UI_Error_InsufficiantRights", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot open connection to first instance ({0}).
+        /// </summary>
+        public static string Program_UI_Error_Pipe_CannotConnectToFirstInstance {
+            get {
+                return ResourceManager.GetString("Program_UI_Error_Pipe_CannotConnectToFirstInstance", resourceCulture);
             }
         }
         

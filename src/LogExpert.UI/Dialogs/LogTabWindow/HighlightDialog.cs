@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text.RegularExpressions;
 
 using LogExpert.Core.Classes.Highlight;
@@ -85,8 +87,11 @@ internal partial class HighlightDialog : Form
 
     private void OnBtnBookmarkCommentClick (object sender, EventArgs e)
     {
-        BookmarkCommentDlg dlg = new();
-        dlg.Comment = _bookmarkComment;
+        BookmarkCommentDlg dlg = new()
+        {
+            Comment = _bookmarkComment
+        };
+
         if (dlg.ShowDialog() == DialogResult.OK)
         {
             _bookmarkComment = dlg.Comment;
@@ -99,7 +104,7 @@ internal partial class HighlightDialog : Form
         if (comboBoxGroups.SelectedIndex >= 0 && comboBoxGroups.SelectedIndex < HighlightGroupList.Count)
         {
             var newGroup = (HighlightGroup)HighlightGroupList[comboBoxGroups.SelectedIndex].Clone();
-            newGroup.GroupName = "Copy of " + newGroup.GroupName;
+            newGroup.GroupName = $"{Resources.HighlightDialog_UI_Snippet_CopyOf} {newGroup.GroupName}";
 
             HighlightGroupList.Add(newGroup);
             FillGroupComboBox();
@@ -148,10 +153,10 @@ internal partial class HighlightDialog : Form
     {
         SaveFileDialog dlg = new()
         {
-            Title = @"Export Settings to file",
+            Title = Resources.HighlightDialog_UI_Title_ExportSettings,
             DefaultExt = "json",
             AddExtension = true,
-            Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*"
+            Filter = Resources.HighlightDialog_UI_Export_Filter
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -218,10 +223,15 @@ internal partial class HighlightDialog : Form
         {
             fileInfo = new FileInfo(dlg.FileName);
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentNullException
+                                    or SecurityException
+                                    or ArgumentException
+                                    or UnauthorizedAccessException
+                                    or PathTooLongException
+                                    or NotSupportedException)
         {
-            MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
-            _logger.Error($"Error while trying to access file: {dlg.FileName}: {ex}");
+            _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsCouldNotBeImported, Resources.Title_LogExpert);
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_FileAccessError, dlg.FileName, ex));
             return;
         }
 
@@ -232,7 +242,8 @@ internal partial class HighlightDialog : Form
 
         FillGroupComboBox();
 
-        MessageBox.Show(this, @"Settings imported", @"LogExpert");
+        _ = MessageBox.Show(this, Resources.HighlightDialog_UI_SettingsImported, Resources.Title_LogExpert);
+
     }
 
     private void OnBtnMoveDownClick (object sender, EventArgs e)
@@ -265,7 +276,7 @@ internal partial class HighlightDialog : Form
     private void OnBtnNewGroupClick (object sender, EventArgs e)
     {
         // Propose a unique name
-        const string baseName = "New group";
+        var baseName = Resources.HighlightDialog_UI_NewGroup_BaseName;
         var name = baseName;
         var uniqueName = false;
         var i = 1;
@@ -344,7 +355,7 @@ internal partial class HighlightDialog : Form
         e.DrawBackground();
         if (e.Index >= 0)
         {
-            HighlightGroup group = HighlightGroupList[e.Index];
+            var group = HighlightGroupList[e.Index];
             Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
             Brush brush = new SolidBrush(SystemColors.ControlText);
@@ -479,16 +490,20 @@ internal partial class HighlightDialog : Form
                     NoBackground = checkBoxNoBackground.Checked
                 };
 
-                listBoxHighlight.Items.Add(entry);
+                _ = listBoxHighlight.Items.Add(entry);
 
                 // Select the newly created item
                 _currentGroup.HighlightEntryList.Add(entry);
                 listBoxHighlight.SelectedItem = entry;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is ArgumentException
+                                            or RegexMatchTimeoutException
+                                            or ArgumentNullException
+                                            or InvalidOperationException
+                                            or SystemException)
             {
-                _logger.Error(ex, "Error during add of highlight entry");
-                MessageBox.Show($"Error during add of entry.\r\n{ex.Message}");
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry, ex));
+                _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringAddOfHighLightEntry, ex.Message, Resources.Title_LogExpert_Error));
             }
         }
     }
@@ -504,20 +519,22 @@ internal partial class HighlightDialog : Form
         {
             if (string.IsNullOrWhiteSpace(textBoxSearchString.Text))
             {
-                throw new ArgumentException("Regex value is null or whitespace");
+                throw new ArgumentException(Resources.HighlightDialog_RegexError);
             }
 
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            Regex.IsMatch("", textBoxSearchString.Text);
+            _ = Regex.IsMatch(string.Empty, textBoxSearchString.Text);
         }
     }
 
-    private void ChooseColor (ColorComboBox comboBox)
+    private static void ChooseColor (ColorComboBox comboBox)
     {
-        ColorDialog colorDialog = new();
-        colorDialog.AllowFullOpen = true;
-        colorDialog.ShowHelp = false;
-        colorDialog.Color = comboBox.CustomColor;
+        ColorDialog colorDialog = new()
+        {
+            AllowFullOpen = true,
+            ShowHelp = false,
+            Color = comboBox.CustomColor
+        };
+
         if (colorDialog.ShowDialog() == DialogResult.OK)
         {
             comboBox.CustomColor = colorDialog.Color;
@@ -543,9 +560,9 @@ internal partial class HighlightDialog : Form
 
         comboBoxGroups.Items.Clear();
 
-        foreach (HighlightGroup group in HighlightGroupList)
+        foreach (var group in HighlightGroupList)
         {
-            comboBoxGroups.Items.Add(group);
+            _ = comboBoxGroups.Items.Add(group);
         }
 
         ReEvaluateGroupButtonStates();
@@ -556,23 +573,22 @@ internal partial class HighlightDialog : Form
         listBoxHighlight.Items.Clear();
         if (_currentGroup != null)
         {
-            foreach (HighlightEntry entry in _currentGroup.HighlightEntryList)
+            foreach (var entry in _currentGroup.HighlightEntryList)
             {
-                listBoxHighlight.Items.Add(entry);
+                _ = listBoxHighlight.Items.Add(entry);
             }
         }
     }
 
     private void InitData ()
     {
-        const string def = "[Default]";
         HighlightGroupList ??= [];
 
         if (HighlightGroupList.Count == 0)
         {
             HighlightGroup highlightGroup = new()
             {
-                GroupName = def,
+                GroupName = Resources.HighlightDialog_UI_DefaultGroupName,
                 HighlightEntryList = []
             };
 
@@ -585,10 +601,10 @@ internal partial class HighlightDialog : Form
         var groupToSelect = PreSelectedGroupName;
         if (string.IsNullOrEmpty(groupToSelect))
         {
-            groupToSelect = def;
+            groupToSelect = Resources.HighlightDialog_UI_DefaultGroupName;
         }
 
-        foreach (HighlightGroup group in HighlightGroupList)
+        foreach (var group in HighlightGroupList)
         {
             if (group.GroupName.Equals(groupToSelect, StringComparison.Ordinal))
             {
@@ -657,10 +673,14 @@ internal partial class HighlightDialog : Form
             entry.NoBackground = checkBoxNoBackground.Checked;
             listBoxHighlight.Refresh();
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is ArgumentException
+                                        or RegexMatchTimeoutException
+                                        or ArgumentNullException
+                                        or InvalidOperationException
+                                        or SystemException)
         {
-            _logger.Error(ex, "Error during save of save highlight entry");
-            MessageBox.Show($"Error during save of entry.\r\n{ex.Message}");
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry, ex));
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry, ex.Message, Resources.Title_LogExpert_Error));
         }
     }
 
