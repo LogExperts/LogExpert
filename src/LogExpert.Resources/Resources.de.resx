@@ -257,7 +257,7 @@
     <value>Laden der Dateien in einen existierendes LogTabWindow</value>
   </data>
   <data name="LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne" xml:space="preserve">
-    <value>Erstes Fenster wurde geschlossen. Ein neues wird erstellt</value>
+    <value>Erstes Fenster wurde geschlossen. Ein neues wird erstellt.</value>
   </data>
   <data name="LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne" xml:space="preserve">
     <value>Kein offenes Fenster übrig. Ein neues Fenster wird erstellt es wird als primäres GUI Fenster benutzt</value>
@@ -275,22 +275,22 @@
     <value>Fenster wird aus der Liste entfernt</value>
   </data>
   <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
-    <value>Settings importiert</value>
+    <value>Einstellungen importiert</value>
   </data>
   <data name="HighlightDialog_Logger_Error_FileAccessError" xml:space="preserve">
     <value>Fehler während des Zugriffes auf die Datei: {0}, Fehlermeldung: {1}</value>
   </data>
   <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
-    <value>Settings konnte nicht importiert werden: {0}</value>
+    <value>Einstellungen konnte nicht importiert werden: {0}</value>
   </data>
   <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
-    <value>Exportieren der Settings in eine Datei</value>
+    <value>Exportieren der Einstellungen in eine Datei</value>
   </data>
   <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
-    <value>Settings (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
+    <value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)</value>
   </data>
   <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
-    <value>Kopie von </value>
+    <value>Kopie von</value>
   </data>
   <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
     <value>Neue Gruppe</value>
@@ -312,5 +312,50 @@
   </data>
   <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
     <value>Während des Speichern des Highlighteintrages ist ein Fehler aufgetreten: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadingSettings" xml:space="preserve">
+    <value>Laden der Einstellungen</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsStandardMode" xml:space="preserve">
+    <value>Laden der Einstellungen im Standard Modus</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsPortableMode" xml:space="preserve">
+    <value>Laden der Einstellungen im portablen Modus</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_FileSystemErrorExMessage" xml:space="preserve">
+    <value>Filesystem Fehler: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_AccessDeniedExMessage" xml:space="preserve">
+    <value>Zugriff verweigert: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_UnexpectedErrorExMessage" xml:space="preserve">
+    <value>Unerwarteter Fehler: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData" xml:space="preserve">
+    <value>Fehler während der Deserialisierung der Konfigurationsdaten: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_SavingSettings" xml:space="preserve">
+    <value>Speichern der Einstellungen</value>
+  </data>
+  <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
+    <value>Zeile</value>
+  </data>
+  <data name="Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle" xml:space="preserve">
+    <value>RmEndSession: {0}</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult" xml:space="preserve">
+    <value>Die Liste der Prozesse, die, die Ressource sperren, kann nicht angezeigt werden. Die Länge des Resultats konnte nicht gefunden werden.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResource" xml:space="preserve">
+    <value>Die Liste der Prozesse, die, die Ressource sperren, kann nicht angezeigt werden</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotRegisterResource" xml:space="preserve">
+    <value>Die Ressource kann nicht registriert werden.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker" xml:space="preserve">
+    <value>Die Session konnte nicht neu gestartet werden. Die Dateisperre konnte nicht festgestellt werden.</value>
+  </data>
+  <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
+    <value>Kein Prozess sperrt den angegebenen Pfad</value>
   </data>
 </root>

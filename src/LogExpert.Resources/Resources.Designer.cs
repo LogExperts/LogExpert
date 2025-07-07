@@ -211,6 +211,78 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied: {0}.
+        /// </summary>
+        public static string ConfigManager_Logger_Error_AccessDeniedExMessage {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Error_AccessDeniedExMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while deserializing config data: {0}.
+        /// </summary>
+        public static string ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File system error: {0}.
+        /// </summary>
+        public static string ConfigManager_Logger_Error_FileSystemErrorExMessage {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Error_FileSystemErrorExMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected error: {0}.
+        /// </summary>
+        public static string ConfigManager_Logger_Error_UnexpectedErrorExMessage {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Error_UnexpectedErrorExMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading settings.
+        /// </summary>
+        public static string ConfigManager_Logger_Info_LoadingSettings {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Info_LoadingSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load settings portable mode.
+        /// </summary>
+        public static string ConfigManager_Logger_Info_LoadSettingsPortableMode {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Info_LoadSettingsPortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load settings standard mode.
+        /// </summary>
+        public static string ConfigManager_Logger_Info_LoadSettingsStandardMode {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Info_LoadSettingsStandardMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saving settings.
+        /// </summary>
+        public static string ConfigManager_Logger_Info_SavingSettings {
+            get {
+                return ResourceManager.GetString("ConfigManager_Logger_Info_SavingSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Deceased {
@@ -398,6 +470,60 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not begin restart session. Unable to determine file locker..
+        /// </summary>
+        public static string Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker {
+            get {
+                return ResourceManager.GetString("Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not list processes locking resource.
+        /// </summary>
+        public static string Lockfinder_Exception_CouldNotListProcessesLockingResource {
+            get {
+                return ResourceManager.GetString("Lockfinder_Exception_CouldNotListProcessesLockingResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not list processes locking resource. Failed to get size of result..
+        /// </summary>
+        public static string Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult {
+            get {
+                return ResourceManager.GetString("Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not register resource..
+        /// </summary>
+        public static string Lockfinder_Exception_CouldNotRegisterResource {
+            get {
+                return ResourceManager.GetString("Lockfinder_Exception_CouldNotRegisterResource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No processes are locking the path specified.
+        /// </summary>
+        public static string Lockfinder_Exception_NoProcessesAreLockingThePathSpecified {
+            get {
+                return ResourceManager.GetString("Lockfinder_Exception_NoProcessesAreLockingThePathSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RmEndSession: {0}.
+        /// </summary>
+        public static string Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle {
+            get {
+                return ResourceManager.GetString("Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Adding window to list.
         /// </summary>
         public static string LogExpertProxy_Logger_Info_AddWindow {
@@ -467,6 +593,15 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("LogLover", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string PaintHelper_HeaderText_LineNumberColumn {
+            get {
+                return ResourceManager.GetString("PaintHelper_HeaderText_LineNumberColumn", resourceCulture);
             }
         }
         

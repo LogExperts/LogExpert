@@ -1,11 +1,11 @@
 using System.Drawing;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
@@ -28,10 +28,12 @@ public class ConfigManager : IConfigManager
     private readonly object _loadSaveLock = new();
     private Settings _settings;
 
+    private const string SettingsFileName = "settings.json";
     #endregion
 
     #region cTor
 
+    [SupportedOSPlatform("windows")]
     private ConfigManager ()
     {
         _settings = Load();
@@ -48,6 +50,7 @@ public class ConfigManager : IConfigManager
     #region Properties
 
     //TODO: Change to init
+    [SupportedOSPlatform("windows")]
     public static ConfigManager Instance
     {
         get
@@ -56,6 +59,7 @@ public class ConfigManager : IConfigManager
             {
                 _instance ??= new ConfigManager();
             }
+
             return _instance;
         }
     }
@@ -65,6 +69,7 @@ public class ConfigManager : IConfigManager
     /// <summary>
     /// Application.StartupPath + portable
     /// </summary>
+    [SupportedOSPlatform("windows")]
     public string PortableModeDir => Application.StartupPath + Path.DirectorySeparatorChar + "portable";
 
     /// <summary>
@@ -72,8 +77,10 @@ public class ConfigManager : IConfigManager
     /// </summary>
     public string PortableModeSettingsFileName => "portableMode.json";
 
+    [SupportedOSPlatform("windows")]
     public Settings Settings => Instance._settings;
 
+    [SupportedOSPlatform("windows")]
     IConfigManager IConfigManager.Instance => Instance;
 
     //        Action<object, ConfigChangedEventArgs> IConfigManager.ConfigChanged { get => ((IConfigManager)_instance).ConfigChanged; set => ((IConfigManager)_instance).ConfigChanged = value; }
@@ -84,30 +91,35 @@ public class ConfigManager : IConfigManager
 
     #region Public methods
 
+    [SupportedOSPlatform("windows")]
     public void Save (SettingsFlags flags)
     {
         Instance.Save(Settings, flags);
     }
 
+    [SupportedOSPlatform("windows")]
     public void Export (FileInfo fileInfo)
     {
-        Instance.Save(fileInfo, Settings);
+        Save(fileInfo, Settings);
     }
 
+    [SupportedOSPlatform("windows")]
     public void Export (FileInfo fileInfo, SettingsFlags highlightSettings)
     {
         Instance.Save(fileInfo, Settings, highlightSettings);
     }
 
+    [SupportedOSPlatform("windows")]
     public void Import (FileInfo fileInfo, ExportImportFlags importFlags)
     {
         Instance._settings = Instance.Import(Instance._settings, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
+    [SupportedOSPlatform("windows")]
     public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags)
     {
-        Instance._settings.Preferences.HighlightGroupList = Instance.Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, importFlags);
+        Instance._settings.Preferences.HighlightGroupList = Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
 
@@ -115,20 +127,21 @@ public class ConfigManager : IConfigManager
 
     #region Private Methods
 
+    [SupportedOSPlatform("windows")]
     private Settings Load ()
     {
-        _logger.Info(CultureInfo.InvariantCulture, "Loading settings");
+        _logger.Info(Resources.ConfigManager_Logger_Info_LoadingSettings);
 
         string dir;
 
         if (!File.Exists(Path.Combine(PortableModeDir, PortableModeSettingsFileName)))
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Load settings standard mode");
+            _logger.Info(Resources.ConfigManager_Logger_Info_LoadSettingsStandardMode);
             dir = ConfigDir;
         }
         else
         {
-            _logger.Info("Load settings portable mode");
+            _logger.Info(Resources.ConfigManager_Logger_Info_LoadSettingsPortableMode);
             dir = Application.StartupPath;
         }
 
@@ -137,27 +150,27 @@ public class ConfigManager : IConfigManager
             _ = Directory.CreateDirectory(dir);
         }
 
-        if (!File.Exists(Path.Combine(dir, "settings.json")))
+        if (!File.Exists(Path.Combine(dir, SettingsFileName)))
         {
             return LoadOrCreateNew(null);
         }
 
         try
         {
-            FileInfo fileInfo = new(Path.Combine(dir, "settings.json"));
+            FileInfo fileInfo = new(Path.Combine(dir, SettingsFileName));
             return LoadOrCreateNew(fileInfo);
         }
         catch (IOException ex)
         {
-            _logger.Error($"File system error: {ex.Message}");
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_FileSystemErrorExMessage, ex.Message));
         }
         catch (UnauthorizedAccessException ex)
         {
-            _logger.Error($"Access denied: {ex.Message}");
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_AccessDeniedExMessage, ex));
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger.Error($"Unexpected error: {ex.Message}");
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_UnexpectedErrorExMessage, ex));
         }
 
         return LoadOrCreateNew(null);
@@ -169,13 +182,14 @@ public class ConfigManager : IConfigManager
     /// </summary>
     /// <param name="fileInfo">file that has settings saved</param>
     /// <returns>loaded or created settings</returns>
+    [SupportedOSPlatform("windows")]
     private Settings LoadOrCreateNew (FileInfo fileInfo)
     {
         lock (_loadSaveLock)
         {
             Settings settings;
 
-            if (fileInfo == null || fileInfo.Exists == false)
+            if (fileInfo == null || !fileInfo.Exists)
             {
                 settings = new Settings();
             }
@@ -185,9 +199,14 @@ public class ConfigManager : IConfigManager
                 {
                     settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText($"{fileInfo.FullName}"));
                 }
-                catch (Exception e)
+                catch (Exception e) when (e is JsonException
+                                            or JsonReaderException
+                                            or JsonSerializationException
+                                            or JsonWriterException
+                                            or ArgumentNullException
+                                            or ArgumentException)
                 {
-                    _logger.Error($"Error while deserializing config data: {e}");
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData, e));
                     settings = new Settings();
                 }
             }
@@ -232,7 +251,7 @@ public class ConfigManager : IConfigManager
 
             settings.FilterRangeHistoryList ??= [];
 
-            foreach (FilterParams filterParams in settings.FilterList)
+            foreach (var filterParams in settings.FilterList)
             {
                 filterParams.Init();
             }
@@ -274,19 +293,20 @@ public class ConfigManager : IConfigManager
     /// </summary>
     /// <param name="settings">Settings to be saved</param>
     /// <param name="flags">Settings that "changed"</param>
+    [SupportedOSPlatform("windows")]
     private void Save (Settings settings, SettingsFlags flags)
     {
         lock (_loadSaveLock)
         {
-            _logger.Info(CultureInfo.InvariantCulture, "Saving settings");
+            _logger.Info(Resources.ConfigManager_Logger_Info_SavingSettings);
             var dir = Settings.Preferences.PortableMode ? Application.StartupPath : ConfigDir;
 
             if (!Directory.Exists(dir))
             {
-                Directory.CreateDirectory(dir);
+                _ = Directory.CreateDirectory(dir);
             }
 
-            FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + "settings.json");
+            FileInfo fileInfo = new(dir + Path.DirectorySeparatorChar + SettingsFileName);
             Save(fileInfo, settings);
 
             OnConfigChanged(flags);
@@ -298,7 +318,7 @@ public class ConfigManager : IConfigManager
     /// </summary>
     /// <param name="fileInfo">FileInfo for creating the file (if exists will be overwritten)</param>
     /// <param name="settings">Current Settings</param>
-    private void Save (FileInfo fileInfo, Settings settings)
+    private static void Save (FileInfo fileInfo, Settings settings)
     {
         //Currently only fileFormat, maybe add some other formats later (YAML or XML?)
         SaveAsJSON(fileInfo, settings);
@@ -310,6 +330,28 @@ public class ConfigManager : IConfigManager
         {
             case SettingsFlags.HighlightSettings:
                 SaveHighlightgroupsAsJSON(fileInfo, settings.Preferences.HighlightGroupList);
+                break;
+            case SettingsFlags.None:
+                break;
+            case SettingsFlags.WindowPosition:
+                break;
+            case SettingsFlags.FileHistory:
+                break;
+            case SettingsFlags.FilterList:
+                break;
+            case SettingsFlags.RegexHistory:
+                break;
+            case SettingsFlags.ToolSettings:
+                break;
+            case SettingsFlags.GuiOrColors:
+                break;
+            case SettingsFlags.FilterHistory:
+                break;
+            case SettingsFlags.All:
+                break;
+            case SettingsFlags.Settings:
+                break;
+            default:
                 break;
         }
 
@@ -332,7 +374,7 @@ public class ConfigManager : IConfigManager
         serializer.Serialize(sw, groups);
     }
 
-    private List<HighlightGroup> Import (List<HighlightGroup> currentGroups, FileInfo fileInfo, ExportImportFlags flags)
+    private static List<HighlightGroup> Import (List<HighlightGroup> currentGroups, FileInfo fileInfo, ExportImportFlags flags)
     {
         List<HighlightGroup> newGroups;
 
@@ -340,9 +382,14 @@ public class ConfigManager : IConfigManager
         {
             newGroups = JsonConvert.DeserializeObject<List<HighlightGroup>>(File.ReadAllText($"{fileInfo.FullName}"));
         }
-        catch (Exception e)
+        catch (Exception e) when (e is JsonException
+                            or JsonReaderException
+                            or JsonSerializationException
+                            or JsonWriterException
+                            or ArgumentNullException
+                            or ArgumentException)
         {
-            _logger.Error($"Error while deserializing config data: {e}");
+            _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData, e));
             newGroups = [];
         }
 
@@ -366,6 +413,7 @@ public class ConfigManager : IConfigManager
     /// <param name="currentSettings"></param>
     /// <param name="fileInfo"></param>
     /// <param name="flags">Flags to indicate which parts shall be imported</param>
+    [SupportedOSPlatform("windows")]
     private Settings Import (Settings currentSettings, FileInfo fileInfo, ExportImportFlags flags)
     {
         var importSettings = LoadOrCreateNew(fileInfo);
@@ -391,14 +439,17 @@ public class ConfigManager : IConfigManager
         {
             newSettings.Preferences.ColumnizerMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ColumnizerMaskList, importSettings.Preferences.ColumnizerMaskList);
         }
+
         if ((flags & ExportImportFlags.HighlightMasks) == ExportImportFlags.HighlightMasks)
         {
             newSettings.Preferences.HighlightMaskList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightMaskList, importSettings.Preferences.HighlightMaskList);
         }
+
         if ((flags & ExportImportFlags.HighlightSettings) == ExportImportFlags.HighlightSettings)
         {
             newSettings.Preferences.HighlightGroupList = ReplaceOrKeepExisting(flags, ownSettings.Preferences.HighlightGroupList, importSettings.Preferences.HighlightGroupList);
         }
+
         if ((flags & ExportImportFlags.ToolEntries) == ExportImportFlags.ToolEntries)
         {
             newSettings.Preferences.ToolEntries = ReplaceOrKeepExisting(flags, ownSettings.Preferences.ToolEntries, importSettings.Preferences.ToolEntries);
@@ -409,17 +460,15 @@ public class ConfigManager : IConfigManager
 
     private static List<T> ReplaceOrKeepExisting<T> (ExportImportFlags flags, List<T> existingList, List<T> newList)
     {
-        if ((flags & ExportImportFlags.KeepExisting) == ExportImportFlags.KeepExisting)
-        {
-            return existingList.Union(newList).ToList();
-        }
-
-        return newList;
+        return (flags & ExportImportFlags.KeepExisting) == ExportImportFlags.KeepExisting
+            ? [.. existingList.Union(newList)]
+            : newList;
     }
 
     // Checking if the appBounds values are outside the current virtual screen.
     // If so, the appBounds values are set to 0.
-    private void SetBoundsWithinVirtualScreen (Settings settings)
+    [SupportedOSPlatform("windows")]
+    private static void SetBoundsWithinVirtualScreen (Settings settings)
     {
         var vs = SystemInformation.VirtualScreen;
         if (vs.X + vs.Width < settings.AppBounds.X + settings.AppBounds.Width ||

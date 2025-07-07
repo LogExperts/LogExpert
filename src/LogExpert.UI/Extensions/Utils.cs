@@ -31,13 +31,13 @@ internal static class Utils
         stringFormat.SetMeasurableCharacterRanges(crArray);
 
         RectangleF rect = new(0, 0, 3000, 20);
-        Region[] stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
+        var stringRegions = g.MeasureCharacterRanges(text, font, rect, stringFormat);
 
         var found = false;
 
         var y = 0;
 
-        foreach (Region regio in stringRegions)
+        foreach (var regio in stringRegions)
         {
             if (regio.IsVisible(xPos, 3, g))
             {

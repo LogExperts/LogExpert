@@ -122,7 +122,7 @@ internal static class PaintHelper
     {
         DataGridViewTextBoxColumn lineNumberColumn = new()
         {
-            HeaderText = "Line",
+            HeaderText = Resources.PaintHelper_HeaderText_LineNumberColumn,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.NotSet,
             Resizable = DataGridViewTriState.NotSet,
             DividerWidth = 1,
@@ -306,6 +306,11 @@ internal static class PaintHelper
         {
             DataGridViewAdvancedCellBorderStyle.None => 0,
             DataGridViewAdvancedCellBorderStyle.InsetDouble or DataGridViewAdvancedCellBorderStyle.OutsetDouble => 2,
+            DataGridViewAdvancedCellBorderStyle.NotSet => throw new NotImplementedException(),
+            DataGridViewAdvancedCellBorderStyle.Single => throw new NotImplementedException(),
+            DataGridViewAdvancedCellBorderStyle.Inset => throw new NotImplementedException(),
+            DataGridViewAdvancedCellBorderStyle.Outset => throw new NotImplementedException(),
+            DataGridViewAdvancedCellBorderStyle.OutsetPartial => throw new NotImplementedException(),
             _ => 1
         };
     }
@@ -377,7 +382,6 @@ internal static class PaintHelper
             valBounds.Height -= e.CellStyle.Padding.Vertical;
         }
 
-
         var flags =
                 TextFormatFlags.Left
                 | TextFormatFlags.SingleLine
@@ -434,7 +438,6 @@ internal static class PaintHelper
                 {
                     e.Graphics.FillRectangle(bgBrush, wordRect);
                 }
-
             }
 
             TextRenderer.DrawText(e.Graphics, matchWord, font, wordRect, foreColor, flags);

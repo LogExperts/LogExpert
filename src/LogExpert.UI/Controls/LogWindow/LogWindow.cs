@@ -357,7 +357,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly IConfigManager ConfigManager;
 
-    public string TempTitleName { get; set; } = "";
+    public string TempTitleName { get; set; } = string.Empty;
 
     internal FilterPipe FilterPipe { get; set; }
 

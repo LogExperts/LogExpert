@@ -316,4 +316,49 @@
   <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
     <value>Error during save of entry.\r\n{0}</value>
   </data>
+  <data name="ConfigManager_Logger_Info_LoadingSettings" xml:space="preserve">
+    <value>Loading settings</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsStandardMode" xml:space="preserve">
+    <value>Load settings standard mode</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsPortableMode" xml:space="preserve">
+    <value>Load settings portable mode</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_FileSystemErrorExMessage" xml:space="preserve">
+    <value>File system error: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_AccessDeniedExMessage" xml:space="preserve">
+    <value>Access denied: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_UnexpectedErrorExMessage" xml:space="preserve">
+    <value>Unexpected error: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData" xml:space="preserve">
+    <value>Error while deserializing config data: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_SavingSettings" xml:space="preserve">
+    <value>Saving settings</value>
+  </data>
+  <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
+    <value>No processes are locking the path specified</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker" xml:space="preserve">
+    <value>Could not begin restart session. Unable to determine file locker.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotRegisterResource" xml:space="preserve">
+    <value>Could not register resource.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResource" xml:space="preserve">
+    <value>Could not list processes locking resource</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult" xml:space="preserve">
+    <value>Could not list processes locking resource. Failed to get size of result.</value>
+  </data>
+  <data name="Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle" xml:space="preserve">
+    <value>RmEndSession: {0}</value>
+  </data>
+  <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
+    <value>Line</value>
+  </data>
 </root>
