@@ -238,7 +238,7 @@
   <data name="Program_Logger_Error_Payload_InvalidCommand" xml:space="preserve">
     <value>Invalid payload command: null</value>
   </data>
-  <data name="Program_Logger_Error_Pipe_UnkownIPCMessage" xml:space="preserve">
+  <data name="Program_Logger_Error_Pipe_UnknownIPCMessage" xml:space="preserve">
     <value>Unknown IPC Message Type: {0}; with payload: {1}</value>
   </data>
   <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
