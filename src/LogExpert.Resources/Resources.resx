@@ -284,7 +284,7 @@
     <value>Error while trying to access file: {0}, exception: {1}</value>
   </data>
   <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
-    <value>Settings could not be imported: {exSettings could not be imported: {0}</value>
+    <value>Settings could not be imported: {0}</value>
   </data>
   <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
     <value>Export Settings to file</value>
