@@ -358,4 +358,508 @@
   <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
     <value>Kein Prozess sperrt den angegebenen Pfad</value>
   </data>
+  <data name="LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter" xml:space="preserve">
+    <value>-&gt;F</value>
+  </data>
+  <data name="LogWindow_UI_FilterCount_ZeroValue" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Copy" xml:space="preserve">
+    <value>{0}-&gt;C</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Clip" xml:space="preserve">
+    <value>{0}-&gt;Clip</value>
+  </data>
+  <data name="LogWindow_UI_Button_Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="LogWindow_UI_Button_FilterToTab" xml:space="preserve">
+    <value>In Tab filtern</value>
+  </data>
+  <data name="LogWindow_UI_Button_SaveFilter" xml:space="preserve">
+    <value>Filter speichern</value>
+  </data>
+  <data name="LogWindow_UI_Button_Search" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
+  <data name="LogWindow_UI_Button_ShowAdvanced" xml:space="preserve">
+    <value>Erweiterung anzeigen...</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Search" xml:space="preserve">
+    <value>Starten des Filters</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_AutoHide" xml:space="preserve">
+    <value>Automatisch verstecken</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterRegex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterSync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterTail" xml:space="preserve">
+    <value>Ende Filtern</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_InvertMatch" xml:space="preserve">
+    <value>Match invertieren</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_RangeSearch" xml:space="preserve">
+    <value>Bereich durchsuchen</value>
+  </data>
+  <data name="LogWindow_UI_Label_BackSpread" xml:space="preserve">
+    <value>Rückstreuung</value>
+  </data>
+  <data name="LogWindow_UI_Label_ForeSpread" xml:space="preserve">
+    <value>Vorwärtsstreuung</value>
+  </data>
+  <data name="LogWindow_UI_Label_Fuzzyness" xml:space="preserve">
+    <value>Fuzzyness</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnName" xml:space="preserve">
+    <value>Spaltenname:</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnNames" xml:space="preserve">
+    <value>Spaltenamen</value>
+  </data>
+  <data name="LogWindow_UI_Label_TextFilter" xml:space="preserve">
+    <value>Text &amp; Filter:</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>   {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingFile" xml:space="preserve">
+    <value>Datei wird geladen...</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingWithParameter" xml:space="preserve">
+    <value>Laden {0}</value>
+  </data>
+  <data name="LogWindow_UI_SureToClose" xml:space="preserve">
+    <value>Wirklich schließen?</value>
+  </data>
+  <data name="LogWindow_UI_Text_Frozen" xml:space="preserve">
+    <value>Eingefroren</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced" xml:space="preserve">
+    <value>Erweiterung verstecken...</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced" xml:space="preserve">
+    <value>Erweiterung anzeigen...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Color" xml:space="preserve">
+    <value>Farbe...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Copy" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="Logger_Error_In_Function" xml:space="preserve">
+    <value>Fehler in {0}: {1}</value>
+  </data>
+  <data name="LogWindow_UI_Button_Column" xml:space="preserve">
+    <value>Spalten...</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Column" xml:space="preserve">
+    <value>Spalten, für die Restriktion, auswählen</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterDown" xml:space="preserve">
+    <value>Ausgewählten Eintrag nach unten verschieben</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Alle Tabs werden auf den selektierten Zeitstempel verschoben, sofern möglich</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn" xml:space="preserve">
+    <value>Verschiebe diese Spalte an die letzte Position</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn" xml:space="preserve">
+    <value>Verstecke diese Spalte</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab" xml:space="preserve">
+    <value>Kopieren der markierten Zeilen in einen neuen Tab</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment" xml:space="preserve">
+    <value>Editieren des Lesezeichenkommentars</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToggleBoomark" xml:space="preserve">
+    <value>Umschalter Lesezeichen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
+    <value>Zeitsynchronisierte Dateien</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
+    <value>Temp Highlights</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment" xml:space="preserve">
+    <value>Den markierten Text als Lesezeichenkommentar setzen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines" xml:space="preserve">
+    <value>Lesezeichen auf markierte Zeile setzen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollToColumn" xml:space="preserve">
+    <value>Zur Spalte scrollen...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Alle Tabs zum aktuellen Zeitstempel scrollen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RestoreColumns" xml:space="preserve">
+    <value>Spalten wiederherstellen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RemoveAll" xml:space="preserve">
+    <value>Alle entfernen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveToLastColumn" xml:space="preserve">
+    <value>Verschieben zur letzten Spalte</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveRight" xml:space="preserve">
+    <value>Verschieben nach rechts</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveLeft" xml:space="preserve">
+    <value>Verschieben nach links</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView" xml:space="preserve">
+    <value>Markiere die getroffenen Filter in der Loganzeige</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkEditMode" xml:space="preserve">
+    <value>Markier/Editier Modus</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange" xml:space="preserve">
+    <value>Markiere den derzeitigen Filterbereich</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MakeAllPermanent" xml:space="preserve">
+    <value>Alles permanent machen</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile" xml:space="preserve">
+    <value>Lokalisiere die gefilterten Zeilen in der originalen Datei</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode" xml:space="preserve">
+    <value>Markiere die Selektion in der Logdatei (Wörter Modus)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine" xml:space="preserve">
+    <value>Markiere die Selektion in der Logdatei (Zeilen Modus)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HideColumn" xml:space="preserve">
+    <value>Verstecke Spalte</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere" xml:space="preserve">
+    <value>Friere alle Spalten von der links markieren bis hier her</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync" xml:space="preserve">
+    <value>Befreie das Fenster von der Zeitsynchronisierung</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterToNewTab" xml:space="preserve">
+    <value>Filtere in einen neuen Tab</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterForSelection" xml:space="preserve">
+    <value>Filter die Markierung</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToNewTab" xml:space="preserve">
+    <value>In einen neuen Tab kopieren</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToClipboard" xml:space="preserve">
+    <value>In die Zwischenablage kopieren</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_BookmarkComment" xml:space="preserve">
+    <value>Lesezeichenkommentar...</value>
+  </data>
+  <data name="LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt" xml:space="preserve">
+    <value>An diesem Lesezeichen hängt ein Kommentar. Soll es wirklich gelöscht werden?</value>
+  </data>
+  <data name="LogWindow_UI_Title_ImportBookmarkList" xml:space="preserve">
+    <value>Wähle eine Datei, aus der die Lesezeichen geladen werden sollen</value>
+  </data>
+  <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
+    <value>Wähle eine Datei, in die, die Lesezeichen gespeichert werden sollen</value>
+  </data>
+  <data name="LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks" xml:space="preserve">
+    <value>Es gibt einige Kommentare in den Lesezeichen. Sollen diese wirklich gelöscht werden?</value>
+  </data>
+  <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
+    <value>Friere alle Spalten von der links markieren bis hier her ({0})</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile" xml:space="preserve">
+    <value>Schreiben der Temporären Datei.... ESC drücken um diesen Vorgang abzubrechen.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile" xml:space="preserve">
+    <value>Unbekanntes Problem beim abschneiden der Datei</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
+    <value>Abschneiden der Datei ist fehlgeschlagen: Datei ist gesperrt von {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
+    <value>Zeitdifferenz ist {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SelCountSelectedLines" xml:space="preserve">
+    <value>{0} ausgewählte Zeilen</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SearchingPressESCToCancel" xml:space="preserve">
+    <value>Suche... ESC drücken um diesen Vorgang abzubrechen.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
+    <value>Filterung... ESC drücken um diesen Vorgang abzubrechen.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
+    <value>Filterzeit: {0} ms.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FileNotFound" xml:space="preserve">
+    <value>Datei nicht gefunden</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromEndOfFile" xml:space="preserve">
+    <value>Gestartet vom Ende der Datei</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromBeginningOfFile" xml:space="preserve">
+    <value>Gestartet vom Anfang der Datei</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
+    <value>Nicht gefunden: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
+    <value>Ungültige Regular Expression</value>
+  </data>
+  <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
+    <value>Suchresultat nicht gefunden</value>
+  </data>
+  <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
+    <value>Unbekannter Fehler beim Speichern der Persistenten Daten: {0}</value>
+  </data>
+  <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
+    <value>Kann die Datei nicht laden\n{0}</value>
+  </data>
+  <data name="LogWindow_UI_ListBox_ToolTip_Filter" xml:space="preserve">
+    <value>Doppelklick um den gespeicherten Filter zu laden</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_Fuzzy" xml:space="preserve">
+    <value>Fuzzy Suchlevel (0 = fuzzy aus)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterForeSpread" xml:space="preserve">
+    <value>Hinzufügen der nachfolgenden Zeilen zum Suchresultat (Nach ob/unten ziehen, Shift drücken für eine feiner Einstellung)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterBackSpread" xml:space="preserve">
+    <value>Hinzufügen der vorausfolgenden Zeilen zum Suchresultat (Nach ob/unten ziehen, Shift drücken für eine feiner Einstellung)</value>
+  </data>
+  <data name="LogWindow_UI_ImportExportBookmarkList_Filter" xml:space="preserve">
+    <value>CSV Datei (*.csv)|*.csv|Lesezeichen Datei (*.bmk)|*.bmk</value>
+  </data>
+  <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
+    <value>Ausnahmefehler während der Filterung. Bitte an den Entwickler weiterleiten: \n\n{0}\n\n{1}</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
+    <value>Fehler während des Imports der Lesezeichenliste: {0}</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileExportingBookmarkList" xml:space="preserve">
+    <value>Fehler während des Exports der Lesezeichenliste: {0}</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_FilterRange" xml:space="preserve">
+    <value>zweiter Suchtext ('End Text') wenn ein Suchbereich benutzt wird</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_Filter" xml:space="preserve">
+    <value>Suchtext für den Filter</value>
+  </data>
+  <data name="LogWindow_UI_ColumnComboBox_ToolTip" xml:space="preserve">
+    <value>Auswahl der Spalte zu der gesprungen werden soll</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_RangeSearch" xml:space="preserve">
+    <value>Aktiviere einen speziellen Suchmodus in welchem alles zwischen zwei gegebenen Suchtermen gefiltert wird.</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_InvertMatch" xml:space="preserve">
+    <value>Invertieren des Suchresultats</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterTail" xml:space="preserve">
+    <value>Filterung des Dateiendes (dadurch wird die Filteranzeige aktuelle gehalten, wenn Dateiänderungen stattfinden)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterSync" xml:space="preserve">
+    <value>Synchronisierung der ausgewählten Zeile in der Filteranzeige zu der Zeile in der Loganzeige</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterRegex" xml:space="preserve">
+    <value>Benutzen eines regulären Ausdrucks (rechts klick für den RegeEx-Helfer Dialog)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterOnLoad" xml:space="preserve">
+    <value>Sofortiges Filtern nachdem ein gespeicherter Filter geladen wurde</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive" xml:space="preserve">
+    <value>Macht den Filter Schreibempfindlich (Groß/Kleinschreibung wird beachtet)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_ColumnRestrict" xml:space="preserve">
+    <value>Schränke die Suche auf die Spalten ein</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_AutoHide" xml:space="preserve">
+    <value>Versteckt die Filterliste nachdem die Filter geladen wurden</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterOnLoad" xml:space="preserve">
+    <value>Autostart</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterCaseSensitive" xml:space="preserve">
+    <value>Schreibabhängig</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ColumnRestrict" xml:space="preserve">
+    <value>Spaltenrestriktion</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ToggleHighlightPanel" xml:space="preserve">
+    <value>Öffnen oder Schließen einer Liste mit gespeicherten Filter</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ShowAdvanced" xml:space="preserve">
+    <value>Aktivieren/Deaktivieren der Erweiterten Filteranzeige</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterUp" xml:space="preserve">
+    <value>Verschiebe den selektierten Eintrag nach oben</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterToTab" xml:space="preserve">
+    <value>Öffne einen neuen Tab mit dem gefilterten Bereich</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage" xml:space="preserve">
+    <value>Unerwartetes Problem beim abschneiden der Datei: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound" xml:space="preserve">
+    <value>FilterRestore(): Columnizer {0} nicht gefunden</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WakeupSignalReceived" xml:space="preserve">
+    <value>Aufwachsignal erhalten.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForSignal" xml:space="preserve">
+    <value>Warten auf Signal</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForLoadingToBeComplete" xml:space="preserve">
+    <value>Warten bis das Laden abgeschlossen ist.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateGridNewRowCount" xml:space="preserve">
+    <value>UpdateGrid(): neue Spaltenanzahl={0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>SelStart: {0}, SelLen: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine" xml:space="preserve">
+    <value>TestStatistics() aufgerufen mit Startzeile {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_Ended" xml:space="preserve">
+    <value>TestStatistics() beendet</value>
+  </data>
+  <data name="LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull" xml:space="preserve">
+    <value>Dialog im LogWindow war NULL</value>
+  </data>
+  <data name="LogWindow_Logger_Info_SetColumnizerInternal" xml:space="preserve">
+    <value>SetColumnizerInternal(): {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter" xml:space="preserve">
+    <value>ReloadNewFile(): Anzahl = {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned" xml:space="preserve">
+    <value>Datei neu laden, weil diese neu erstellt wurde.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_AddBookmarkOverlays" xml:space="preserve">
+    <value>AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter" xml:space="preserve">
+    <value>GetTimestampForLine({0}) Funktionsaufruf</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum" xml:space="preserve">
+    <value>GetTimestampForLine() verlasse Funktion mit Zeilennummer ={0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls" xml:space="preserve">
+    <value>Verhindern des Neuladens aufgrund von Rekursivenaufrufen.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_ReloadingInvoked" xml:space="preserve">
+    <value>Neuladen angeworfen.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_SelectionChangedTrigger" xml:space="preserve">
+    <value>Selection changed trigger</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName" xml:space="preserve">
+    <value>Einstellungen Columnizer {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock" xml:space="preserve">
+    <value>Gefundener block: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo" xml:space="preserve">
+    <value>TestStatistic(): i={0} searchLine={1}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover" xml:space="preserve">
+    <value>UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
+    <value>Fehler während des Löschens der Filterliste: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile" xml:space="preserve">
+    <value>Fehler während des Löschens der temporären Datei {0}: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ErrorSavingPersistence" xml:space="preserve">
+    <value>Fehler während des Speicherns der persistierten Daten: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount" xml:space="preserve">
+    <value>Fehler im, selectionChangedTrigger_Signal selcount {0}, Fehlermeldung: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InUpdateProgressCallback" xml:space="preserve">
+    <value>Fehler im UpdateProgress Callback: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount" xml:space="preserve">
+    <value>Zeilenanzahl des Events: {0}, sollte größer als die letzte Zeilenanzahl sein: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload" xml:space="preserve">
+    <value>Filteranzeige neuladen weil die Filter neugeladen wurden.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded" xml:space="preserve">
+    <value>Persistierte Daten {0} sind nicht mehr aktuell. Sind verworfen worden.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NoPersistenceDataForFileNameFound" xml:space="preserve">
+    <value>Keine Persistierten Daten gefunden. {0}.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NewFileCreated" xml:space="preserve">
+    <value>neue Datei erstellt.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_MultiThreadedFilter_Duration" xml:space="preserve">
+    <value>Zeit der Multi-Thread Filterung {0} in ms.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFilesAsMulti_FileName" xml:space="preserve">
+    <value>LoadFilesAsMulti: Datei: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_PickedNewColumnizer" xml:space="preserve">
+    <value>Neuer Columnizer ausgewählt: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_LoadingLogfile" xml:space="preserve">
+    <value>Laden der Logdatei: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_HandlingFileNotFoundEvent" xml:space="preserve">
+    <value>Datei nicht gefunden Event wird behandelt.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1" xml:space="preserve">
+    <value>Dateigröße hat sich geändert. prevLines:{0}, curr lines: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow" xml:space="preserve">
+    <value>Desynchronisierung des Fensters {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FinishedLoading" xml:space="preserve">
+    <value>Laden erledigt.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration" xml:space="preserve">
+    <value>Zeit der Single-Thread Filterung {0} in ms.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FileLoadingComplete" xml:space="preserve">
+    <value>Datei laden erledigt.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_EventsInQueue" xml:space="preserve">
+    <value>{0} Events in der Warteschlange</value>
+  </data>
+  <data name="LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions" xml:space="preserve">
+    <value>MultiDateiname in den Persistierten Daten gefunden</value>
+  </data>
+  <data name="LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile" xml:space="preserve">
+    <value>Löschen der temporären Datei {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_AddToTimeSync_SyncingWindow" xml:space="preserve">
+    <value>Synchronisierung des Fenster von {0} zu {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_WhileResizingColumns" xml:space="preserve">
+    <value>Fehler während der Vergrößerung der Spalten {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SettingSplitterDistance" xml:space="preserve">
+    <value>Fehler während die Splitterdistanz verändert wurde {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SelectLine_WhileSelectingLine" xml:space="preserve">
+    <value>Fehler während des selektierens der Zeile: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingStartedCallback" xml:space="preserve">
+    <value>Fehler im LoadingStarted Callback {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingPersistenceData" xml:space="preserve">
+    <value>Fehler während des Ladens der persistierten Daten {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingBookmarks" xml:space="preserve">
+    <value>Fehler während des Ladens der Lesezeichen {0}</value>
+  </data>
 </root>

@@ -156,6 +156,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        SetResources();
 
         CreateDefaultViewStyle();
 
@@ -175,8 +176,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         filterGridView.CellValueNeeded += OnFilterGridViewCellValueNeeded;
         filterGridView.CellPainting += OnFilterGridViewCellPainting;
-        filterListBox.DrawMode = DrawMode.OwnerDrawVariable;
-        filterListBox.MeasureItem += MeasureItem;
+        listBoxFilter.DrawMode = DrawMode.OwnerDrawVariable;
+        listBoxFilter.MeasureItem += MeasureItem;
 
         Closing += OnLogWindowClosing;
         Disposed += OnLogWindowDisposed;
@@ -206,10 +207,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _filterParams = new FilterParams();
         foreach (var item in configManager.Settings.FilterHistoryList)
         {
-            _ = filterComboBox.Items.Add(item);
+            _ = comboBoxFilter.Items.Add(item);
         }
 
-        filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
+        comboBoxFilter.DropDownHeight = comboBoxFilter.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
@@ -228,9 +229,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //this.filterUpdateThread = new Thread(new ThreadStart(this.FilterUpdateWorker));
         //this.filterUpdateThread.Start();
 
-        _advancedButtonImage = advancedButton.Image;
-        _searchButtonImage = filterSearchButton.Image;
-        filterSearchButton.Image = null;
+        _advancedButtonImage = btnAdvanced.Image;
+        _searchButtonImage = btnFilterSearch.Image;
+        btnFilterSearch.Image = null;
 
         dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
         markEditModeToolStripMenuItem.Enabled = true;
@@ -249,14 +250,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         dataGridView.Enabled = false;
         dataGridView.ColumnDividerDoubleClick += OnDataGridViewColumnDividerDoubleClick;
         ShowAdvancedFilterPanel(false);
-        filterKnobBackSpread.MinValue = 0;
-        filterKnobBackSpread.MaxValue = SPREAD_MAX;
-        filterKnobBackSpread.ValueChanged += OnFilterKnobControlValueChanged;
-        filterKnobForeSpread.MinValue = 0;
-        filterKnobForeSpread.MaxValue = SPREAD_MAX;
-        filterKnobForeSpread.ValueChanged += OnFilterKnobControlValueChanged;
-        fuzzyKnobControl.MinValue = 0;
-        fuzzyKnobControl.MaxValue = 10;
+        knobControlFilterBackSpread.MinValue = 0;
+        knobControlFilterBackSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterBackSpread.ValueChanged += OnFilterKnobControlValueChanged;
+        knobControlFilterForeSpread.MinValue = 0;
+        knobControlFilterForeSpread.MaxValue = SPREAD_MAX;
+        knobControlFilterForeSpread.ValueChanged += OnFilterKnobControlValueChanged;
+        knobControlFuzzy.MinValue = 0;
+        knobControlFuzzy.MaxValue = 10;
         //PreferencesChanged(settings.preferences, true);
         AdjustHighlightSplitterWidth();
         ToggleHighlightPanel(false); // hidden
@@ -448,6 +449,89 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         //}
     }
 
+    private void SetResources ()
+    {
+        helpToolTip.SetToolTip(columnComboBox, Resources.LogWindow_UI_ColumnComboBox_ToolTip);
+        lblColumnName.Text = Resources.LogWindow_UI_Label_ColumnName;
+        copyToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_CopyToClipboard;
+        copyToTabToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_CopyToNewTab;
+        copyToTabToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab;
+        scrollAllTabsToTimestampToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp;
+        scrollAllTabsToTimestampToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp;
+        syncTimestampsToToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles;
+        freeThisWindowFromTimeSyncToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync;
+        locateLineInOriginalFileToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile;
+        toggleBoomarkToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_ToggleBoomark;
+        bookmarkCommentToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_BookmarkComment;
+        bookmarkCommentToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment;
+        markEditModeToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MarkEditMode;
+        tempHighlightsToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_TempHighlights;
+        removeAllToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_RemoveAll;
+        makePermanentToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MakeAllPermanent;
+        markCurrentFilterRangeToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange;
+        btnColumn.Text = Resources.LogWindow_UI_Button_Column;
+        helpToolTip.SetToolTip(btnColumn, Resources.LogWindow_UI_Button_ToolTip_Column);
+        columnRestrictCheckBox.Text = Resources.LogWindow_UI_CheckBox_ColumnRestrict;
+        helpToolTip.SetToolTip(columnRestrictCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_ColumnRestrict);
+        rangeCheckBox.Text = Resources.LogWindow_UI_CheckBox_RangeSearch;
+        helpToolTip.SetToolTip(rangeCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_RangeSearch);
+        helpToolTip.SetToolTip(filterRangeComboBox, Resources.LogWindow_UI_ComboBox_ToolTip_FilterRange);
+        columnNamesLabel.Text = Resources.LogWindow_UI_Label_ColumnNames;
+        lblfuzzy.Text = Resources.LogWindow_UI_Label_Fuzzyness;
+        helpToolTip.SetToolTip(knobControlFuzzy, Resources.LogWindow_UI_KnobControl_Fuzzy);
+        invertFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_InvertMatch;
+        helpToolTip.SetToolTip(invertFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_InvertMatch);
+        lblBackSpread.Text = Resources.LogWindow_UI_Label_BackSpread;
+        helpToolTip.SetToolTip(knobControlFilterBackSpread, Resources.LogWindow_UI_KnobControl_FilterBackSpread);
+        lblForeSpread.Text = Resources.LogWindow_UI_Label_ForeSpread;
+        helpToolTip.SetToolTip(knobControlFilterForeSpread, Resources.LogWindow_UI_KnobControl_FilterForeSpread);
+        btnFilterToTab.Text = Resources.LogWindow_UI_Button_FilterToTab;
+        helpToolTip.SetToolTip(btnFilterToTab, Resources.LogWindow_UI_Button_ToolTip_FilterToTab);
+        helpToolTip.SetToolTip(btnToggleHighlightPanel, Resources.LogWindow_UI_Button_ToolTip_ToggleHighlightPanel);
+        setBookmarksOnSelectedLinesToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines;
+        filterToTabToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FilterToNewTab;
+        markFilterHitsInLogViewToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView;
+        hideFilterListOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_AutoHide;
+        helpToolTip.SetToolTip(hideFilterListOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_AutoHide);
+        helpToolTip.SetToolTip(btnFilterDown, Resources.LogWindow_UI_Button_ToolTip_FilterDown);
+        helpToolTip.SetToolTip(btnFilterUp, Resources.LogWindow_UI_Button_ToolTip_FilterUp);
+        filterOnLoadCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterOnLoad;
+        helpToolTip.SetToolTip(filterOnLoadCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterOnLoad);
+        bntSaveFilter.Text = Resources.LogWindow_UI_Button_SaveFilter;
+        btnDeleteFilter.Text = Resources.LogWindow_UI_Button_Delete;
+        helpToolTip.SetToolTip(listBoxFilter, Resources.LogWindow_UI_ListBox_ToolTip_Filter);
+        colorToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_Color;
+        helpToolTip.SetToolTip(comboBoxFilter, Resources.LogWindow_UI_ComboBox_ToolTip_Filter);
+        lblTextFilter.Text = Resources.LogWindow_UI_Label_TextFilter;
+        btnAdvanced.Text = Resources.LogWindow_UI_Button_ShowAdvanced;
+        helpToolTip.SetToolTip(btnAdvanced, Resources.LogWindow_UI_Button_ToolTip_ShowAdvanced);
+        syncFilterCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterSync;
+        helpToolTip.SetToolTip(syncFilterCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterSync);
+        lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
+        filterTailCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterTail;
+        helpToolTip.SetToolTip(filterTailCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterTail);
+        filterRegexCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterRegex;
+        helpToolTip.SetToolTip(filterRegexCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterRegex);
+        filterCaseSensitiveCheckBox.Text = Resources.LogWindow_UI_CheckBox_FilterCaseSensitive;
+        helpToolTip.SetToolTip(filterCaseSensitiveCheckBox, Resources.LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive);
+        btnFilterSearch.Text = Resources.LogWindow_UI_Button_Search;
+        helpToolTip.SetToolTip(btnFilterSearch, Resources.LogWindow_UI_Button_ToolTip_Search);
+        freezeLeftColumnsUntilHereToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere;
+        moveToLastColumnToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MoveToLastColumn;
+        moveToLastColumnToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn;
+        moveLeftToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MoveLeft;
+        moveRightToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_MoveRight;
+        hideColumnToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_HideColumn;
+        hideColumnToolStripMenuItem.ToolTipText = Resources.LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn;
+        restoreColumnsToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_RestoreColumns;
+        allColumnsToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_ScrollToColumn;
+        editModecopyToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_Copy;
+        highlightSelectionInLogFileToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine;
+        highlightSelectionInLogFilewordModeToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode;
+        filterForSelectionToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_FilterForSelection;
+        setSelectedTextAsBookmarkCommentToolStripMenuItem.Text = Resources.LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment;
+    }
+
     [SupportedOSPlatform("windows")]
     internal void RefreshAllGrids ()
     {
@@ -587,7 +671,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AutoResizeFilterBox ()
     {
-        filterSplitContainer.SplitterDistance = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        filterSplitContainer.SplitterDistance = comboBoxFilter.Left + comboBoxFilter.GetMaxTextWidth();
     }
 
     #region Events handler
@@ -1474,7 +1558,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnColumnRestrictCheckBoxCheckedChanged (object sender, EventArgs e)
     {
-        columnButton.Enabled = columnRestrictCheckBox.Checked;
+        btnColumn.Enabled = columnRestrictCheckBox.Checked;
         if (columnRestrictCheckBox.Checked) // disable when nothing to filter
         {
             columnNamesLabel.Visible = true;
@@ -1499,8 +1583,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             columnNamesLabel.Text = CalculateColumnNames(_filterParams);
 
             //CheckForFilterDirty(); //!!!GBro: Indicate to redo the search if search columns were changed
-            filterSearchButton.Image = _searchButtonImage;
-            saveFilterButton.Enabled = false;
+            btnFilterSearch.Image = _searchButtonImage;
+            bntSaveFilter.Enabled = false;
         }
     }
 
@@ -1856,7 +1940,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 TesttextHistoryList = ConfigManager.Settings.RegexHistory.TesttextHistoryList,
                 Owner = this,
                 CaseSensitive = filterCaseSensitiveCheckBox.Checked,
-                Pattern = filterComboBox.Text
+                Pattern = comboBoxFilter.Text
             };
 
             if (dlg.ShowDialog() == DialogResult.OK)
@@ -1865,7 +1949,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 ConfigManager.Settings.RegexHistory.TesttextHistoryList = dlg.TesttextHistoryList;
 
                 filterCaseSensitiveCheckBox.Checked = dlg.CaseSensitive;
-                filterComboBox.Text = dlg.Pattern;
+                comboBoxFilter.Text = dlg.Pattern;
 
                 ConfigManager.Save(SettingsFlags.RegexHistory);
             }
@@ -1893,15 +1977,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnDeleteFilterButtonClick (object sender, EventArgs e)
     {
-        var index = filterListBox.SelectedIndex;
+        var index = listBoxFilter.SelectedIndex;
         if (index >= 0)
         {
-            var filterParams = (FilterParams)filterListBox.Items[index];
+            var filterParams = (FilterParams)listBoxFilter.Items[index];
             _ = ConfigManager.Settings.FilterList.Remove(filterParams);
             OnFilterListChanged(this);
-            if (filterListBox.Items.Count > 0)
+            if (listBoxFilter.Items.Count > 0)
             {
-                filterListBox.SelectedIndex = filterListBox.Items.Count - 1;
+                listBoxFilter.SelectedIndex = listBoxFilter.Items.Count - 1;
             }
         }
     }
@@ -1909,44 +1993,44 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnFilterUpButtonClick (object sender, EventArgs e)
     {
-        var i = filterListBox.SelectedIndex;
+        var i = listBoxFilter.SelectedIndex;
         if (i > 0)
         {
-            var filterParams = (FilterParams)filterListBox.Items[i];
+            var filterParams = (FilterParams)listBoxFilter.Items[i];
             ConfigManager.Settings.FilterList.RemoveAt(i);
             i--;
             ConfigManager.Settings.FilterList.Insert(i, filterParams);
             OnFilterListChanged(this);
-            filterListBox.SelectedIndex = i;
+            listBoxFilter.SelectedIndex = i;
         }
     }
 
     [SupportedOSPlatform("windows")]
     private void OnFilterDownButtonClick (object sender, EventArgs e)
     {
-        var i = filterListBox.SelectedIndex;
+        var i = listBoxFilter.SelectedIndex;
         if (i < 0)
         {
             return;
         }
 
-        if (i < filterListBox.Items.Count - 1)
+        if (i < listBoxFilter.Items.Count - 1)
         {
-            var filterParams = (FilterParams)filterListBox.Items[i];
+            var filterParams = (FilterParams)listBoxFilter.Items[i];
             ConfigManager.Settings.FilterList.RemoveAt(i);
             i++;
             ConfigManager.Settings.FilterList.Insert(i, filterParams);
             OnFilterListChanged(this);
-            filterListBox.SelectedIndex = i;
+            listBoxFilter.SelectedIndex = i;
         }
     }
 
     [SupportedOSPlatform("windows")]
     private void OnFilterListBoxMouseDoubleClick (object sender, MouseEventArgs e)
     {
-        if (filterListBox.SelectedIndex >= 0)
+        if (listBoxFilter.SelectedIndex >= 0)
         {
-            var filterParams = (FilterParams)filterListBox.Items[filterListBox.SelectedIndex];
+            var filterParams = (FilterParams)listBoxFilter.Items[listBoxFilter.SelectedIndex];
             var newParams = filterParams.Clone();
             //newParams.historyList = ConfigManager.Settings.filterHistoryList;
             _filterParams = newParams;
@@ -1954,8 +2038,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             ApplyFilterParams();
             CheckForAdvancedButtonDirty();
             CheckForFilterDirty();
-            filterSearchButton.Image = _searchButtonImage;
-            saveFilterButton.Enabled = false;
+            btnFilterSearch.Image = _searchButtonImage;
+            bntSaveFilter.Enabled = false;
             if (hideFilterListOnLoadCheckBox.Checked)
             {
                 ToggleHighlightPanel(false);
@@ -1974,11 +2058,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         e.DrawBackground();
         if (e.Index >= 0)
         {
-            var filterParams = (FilterParams)filterListBox.Items[e.Index];
+            var filterParams = (FilterParams)listBoxFilter.Items[e.Index];
             Rectangle rectangle = new(0, e.Bounds.Top, e.Bounds.Width, e.Bounds.Height);
 
             using var brush = (e.State & DrawItemState.Selected) == DrawItemState.Selected
-                ? new SolidBrush(filterListBox.BackColor)
+                ? new SolidBrush(listBoxFilter.BackColor)
                 : new SolidBrush(filterParams.Color);
 
             e.Graphics.DrawString(filterParams.SearchText, e.Font, brush, new PointF(rectangle.Left, rectangle.Top));
@@ -1990,10 +2074,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     // Color for filter list entry
     private void OnColorToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var i = filterListBox.SelectedIndex;
-        if (i < filterListBox.Items.Count && i >= 0)
+        var i = listBoxFilter.SelectedIndex;
+        if (i < listBoxFilter.Items.Count && i >= 0)
         {
-            var filterParams = (FilterParams)filterListBox.Items[i];
+            var filterParams = (FilterParams)listBoxFilter.Items[i];
             ColorDialog dlg = new()
             {
                 CustomColors = [filterParams.Color.ToArgb()],
@@ -2003,7 +2087,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 filterParams.Color = dlg.Color;
-                filterListBox.Refresh();
+                listBoxFilter.Refresh();
             }
         }
     }
@@ -2017,8 +2101,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnFilterRegexCheckBoxCheckedChanged (object sender, EventArgs e)
     {
-        fuzzyKnobControl.Enabled = !filterRegexCheckBox.Checked;
-        fuzzyLabel.Enabled = !filterRegexCheckBox.Checked;
+        knobControlFuzzy.Enabled = !filterRegexCheckBox.Checked;
+        lblfuzzy.Enabled = !filterRegexCheckBox.Checked;
         CheckForFilterDirty();
     }
 
@@ -2205,7 +2289,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void MeasureItem (object sender, MeasureItemEventArgs e)
     {
-        e.ItemHeight = filterListBox.Font.Height;
+        e.ItemHeight = listBoxFilter.Font.Height;
     }
 
     #endregion
@@ -4076,50 +4160,50 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void ApplyFilterParams ()
     {
-        filterComboBox.Text = _filterParams.SearchText;
+        comboBoxFilter.Text = _filterParams.SearchText;
         filterCaseSensitiveCheckBox.Checked = _filterParams.IsCaseSensitive;
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
         filterTailCheckBox.Checked = _filterParams.IsFilterTail;
         invertFilterCheckBox.Checked = _filterParams.IsInvert;
-        filterKnobBackSpread.Value = _filterParams.SpreadBefore;
-        filterKnobForeSpread.Value = _filterParams.SpreadBehind;
+        knobControlFilterBackSpread.Value = _filterParams.SpreadBefore;
+        knobControlFilterForeSpread.Value = _filterParams.SpreadBehind;
         rangeCheckBox.Checked = _filterParams.IsRangeSearch;
         columnRestrictCheckBox.Checked = _filterParams.ColumnRestrict;
-        fuzzyKnobControl.Value = _filterParams.FuzzyValue;
+        knobControlFuzzy.Value = _filterParams.FuzzyValue;
         filterRangeComboBox.Text = _filterParams.RangeSearchText;
     }
 
     [SupportedOSPlatform("windows")]
     private void ResetFilterControls ()
     {
-        filterComboBox.Text = "";
+        comboBoxFilter.Text = "";
         filterCaseSensitiveCheckBox.Checked = false;
         filterRegexCheckBox.Checked = false;
         //this.filterTailCheckBox.Checked = this.Preferences.filterTail;
         invertFilterCheckBox.Checked = false;
-        filterKnobBackSpread.Value = 0;
-        filterKnobForeSpread.Value = 0;
+        knobControlFilterBackSpread.Value = 0;
+        knobControlFilterForeSpread.Value = 0;
         rangeCheckBox.Checked = false;
         columnRestrictCheckBox.Checked = false;
-        fuzzyKnobControl.Value = 0;
+        knobControlFuzzy.Value = 0;
         filterRangeComboBox.Text = "";
     }
 
     [SupportedOSPlatform("windows")]
     private void FilterSearch ()
     {
-        if (filterComboBox.Text.Length == 0)
+        if (comboBoxFilter.Text.Length == 0)
         {
             _filterParams.SearchText = string.Empty;
             _filterParams.IsRangeSearch = false;
             ClearFilterList();
-            filterSearchButton.Image = null;
+            btnFilterSearch.Image = null;
             ResetFilterControls();
-            saveFilterButton.Enabled = false;
+            bntSaveFilter.Enabled = false;
             return;
         }
 
-        FilterSearch(filterComboBox.Text);
+        FilterSearch(comboBoxFilter.Text);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4134,16 +4218,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (ConfigManager.Settings.FilterHistoryList.Count > maxHistory)
         {
-            ConfigManager.Settings.FilterHistoryList.RemoveAt(filterComboBox.Items.Count - 1);
+            ConfigManager.Settings.FilterHistoryList.RemoveAt(comboBoxFilter.Items.Count - 1);
         }
 
-        filterComboBox.Items.Clear();
+        comboBoxFilter.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
-            _ = filterComboBox.Items.Add(item);
+            _ = comboBoxFilter.Items.Add(item);
         }
 
-        filterComboBox.Text = text;
+        comboBoxFilter.Text = text;
 
         _filterParams.IsRangeSearch = rangeCheckBox.Checked;
         _filterParams.RangeSearchText = filterRangeComboBox.Text;
@@ -4182,9 +4266,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        _filterParams.FuzzyValue = fuzzyKnobControl.Value;
-        _filterParams.SpreadBefore = filterKnobBackSpread.Value;
-        _filterParams.SpreadBehind = filterKnobForeSpread.Value;
+        _filterParams.FuzzyValue = knobControlFuzzy.Value;
+        _filterParams.SpreadBefore = knobControlFilterBackSpread.Value;
+        _filterParams.SpreadBehind = knobControlFilterForeSpread.Value;
         _filterParams.ColumnRestrict = columnRestrictCheckBox.Checked;
 
         //ConfigManager.SaveFilterParams(this.filterParams);
@@ -4193,7 +4277,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _shouldCancel = false;
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_FilterSearch_Filtering);
-        filterSearchButton.Enabled = false;
+        btnFilterSearch.Enabled = false;
         ClearFilterList();
 
         _progressEventArgs.MinValue = 0;
@@ -4449,7 +4533,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             lock (_filterResultList)
             {
-                lblFilterCount.Text = "" + _filterResultList.Count;
+                lblFilterCount.Text = string.Empty + _filterResultList.Count;
                 if (filterGridView.RowCount > _filterResultList.Count)
                 {
                     filterGridView.RowCount = 0; // helps to prevent hang ?
@@ -4515,7 +4599,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 _ = filterGridView.Focus();
             }
 
-            filterSearchButton.Enabled = true;
+            btnFilterSearch.Enabled = true;
         }
         catch (NullReferenceException e)
         {
@@ -4536,7 +4620,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 filterGridView.SuspendLayout();
                 filterGridView.RowCount = 0;
-                lblFilterCount.Text = Resources.LogWindow_UI_ClearFilterList_ResetFilterCounterToZero;
+                lblFilterCount.Text = Resources.LogWindow_UI_FilterCount_ZeroValue;
                 _filterResultList = [];
                 _lastFilterLinesList = [];
                 _filterHitList = [];
@@ -4610,20 +4694,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (IsFilterSearchDirty(_filterParams))
         {
-            filterSearchButton.Image = _searchButtonImage;
-            saveFilterButton.Enabled = false;
+            btnFilterSearch.Image = _searchButtonImage;
+            bntSaveFilter.Enabled = false;
         }
         else
         {
-            filterSearchButton.Image = null;
-            saveFilterButton.Enabled = true;
+            btnFilterSearch.Image = null;
+            bntSaveFilter.Enabled = true;
         }
     }
 
     [SupportedOSPlatform("windows")]
     private bool IsFilterSearchDirty (FilterParams filterParams)
     {
-        if (!filterParams.SearchText.Equals(filterComboBox.Text, StringComparison.Ordinal))
+        if (!filterParams.SearchText.Equals(comboBoxFilter.Text, StringComparison.Ordinal))
         {
             return true;
         }
@@ -4648,17 +4732,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return true;
         }
 
-        if (filterParams.SpreadBefore != filterKnobBackSpread.Value)
+        if (filterParams.SpreadBefore != knobControlFilterBackSpread.Value)
         {
             return true;
         }
 
-        if (filterParams.SpreadBehind != filterKnobForeSpread.Value)
+        if (filterParams.SpreadBehind != knobControlFilterForeSpread.Value)
         {
             return true;
         }
 
-        if (filterParams.FuzzyValue != fuzzyKnobControl.Value)
+        if (filterParams.FuzzyValue != knobControlFuzzy.Value)
         {
             return true;
         }
@@ -4744,10 +4828,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void UpdateFilterHistoryFromSettings ()
     {
         ConfigManager.Settings.FilterHistoryList = ConfigManager.Settings.FilterHistoryList;
-        filterComboBox.Items.Clear();
+        comboBoxFilter.Items.Clear();
         foreach (var item in ConfigManager.Settings.FilterHistoryList)
         {
-            _ = filterComboBox.Items.Add(item);
+            _ = comboBoxFilter.Items.Add(item);
         }
 
         filterRangeComboBox.Items.Clear();
@@ -4795,12 +4879,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (show)
         {
-            advancedButton.Text = Resources.LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced;
-            advancedButton.Image = null;
+            btnAdvanced.Text = Resources.LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced;
+            btnAdvanced.Image = null;
         }
         else
         {
-            advancedButton.Text = Resources.LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced;
+            btnAdvanced.Text = Resources.LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced;
             CheckForAdvancedButtonDirty();
         }
 
@@ -4812,7 +4896,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void CheckForAdvancedButtonDirty ()
     {
-        advancedButton.Image = IsAdvancedOptionActive() && !_showAdvanced
+        btnAdvanced.Image = IsAdvancedOptionActive() && !_showAdvanced
             ? _advancedButtonImage
             : null;
     }
@@ -4820,7 +4904,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void FilterToTab ()
     {
-        filterSearchButton.Enabled = false;
+        btnFilterSearch.Enabled = false;
         _ = Task.Run(WriteFilterToTab);
     }
 
@@ -4916,7 +5000,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _guiStateArgs.MenuEnabled = true;
         SendGuiStateUpdate();
         StatusLineText("");
-        filterSearchButton.Enabled = true;
+        btnFilterSearch.Enabled = true;
     }
 
     /// <summary>
@@ -7059,7 +7143,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         splitContainerLogWindow.Panel2Collapsed = !splitContainerLogWindow.Panel2Collapsed;
         _ = !splitContainerLogWindow.Panel2Collapsed
-            ? filterComboBox.Focus()
+            ? comboBoxFilter.Focus()
             : dataGridView.Focus();
     }
 
@@ -7656,9 +7740,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public bool IsAdvancedOptionActive ()
     {
         return rangeCheckBox.Checked ||
-               fuzzyKnobControl.Value > 0 ||
-               filterKnobBackSpread.Value > 0 ||
-               filterKnobForeSpread.Value > 0 ||
+               knobControlFuzzy.Value > 0 ||
+               knobControlFilterBackSpread.Value > 0 ||
+               knobControlFilterForeSpread.Value > 0 ||
                invertFilterCheckBox.Checked ||
                columnRestrictCheckBox.Checked;
     }
@@ -7670,17 +7754,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void HandleChangedFilterListWorker ()
     {
-        var index = filterListBox.SelectedIndex;
-        filterListBox.Items.Clear();
+        var index = listBoxFilter.SelectedIndex;
+        listBoxFilter.Items.Clear();
         foreach (var filterParam in ConfigManager.Settings.FilterList)
         {
-            _ = filterListBox.Items.Add(filterParam);
+            _ = listBoxFilter.Items.Add(filterParam);
         }
 
-        filterListBox.Refresh();
-        if (index >= 0 && index < filterListBox.Items.Count)
+        listBoxFilter.Refresh();
+        if (index >= 0 && index < listBoxFilter.Items.Count)
         {
-            filterListBox.SelectedIndex = index;
+            listBoxFilter.SelectedIndex = index;
         }
 
         filterOnLoadCheckBox.Checked = Preferences.IsFilterOnLoad;

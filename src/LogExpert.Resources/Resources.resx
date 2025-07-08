@@ -512,7 +512,7 @@
     <value>Choose a file to save bookmarks into</value>
   </data>
   <data name="LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter" xml:space="preserve">
-    <value>"GetTimestampForLine({0}) enter</value>
+    <value>GetTimestampForLine({0}) enter</value>
   </data>
   <data name="LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum" xml:space="preserve">
     <value>GetTimestampForLine() leave with lineNum={0}</value>
@@ -554,7 +554,7 @@
     <value>LoadFilesAsMulti: File: {0}</value>
   </data>
   <data name="LogWindow_Logger_Info_LoadFile_PickedNewColumnizer" xml:space="preserve">
-    <value>Picked new columnizer '{0}</value>
+    <value>Picked new columnizer {0}</value>
   </data>
   <data name="LogWindow_Logger_Info_LoadFile_LoadingLogfile" xml:space="preserve">
     <value>Loading logfile: {0}</value>
@@ -592,7 +592,7 @@
   <data name="LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
     <value>Error occured while clearing filter list: {0}</value>
   </data>
-  <data name="LogWindow_UI_ClearFilterList_ResetFilterCounterToZero" xml:space="preserve">
+  <data name="LogWindow_UI_FilterCount_ZeroValue" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
@@ -608,13 +608,13 @@
     <value>Single threaded filter duration: {0} ms.</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
-    <value>Filter duration: " + ({0}) + " ms.</value>
+    <value>Filter duration: {0} ms.</value>
   </data>
   <data name="LogWindow_Logger_Info_MultiThreadedFilter_Duration" xml:space="preserve">
     <value>Multi threaded filter duration: {0} ms.</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
-    <value>Filtering... Press ESC to cancel</value>
+    <value>Filtering... Press ESC to cancel.</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
     <value>   {0}</value>
@@ -630,5 +630,239 @@
   </data>
   <data name="LogWindow_Logger_Info_AddToTimeSync_SyncingWindow" xml:space="preserve">
     <value>Syncing window for {0} to {1}</value>
+  </data>
+  <data name="LogWindow_UI_ColumnComboBox_ToolTip" xml:space="preserve">
+    <value>Select column to scroll to</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnName" xml:space="preserve">
+    <value>Column name:</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToNewTab" xml:space="preserve">
+    <value>Copy to new tab</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab" xml:space="preserve">
+    <value>Copy marked lines into a new tab window</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Scroll all tabs to current timestamp</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Scolls all open tabs to the selected timestamp, if possible</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
+    <value>Time synced files</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync" xml:space="preserve">
+    <value>Free this window from time sync</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile" xml:space="preserve">
+    <value>Locate filtered line in original file</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToggleBoomark" xml:space="preserve">
+    <value>Toggle Boomark</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_BookmarkComment" xml:space="preserve">
+    <value>Bookmark comment...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkEditMode" xml:space="preserve">
+    <value>Mark/Edit-Mode</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
+    <value>Temp Highlights</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RemoveAll" xml:space="preserve">
+    <value>Remove all</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MakeAllPermanent" xml:space="preserve">
+    <value>Make all permanent</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange" xml:space="preserve">
+    <value>Mark current filter range</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Color" xml:space="preserve">
+    <value>Color...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveToLastColumn" xml:space="preserve">
+    <value>Move to last column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere" xml:space="preserve">
+    <value>Freeze left columns until here</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveLeft" xml:space="preserve">
+    <value>Move left</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveRight" xml:space="preserve">
+    <value>Move right</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HideColumn" xml:space="preserve">
+    <value>Hide column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RestoreColumns" xml:space="preserve">
+    <value>Restore columns</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollToColumn" xml:space="preserve">
+    <value>Scroll to column...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine" xml:space="preserve">
+    <value>Highlight selection in log file (full line)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode" xml:space="preserve">
+    <value>Highlight selection in log file (word mode)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterForSelection" xml:space="preserve">
+    <value>Filter for selection</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment" xml:space="preserve">
+    <value>Set selected text as bookmark comment</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView" xml:space="preserve">
+    <value>Mark filter hits in log view</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines" xml:space="preserve">
+    <value>Set bookmarks on selected lines</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn" xml:space="preserve">
+    <value>Hide this column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn" xml:space="preserve">
+    <value>Move this column to the last position</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment" xml:space="preserve">
+    <value>Edit the comment for a bookmark</value>
+  </data>
+  <data name="LogWindow_UI_Button_Column" xml:space="preserve">
+    <value>Columns...</value>
+  </data>
+  <data name="LogWindow_UI_Button_SaveFilter" xml:space="preserve">
+    <value>Save filter</value>
+  </data>
+  <data name="LogWindow_UI_Button_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="LogWindow_UI_Button_ShowAdvanced" xml:space="preserve">
+    <value>Show advanced...</value>
+  </data>
+  <data name="LogWindow_UI_Button_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Search" xml:space="preserve">
+    <value>Start the filter search</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ShowAdvanced" xml:space="preserve">
+    <value>Toggel the advanced filter options panel</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Column" xml:space="preserve">
+    <value>Choose columns for 'Column restrict'</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterDown" xml:space="preserve">
+    <value>Move the selected entry down in the list</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterUp" xml:space="preserve">
+    <value>Move the selected entry up in the list</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ColumnRestrict" xml:space="preserve">
+    <value>Column restrict</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_RangeSearch" xml:space="preserve">
+    <value>Range search</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_InvertMatch" xml:space="preserve">
+    <value>Invert Match</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_AutoHide" xml:space="preserve">
+    <value>Auto hide</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterOnLoad" xml:space="preserve">
+    <value>Auto start</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterSync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterTail" xml:space="preserve">
+    <value>Filter tail</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterRegex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterCaseSensitive" xml:space="preserve">
+    <value>Case sensitive</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_ColumnRestrict" xml:space="preserve">
+    <value>Restrict search to columns</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_RangeSearch" xml:space="preserve">
+    <value>Enable a special search mode which filters all content between the 2 given search terms.</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_InvertMatch" xml:space="preserve">
+    <value>Invert the search result</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_AutoHide" xml:space="preserve">
+    <value>Hides the filter list after loading a filter</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterOnLoad" xml:space="preserve">
+    <value>Start immediate filtering after loading a saved filter</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterSync" xml:space="preserve">
+    <value>Sync the current selected line in the filter view to the selection in the log file view</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterTail" xml:space="preserve">
+    <value>Filter tailed file content (keeps filter view up to date on file changes)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterRegex" xml:space="preserve">
+    <value>Use regular expressions. (right-click for RegEx helper window)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive" xml:space="preserve">
+    <value>Makes the filter case sensitive</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_FilterRange" xml:space="preserve">
+    <value>2nd search string ('end string') when using the range search</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnNames" xml:space="preserve">
+    <value>column names</value>
+  </data>
+  <data name="LogWindow_UI_Label_TextFilter" xml:space="preserve">
+    <value>Text &amp;filter:</value>
+  </data>
+  <data name="LogWindow_UI_Label_Fuzzyness" xml:space="preserve">
+    <value>Fuzzyness</value>
+  </data>
+  <data name="LogWindow_UI_Label_BackSpread" xml:space="preserve">
+    <value>Back Spread</value>
+  </data>
+  <data name="LogWindow_UI_Label_ForeSpread" xml:space="preserve">
+    <value>Fore Spread</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_Fuzzy" xml:space="preserve">
+    <value>Fuzzy search level (0 = fuzzy off)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterBackSpread" xml:space="preserve">
+    <value>Add preceding lines to search result (Drag up/down, press Shift for finer pitch)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterForeSpread" xml:space="preserve">
+    <value>Add following lines to search result (Drag up/down, press Shift for finer pitch)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterToNewTab" xml:space="preserve">
+    <value>Filter to new tab</value>
+  </data>
+  <data name="LogWindow_UI_Button_FilterToTab" xml:space="preserve">
+    <value>Filter to Tab</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterToTab" xml:space="preserve">
+    <value>Launch a new tab with filtered content</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ToggleHighlightPanel" xml:space="preserve">
+    <value>Open or close a list with saved filters</value>
+  </data>
+  <data name="LogWindow_UI_ListBox_ToolTip_Filter" xml:space="preserve">
+    <value>Doubleclick to load a saved filter</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_Filter" xml:space="preserve">
+    <value>Search string for the filter</value>
   </data>
 </root>

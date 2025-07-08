@@ -615,7 +615,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;GetTimestampForLine({0}) enter.
+        ///   Looks up a localized string similar to GetTimestampForLine({0}) enter.
         /// </summary>
         public static string LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter {
             get {
@@ -903,7 +903,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Picked new columnizer &apos;{0}.
+        ///   Looks up a localized string similar to Picked new columnizer {0}.
         /// </summary>
         public static string LogWindow_Logger_Info_LoadFile_PickedNewColumnizer {
             get {
@@ -1083,11 +1083,308 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.
+        ///   Looks up a localized string similar to Columns....
         /// </summary>
-        public static string LogWindow_UI_ClearFilterList_ResetFilterCounterToZero {
+        public static string LogWindow_UI_Button_Column {
             get {
-                return ResourceManager.GetString("LogWindow_UI_ClearFilterList_ResetFilterCounterToZero", resourceCulture);
+                return ResourceManager.GetString("LogWindow_UI_Button_Column", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string LogWindow_UI_Button_Delete {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter to Tab.
+        /// </summary>
+        public static string LogWindow_UI_Button_FilterToTab {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_FilterToTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save filter.
+        /// </summary>
+        public static string LogWindow_UI_Button_SaveFilter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_SaveFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search.
+        /// </summary>
+        public static string LogWindow_UI_Button_Search {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show advanced....
+        /// </summary>
+        public static string LogWindow_UI_Button_ShowAdvanced {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ShowAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose columns for &apos;Column restrict&apos;.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_Column {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_Column", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the selected entry down in the list.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_FilterDown {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_FilterDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch a new tab with filtered content.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_FilterToTab {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_FilterToTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the selected entry up in the list.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_FilterUp {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_FilterUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start the filter search.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_Search {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_Search", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggel the advanced filter options panel.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_ShowAdvanced {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_ShowAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open or close a list with saved filters.
+        /// </summary>
+        public static string LogWindow_UI_Button_ToolTip_ToggleHighlightPanel {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Button_ToolTip_ToggleHighlightPanel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto hide.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_AutoHide {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_AutoHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Column restrict.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ColumnRestrict {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ColumnRestrict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Case sensitive.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_FilterCaseSensitive {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_FilterCaseSensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Auto start.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_FilterOnLoad {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_FilterOnLoad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Regex.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_FilterRegex {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_FilterRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_FilterSync {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_FilterSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter tail.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_FilterTail {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_FilterTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invert Match.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_InvertMatch {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_InvertMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range search.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_RangeSearch {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_RangeSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hides the filter list after loading a filter.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_AutoHide {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_AutoHide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restrict search to columns.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_ColumnRestrict {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_ColumnRestrict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Makes the filter case sensitive.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start immediate filtering after loading a saved filter.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_FilterOnLoad {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_FilterOnLoad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use regular expressions. (right-click for RegEx helper window).
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_FilterRegex {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_FilterRegex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync the current selected line in the filter view to the selection in the log file view.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_FilterSync {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_FilterSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter tailed file content (keeps filter view up to date on file changes).
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_FilterTail {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_FilterTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invert the search result.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_InvertMatch {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_InvertMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable a special search mode which filters all content between the 2 given search terms..
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ToolTip_RangeSearch {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ToolTip_RangeSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select column to scroll to.
+        /// </summary>
+        public static string LogWindow_UI_ColumnComboBox_ToolTip {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ColumnComboBox_ToolTip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search string for the filter.
+        /// </summary>
+        public static string LogWindow_UI_ComboBox_ToolTip_Filter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ComboBox_ToolTip_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2nd search string (&apos;end string&apos;) when using the range search.
+        /// </summary>
+        public static string LogWindow_UI_ComboBox_ToolTip_FilterRange {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ComboBox_ToolTip_FilterRange", resourceCulture);
             }
         }
         
@@ -1137,11 +1434,110 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 0.
+        /// </summary>
+        public static string LogWindow_UI_FilterCount_ZeroValue {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_FilterCount_ZeroValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk.
         /// </summary>
         public static string LogWindow_UI_ImportExportBookmarkList_Filter {
             get {
                 return ResourceManager.GetString("LogWindow_UI_ImportExportBookmarkList_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add preceding lines to search result (Drag up/down, press Shift for finer pitch).
+        /// </summary>
+        public static string LogWindow_UI_KnobControl_FilterBackSpread {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_KnobControl_FilterBackSpread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add following lines to search result (Drag up/down, press Shift for finer pitch).
+        /// </summary>
+        public static string LogWindow_UI_KnobControl_FilterForeSpread {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_KnobControl_FilterForeSpread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fuzzy search level (0 = fuzzy off).
+        /// </summary>
+        public static string LogWindow_UI_KnobControl_Fuzzy {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_KnobControl_Fuzzy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back Spread.
+        /// </summary>
+        public static string LogWindow_UI_Label_BackSpread {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_BackSpread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Column name:.
+        /// </summary>
+        public static string LogWindow_UI_Label_ColumnName {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_ColumnName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to column names.
+        /// </summary>
+        public static string LogWindow_UI_Label_ColumnNames {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_ColumnNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fore Spread.
+        /// </summary>
+        public static string LogWindow_UI_Label_ForeSpread {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_ForeSpread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fuzzyness.
+        /// </summary>
+        public static string LogWindow_UI_Label_Fuzzyness {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_Fuzzyness", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Text &amp;filter:.
+        /// </summary>
+        public static string LogWindow_UI_Label_TextFilter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_TextFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Doubleclick to load a saved filter.
+        /// </summary>
+        public static string LogWindow_UI_ListBox_ToolTip_Filter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ListBox_ToolTip_Filter", resourceCulture);
             }
         }
         
@@ -1218,7 +1614,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter duration: &quot; + ({0}) + &quot; ms..
+        ///   Looks up a localized string similar to Filter duration: {0} ms..
         /// </summary>
         public static string LogWindow_UI_StatusLineText_Filter_FilterDurationMs {
             get {
@@ -1227,7 +1623,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filtering... Press ESC to cancel.
+        ///   Looks up a localized string similar to Filtering... Press ESC to cancel..
         /// </summary>
         public static string LogWindow_UI_StatusLineText_FilterSearch_Filtering {
             get {
@@ -1395,6 +1791,312 @@ namespace LogExpert {
         public static string LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt {
             get {
                 return ResourceManager.GetString("LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bookmark comment....
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_BookmarkComment {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_BookmarkComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color....
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_Color {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_Copy {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to clipboard.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_CopyToClipboard {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_CopyToClipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy to new tab.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_CopyToNewTab {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_CopyToNewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter for selection.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_FilterForSelection {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_FilterForSelection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter to new tab.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_FilterToNewTab {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_FilterToNewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Free this window from time sync.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze left columns until here.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide column.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_HideColumn {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_HideColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight selection in log file (full line).
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight selection in log file (word mode).
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Locate filtered line in original file.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make all permanent.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MakeAllPermanent {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MakeAllPermanent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark current filter range.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark/Edit-Mode.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MarkEditMode {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MarkEditMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mark filter hits in log view.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move left.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MoveLeft {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MoveLeft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move right.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MoveRight {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MoveRight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move to last column.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_MoveToLastColumn {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_MoveToLastColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove all.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_RemoveAll {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_RemoveAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore columns.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_RestoreColumns {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_RestoreColumns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll all tabs to current timestamp.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll to column....
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ScrollToColumn {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ScrollToColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set bookmarks on selected lines.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set selected text as bookmark comment.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Temp Highlights.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_TempHighlights {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_TempHighlights", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time synced files.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Toggle Boomark.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToggleBoomark {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToggleBoomark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit the comment for a bookmark.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy marked lines into a new tab window.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide this column.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move this column to the last position.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scolls all open tabs to the selected timestamp, if possible.
+        /// </summary>
+        public static string LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp", resourceCulture);
             }
         }
         
