@@ -587,12 +587,823 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error in {0}: {1}.
+        /// </summary>
+        public static string Logger_Error_In_Function {
+            get {
+                return ResourceManager.GetString("Logger_Error_In_Function", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap LogLover {
             get {
                 object obj = ResourceManager.GetObject("LogLover", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_AddBookmarkOverlays {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_AddBookmarkOverlays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &quot;GetTimestampForLine({0}) enter.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetTimestampForLine() leave with lineNum={0}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preventing reload because of recursive calls..
+        /// </summary>
+        public static string LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reloading invoked..
+        /// </summary>
+        public static string LogWindow_Logger_Debug_ReloadingInvoked {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_ReloadingInvoked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection changed trigger.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_SelectionChangedTrigger {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_SelectionChangedTrigger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Setting columnizer {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found block: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TestStatistic(): i={0} searchLine={1}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}.
+        /// </summary>
+        public static string LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error occured while clearing filter list: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while deleting temp file {0}: {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error saving persistence: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_ErrorSavingPersistence {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_ErrorSavingPersistence", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error in selectionChangedTrigger_Signal selcount {0}, Exception: {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error in UpdateProgress Callback: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_InUpdateProgressCallback {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_InUpdateProgressCallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line count of event is: {0}, should be greater than last line count: {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading bookmarks: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_LoadingBookmarks {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_LoadingBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading persistence data: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_LoadingPersistenceData {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_LoadingPersistenceData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error LoadingStarted Callback: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_LoadingStartedCallback {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_LoadingStartedCallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while selecting line: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_SelectLine_WhileSelectingLine {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_SelectLine_WhileSelectingLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error setting splitter distance: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_SettingSplitterDistance {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_SettingSplitterDistance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while resizing columns: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Error_WhileResizingColumns {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Error_WhileResizingColumns", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Syncing window for {0} to {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_AddToTimeSync_SyncingWindow {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_AddToTimeSync_SyncingWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting temp file {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Detected MultiFile name list in persistence options.
+        /// </summary>
+        public static string LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} events in queue.
+        /// </summary>
+        public static string LogWindow_Logger_Info_EventsInQueue {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_EventsInQueue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File loading complete..
+        /// </summary>
+        public static string LogWindow_Logger_Info_FileLoadingComplete {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_FileLoadingComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Single threaded filter duration: {0} ms..
+        /// </summary>
+        public static string LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finished loading..
+        /// </summary>
+        public static string LogWindow_Logger_Info_FinishedLoading {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_FinishedLoading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to De-Syncing window for {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Got FileSizeChanged event. prevLines:{0}, curr lines: {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1 {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Handling file not found event..
+        /// </summary>
+        public static string LogWindow_Logger_Info_HandlingFileNotFoundEvent {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_HandlingFileNotFoundEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading logfile: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_LoadFile_LoadingLogfile {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_LoadFile_LoadingLogfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Picked new columnizer &apos;{0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_LoadFile_PickedNewColumnizer {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_LoadFile_PickedNewColumnizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LoadFilesAsMulti: File: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_LoadFilesAsMulti_FileName {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_LoadFilesAsMulti_FileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multi threaded filter duration: {0} ms..
+        /// </summary>
+        public static string LogWindow_Logger_Info_MultiThreadedFilter_Duration {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_MultiThreadedFilter_Duration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to new File created..
+        /// </summary>
+        public static string LogWindow_Logger_Info_NewFileCreated {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_NewFileCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No persistence data for {0} found..
+        /// </summary>
+        public static string LogWindow_Logger_Info_NoPersistenceDataForFileNameFound {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_NoPersistenceDataForFileNameFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Persistence data for {0} is outdated. It was discarded..
+        /// </summary>
+        public static string LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refreshing filter view because of reload..
+        /// </summary>
+        public static string LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reloading file because it has been respawned..
+        /// </summary>
+        public static string LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ReloadNewFile(): counter = {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SetColumnizerInternal(): {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_SetColumnizerInternal {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_SetColumnizerInternal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit control in logWindow was null.
+        /// </summary>
+        public static string LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TestStatistics() ended.
+        /// </summary>
+        public static string LogWindow_Logger_Info_TestStatistic_Ended {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_TestStatistic_Ended", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TestStatistics() called with start line {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SelStart: {0}, SelLen: {1}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_UpdateEditColumnDisplay {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_UpdateEditColumnDisplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UpdateGrid(): new RowCount={0}.
+        /// </summary>
+        public static string LogWindow_Logger_Info_UpdateGridNewRowCount {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_UpdateGridNewRowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for loading to be complete..
+        /// </summary>
+        public static string LogWindow_Logger_Info_WaitingForLoadingToBeComplete {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_WaitingForLoadingToBeComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for signal.
+        /// </summary>
+        public static string LogWindow_Logger_Info_WaitingForSignal {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_WaitingForSignal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wakeup signal received..
+        /// </summary>
+        public static string LogWindow_Logger_Info_WakeupSignalReceived {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Info_WakeupSignalReceived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FilterRestore(): Columnizer {0} not found.
+        /// </summary>
+        public static string LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected issue truncating file: {0}.
+        /// </summary>
+        public static string LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage {
+            get {
+                return ResourceManager.GetString("LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.
+        /// </summary>
+        public static string LogWindow_UI_ClearFilterList_ResetFilterCounterToZero {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ClearFilterList_ResetFilterCounterToZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}-&gt;Clip.
+        /// </summary>
+        public static string LogWindow_UI_CopyMarkedLinesToTab_Clip {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CopyMarkedLinesToTab_Clip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}-&gt;C.
+        /// </summary>
+        public static string LogWindow_UI_CopyMarkedLinesToTab_Copy {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CopyMarkedLinesToTab_Copy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while exporting bookmark list: {0}.
+        /// </summary>
+        public static string LogWindow_UI_ErrorWhileExportingBookmarkList {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ErrorWhileExportingBookmarkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while importing bookmark list: {0}.
+        /// </summary>
+        public static string LogWindow_UI_ErrorWhileImportingBookmarkList {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ErrorWhileImportingBookmarkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exception while filtering. Please report to developer: \n\n{0}\n\n{1}.
+        /// </summary>
+        public static string LogWindow_UI_Filter_ExceptionWhileFiltering {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Filter_ExceptionWhileFiltering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk.
+        /// </summary>
+        public static string LogWindow_UI_ImportExportBookmarkList_Filter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ImportExportBookmarkList_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot load file\n{0}.
+        /// </summary>
+        public static string LogWindow_UI_LoadFile_CannotLoadFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_LoadFile_CannotLoadFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected error while saving persistence: {0}.
+        /// </summary>
+        public static string LogWindow_UI_SavePersistenceData_ErrorWhileSaving {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_SavePersistenceData_ErrorWhileSaving", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search result not found.
+        /// </summary>
+        public static string LogWindow_UI_SelectLine_SearchResultNotFound {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_SelectLine_SearchResultNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid regular expression.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_InvalidRegularExpression {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_InvalidRegularExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not found: {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_NotFound {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started from beginning of file.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_StartedFromBeginningOfFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_StartedFromBeginningOfFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Started from end of file.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_StartedFromEndOfFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_StartedFromEndOfFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File not found.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_FileNotFound {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_FileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter duration: &quot; + ({0}) + &quot; ms..
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_Filter_FilterDurationMs {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_Filter_FilterDurationMs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filtering... Press ESC to cancel.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_FilterSearch_Filtering {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_FilterSearch_Filtering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching... Press ESC to cancel..
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_SearchingPressESCToCancel {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_SearchingPressESCToCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} selected lines.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_SelCountSelectedLines {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_SelCountSelectedLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time diff is {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_TimeDiff {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_TimeDiff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Truncate failed: file is locked by {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected issue truncating file.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to    {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_UpdateEditColumnDisplay {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_UpdateEditColumnDisplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing to temp file... Press ESC to cancel..
+        /// </summary>
+        public static string LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading file....
+        /// </summary>
+        public static string LogWindow_UI_StatusText_LoadingFile {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusText_LoadingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Loading {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusText_LoadingWithParameter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusText_LoadingWithParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sure to close?.
+        /// </summary>
+        public static string LogWindow_UI_SureToClose {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_SureToClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Freeze left columns until here ({0}).
+        /// </summary>
+        public static string LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" +
+                        "", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frozen.
+        /// </summary>
+        public static string LogWindow_UI_Text_Frozen {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Text_Frozen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide advanced....
+        /// </summary>
+        public static string LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show advanced....
+        /// </summary>
+        public static string LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are some comments in the bookmarks. Really remove bookmarks?.
+        /// </summary>
+        public static string LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a file to save bookmarks into.
+        /// </summary>
+        public static string LogWindow_UI_Title_ExportBookMarkList {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Title_ExportBookMarkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a file to load bookmarks from.
+        /// </summary>
+        public static string LogWindow_UI_Title_ImportBookmarkList {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Title_ImportBookmarkList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There&apos;s a comment attached to the bookmark. Really remove the bookmark?.
+        /// </summary>
+        public static string LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -&gt;F.
+        /// </summary>
+        public static string LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter", resourceCulture);
             }
         }
         

@@ -2753,7 +2753,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 foreach (var logWindow in dockPanel.Contents.OfType<LogWindow.LogWindow>())
                 {
-                    var persistenceFileName = logWindow?.SavePersistenceData(true);
+                    var persistenceFileName = logWindow?.SavePersistenceDataAndReturnFileName(true);
                     if (persistenceFileName != null)
                     {
                         fileNames.Add(persistenceFileName);

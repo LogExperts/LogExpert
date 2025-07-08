@@ -361,4 +361,274 @@
   <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
     <value>Line</value>
   </data>
+  <data name="LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName" xml:space="preserve">
+    <value>Setting columnizer {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FinishedLoading" xml:space="preserve">
+    <value>Finished loading.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload" xml:space="preserve">
+    <value>Refreshing filter view because of reload.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_HandlingFileNotFoundEvent" xml:space="preserve">
+    <value>Handling file not found event.</value>
+  </data>
+  <data name="LogWindow_UI_SureToClose" xml:space="preserve">
+    <value>Sure to close?</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NewFileCreated" xml:space="preserve">
+    <value>new File created.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_ReloadingInvoked" xml:space="preserve">
+    <value>Reloading invoked.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1" xml:space="preserve">
+    <value>Got FileSizeChanged event. prevLines:{0}, curr lines: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_SelectionChangedTrigger" xml:space="preserve">
+    <value>Selection changed trigger</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SelCountSelectedLines" xml:space="preserve">
+    <value>{0} selected lines</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount" xml:space="preserve">
+    <value>Error in selectionChangedTrigger_Signal selcount {0}, Exception: {1}</value>
+  </data>
+  <data name="LogWindow_UI_Text_Frozen" xml:space="preserve">
+    <value>Frozen</value>
+  </data>
+  <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
+    <value>Freeze left columns until here ({0})</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NoPersistenceDataForFileNameFound" xml:space="preserve">
+    <value>No persistence data for {0} found.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions" xml:space="preserve">
+    <value>Detected MultiFile name list in persistence options</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingPersistenceData" xml:space="preserve">
+    <value>Error loading persistence data: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingBookmarks" xml:space="preserve">
+    <value>Error loading bookmarks: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded" xml:space="preserve">
+    <value>Persistence data for {0} is outdated. It was discarded.</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SettingSplitterDistance" xml:space="preserve">
+    <value>Error setting splitter distance: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
+    <value>Invalid regular expression</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingFile" xml:space="preserve">
+    <value>Loading file...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FileNotFound" xml:space="preserve">
+    <value>File not found</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned" xml:space="preserve">
+    <value>Reloading file because it has been respawned.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls" xml:space="preserve">
+    <value>Preventing reload because of recursive calls.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter" xml:space="preserve">
+    <value>ReloadNewFile(): counter = {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForLoadingToBeComplete" xml:space="preserve">
+    <value>Waiting for loading to be complete.</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InUpdateProgressCallback" xml:space="preserve">
+    <value>Error in UpdateProgress Callback: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingWithParameter" xml:space="preserve">
+    <value>Loading {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingStartedCallback" xml:space="preserve">
+    <value>Error LoadingStarted Callback: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FileLoadingComplete" xml:space="preserve">
+    <value>File loading complete.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForSignal" xml:space="preserve">
+    <value>Waiting for signal</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WakeupSignalReceived" xml:space="preserve">
+    <value>Wakeup signal received.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_EventsInQueue" xml:space="preserve">
+    <value>{0} events in queue</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount" xml:space="preserve">
+    <value>Line count of event is: {0}, should be greater than last line count: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateGridNewRowCount" xml:space="preserve">
+    <value>UpdateGrid(): new RowCount={0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover" xml:space="preserve">
+    <value>UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}</value>
+  </data>
+  <data name="Logger_Error_In_Function" xml:space="preserve">
+    <value>Error in {0}: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_SetColumnizerInternal" xml:space="preserve">
+    <value>SetColumnizerInternal(): {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_WhileResizingColumns" xml:space="preserve">
+    <value>Error while resizing columns: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
+    <value>Time diff is {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
+    <value>Not found: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromBeginningOfFile" xml:space="preserve">
+    <value>Started from beginning of file</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromEndOfFile" xml:space="preserve">
+    <value>Started from end of file</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SearchingPressESCToCancel" xml:space="preserve">
+    <value>Searching... Press ESC to cancel.</value>
+  </data>
+  <data name="LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks" xml:space="preserve">
+    <value>There are some comments in the bookmarks. Really remove bookmarks?</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
+    <value>Error while importing bookmark list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ImportBookmarkList" xml:space="preserve">
+    <value>Choose a file to load bookmarks from</value>
+  </data>
+  <data name="LogWindow_UI_ImportExportBookmarkList_Filter" xml:space="preserve">
+    <value>CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileExportingBookmarkList" xml:space="preserve">
+    <value>Error while exporting bookmark list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
+    <value>Choose a file to save bookmarks into</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter" xml:space="preserve">
+    <value>"GetTimestampForLine({0}) enter</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum" xml:space="preserve">
+    <value>GetTimestampForLine() leave with lineNum={0}</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Clip" xml:space="preserve">
+    <value>{0}-&gt;Clip</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Copy" xml:space="preserve">
+    <value>{0}-&gt;C</value>
+  </data>
+  <data name="LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt" xml:space="preserve">
+    <value>There's a comment attached to the bookmark. Really remove the bookmark?</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_AddBookmarkOverlays" xml:space="preserve">
+    <value>AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile" xml:space="preserve">
+    <value>Unexpected issue truncating file</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage" xml:space="preserve">
+    <value>Unexpected issue truncating file: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
+    <value>Truncate failed: file is locked by {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile" xml:space="preserve">
+    <value>Error while deleting temp file {0}: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile" xml:space="preserve">
+    <value>Deleting temp file {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ErrorSavingPersistence" xml:space="preserve">
+    <value>Error saving persistence: {0}</value>
+  </data>
+  <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
+    <value>Unexpected error while saving persistence: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFilesAsMulti_FileName" xml:space="preserve">
+    <value>LoadFilesAsMulti: File: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_PickedNewColumnizer" xml:space="preserve">
+    <value>Picked new columnizer '{0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_LoadingLogfile" xml:space="preserve">
+    <value>Loading logfile: {0}</value>
+  </data>
+  <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
+    <value>Cannot load file\n{0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine" xml:space="preserve">
+    <value>TestStatistics() called with start line {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo" xml:space="preserve">
+    <value>TestStatistic(): i={0} searchLine={1}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock" xml:space="preserve">
+    <value>Found block: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_Ended" xml:space="preserve">
+    <value>TestStatistics() ended</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound" xml:space="preserve">
+    <value>FilterRestore(): Columnizer {0} not found</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile" xml:space="preserve">
+    <value>Writing to temp file... Press ESC to cancel.</value>
+  </data>
+  <data name="LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter" xml:space="preserve">
+    <value>-&gt;F</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced" xml:space="preserve">
+    <value>Hide advanced...</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced" xml:space="preserve">
+    <value>Show advanced...</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
+    <value>Error occured while clearing filter list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_ClearFilterList_ResetFilterCounterToZero" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
+    <value>Search result not found</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SelectLine_WhileSelectingLine" xml:space="preserve">
+    <value>Error while selecting line: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
+    <value>Exception while filtering. Please report to developer: \n\n{0}\n\n{1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration" xml:space="preserve">
+    <value>Single threaded filter duration: {0} ms.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
+    <value>Filter duration: " + ({0}) + " ms.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_MultiThreadedFilter_Duration" xml:space="preserve">
+    <value>Multi threaded filter duration: {0} ms.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
+    <value>Filtering... Press ESC to cancel</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>   {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>SelStart: {0}, SelLen: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull" xml:space="preserve">
+    <value>Edit control in logWindow was null</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow" xml:space="preserve">
+    <value>De-Syncing window for {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_AddToTimeSync_SyncingWindow" xml:space="preserve">
+    <value>Syncing window for {0} to {1}</value>
+  </data>
 </root>
