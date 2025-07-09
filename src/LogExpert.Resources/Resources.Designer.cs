@@ -434,7 +434,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Settings could not be imported: {exSettings could not be imported: {0}.
+        ///   Looks up a localized string similar to Settings could not be imported: {0}.
         /// </summary>
         public static string HighlightDialog_UI_SettingsCouldNotBeImported {
             get {
@@ -2424,9 +2424,9 @@ namespace LogExpert {
         /// <summary>
         ///   Looks up a localized string similar to Unknown IPC Message Type: {0}; with payload: {1}.
         /// </summary>
-        public static string Program_Logger_Error_Pipe_UnkownIPCMessage {
+        public static string Program_Logger_Error_Pipe_UnknownIPCMessage {
             get {
-                return ResourceManager.GetString("Program_Logger_Error_Pipe_UnkownIPCMessage", resourceCulture);
+                return ResourceManager.GetString("Program_Logger_Error_Pipe_UnknownIPCMessage", resourceCulture);
             }
         }
         
