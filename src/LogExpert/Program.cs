@@ -132,7 +132,7 @@ internal static class Program
                         _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_Pipe_CannotConnectToFirstInstance, errMsg), Resources.Title_LogExpert);
                     }
 
-                    //TODO: Remove this from here? Why is it called from the Main project and not from the main window?
+                    //Dont create a new separated instance of LogExpert if the settings allows only one instance
                     if (settings.Preferences.AllowOnlyOneInstance && settings.Preferences.ShowErrorMessageAllowOnlyOneInstances)
                     {
                         AllowOnlyOneInstanceErrorDialog a = new();
