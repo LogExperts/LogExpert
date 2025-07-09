@@ -116,9 +116,17 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.All);
     }
 
+    /// <summary>
+    /// Imports the highlight settings from a file.
+    /// Throws ArgumentNullException if fileInfo is null, this should not happen.
+    /// </summary>
+    /// <param name="fileInfo"></param>
+    /// <param name="importFlags"></param>
+    /// <exception cref="ArgumentNullException"></exception>
     [SupportedOSPlatform("windows")]
     public void ImportHighlightSettings (FileInfo fileInfo, ExportImportFlags importFlags)
     {
+        ArgumentNullException.ThrowIfNull(fileInfo, nameof(fileInfo));
         Instance._settings.Preferences.HighlightGroupList = Import(Instance._settings.Preferences.HighlightGroupList, fileInfo, importFlags);
         Save(SettingsFlags.All);
     }
