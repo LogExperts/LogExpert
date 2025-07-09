@@ -166,8 +166,10 @@ internal partial class SettingsDialog : Form
         buttonExport.Text = Resources.LogExpert_Common_UI_Button_Export;
         buttonImport.Text = Resources.LogExpert_Common_UI_Button_Import;
         Text = Resources.SettingsDialog_Form_Text;
+        labelLanguage.Text = Resources.SettingsDialog_UI_Label_Language;
 
         // ToolTips
+        toolTip.SetToolTip(comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_Language);
         toolTip.SetToolTip(comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_Encoding);
         toolTip.SetToolTip(checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_PortableMode);
         toolTip.SetToolTip(radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir);

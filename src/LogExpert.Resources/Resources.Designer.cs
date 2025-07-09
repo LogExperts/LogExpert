@@ -2907,6 +2907,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Userinterface language.
+        /// </summary>
+        public static string SettingsDialog_UI_ComboBox_ToolTip_Language {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_ComboBox_ToolTip_Language", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not create / delete marker for Portable Mode: {0}.
         /// </summary>
         public static string SettingsDialog_UI_CouldNotCreatePortableMode {
@@ -3182,6 +3191,15 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Label_Info {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Label_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Language {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Language", resourceCulture);
             }
         }
         
