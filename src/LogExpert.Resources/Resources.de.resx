@@ -296,7 +296,8 @@
     <value>Fehler während des Hinzufügens eines Highlighteintrages: {0}</value>
   </data>
   <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
-    <value>Fehler während des Hinzufügens eines Highlighteintrages.\r\n{0}</value>
+    <value>Fehler während des Hinzufügens eines Highlighteintrages.
+{0}</value>
   </data>
   <data name="HighlightDialog_RegexError" xml:space="preserve">
     <value>Die Regex ist "null" oder besteht nur aus Leerzeichen</value>
@@ -617,7 +618,8 @@
     <value>Unbekannter Fehler beim Speichern der Persistenten Daten: {0}</value>
   </data>
   <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
-    <value>Kann die Datei nicht laden\n{0}</value>
+    <value>Kann die Datei nicht laden
+{0}</value>
   </data>
   <data name="LogWindow_UI_ListBox_ToolTip_Filter" xml:space="preserve">
     <value>Doppelklick um den gespeicherten Filter zu laden</value>
@@ -635,7 +637,9 @@
     <value>CSV Datei (*.csv)|*.csv|Lesezeichen Datei (*.bmk)|*.bmk</value>
   </data>
   <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
-    <value>Ausnahmefehler während der Filterung. Bitte an den Entwickler weiterleiten: \n\n{0}\n\n{1}</value>
+    <value>Ausnahmefehler während der Filterung. Bitte an den Entwickler weiterleiten:
+{0}
+{1}</value>
   </data>
   <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
     <value>Fehler während des Imports der Lesezeichenliste: {0}</value>
@@ -866,10 +870,11 @@
     <value>(Invertiere Match)</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
-    <value>\nSpalten restriktion</value>
+    <value>
+Spalten restriktion</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
-    <value>Filter: \"{0}\"{1}{3}</value>
+    <value>Filter: {0} {1}{2}</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard" xml:space="preserve">
     <value>Zwischenablage</value>
@@ -1266,5 +1271,18 @@
   </data>
   <data name="SettingsDialog_UI_SettingsImported" xml:space="preserve">
     <value>Einstellungen importiert</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_ToolsDescription" xml:space="preserve">
+    <value>Sie können so viele  Tools konfigurieren wie Sie möchten.
+Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools werden im Toolsmenu angezeigt.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_SessionSaveOwnDir" xml:space="preserve">
+    <value>Place Holder Text, this will be replaced programmatically</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_HintMultiFile" xml:space="preserve">
+    <value>Hinweis: Mit der Taste Shift kann während die Dateien mittels Drag&amp;Drop auf das LogExpert Fenster gezogen werden, das Verhalten von Einzel- zu Multidatei gewechselt werden und vice versa.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_NoteMultifile" xml:space="preserve">
+    <value>Notiz: Sie können immer alle Dateien als Multifile automatisch laden wenn die Dateien die Multidateien Namensregeln folgen (&lt;dateiname&gt;, &lt;dateiname&gt;.1, &lt;dateiname&gt;.2, ...). Wählen Sie hierfür 'Multidatei' vom Dateimenü aus nachdem die erste Datei geladen wurde.</value>
   </data>
 </root>

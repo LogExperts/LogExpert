@@ -302,7 +302,8 @@
     <value>Error during add of highlight entry: {0}</value>
   </data>
   <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
-    <value>Error during add of entry.\r\n{0}</value>
+    <value>Error during add of entry.
+{0}</value>
   </data>
   <data name="HighlightDialog_RegexError" xml:space="preserve">
     <value>Regex value is null or whitespace</value>
@@ -560,7 +561,8 @@
     <value>Loading logfile: {0}</value>
   </data>
   <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
-    <value>Cannot load file\n{0}</value>
+    <value>Cannot load file
+{0}</value>
   </data>
   <data name="LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine" xml:space="preserve">
     <value>TestStatistics() called with start line {0}</value>
@@ -602,7 +604,9 @@
     <value>Error while selecting line: {0}</value>
   </data>
   <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
-    <value>Exception while filtering. Please report to developer: \n\n{0}\n\n{1}</value>
+    <value>Exception while filtering. Please report to developer: 
+{0}
+{1}</value>
   </data>
   <data name="LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration" xml:space="preserve">
     <value>Single threaded filter duration: {0} ms.</value>
@@ -872,10 +876,11 @@
     <value>(Invert match)</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
-    <value>\nColumn restrict</value>
+    <value>
+Column restrict</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
-    <value>Filter: \"{0}\"{1}{3}</value>
+    <value>Filter: {0} {1}{2}</value>
   </data>
   <data name="LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard" xml:space="preserve">
     <value>Clipboard</value>
@@ -953,7 +958,8 @@
     <value>Font</value>
   </data>
   <data name="SettingsDialog_UI_Label_ToolsDescription" xml:space="preserve">
-    <value>You can configure as many tools as you want. \r\nChecked tools will appear in the icon bar. All other tools are available in the tools menu.</value>
+    <value>You can configure as many tools as you want.
+Checked tools will appear in the icon bar. All other tools are available in the tools menu.</value>
   </data>
   <data name="SettingsDialog_UI_Label_WorkingDir" xml:space="preserve">
     <value>Working dir:</value>
@@ -977,13 +983,13 @@
     <value>Pattern:</value>
   </data>
   <data name="SettingsDialog_UI_Label_HintMultiFile" xml:space="preserve">
-    <value>Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.";</value>
+    <value>Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.</value>
   </data>
   <data name="SettingsDialog_UI_Label_NoteMultifile" xml:space="preserve">
     <value>Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (&lt;filename&gt;, &lt;filename&gt;.1, &lt;filename&gt;.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.</value>
   </data>
   <data name="SettingsDialog_UI_Label_SessionSaveOwnDir" xml:space="preserve">
-    <value>sessionSaveOwnDirLabel</value>
+    <value>Place Holder Text, this will be replaced programmatically</value>
   </data>
   <data name="SettingsDialog_UI_Label_FilePollingInterval" xml:space="preserve">
     <value>File polling interval (ms):</value>

@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text;
 
 using LogExpert.Core.Classes;
@@ -22,6 +23,7 @@ internal partial class SettingsDialog : Form
 
     private readonly Image _emptyImage = new Bitmap(16, 16);
     private readonly LogTabWindow _logTabWin;
+    private const string DEFAULT_FONT_NAME = "Courier New";
 
     private ILogExpertPluginConfigurator _selectedPlugin;
     private ToolEntry _selectedTool;
@@ -178,7 +180,7 @@ internal partial class SettingsDialog : Form
 
         if (Preferences.FontName == null)
         {
-            Preferences.FontName = "Courier New";
+            Preferences.FontName = DEFAULT_FONT_NAME;
         }
 
         if (Math.Abs(Preferences.FontSize) < 0.1)
@@ -232,13 +234,13 @@ internal partial class SettingsDialog : Form
             case SessionSaveLocation.OwnDir:
                 {
                     radioButtonSessionSaveOwn.Checked = true;
+                    break;
                 }
-                break;
             case SessionSaveLocation.SameDir:
                 {
                     radioButtonSessionSameDir.Checked = true;
+                    break;
                 }
-                break;
             case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
@@ -249,6 +251,12 @@ internal partial class SettingsDialog : Form
                     radioButtonSessionApplicationStartupDir.Checked = true;
                     break;
                 }
+            case SessionSaveLocation.LoadedSessionFile:
+                // intentionally left blank
+                break;
+            default:
+                // intentionally left blank
+                break;
         }
 
         //overwrite preferences save location in portable mode to always be application startup directory
@@ -297,7 +305,7 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = Preferences.FontName + @" " + (int)Preferences.FontSize;
+        labelFont.Text = $"{Preferences.FontName} {(int)Preferences.FontSize}";
         labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
     }
 
@@ -322,7 +330,7 @@ internal partial class SettingsDialog : Form
         Preferences.MultiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
     }
 
-    private void OnBtnToolClickInternal (TextBox textBox)
+    private static void OnBtnToolClickInternal (TextBox textBox)
     {
         OpenFileDialog dlg = new()
         {
@@ -358,7 +366,7 @@ internal partial class SettingsDialog : Form
         }
     }
 
-    private void OnBtnWorkingDirClick (TextBox textBox)
+    private static void OnBtnWorkingDirClick (TextBox textBox)
     {
         FolderBrowserDialog dlg = new()
         {
@@ -389,7 +397,7 @@ internal partial class SettingsDialog : Form
         }
     }
 
-    private void FillColumnizerForToolsList (ComboBox comboBox, string columnizerName)
+    private static void FillColumnizerForToolsList (ComboBox comboBox, string columnizerName)
     {
         var selIndex = 0;
         comboBox.Items.Clear();
@@ -629,6 +637,9 @@ internal partial class SettingsDialog : Form
                     radioButtonAskWhatToDo.Checked = true;
                     break;
                 }
+            default:
+                //intentionally left blank
+                break;
         }
 
         textBoxMultifilePattern.Text = Preferences.MultiFileOptions.FormatPattern; //TODO: Impport settings file throws an exception. Fix or I caused it?
@@ -742,18 +753,11 @@ internal partial class SettingsDialog : Form
         Preferences.FilterTail = checkBoxFilterTail.Checked;
         Preferences.FollowTail = checkBoxFollowTail.Checked;
 
-        if (radioButtonVerticalMouseDrag.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Vertical;
-        }
-        else if (radioButtonVerticalMouseDragInverted.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.InvertedVertical;
-        }
-        else
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Horizontal;
-        }
+        Preferences.TimestampControlDragOrientation = radioButtonVerticalMouseDrag.Checked
+            ? DragOrientationsEnum.Vertical
+            : radioButtonVerticalMouseDragInverted.Checked
+                ? DragOrientationsEnum.InvertedVertical
+                : DragOrientationsEnum.Horizontal;
 
         SaveColumnizerList();
 
@@ -772,22 +776,13 @@ internal partial class SettingsDialog : Form
         Preferences.SaveSessions = checkBoxSaveSessions.Checked;
         Preferences.SessionSaveDirectory = labelSessionSaveOwnDir.Text;
 
-        if (radioButtonsessionSaveDocuments.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.DocumentsDir;
-        }
-        else if (radioButtonSessionSaveOwn.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.OwnDir;
-        }
-        else if (radioButtonSessionApplicationStartupDir.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.ApplicationStartupDir;
-        }
-        else
-        {
-            Preferences.SaveLocation = SessionSaveLocation.SameDir;
-        }
+        Preferences.SaveLocation = radioButtonsessionSaveDocuments.Checked
+            ? SessionSaveLocation.DocumentsDir
+            : radioButtonSessionSaveOwn.Checked
+                ? SessionSaveLocation.OwnDir
+                : radioButtonSessionApplicationStartupDir.Checked
+                    ? SessionSaveLocation.ApplicationStartupDir
+                    : SessionSaveLocation.SameDir;
 
         Preferences.SaveFilters = checkBoxSaveFilter.Checked;
         Preferences.BufferCount = (int)upDownBlockCount.Value;
@@ -954,6 +949,19 @@ internal partial class SettingsDialog : Form
                         File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
                         break;
                     }
+
+                case CheckState.Unchecked:
+                    //intentionally left blank
+                    break;
+                case CheckState.Checked:
+                    //intentionally left blank
+                    break;
+                case CheckState.Indeterminate:
+                    //intentionally left blank
+                    break;
+                default:
+                    //intentionally left blank
+                    break;
             }
 
             switch (checkBoxPortableMode.CheckState)
@@ -964,16 +972,27 @@ internal partial class SettingsDialog : Form
                         Preferences.PortableMode = false;
                         break;
                     }
-
                 case CheckState.Checked:
                     {
                         Preferences.PortableMode = true;
                         checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
                         break;
                     }
+                case CheckState.Indeterminate:
+                    //intentionally left blank
+                    break;
+                default:
+                    //intentionally left blank
+                    break;
             }
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is UnauthorizedAccessException
+                                                    or IOException
+                                                    or ArgumentException
+                                                    or ArgumentNullException
+                                                    or PathTooLongException
+                                                    or DirectoryNotFoundException
+                                                    or NotSupportedException)
         {
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.Title_LogExpert_Error, MessageBoxButtons.OK);
         }
@@ -1145,7 +1164,12 @@ internal partial class SettingsDialog : Form
             {
                 fileInfo = new FileInfo(dlg.FileName);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is ArgumentException
+                                          or ArgumentNullException
+                                          or PathTooLongException
+                                          or SecurityException
+                                          or NotSupportedException
+                                          or UnauthorizedAccessException)
             {
                 _ = MessageBox.Show(this, string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Error_SettingsCouldNotBeImported, ex), Resources.Title_LogExpert_Error);
                 return;

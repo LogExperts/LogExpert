@@ -398,7 +398,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error during add of entry.\r\n{0}.
+        ///   Looks up a localized string similar to Error during add of entry.
+        ///{0}.
         /// </summary>
         public static string HighlightDialog_UI_ErrorDuringAddOfHighLightEntry {
             get {
@@ -818,7 +819,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to \nColumn restrict.
+        ///   Looks up a localized string similar to 
+        ///Column restrict.
         /// </summary>
         public static string LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict {
             get {
@@ -827,7 +829,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter: \&quot;{0}\&quot;{1}{3}.
+        ///   Looks up a localized string similar to Filter: {0} {1}{2}.
         /// </summary>
         public static string LogTabWindow_UI_LogWindow_ToolTip_Filter {
             get {
@@ -1673,7 +1675,9 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exception while filtering. Please report to developer: \n\n{0}\n\n{1}.
+        ///   Looks up a localized string similar to Exception while filtering. Please report to developer: 
+        ///{0}
+        ///{1}.
         /// </summary>
         public static string LogWindow_UI_Filter_ExceptionWhileFiltering {
             get {
@@ -1790,7 +1794,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot load file\n{0}.
+        ///   Looks up a localized string similar to Cannot load file
+        ///{0}.
         /// </summary>
         public static string LogWindow_UI_LoadFile_CannotLoadFile {
             get {
@@ -3163,7 +3168,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.&quot;;.
+        ///   Looks up a localized string similar to Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa..
         /// </summary>
         public static string SettingsDialog_UI_Label_HintMultiFile {
             get {
@@ -3253,7 +3258,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to sessionSaveOwnDirLabel.
+        ///   Looks up a localized string similar to Place Holder Text, this will be replaced programmatically.
         /// </summary>
         public static string SettingsDialog_UI_Label_SessionSaveOwnDir {
             get {
@@ -3289,7 +3294,8 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You can configure as many tools as you want. \r\nChecked tools will appear in the icon bar. All other tools are available in the tools menu..
+        ///   Looks up a localized string similar to You can configure as many tools as you want.
+        ///Checked tools will appear in the icon bar. All other tools are available in the tools menu..
         /// </summary>
         public static string SettingsDialog_UI_Label_ToolsDescription {
             get {
