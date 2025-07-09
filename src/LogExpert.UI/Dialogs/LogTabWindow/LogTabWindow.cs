@@ -2249,7 +2249,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             var o = e.Data.GetData(DataFormats.FileDrop);
             if (o is string[] names)
             {
-                LoadFiles(names, (e.KeyState & 4) == 4); // (shift pressed?)
+                // (shift pressed) https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.drageventargs.keystate
+                LoadFiles(names, (e.KeyState & 4) == 4);
                 e.Effect = DragDropEffects.Copy;
             }
         }

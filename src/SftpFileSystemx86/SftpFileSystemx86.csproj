@@ -7,6 +7,7 @@
     <AssemblyName>SftpFileSystem</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>SftpFileSystemx86</AssemblyTitle>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\pluginsx86</OutputPath>
   </PropertyGroup>
@@ -48,11 +49,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
+    <PackageReference Include="SSH.NET" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SSH.NET" />
+    <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
+    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" />
   </ItemGroup>
 </Project>

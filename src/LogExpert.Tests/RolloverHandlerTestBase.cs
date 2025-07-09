@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-
 using LogExpert.Core.Classes.Log;
 
 namespace LogExpert.Tests;
@@ -60,6 +56,7 @@ internal class RolloverHandlerTestBase
         LinkedList<string>.Enumerator nextEnumerator = fileList.GetEnumerator();
         nextEnumerator.MoveNext(); // move on 2nd entry
         enumerator.MoveNext();
+
         while (nextEnumerator.MoveNext())
         {
             File.Move(nextEnumerator.Current, enumerator.Current);
@@ -98,7 +95,7 @@ internal class RolloverHandlerTestBase
         {
             for (var i = 1; i <= lineCount; ++i)
             {
-                writer.WriteLine("Line number " + i.ToString("D3") + " of File " + fullName);
+                writer.WriteLine($"Line number {i:D3} of File {fullName}");
             }
 
             writer.Flush();

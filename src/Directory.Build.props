@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>8.2.0</Version>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <FileVersion>2.0.0.0</FileVersion>
-    <InformationalVersion>2.0.0.0-rc1</InformationalVersion>
+    <Version>1.20.0.0</Version>
+    <AssemblyVersion>1.20.0.0</AssemblyVersion>
+    <FileVersion>1.20.0.0</FileVersion>
+    <InformationalVersion>1.20.0.0</InformationalVersion>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
     <Company>Log Expert</Company>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -25,8 +25,25 @@
     <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
     <EnableWindowsTargeting>false</EnableWindowsTargeting>
 
-    <AssemblyTitle>FIX ME - AssemblyTitle!</AssemblyTitle>
-    <Description>FIX ME - Description!</Description>
+    <AssemblyTitle>LogExpert</AssemblyTitle>
+    <Description>
+      LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
+
+      Summary of (most) features:
+
+      * Tail mode
+      * MDI-Interface with Tabs
+      * Search function (including RegEx)
+      * Bookmarks
+      * A very flexible filter view and possibility to filter to tab
+      * Highlighting lines via search criteria
+      * Triggers (e.g. create Bookmark or execute a plugin) via search criteria
+      * Columnizers: Plugins which split log lines into columns
+      * Unicode support
+      * log4j XML file support
+      * 3rd party plugin support
+      * Plugin API for more log file data sources
+    </Description>
   </PropertyGroup>
 
   <ItemGroup Label="Links">

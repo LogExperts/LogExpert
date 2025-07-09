@@ -7,6 +7,7 @@
     <AssemblyName>SftpFileSystem</AssemblyName>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
     <AssemblyTitle>SftpFileSystem</AssemblyTitle>
   </PropertyGroup>
@@ -17,14 +18,6 @@
 
   <ItemGroup>
     <PackageReference Include="SSH.NET" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="SftpFileSystemSSHDotNET.cs" />
-    <Compile Remove="SftpLogFileInfoSharpSSH.cs" />
-    <Compile Remove="SftpLogFileInfoSSHDotNET.cs" />
-    <Compile Remove="SftpStreamSharpSSH.cs" />
-    <Compile Remove="SharpSshUserInfo.cs" />
   </ItemGroup>
 
 </Project>

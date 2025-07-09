@@ -24,7 +24,7 @@ Summary of (most) features:
 * Portable (all options / settings saved in application startup directory)
 
 # Download
-Follow the [Link](https://github.com/zarunbal/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
+Follow the [Link](https://github.com/LogExperts/LogExpert/releases/latest) and download the latest package. Just extract it where you want and execute the application or download the Setup and install it
 
 Or Install via chocolatey
 
@@ -62,7 +62,7 @@ Please checkout the wiki for FAQ / HELP / Informations / Examples
 - dont use AutoScaleMode for single GUI controls like Buttons etc.
 - dont use AutoScaleDimensions for single GUI controls like Buttons etc.
 
-https://github.com/zarunbal/LogExpert/wiki
+https://github.com/LogExperts/LogExpert/wiki
 
 # Discord Server
 https://discord.gg/SjxkuckRe9
@@ -71,8 +71,8 @@ https://discord.gg/SjxkuckRe9
 ### Contributors
 
 This project exists thanks to all the people who contribute.
-<a href="https://github.com/zarunbal/LogExpert/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=zarunbal/LogExpert" />
+<a href="https://github.com/LogExperts/LogExpert/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=LogExperts/LogExpert" />
 </a>
 
 Made with [contrib.rocks](https://contrib.rocks).

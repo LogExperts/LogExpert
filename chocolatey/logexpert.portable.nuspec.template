@@ -4,13 +4,13 @@
     <id>logexpert</id>
     <version>##version##</version>
     <title>LogExpert</title>
-    <authors>Zarunbal Previous:Hagen Raab</authors>
-    <owners>Zarunbal</owners>
-    <licenseUrl>https://cdn.rawgit.com/zarunbal/LogExpert/v##version##/LICENSE</licenseUrl>
-    <packageSourceUrl>https://github.com/zarunbal/LogExpert/tree/master/chocolatey</packageSourceUrl>
-    <projectUrl>https://github.com/zarunbal/LogExpert</projectUrl>
-    <bugTrackerUrl>https://github.com/zarunbal/LogExpert/issues</bugTrackerUrl>
-    <releaseNotes>https://github.com/zarunbal/LogExpert/releases/tag/v##version##</releaseNotes>
+    <authors>Zarunbal, Hagen Raab, Hirogen, RandallFlagg and others</authors>
+    <owners>Zarunbal, Hirogen</owners>
+    <licenseUrl>https://raw.githubusercontent.com/LogExperts/LogExpert/v##version##/LICENSE</licenseUrl>
+    <packageSourceUrl>https://github.com/LogExperts/LogExpert/tree/master/chocolatey</packageSourceUrl>
+    <projectUrl>https://github.com/LogExperts/LogExpert</projectUrl>
+    <bugTrackerUrl>https://github.com/LogExperts/LogExpert/issues</bugTrackerUrl>
+    <releaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v##version##</releaseNotes>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>LogExpert is a Windows tail program (a GUI replacement for the Unix tail command).
 
@@ -37,6 +37,9 @@ Summary of (most) features:
     <summary>LogExpert is log file viewing for the Pros.</summary>
     <copyright>Original work Copyright (c) 2011 Hagen Raab, Modified work Copyright (c) 2017 Zarunbal</copyright>
     <tags>LogExpert windows tail logging viewer troubleshooting</tags>
+	<dependencies>
+		<dependency id="dotnet-desktopruntime" version="[8.0,)" />
+	</dependencies>
   </metadata>
   <files>
         <file src="tools\**" target="tools" />        

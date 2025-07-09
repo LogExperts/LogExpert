@@ -1,12 +1,8 @@
-﻿using LogExpert.Core.Classes.Columnizer;
+using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
 
 using NUnit.Framework;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace LogExpert.Tests;
 
@@ -17,12 +13,12 @@ public class SquareBracketColumnizerTest
     [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5)]
     [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6)]
     [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3)]
-    public void GetPriority_HappyFile_ColumnCountMatches(string fileName, int count)
+    public void GetPriority_HappyFile_ColumnCountMatches (string fileName, int count)
     {
         SquareBracketColumnizer squareBracketColumnizer = new();
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         logFileReader.ReadFiles();
         List<ILogLine> loglines = new()
         {

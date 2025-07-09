@@ -1,8 +1,3 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
-
 using LogExpert;
 
 using Renci.SshNet;
@@ -10,7 +5,7 @@ using Renci.SshNet.Sftp;
 
 namespace SftpFileSystem;
 
-internal class SftpLogFileInfo : ILogFileInfo
+public class SftpLogFileInfo : ILogFileInfo
 {
     #region Static/Constants
     //TODO Add to Options
@@ -33,10 +28,10 @@ internal class SftpLogFileInfo : ILogFileInfo
 
     #region Ctor
 
-    internal SftpLogFileInfo (SftpFileSystem sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
+    public SftpLogFileInfo (SftpFileSystem sftpFileSystem, Uri fileUri, ILogExpertLogger logger)
     {
         _logger = logger;
-        SftpFileSystem sftFileSystem = sftpFileSystem;
+        var sftFileSystem = sftpFileSystem;
         Uri = fileUri;
         _remoteFileName = Uri.PathAndQuery;
 
@@ -51,7 +46,7 @@ internal class SftpLogFileInfo : ILogFileInfo
                 while (sftFileSystem.PrivateKeyFile == null)
                 {
                     PrivateKeyPasswordDialog dlg = new();
-                    DialogResult dialogResult = dlg.ShowDialog();
+                    var dialogResult = dlg.ShowDialog();
                     if (dialogResult == DialogResult.Cancel)
                     {
                         cancelled = true;
@@ -74,7 +69,7 @@ internal class SftpLogFileInfo : ILogFileInfo
             if (cancelled == false)
             {
                 success = false;
-                Credentials credentials = sftFileSystem.GetCredentials(Uri, true, true);
+                var credentials = sftFileSystem.GetCredentials(Uri, true, true);
                 while (success == false)
                 {
                     //Add ConnectionInfo object
@@ -89,7 +84,7 @@ internal class SftpLogFileInfo : ILogFileInfo
                     if (success == false)
                     {
                         FailedKeyDialog dlg = new();
-                        DialogResult res = dlg.ShowDialog();
+                        var res = dlg.ShowDialog();
                         dlg.Dispose();
                         if (res == DialogResult.Cancel)
                         {
@@ -111,7 +106,7 @@ internal class SftpLogFileInfo : ILogFileInfo
         if (success == false)
         {
             // username/password auth
-            Credentials credentials = sftFileSystem.GetCredentials(Uri, true, false);
+            var credentials = sftFileSystem.GetCredentials(Uri, true, false);
             _sftp = new SftpClient(Uri.Host, port, credentials.UserName, credentials.Password);
 
             if (_sftp == null)
@@ -153,12 +148,9 @@ internal class SftpLogFileInfo : ILogFileInfo
         {
             var full = FullName;
             var i = full.LastIndexOf(DirectorySeparatorChar);
-            if (i != -1)
-            {
-                return full.Substring(0, i);
-            }
-
-            return ".";
+            return i != -1
+                ? full[..i]
+                : ".";
         }
     }
 
@@ -188,7 +180,7 @@ internal class SftpLogFileInfo : ILogFileInfo
         {
             var full = FullName;
             var i = full.LastIndexOf(DirectorySeparatorChar);
-            return full.Substring(i + 1);
+            return full[(i + 1)..];
         }
     }
 
@@ -209,18 +201,12 @@ internal class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            TimeSpan diff = DateTime.Now - _lastChange;
-            if (diff.TotalSeconds < 4)
-            {
-                return 400;
-            }
-
-            if (diff.TotalSeconds < 30)
-            {
-                return (int)diff.TotalSeconds * 100;
-            }
-
-            return 5000;
+            var diff = DateTime.Now - _lastChange;
+            return diff.TotalSeconds < 4
+                ? 400
+                : diff.TotalSeconds < 30
+                    ? (int)diff.TotalSeconds * 100
+                    : 5000;
         }
     }
 

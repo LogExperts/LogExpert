@@ -1,11 +1,12 @@
-﻿using JsonColumnizer;
+using JsonColumnizer;
+
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
+
 using Moq;
+
 using NUnit.Framework;
-using System;
-using System.IO;
 
 namespace LogExpert.Tests;
 
@@ -19,7 +20,7 @@ public class ColumnizerPickerTest
     [TestCase("Square Bracket Columnizer", "30/08/2018 08:51:42.712 [TRACE]     hello", "30/08/2018 08:51:42.712 [DATAIO][]    world", null, null, null)]
     [TestCase("Square Bracket Columnizer", "", "30/08/2018 08:51:42.712 [TRACE]    hello", "30/08/2018 08:51:42.712 [TRACE]    hello", "[DATAIO][b][c] world", null)]
     [TestCase("Timestamp Columnizer", "30/08/2018 08:51:42.712 no bracket 1", "30/08/2018 08:51:42.712 no bracket 2", "30/08/2018 08:51:42.712 [TRACE]    with bracket 1", "30/08/2018 08:51:42.712 [TRACE]    with bracket 2", "no bracket 3")]
-    public void FindColumnizer_ReturnCorrectColumnizer(string expectedColumnizerName, string line0, string line1, string line2, string line3, string line4)
+    public void FindColumnizer_ReturnCorrectColumnizer (string expectedColumnizerName, string line0, string line1, string line2, string line3, string line4)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "test");
 
@@ -62,11 +63,11 @@ public class ColumnizerPickerTest
 
     [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer))]
     [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", typeof(SquareBracketColumnizer))]
-    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer(
+    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (
         string fileName, Type columnizerType)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
 
         Mock<ILogLineColumnizer> autoColumnizer = new();
@@ -80,7 +81,7 @@ public class ColumnizerPickerTest
     }
 
     [TestCase(@".\TestData\FileNotExists.txt", typeof(DefaultLogfileColumnizer))]
-    public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer(
+    public void DecideColumnizerByName_WhenReaderIsNotReady_ReturnCorrectColumnizer (
         string fileName, Type columnizerType)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
@@ -94,7 +95,7 @@ public class ColumnizerPickerTest
 
     [TestCase(@"Invalid Name", typeof(DefaultLogfileColumnizer))]
     [TestCase(@"JSON Columnizer", typeof(JsonColumnizer.JsonColumnizer))]
-    public void DecideColumnizerByName_ValidTextFile_ReturnCorrectColumnizer(
+    public void DecideColumnizerByName_ValidTextFile_ReturnCorrectColumnizer (
         string columnizerName, Type columnizerType)
     {
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, columnizerName);

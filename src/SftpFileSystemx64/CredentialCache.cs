@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace SftpFileSystem;
 
 internal class CredentialCache
@@ -14,7 +12,7 @@ internal class CredentialCache
 
     private void RemoveCredentials (string host, string user)
     {
-        Credentials credentials = GetCredentials(host, user);
+        var credentials = GetCredentials(host, user);
         if (credentials != null)
         {
             _credList.Remove(credentials);
@@ -27,9 +25,9 @@ internal class CredentialCache
     {
         IList<string> result = [];
 
-        foreach (Credentials cred in _credList)
+        foreach (var cred in _credList)
         {
-            if (cred.Host.Equals(host, System.StringComparison.Ordinal))
+            if (cred.Host.Equals(host, StringComparison.Ordinal))
             {
                 result.Add(cred.UserName);
             }
@@ -40,9 +38,9 @@ internal class CredentialCache
 
     internal Credentials GetCredentials (string host, string user)
     {
-        foreach (Credentials cred in _credList)
+        foreach (var cred in _credList)
         {
-            if (cred.Host.Equals(host, System.StringComparison.Ordinal) && cred.UserName.Equals(user, System.StringComparison.Ordinal))
+            if (cred.Host.Equals(host, StringComparison.Ordinal) && cred.UserName.Equals(user, StringComparison.Ordinal))
             {
                 return cred;
             }

@@ -24,7 +24,7 @@ internal partial class AboutBox : Form
         InitializeComponent();
 
         LoadResources();
-
+        usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
 
         Text = $@"About {AssemblyTitle}";
@@ -32,7 +32,7 @@ internal partial class AboutBox : Form
         labelVersion.Text = AssemblyVersion;
         labelCopyright.Text = AssemblyCopyright;
         var link = "https://github.com/LogExperts/LogExpert";
-        linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
+        _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
         LoadUsedComponents();
     }
 
@@ -44,6 +44,7 @@ internal partial class AboutBox : Form
         var usedComponents = JsonConvert.DeserializeObject<UsedComponents[]>(json);
         usedComponents = usedComponents?.OrderBy(x => x.PackageId).ToArray();
         usedComponentsDataGrid.DataSource = usedComponents;
+
     }
 
 
@@ -64,7 +65,7 @@ internal partial class AboutBox : Form
             if (attributes.Length > 0)
             {
                 var titleAttribute = (AssemblyTitleAttribute)attributes[0];
-                if (titleAttribute.Title != string.Empty)
+                if (!string.IsNullOrEmpty(titleAttribute.Title))
                 {
                     return titleAttribute.Title;
                 }
@@ -77,20 +78,11 @@ internal partial class AboutBox : Form
     {
         get
         {
-            AssemblyName assembly = _assembly.GetName();
+            var assembly = _assembly.GetName();
 
-            if (assembly.Version != null)
-            {
-                var version = $"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}.{assembly.Version.Revision}";
-                if (assembly.Version.Revision >= 9000)
-                {
-                    version += " Testrelease";
-                }
-
-                return version;
-            }
-
-            return "0.0.0.0";
+            return assembly.Version != null
+                ? $"{assembly.Version.Major}.{assembly.Version.Minor}.{assembly.Version.Build}.{assembly.Version.Revision}"
+                : "0.0.0.0";
         }
 
     }
@@ -101,11 +93,9 @@ internal partial class AboutBox : Form
         {
             var attributes = _assembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
 
-            if (attributes.Length == 0)
-            {
-                return string.Empty;
-            }
-            return ((AssemblyDescriptionAttribute)attributes[0]).Description;
+            return attributes.Length == 0
+                ? string.Empty
+                : ((AssemblyDescriptionAttribute)attributes[0]).Description;
         }
     }
 
@@ -114,11 +104,9 @@ internal partial class AboutBox : Form
         get
         {
             var attributes = _assembly.GetCustomAttributes(typeof(AssemblyProductAttribute), false);
-            if (attributes.Length == 0)
-            {
-                return string.Empty;
-            }
-            return ((AssemblyProductAttribute)attributes[0]).Product;
+            return attributes.Length == 0
+                ? string.Empty
+                : ((AssemblyProductAttribute)attributes[0]).Product;
         }
     }
 
@@ -127,11 +115,9 @@ internal partial class AboutBox : Form
         get
         {
             var attributes = _assembly.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            if (attributes.Length == 0)
-            {
-                return string.Empty;
-            }
-            return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+            return attributes.Length == 0
+                ? string.Empty
+                : ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
         }
     }
 
@@ -148,7 +134,7 @@ internal partial class AboutBox : Form
             target = e.Link.LinkData as string;
         }
 
-        Process.Start(new ProcessStartInfo
+        _ = Process.Start(new ProcessStartInfo
         {
             UseShellExecute = true,
             FileName = target,

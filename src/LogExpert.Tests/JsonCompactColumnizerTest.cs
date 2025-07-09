@@ -1,11 +1,7 @@
-﻿using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
 
 using NUnit.Framework;
-
-using System;
-using System.Collections.Generic;
-using System.IO;
 
 namespace LogExpert.Tests;
 
@@ -16,11 +12,11 @@ public class JsonCompactColumnizerTest
     // As long as the json file contains one of the pre-defined key, it's perfectly supported.
     [TestCase(@".\TestData\JsonCompactColumnizerTest_02.json", Priority.PerfectlySupport)]
     [TestCase(@".\TestData\JsonCompactColumnizerTest_03.json", Priority.WellSupport)]
-    public void GetPriority_HappyFile_PriorityMatches(string fileName, Priority priority)
+    public void GetPriority_HappyFile_PriorityMatches (string fileName, Priority priority)
     {
         var jsonCompactColumnizer = new JsonColumnizer.JsonCompactColumnizer();
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         logFileReader.ReadFiles();
         List<ILogLine> loglines = new()
         {

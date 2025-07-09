@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -83,11 +82,13 @@ public class RolloverFilenameBuilder
                 {
                 }
             }
+
             _indexGroup = match.Groups["index"];
             if (_indexGroup.Success)
             {
                 Index = _indexGroup.Value.Length > 0 ? int.Parse(_indexGroup.Value) : 0;
             }
+
             _condGroup = match.Groups["cond"];
         }
     }

@@ -1,4 +1,4 @@
-﻿using System.Runtime.Versioning;
+using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -27,7 +27,7 @@ partial class AboutBox
     /// Required method for Designer support - do not modify
     /// the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
+    private void InitializeComponent ()
     {
         tableLayoutPanel = new TableLayoutPanel();
         logoPictureBox = new PictureBox();
@@ -158,6 +158,7 @@ partial class AboutBox
         // 
         usedComponentsDataGrid.AllowUserToAddRows = false;
         usedComponentsDataGrid.AllowUserToDeleteRows = false;
+        usedComponentsDataGrid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
         usedComponentsDataGrid.BackgroundColor = SystemColors.Control;
         usedComponentsDataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
         usedComponentsDataGrid.Dock = DockStyle.Fill;

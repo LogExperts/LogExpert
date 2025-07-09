@@ -1,10 +1,7 @@
-﻿using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
 
 using NUnit.Framework;
-
-using System;
-using System.IO;
 
 namespace LogExpert.Tests;
 
@@ -12,11 +9,11 @@ namespace LogExpert.Tests;
 public class JsonColumnizerTest
 {
     [TestCase(@".\TestData\JsonColumnizerTest_01.txt", "time @m level")]
-    public void GetColumnNames_HappyFile_ColumnNameMatches(string fileName, string expectedHeaders)
+    public void GetColumnNames_HappyFile_ColumnNameMatches (string fileName, string expectedHeaders)
     {
         var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
         var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), false, PluginRegistry.PluginRegistry.Instance);
         reader.ReadFiles();
 
         ILogLine line = reader.GetLogLine(0);

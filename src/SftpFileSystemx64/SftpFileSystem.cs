@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Windows.Forms;
 using System.Xml.Serialization;
 
 using LogExpert;
@@ -19,7 +15,7 @@ public class SftpFileSystem (IFileSystemCallback callback) : IFileSystemPlugin, 
 
     private ConfigDialog _configDialog;
     private volatile PrivateKeyFile _privateKeyFile;
-    private object _lock = new object();
+    private readonly object _lock = new();
 
     #endregion
 
@@ -187,7 +183,7 @@ public class SftpFileSystem (IFileSystemCallback callback) : IFileSystemPlugin, 
                 }
             }
 
-            IList<string> usersForHost = CredentialsCache.GetUsersForHost(uri.Host);
+            var usersForHost = CredentialsCache.GetUsersForHost(uri.Host);
             if (userName == null && cacheAllowed)
             {
                 if (usersForHost.Count == 1)
@@ -198,7 +194,7 @@ public class SftpFileSystem (IFileSystemCallback callback) : IFileSystemPlugin, 
 
             if (userName != null && password == null && cacheAllowed)
             {
-                Credentials cred = CredentialsCache.GetCredentials(uri.Host, userName);
+                var cred = CredentialsCache.GetCredentials(uri.Host, userName);
                 if (cred != null)
                 {
                     return cred;
