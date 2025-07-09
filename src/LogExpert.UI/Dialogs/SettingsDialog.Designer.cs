@@ -458,15 +458,15 @@ partial class SettingsDialog
         labelLanguage.Location = new Point(9, 175);
         labelLanguage.Margin = new Padding(4, 0, 4, 0);
         labelLanguage.Name = "labelLanguage";
-        labelLanguage.Size = new Size(98, 15);
+        labelLanguage.Size = new Size(187, 15);
         labelLanguage.TabIndex = 17;
-        labelLanguage.Text = "Default encoding";
+        labelLanguage.Text = "Default encoding (requires restart)";
         // 
         // comboBoxLanguage
         // 
         comboBoxLanguage.DropDownStyle = ComboBoxStyle.DropDownList;
         comboBoxLanguage.FormattingEnabled = true;
-        comboBoxLanguage.Location = new Point(115, 172);
+        comboBoxLanguage.Location = new Point(204, 172);
         comboBoxLanguage.Margin = new Padding(4, 5, 4, 5);
         comboBoxLanguage.Name = "comboBoxLanguage";
         comboBoxLanguage.Size = new Size(177, 23);
