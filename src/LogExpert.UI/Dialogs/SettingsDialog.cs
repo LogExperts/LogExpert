@@ -288,10 +288,11 @@ internal partial class SettingsDialog : Form
         FillToolListbox();
         FillMultifileSettings();
         FillEncodingList();
-
-        var temp = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        FillLanguageList();
 
         comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
+
         checkBoxMaskPrio.Checked = Preferences.MaskPrio;
         checkBoxAutoPick.Checked = Preferences.AutoPick;
         checkBoxAskCloseTabs.Checked = Preferences.AskForClose;
@@ -720,6 +721,14 @@ internal partial class SettingsDialog : Form
         comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
     }
 
+    private void FillLanguageList ()
+    {
+        comboBoxLanguage.Items.Clear();
+
+        _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("en-US").Name); // Add English as default
+        _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("de-DE").Name);
+    }
+
     #endregion
 
     #region Events handler
@@ -792,6 +801,7 @@ internal partial class SettingsDialog : Form
         Preferences.PollingInterval = (int)upDownPollingInterval.Value;
         Preferences.MultiThreadFilter = checkBoxMultiThread.Checked;
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
+        Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
         Preferences.UseLegacyReader = checkBoxLegacyReader.Checked;
 

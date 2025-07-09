@@ -1286,7 +1286,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
     <value>Notiz: Sie können immer alle Dateien als Multifile automatisch laden wenn die Dateien die Multidateien Namensregeln folgen (&lt;dateiname&gt;, &lt;dateiname&gt;.1, &lt;dateiname&gt;.2, ...). Wählen Sie hierfür 'Multidatei' vom Dateimenü aus nachdem die erste Datei geladen wurde.</value>
   </data>
   <data name="SettingsDialog_UI_Label_Language" xml:space="preserve">
-    <value>Sprache:</value>
+    <value>Sprache (benötigt neustart):</value>
   </data>
   <data name="SettingsDialog_UI_ComboBox_ToolTip_Language" xml:space="preserve">
     <value>Sprache des Userinterfaces</value>

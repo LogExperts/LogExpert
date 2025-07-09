@@ -3195,7 +3195,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Language:.
+        ///   Looks up a localized string similar to Language (requires restart):.
         /// </summary>
         public static string SettingsDialog_UI_Label_Language {
             get {

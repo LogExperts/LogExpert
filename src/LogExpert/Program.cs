@@ -73,6 +73,8 @@ internal static class Program
                 }
             }
 
+            SetCulture();
+
             _ = PluginRegistry.PluginRegistry.Instance.Create(ConfigManager.Instance.ConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             var pId = Process.GetCurrentProcess().SessionId;
@@ -167,6 +169,15 @@ internal static class Program
             _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficiantRights, se.Message), Resources.Title_LogExpert_Error);
             cts.Cancel();
         }
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void SetCulture ()
+    {
+        var defaultCulture = CultureInfo.GetCultureInfo(ConfigManager.Instance.Settings.Preferences.DefaultLanguage ?? "en-US");
+
+        CultureInfo.CurrentUICulture = defaultCulture;
+        CultureInfo.CurrentCulture = defaultCulture;
     }
 
     private static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance)

@@ -1289,7 +1289,7 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     <value>Settings imported</value>
   </data>
   <data name="SettingsDialog_UI_Label_Language" xml:space="preserve">
-    <value>Language:</value>
+    <value>Language (requires restart):</value>
   </data>
   <data name="SettingsDialog_UI_ComboBox_ToolTip_Language" xml:space="preserve">
     <value>Userinterface language</value>
