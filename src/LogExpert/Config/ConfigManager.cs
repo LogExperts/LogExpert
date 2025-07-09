@@ -332,24 +332,34 @@ public class ConfigManager : IConfigManager
                 SaveHighlightgroupsAsJSON(fileInfo, settings.Preferences.HighlightGroupList);
                 break;
             case SettingsFlags.None:
+                // No action required for SettingsFlags.None
                 break;
             case SettingsFlags.WindowPosition:
+                // No action required for SettingsFlags.WindowPosition
                 break;
             case SettingsFlags.FileHistory:
+                // No action required for SettingsFlags.FileHistory
                 break;
             case SettingsFlags.FilterList:
+                // No action required for SettingsFlags.FilterList
                 break;
             case SettingsFlags.RegexHistory:
+                // No action required for SettingsFlags.RegexHistory
                 break;
             case SettingsFlags.ToolSettings:
+                // No action required for SettingsFlags.ToolSettings
                 break;
             case SettingsFlags.GuiOrColors:
+                // No action required for SettingsFlags.GuiOrColors
                 break;
             case SettingsFlags.FilterHistory:
+                // No action required for SettingsFlags.FilterHistory
                 break;
             case SettingsFlags.All:
+                // No action required for SettingsFlags.All
                 break;
             case SettingsFlags.Settings:
+                // No action required for SettingsFlags.Settings
                 break;
             default:
                 break;
