@@ -306,11 +306,11 @@ internal static class PaintHelper
         {
             DataGridViewAdvancedCellBorderStyle.None => 0,
             DataGridViewAdvancedCellBorderStyle.InsetDouble or DataGridViewAdvancedCellBorderStyle.OutsetDouble => 2,
-            DataGridViewAdvancedCellBorderStyle.NotSet => throw new NotImplementedException(),
-            DataGridViewAdvancedCellBorderStyle.Single => throw new NotImplementedException(),
-            DataGridViewAdvancedCellBorderStyle.Inset => throw new NotImplementedException(),
-            DataGridViewAdvancedCellBorderStyle.Outset => throw new NotImplementedException(),
-            DataGridViewAdvancedCellBorderStyle.OutsetPartial => throw new NotImplementedException(),
+            DataGridViewAdvancedCellBorderStyle.NotSet => 1, // Default border size for NotSet
+            DataGridViewAdvancedCellBorderStyle.Single => 1, // Default border size for Single
+            DataGridViewAdvancedCellBorderStyle.Inset => 1, // Default border size for Inset
+            DataGridViewAdvancedCellBorderStyle.Outset => 1, // Default border size for Outset
+            DataGridViewAdvancedCellBorderStyle.OutsetPartial => 1, // Default border size for OutsetPartial
             _ => 1
         };
     }
