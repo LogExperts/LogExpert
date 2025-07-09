@@ -1208,7 +1208,7 @@
     <value>Ask what to do</value>
   </data>
   <data name="SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile" xml:space="preserve">
-    <value>Treat all files as one 'MultiFile</value>
+    <value>Treat all files as one MultiFile</value>
   </data>
   <data name="SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab" xml:space="preserve">
     <value>Load every file into a separate tab</value>
@@ -1274,7 +1274,7 @@
     <value>Export Settings to file</value>
   </data>
   <data name="SettingsDialog_UI_Filter_ExportSettings" xml:space="preserve">
-    <value>@"Settings {0}|All files {1}</value>
+    <value>Settings {0}|All files {1}</value>
   </data>
   <data name="SettingsDialog_UI_Error_SettingsCouldNotBeImported" xml:space="preserve">
     <value>Settings could not be imported: {0}</value>

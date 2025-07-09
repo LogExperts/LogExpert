@@ -2965,7 +2965,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to @&quot;Settings {0}|All files {1}.
+        ///   Looks up a localized string similar to Settings {0}|All files {1}.
         /// </summary>
         public static string SettingsDialog_UI_Filter_ExportSettings {
             get {
@@ -3406,7 +3406,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Treat all files as one &apos;MultiFile.
+        ///   Looks up a localized string similar to Treat all files as one MultiFile.
         /// </summary>
         public static string SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile {
             get {
