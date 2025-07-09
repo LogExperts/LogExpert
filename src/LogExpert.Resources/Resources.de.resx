@@ -862,4 +862,73 @@
   <data name="LogWindow_Logger_Error_LoadingBookmarks" xml:space="preserve">
     <value>Fehler während des Ladens der Lesezeichen {0}</value>
   </data>
+  <data name="LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer" xml:space="preserve">
+    <value>RegEx-Fehler während der Suche eines Columnizers: {0}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_InvertMatch" xml:space="preserve">
+    <value>(Invertiere Match)</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
+    <value>\nSpalten restriktion</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
+    <value>Filter: \"{0}\"{1}{3}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard" xml:space="preserve">
+    <value>Zwischenablage</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn" xml:space="preserve">
+    <value>Eingfügt am {0}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_EncodingIsNotValid" xml:space="preserve">
+    <value>Encoding {0} ist nicht valide</value>
+  </data>
+  <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
+    <value>Unzureichende Rechte {0}: {1} </value>
+  </data>
+  <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
+    <value>Fehler während {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
+    <value>linien</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
+    <value>Linien</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_ThePreferencesHaveChanged" xml:space="preserve">
+    <value>Die Einstellungen haben sich geändert</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection" xml:space="preserve">
+    <value>Starten eines externen Tools mit sysout Redirektion: {0} {1}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_StartingExternalTool" xml:space="preserve">
+    <value>Starten eines externen Tools: {0} {1}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
+    <value>-&gt;E</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate" xml:space="preserve">
+    <value>Das ist eine Test Fehlermeldung, geworfen durch einen Async Delegate</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
+    <value>Das ist eine Test Fehlermeldung, geworfen durch einen Hintergrund Thread</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogWindowForFileName" xml:space="preserve">
+    <value>Layoutdaten besitz ein nicht existierendes LogWindow für {0}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFormats" xml:space="preserve">
+    <value>Über Logexpert etwas ziehen. Formate: </value>
+  </data>
+  <data name="LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats" xml:space="preserve">
+    <value>Fallengelassene Formate: </value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventWhileDisposingEventIgnored" xml:space="preserve">
+    <value>Ein SyncModeChanged Event erhalten während Disposed wurde. Event wird Ignoriert.</value>
+  </data>
+  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+    <value>LogExpert Session {0}</value>
+  </data>
+  <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
+    <value>Das ist eine Test Fehlermeldung, geworfen durch den GUI Thread</value>
+  </data>
 </root>

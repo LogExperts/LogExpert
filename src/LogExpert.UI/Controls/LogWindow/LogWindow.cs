@@ -61,7 +61,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private readonly IList<FilterPipe> _filterPipeList = [];
     private readonly Dictionary<Control, bool> _freezeStateMap = [];
-    private readonly GuiStateArgs _guiStateArgs = new();
+    private readonly GuiStateEventArgs _guiStateArgs = new();
 
     private readonly List<int> _lineHashList = [];
 
@@ -292,7 +292,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public event EventHandler<StatusLineEventArgs> StatusLineEvent;
 
-    public event EventHandler<GuiStateArgs> GuiStateUpdate;
+    public event EventHandler<GuiStateEventArgs> GuiStateUpdate;
 
     public event TailFollowedEventHandler TailFollowed;
 
@@ -686,7 +686,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineEvent?.Invoke(this, e);
     }
 
-    protected void OnGuiState (GuiStateArgs e)
+    protected void OnGuiState (GuiStateEventArgs e)
     {
         GuiStateUpdate?.Invoke(this, e);
     }

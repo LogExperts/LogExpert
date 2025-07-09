@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 using System.Text;
 
@@ -34,6 +35,7 @@ internal partial class SettingsDialog : Form
         Preferences = prefs;
         _logTabWin = logTabWin; //TODO: uses only HighlightGroupList. Can we pass IList instead?
         InitializeComponent();
+        LoadResources();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -57,6 +59,118 @@ internal partial class SettingsDialog : Form
     #endregion
 
     #region Private Methods
+
+    private void LoadResources ()
+    {
+        labelWarningMaximumLineLength.Text = Resources.SettingsDialog_UI_Label_WarningMaximumLineLength;
+        labelMaximumLineLength.Text = Resources.SettingsDialog_UI_Label_MaximumLineLengthRestartRequired;
+        labelMaximumFilterEntriesDisplayed.Text = Resources.SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed;
+        labelMaximumFilterEntries.Text = Resources.SettingsDialog_UI_Label_MaximumFilterEntries;
+        labelDefaultEncoding.Text = Resources.SettingsDialog_UI_Label_DefaultEncoding;
+        groupBoxMisc.Text = Resources.SettingsDialog_UI_GroupBox_Misc;
+        checkBoxShowErrorMessageOnlyOneInstance.Text = Resources.SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance;
+        checkBoxColumnSize.Text = Resources.SettingsDialog_UI_CheckBox_ColumnSize;
+        buttonTailColor.Text = Resources.SettingsDialog_UI_Button_Color;
+        checkBoxTailState.Text = Resources.SettingsDialog_UI_CheckBox_TailState;
+        checkBoxOpenLastFiles.Text = Resources.SettingsDialog_UI_CheckBox_OpenLastFiles;
+        checkBoxSingleInstance.Text = Resources.SettingsDialog_UI_CheckBox_SingleInstance;
+        checkBoxAskCloseTabs.Text = Resources.SettingsDialog_UI_CheckBox_AskCloseTabs;
+        groupBoxDefaults.Text = Resources.SettingsDialog_UI_GroupBox_Defaults;
+        checkBoxDarkMode.Text = Resources.SettingsDialog_UI_CheckBox_DarkMode;
+        checkBoxFollowTail.Text = Resources.SettingsDialog_UI_CheckBox_FollowTail;
+        checkBoxColumnFinder.Text = Resources.SettingsDialog_UI_CheckBox_ColumnFinder;
+        checkBoxSyncFilter.Text = Resources.SettingsDialog_UI_CheckBox_SyncFilter;
+        checkBoxFilterTail.Text = Resources.SettingsDialog_UI_CheckBox_FilterTail;
+        groupBoxFont.Text = Resources.SettingsDialog_UI_GroupBox_Font;
+        buttonChangeFont.Text = Resources.SettingsDialog_UI_Button_ChangeFont;
+        labelFont.Text = Resources.SettingsDialog_UI_Label_Font;
+        tabPageViewSettings.Text = Resources.SettingsDialog_UI_TabPage_ViewSettings;
+        tabPageTimeStampFeatures.Text = Resources.SettingsDialog_UI_TabPage_TimestampFeatures;
+        groupBoxTimeSpreadDisplay.Text = Resources.SettingsDialog_UI_GroupBox_TimeSpreadDisplay;
+        groupBoxDisplayMode.Text = Resources.SettingsDialog_UI_GroupBox_DisplayMode;
+        radioButtonLineView.Text = Resources.SettingsDialog_UI_RadioButton_LineView;
+        radioButtonTimeView.Text = Resources.SettingsDialog_UI_RadioButton_TimeView;
+        checkBoxReverseAlpha.Text = Resources.SettingsDialog_UI_CheckBox_ReverseAlpha;
+        buttonTimespreadColor.Text = Resources.SettingsDialog_UI_Button_TimespreadColor;
+        checkBoxTimeSpread.Text = Resources.SettingsDialog_UI_CheckBox_TimeSpread;
+        groupBoxTimeStampNavigationControl.Text = Resources.SettingsDialog_UI_GroupBox_TimestampNavigationControl;
+        checkBoxTimestamp.Text = Resources.SettingsDialog_UI_CheckBox_Timestamp;
+        groupBoxMouseDragDefaults.Text = Resources.SettingsDialog_UI_GroupBox_MouseDragDefault;
+        radioButtonVerticalMouseDragInverted.Text = Resources.SettingsDialog_UI_RadioButton_VerticalMouseDragInverted;
+        radioButtonHorizMouseDrag.Text = Resources.SettingsDialog_UI_RadioButton_HorizMouseDrag;
+        radioButtonVerticalMouseDrag.Text = Resources.SettingsDialog_UI_RadioButton_VerticalMouseDrag;
+        tabPageExternalTools.Text = Resources.SettingsDialog_UI_TabPage_ExternalTools;
+        labelToolsDescription.Text = Resources.SettingsDialog_UI_Label_ToolsDescription;
+        buttonToolDelete.Text = Resources.SettingsDialog_UI_Button_ToolDelete;
+        buttonToolAdd.Text = Resources.SettingsDialog_UI_Button_ToolAdd;
+        buttonToolDown.Text = Resources.SettingsDialog_UI_Button_ToolDown;
+        buttonToolUp.Text = Resources.SettingsDialog_UI_Button_ToolUp;
+        groupBoxToolSettings.Text = Resources.SettingsDialog_UI_GroupBox_ToolSettings;
+        labelWorkingDir.Text = Resources.SettingsDialog_UI_Label_WorkingDir;
+        buttonWorkingDir.Text = Resources.SettingsDialog_UI_Button_WorkingDir;
+        buttonIcon.Text = Resources.SettingsDialog_UI_Button_Icon;
+        labelToolName.Text = Resources.SettingsDialog_UI_Label_ToolName;
+        labelToolColumnizerForOutput.Text = Resources.SettingsDialog_UI_Label_ToolColumnizerForOutput;
+        checkBoxSysout.Text = Resources.SettingsDialog_UI_CheckBox_Sysout;
+        buttonArguments.Text = Resources.SettingsDialog_UI_Button_Arguments;
+        labelTool.Text = Resources.SettingsDialog_UI_Label_Tool;
+        buttonTool.Text = Resources.SettingsDialog_UI_Button_Tool;
+        labelArguments.Text = Resources.SettingsDialog_UI_Label_Arguments;
+        tabPageColumnizers.Text = Resources.SettingsDialog_UI_TabPage_Columnizers;
+        checkBoxAutoPick.Text = Resources.SettingsDialog_UI_CheckBox_AutoPick;
+        checkBoxMaskPrio.Text = Resources.SettingsDialog_UI_CheckBox_MaskPrio;
+        buttonDelete.Text = Resources.SettingsDialog_UI_Button_Delete;
+        dataGridViewTextBoxColumnFileMask.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask;
+        dataGridViewComboBoxColumnColumnizer.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer;
+        tabPageHighlightMask.Text = Resources.SettingsDialog_UI_TabPage_Highlight;
+        dataGridViewTextBoxColumnFileName.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileName;
+        dataGridViewComboBoxColumnHighlightGroup.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup;
+        tabPageMultiFile.Text = Resources.SettingsDialog_UI_TabPage_MultiFile;
+        groupBoxDefaultFileNamePattern.Text = Resources.SettingsDialog_UI_GroupBox_DefaultFilenamePattern;
+        labelMaxDays.Text = Resources.SettingsDialog_UI_Label_MaxDays;
+        labelPattern.Text = Resources.SettingsDialog_UI_Label_Pattern;
+        labelHintMultiFile.Text = Resources.SettingsDialog_UI_Label_HintMultiFile;
+        labelNoteMultiFile.Text = Resources.SettingsDialog_UI_Label_NoteMultifile;
+        groupBoxWhenOpeningMultiFile.Text = Resources.SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles;
+        radioButtonAskWhatToDo.Text = Resources.SettingsDialog_UI_RadioButton_AskWhatToDo;
+        radioButtonTreatAllFilesAsOneMultifile.Text = Resources.SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile;
+        radioButtonLoadEveryFileIntoSeperatedTab.Text = Resources.SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab;
+        tabPagePlugins.Text = Resources.SettingsDialog_UI_TabPage_Plugins;
+        groupBoxPlugins.Text = Resources.SettingsDialog_UI_GroupBox_Plugins;
+        groupBoxSettings.Text = Resources.SettingsDialog_UI_GroupBox_Settings;
+        buttonConfigPlugin.Text = Resources.SettingsDialog_UI_Button_ConfigurePlugin;
+        tabPageSessions.Text = Resources.SettingsDialog_UI_TabPage_Sessions;
+        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_CheckBox_PortableMode;
+        checkBoxSaveFilter.Text = Resources.SettingsDialog_UI_CheckBox_SaveFilter;
+        groupBoxPersistantFileLocation.Text = Resources.SettingsDialog_UI_GroupBox_PersistenceFileLocation;
+        labelSessionSaveOwnDir.Text = Resources.SettingsDialog_UI_Label_SessionSaveOwnDir;
+        buttonSessionSaveDir.Text = Resources.SettingsDialog_UI_Button_SessionSaveDir;
+        radioButtonSessionSaveOwn.Text = Resources.SettingsDialog_UI_RadioButton_SessionSaveOwn;
+        radioButtonsessionSaveDocuments.Text = Resources.SettingsDialog_UI_RadioButton_SessionSaveDocuments;
+        radioButtonSessionSameDir.Text = Resources.SettingsDialog_UI_RadioButton_SessionSameDir;
+        radioButtonSessionApplicationStartupDir.Text = Resources.SettingsDialog_UI_RadioButton_SessionApplicationStartupDir;
+        checkBoxSaveSessions.Text = Resources.SettingsDialog_UI_CheckBox_SaveSessions;
+        tabPageMemory.Text = Resources.SettingsDialog_UI_TabPage_Memory;
+        groupBoxCPUAndStuff.Text = Resources.SettingsDialog_UI_GroupBox_CPUAndStuff;
+        checkBoxLegacyReader.Text = Resources.SettingsDialog_UI_CheckBox_LegacyReader;
+        checkBoxMultiThread.Text = Resources.SettingsDialog_UI_CheckBox_MultiThread;
+        labelFilePollingInterval.Text = Resources.SettingsDialog_UI_Label_FilePollingInterval;
+        groupBoxLineBufferUsage.Text = Resources.SettingsDialog_UI_GroupBox_LineBufferUsage;
+        labelInfo.Text = Resources.SettingsDialog_UI_Label_Info;
+        labelNumberOfBlocks.Text = Resources.SettingsDialog_UI_Label_NumberOfBlocks;
+        labelLinesPerBlock.Text = Resources.SettingsDialog_UI_Label_LinesPerBlock;
+        buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
+        buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
+        buttonExport.Text = Resources.LogExpert_Common_UI_Button_Export;
+        buttonImport.Text = Resources.LogExpert_Common_UI_Button_Import;
+        Text = Resources.SettingsDialog_Form_Text;
+
+        // ToolTips
+        toolTip.SetToolTip(comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_Encoding);
+        toolTip.SetToolTip(checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_PortableMode);
+        toolTip.SetToolTip(radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir);
+        toolTip.SetToolTip(checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_LegacyReader);
+    }
 
     private void FillDialog ()
     {
@@ -210,10 +324,12 @@ internal partial class SettingsDialog : Form
 
     private void OnBtnToolClickInternal (TextBox textBox)
     {
-        OpenFileDialog dlg = new();
-        dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        OpenFileDialog dlg = new()
+        {
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
 
-        if (string.IsNullOrEmpty(textBox.Text) == false)
+        if (!string.IsNullOrEmpty(textBox.Text))
         {
             FileInfo info = new(textBox.Text);
             if (info.Directory != null && info.Directory.Exists)
@@ -247,7 +363,7 @@ internal partial class SettingsDialog : Form
         FolderBrowserDialog dlg = new()
         {
             RootFolder = Environment.SpecialFolder.MyComputer,
-            Description = @"Select a working directory"
+            Description = Resources.SettingsDialog_UI_FolderBrowser_WorkingDir
         };
 
         if (!string.IsNullOrEmpty(textBox.Text))
@@ -277,9 +393,9 @@ internal partial class SettingsDialog : Form
     {
         var selIndex = 0;
         comboBox.Items.Clear();
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
             var index = comboBox.Items.Add(columnizer.GetName());
             if (columnizer.GetName().Equals(columnizerName, StringComparison.Ordinal))
@@ -301,35 +417,35 @@ internal partial class SettingsDialog : Form
         var comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[1];
         comboColumn.Items.Clear();
 
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
+        //var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
 
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
-            comboColumn.Items.Add(columnizer.GetName());
+            _ = comboColumn.Items.Add(columnizer.GetName());
         }
         //comboColumn.DisplayMember = "Name";
         //comboColumn.ValueMember = "Columnizer";
 
-        foreach (ColumnizerMaskEntry maskEntry in Preferences.ColumnizerMaskList)
+        foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (ILogLineColumnizer logColumnizer in columnizers)
+            foreach (var logColumnizer in columnizers)
             {
-                cell.Items.Add(logColumnizer.GetName());
+                _ = cell.Items.Add(logColumnizer.GetName());
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
-            dataGridViewColumnizer.Rows.Add(row);
+            _ = dataGridViewColumnizer.Rows.Add(row);
         }
 
         var count = dataGridViewColumnizer.RowCount;
@@ -349,33 +465,33 @@ internal partial class SettingsDialog : Form
         comboColumn.Items.Clear();
 
         //TODO Remove if not necessary
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
+        //var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
 
-        foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+        foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
         {
-            comboColumn.Items.Add(group.GroupName);
+            _ = comboColumn.Items.Add(group.GroupName);
         }
 
-        foreach (HighlightMaskEntry maskEntry in Preferences.HighlightMaskList)
+        foreach (var maskEntry in Preferences.HighlightMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+            foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
-                cell.Items.Add(group.GroupName);
+                _ = cell.Items.Add(group.GroupName);
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
-            HighlightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
+            var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
             currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
-            dataGridViewHighlightMask.Rows.Add(row);
+            _ = dataGridViewHighlightMask.Rows.Add(row);
         }
 
         var count = dataGridViewHighlightMask.RowCount;
@@ -396,9 +512,11 @@ internal partial class SettingsDialog : Form
         {
             if (!row.IsNewRow)
             {
-                ColumnizerMaskEntry entry = new();
-                entry.Mask = (string)row.Cells[0].Value;
-                entry.ColumnizerName = (string)row.Cells[1].Value;
+                ColumnizerMaskEntry entry = new()
+                {
+                    Mask = (string)row.Cells[0].Value,
+                    ColumnizerName = (string)row.Cells[1].Value
+                };
                 Preferences.ColumnizerMaskList.Add(entry);
             }
         }
@@ -412,9 +530,11 @@ internal partial class SettingsDialog : Form
         {
             if (!row.IsNewRow)
             {
-                HighlightMaskEntry entry = new();
-                entry.Mask = (string)row.Cells[0].Value;
-                entry.HighlightGroupName = (string)row.Cells[1].Value;
+                HighlightMaskEntry entry = new()
+                {
+                    Mask = (string)row.Cells[0].Value,
+                    HighlightGroupName = (string)row.Cells[1].Value
+                };
                 Preferences.HighlightMaskList.Add(entry);
             }
         }
@@ -424,27 +544,27 @@ internal partial class SettingsDialog : Form
     {
         listBoxPlugin.Items.Clear();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IFileSystemPlugin entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -458,7 +578,7 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -466,7 +586,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -479,9 +599,9 @@ internal partial class SettingsDialog : Form
     {
         listBoxTools.Items.Clear();
 
-        foreach (ToolEntry tool in Preferences.ToolEntries)
+        foreach (var tool in Preferences.ToolEntries)
         {
-            listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
+            _ = listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
         }
 
         if (listBoxTools.Items.Count > 0)
@@ -558,12 +678,12 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            Icon icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
+            var icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
             if (icon != null)
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                NativeMethods.DestroyIcon(icon.Handle);
+                _ = NativeMethods.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -577,14 +697,14 @@ internal partial class SettingsDialog : Form
     {
         comboBoxEncoding.Items.Clear();
 
-        comboBoxEncoding.Items.Add(Encoding.ASCII);
-        comboBoxEncoding.Items.Add(Encoding.Default);
-        comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        comboBoxEncoding.Items.Add(Encoding.UTF8);
-        comboBoxEncoding.Items.Add(Encoding.Unicode);
-        comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
+        _ = comboBoxEncoding.Items.Add(Encoding.Default);
+        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
+        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
+        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
-        comboBoxEncoding.ValueMember = "HeaderName";
+        comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
     }
 
     #endregion
@@ -715,7 +835,7 @@ internal partial class SettingsDialog : Form
         if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
         {
             var index = dataGridViewColumnizer.CurrentRow.Index;
-            dataGridViewColumnizer.EndEdit();
+            _ = dataGridViewColumnizer.EndEdit();
             dataGridViewColumnizer.Rows.RemoveAt(index);
         }
     }
@@ -803,7 +923,7 @@ internal partial class SettingsDialog : Form
         }
 
         dlg.ShowNewFolderButton = true;
-        dlg.Description = @"Choose folder for LogExpert's session files";
+        dlg.Description = Resources.SettingsDialog_UI_FolderBrowser_SessionSaveDir;
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
@@ -819,9 +939,9 @@ internal partial class SettingsDialog : Form
             {
                 case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                        if (!Directory.Exists(ConfigManager.PortableModeDir))
                         {
-                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            _ = Directory.CreateDirectory(ConfigManager.PortableModeDir);
                         }
 
                         using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
@@ -840,7 +960,7 @@ internal partial class SettingsDialog : Form
             {
                 case CheckState.Unchecked:
                     {
-                        checkBoxPortableMode.Text = @"Activate Portable Mode";
+                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_ActivatePortableMode;
                         Preferences.PortableMode = false;
                         break;
                     }
@@ -848,14 +968,14 @@ internal partial class SettingsDialog : Form
                 case CheckState.Checked:
                     {
                         Preferences.PortableMode = true;
-                        checkBoxPortableMode.Text = @"Deactivate Portable Mode";
+                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
                         break;
                     }
             }
         }
         catch (Exception exception)
         {
-            MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.Title_LogExpert_Error, MessageBoxButtons.OK);
         }
 
     }
@@ -918,7 +1038,7 @@ internal partial class SettingsDialog : Form
     [SupportedOSPlatform("windows")]
     private void OnBtnToolAddClick (object sender, EventArgs e)
     {
-        listBoxTools.Items.Add(new ToolEntry());
+        _ = listBoxTools.Items.Add(new ToolEntry());
         listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
     }
 
@@ -981,7 +1101,7 @@ internal partial class SettingsDialog : Form
     private void OnMultiFilePatternTextChanged (object sender, EventArgs e)
     {
         var pattern = textBoxMultifilePattern.Text;
-        upDownMultifileDays.Enabled = pattern.Contains("$D", System.StringComparison.Ordinal);
+        upDownMultifileDays.Enabled = pattern.Contains("$D", StringComparison.Ordinal);
     }
 
     [SupportedOSPlatform("windows")]
@@ -989,13 +1109,13 @@ internal partial class SettingsDialog : Form
     {
         SaveFileDialog dlg = new()
         {
-            Title = @"Export Settings to file",
+            Title = @Resources.SettingsDialog_UI_Title_ExportSettings,
             DefaultExt = "json",
             AddExtension = true,
-            Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*"
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Filter_ExportSettings, "(*.json)|*.json", "(*.*)|*.*")
         };
 
-        DialogResult result = dlg.ShowDialog();
+        var result = dlg.ShowDialog();
 
         if (result == DialogResult.OK)
         {
@@ -1027,14 +1147,14 @@ internal partial class SettingsDialog : Form
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                _ = MessageBox.Show(this, string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Error_SettingsCouldNotBeImported, ex), Resources.Title_LogExpert_Error);
                 return;
             }
 
             ConfigManager.Import(fileInfo, dlg.ImportFlags);
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
-            MessageBox.Show(this, @"Settings imported", @"LogExpert");
+            _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.Title_LogExpert);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace LogExpert.Dialogs;
+namespace LogExpert.Dialogs;
 
 partial class SettingsDialog
 {
@@ -32,7 +32,7 @@ partial class SettingsDialog
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsDialog));
         tabControlSettings = new System.Windows.Forms.TabControl();
         tabPageViewSettings = new System.Windows.Forms.TabPage();
-        labelWarningMaximumLineLenght = new System.Windows.Forms.Label();
+        labelWarningMaximumLineLength = new System.Windows.Forms.Label();
         upDownMaximumLineLength = new System.Windows.Forms.NumericUpDown();
         labelMaximumLineLength = new System.Windows.Forms.Label();
         upDownMaximumFilterEntriesDisplayed = new System.Windows.Forms.NumericUpDown();
@@ -101,12 +101,12 @@ partial class SettingsDialog
         checkBoxMaskPrio = new System.Windows.Forms.CheckBox();
         buttonDelete = new System.Windows.Forms.Button();
         dataGridViewColumnizer = new System.Windows.Forms.DataGridView();
-        columnFileMask = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        columnColumnizer = new System.Windows.Forms.DataGridViewComboBoxColumn();
+        dataGridViewTextBoxColumnFileMask = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        dataGridViewComboBoxColumnColumnizer = new System.Windows.Forms.DataGridViewComboBoxColumn();
         tabPageHighlightMask = new System.Windows.Forms.TabPage();
         dataGridViewHighlightMask = new System.Windows.Forms.DataGridView();
-        columnFileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        columnHighlightGroup = new System.Windows.Forms.DataGridViewComboBoxColumn();
+        dataGridViewTextBoxColumnFileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+        dataGridViewComboBoxColumnHighlightGroup = new System.Windows.Forms.DataGridViewComboBoxColumn();
         tabPageMultiFile = new System.Windows.Forms.TabPage();
         groupBoxDefaultFileNamePattern = new System.Windows.Forms.GroupBox();
         labelMaxDays = new System.Windows.Forms.Label();
@@ -154,8 +154,6 @@ partial class SettingsDialog
         toolTip = new System.Windows.Forms.ToolTip(components);
         buttonExport = new System.Windows.Forms.Button();
         buttonImport = new System.Windows.Forms.Button();
-        dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-        dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
         tabControlSettings.SuspendLayout();
         tabPageViewSettings.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).BeginInit();
@@ -214,7 +212,7 @@ partial class SettingsDialog
         // 
         // tabPageViewSettings
         // 
-        tabPageViewSettings.Controls.Add(labelWarningMaximumLineLenght);
+        tabPageViewSettings.Controls.Add(labelWarningMaximumLineLength);
         tabPageViewSettings.Controls.Add(upDownMaximumLineLength);
         tabPageViewSettings.Controls.Add(labelMaximumLineLength);
         tabPageViewSettings.Controls.Add(upDownMaximumFilterEntriesDisplayed);
@@ -237,12 +235,12 @@ partial class SettingsDialog
         // 
         // labelWarningMaximumLineLenght
         // 
-        labelWarningMaximumLineLenght.AutoSize = true;
-        labelWarningMaximumLineLenght.Location = new System.Drawing.Point(446, 118);
-        labelWarningMaximumLineLenght.Name = "labelWarningMaximumLineLenght";
-        labelWarningMaximumLineLenght.Size = new System.Drawing.Size(482, 15);
-        labelWarningMaximumLineLenght.TabIndex = 16;
-        labelWarningMaximumLineLenght.Text = "! Changing the Maximum Line Length can impact performance and is not recommended !";
+        labelWarningMaximumLineLength.AutoSize = true;
+        labelWarningMaximumLineLength.Location = new System.Drawing.Point(446, 118);
+        labelWarningMaximumLineLength.Name = "labelWarningMaximumLineLenght";
+        labelWarningMaximumLineLength.Size = new System.Drawing.Size(482, 15);
+        labelWarningMaximumLineLength.TabIndex = 16;
+        labelWarningMaximumLineLength.Text = "! Changing the Maximum Line Length can impact performance and is not recommended !";
         // 
         // upDownMaximumLineLength
         // 
@@ -1024,7 +1022,7 @@ partial class SettingsDialog
         dataGridViewColumnizer.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
         dataGridViewColumnizer.BackgroundColor = System.Drawing.SystemColors.ControlLight;
         dataGridViewColumnizer.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dataGridViewColumnizer.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { columnFileMask, columnColumnizer });
+        dataGridViewColumnizer.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumnFileMask, dataGridViewComboBoxColumnColumnizer });
         dataGridViewColumnizer.Dock = System.Windows.Forms.DockStyle.Top;
         dataGridViewColumnizer.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
         dataGridViewColumnizer.Location = new System.Drawing.Point(4, 5);
@@ -1037,15 +1035,15 @@ partial class SettingsDialog
         // 
         // columnFileMask
         // 
-        columnFileMask.HeaderText = "File name mask (RegEx)";
-        columnFileMask.MinimumWidth = 40;
-        columnFileMask.Name = "columnFileMask";
+        dataGridViewTextBoxColumnFileMask.HeaderText = "File name mask (RegEx)";
+        dataGridViewTextBoxColumnFileMask.MinimumWidth = 40;
+        dataGridViewTextBoxColumnFileMask.Name = "columnFileMask";
         // 
         // columnColumnizer
         // 
-        columnColumnizer.HeaderText = "Columnizer";
-        columnColumnizer.MinimumWidth = 230;
-        columnColumnizer.Name = "columnColumnizer";
+        dataGridViewComboBoxColumnColumnizer.HeaderText = "Columnizer";
+        dataGridViewComboBoxColumnColumnizer.MinimumWidth = 230;
+        dataGridViewComboBoxColumnColumnizer.Name = "columnColumnizer";
         // 
         // tabPageHighlightMask
         // 
@@ -1063,7 +1061,7 @@ partial class SettingsDialog
         // 
         dataGridViewHighlightMask.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
         dataGridViewHighlightMask.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dataGridViewHighlightMask.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { columnFileName, columnHighlightGroup });
+        dataGridViewHighlightMask.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] { dataGridViewTextBoxColumnFileName, dataGridViewComboBoxColumnHighlightGroup });
         dataGridViewHighlightMask.Dock = System.Windows.Forms.DockStyle.Fill;
         dataGridViewHighlightMask.Location = new System.Drawing.Point(4, 5);
         dataGridViewHighlightMask.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -1074,15 +1072,15 @@ partial class SettingsDialog
         // 
         // columnFileName
         // 
-        columnFileName.HeaderText = "File name mask (RegEx)";
-        columnFileName.MinimumWidth = 40;
-        columnFileName.Name = "columnFileName";
+        dataGridViewTextBoxColumnFileName.HeaderText = "File name mask (RegEx)";
+        dataGridViewTextBoxColumnFileName.MinimumWidth = 40;
+        dataGridViewTextBoxColumnFileName.Name = "columnFileName";
         // 
         // columnHighlightGroup
         // 
-        columnHighlightGroup.HeaderText = "Highlight group";
-        columnHighlightGroup.MinimumWidth = 50;
-        columnHighlightGroup.Name = "columnHighlightGroup";
+        dataGridViewComboBoxColumnHighlightGroup.HeaderText = "Highlight group";
+        dataGridViewComboBoxColumnHighlightGroup.MinimumWidth = 50;
+        dataGridViewComboBoxColumnHighlightGroup.Name = "columnHighlightGroup";
         // 
         // tabPageMultiFile
         // 
@@ -1170,7 +1168,7 @@ partial class SettingsDialog
         labelNoteMultiFile.Name = "labelNoteMultiFile";
         labelNoteMultiFile.Size = new System.Drawing.Size(705, 82);
         labelNoteMultiFile.TabIndex = 1;
-        labelNoteMultiFile.Text = resources.GetString("labelNoteMultiFile.Text");
+        labelNoteMultiFile.Text = "Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (<filename>, <filename>.1, <filename>.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.";
         // 
         // groupBoxWhenOpeningMultiFile
         // 
@@ -1624,20 +1622,6 @@ partial class SettingsDialog
         buttonImport.UseVisualStyleBackColor = true;
         buttonImport.Click += OnBtnImportClick;
         // 
-        // dataGridViewTextBoxColumn1
-        // 
-        dataGridViewTextBoxColumn1.HeaderText = "File name mask (RegEx)";
-        dataGridViewTextBoxColumn1.MinimumWidth = 40;
-        dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-        dataGridViewTextBoxColumn1.Width = 99;
-        // 
-        // dataGridViewTextBoxColumn2
-        // 
-        dataGridViewTextBoxColumn2.HeaderText = "File name mask (RegEx)";
-        dataGridViewTextBoxColumn2.MinimumWidth = 40;
-        dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-        dataGridViewTextBoxColumn2.Width = 259;
-        // 
         // SettingsDialog
         // 
         AcceptButton = buttonOk;
@@ -1743,10 +1727,9 @@ partial class SettingsDialog
     private System.Windows.Forms.Button buttonArguments;
     private System.Windows.Forms.TabPage tabPageColumnizers;
     private System.Windows.Forms.DataGridView dataGridViewColumnizer;
-    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn1;
     private System.Windows.Forms.Button buttonDelete;
-    private System.Windows.Forms.DataGridViewTextBoxColumn columnFileMask;
-    private System.Windows.Forms.DataGridViewComboBoxColumn columnColumnizer;
+    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileMask;
+    private System.Windows.Forms.DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizer;
     private System.Windows.Forms.CheckBox checkBoxSysout;
     private System.Windows.Forms.CheckBox checkBoxMaskPrio;
     private System.Windows.Forms.GroupBox groupBoxMisc;
@@ -1798,9 +1781,8 @@ partial class SettingsDialog
     private System.Windows.Forms.Label labelInfo;
     private System.Windows.Forms.TabPage tabPageHighlightMask;
     private System.Windows.Forms.DataGridView dataGridViewHighlightMask;
-    private System.Windows.Forms.DataGridViewTextBoxColumn columnFileName;
-    private System.Windows.Forms.DataGridViewComboBoxColumn columnHighlightGroup;
-    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn2;
+    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileName;
+    private System.Windows.Forms.DataGridViewComboBoxColumn dataGridViewComboBoxColumnHighlightGroup;
     private System.Windows.Forms.CheckBox checkBoxMultiThread;
     private System.Windows.Forms.Label labelFilePollingInterval;
     private System.Windows.Forms.NumericUpDown upDownPollingInterval;
@@ -1841,5 +1823,5 @@ partial class SettingsDialog
     private System.Windows.Forms.CheckBox checkBoxDarkMode;
     private System.Windows.Forms.NumericUpDown upDownMaximumLineLength;
     private System.Windows.Forms.Label labelMaximumLineLength;
-    private System.Windows.Forms.Label labelWarningMaximumLineLenght;
+    private System.Windows.Forms.Label labelWarningMaximumLineLength;
 }

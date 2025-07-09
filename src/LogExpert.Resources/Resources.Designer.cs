@@ -524,6 +524,60 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error during {0} value {1}, min {2}, max {3}, visible {4}: {5}.
+        /// </summary>
+        public static string LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45 {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Insufficient rights {0}: {1} .
+        /// </summary>
+        public static string LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_Cancel {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export....
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_Export {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import....
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_Import {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_Import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string LogExpert_Common_UI_Button_OK {
+            get {
+                return ResourceManager.GetString("LogExpert_Common_UI_Button_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Adding window to list.
         /// </summary>
         public static string LogExpertProxy_Logger_Info_AddWindow {
@@ -602,6 +656,200 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("LogLover", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dropped formats: .
+        /// </summary>
+        public static string LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RegEx-error while finding columnizer: {0}.
+        /// </summary>
+        public static string LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dragging something over LogExpert. Formats: .
+        /// </summary>
+        public static string LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFormats {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFo" +
+                        "rmats", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting external tool: {0} {1}.
+        /// </summary>
+        public static string LogTabWindow_Logger_Info_StartingExternalTool {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Info_StartingExternalTool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Starting external tool with sysout redirection: {0} {1}.
+        /// </summary>
+        public static string LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Layout data contains non-existing LogWindow for {0}.
+        /// </summary>
+        public static string LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogWindowForFileName {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogW" +
+                        "indowForFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encoding {0} is not a valid encoding.
+        /// </summary>
+        public static string LogTabWindow_Logger_Warn_EncodingIsNotValid {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Warn_EncodingIsNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Received SyncModeChanged event while disposing. Event ignored..
+        /// </summary>
+        public static string LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventWhileDisposingEventIgnored {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventW" +
+                        "hileDisposingEventIgnored", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The preferences have changed.
+        /// </summary>
+        public static string LogTabWindow_Logger_Warn_ThePreferencesHaveChanged {
+            get {
+                return ResourceManager.GetString("LogTabWindow_Logger_Warn_ThePreferencesHaveChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a test exception thrown by the GUI thread.
+        /// </summary>
+        public static string LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread {
+            get {
+                return ResourceManager.GetString("LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThre" +
+                        "ad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to lines.
+        /// </summary>
+        public static string LogTabWindow_StatusLineText_lowerCase_Lines {
+            get {
+                return ResourceManager.GetString("LogTabWindow_StatusLineText_lowerCase_Lines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string LogTabWindow_StatusLineText_UpperCase_Lines {
+            get {
+                return ResourceManager.GetString("LogTabWindow_StatusLineText_UpperCase_Lines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a test exception thrown by an async delegate.
+        /// </summary>
+        public static string LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate {
+            get {
+                return ResourceManager.GetString("LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is a test exception thrown by a background thread.
+        /// </summary>
+        public static string LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread {
+            get {
+                return ResourceManager.GetString("LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThre" +
+                        "ad", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to -&gt;E.
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clipboard.
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pasted on {0}.
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to \nColumn restrict.
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter: \&quot;{0}\&quot;{1}{3}.
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_ToolTip_Filter {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_ToolTip_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (Invert match).
+        /// </summary>
+        public static string LogTabWindow_UI_LogWindow_ToolTip_InvertMatch {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_LogWindow_ToolTip_InvertMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LogExpert session {0}.
+        /// </summary>
+        public static string LogTabWindow_UI_Project_Session_Default_Filter {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Project_Session_Default_Filter", resourceCulture);
             }
         }
         
@@ -2272,6 +2520,1014 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Settings", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsDialog_Form_Text {
+            get {
+                return ResourceManager.GetString("SettingsDialog_Form_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Activate Portable Mode.
+        /// </summary>
+        public static string SettingsDialog_UI_ActivatePortableMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_ActivatePortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_Arguments {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_Arguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ChangeFont {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ChangeFont", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_Color {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_Color", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configure....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ConfigurePlugin {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ConfigurePlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_Delete {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to    Icon....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_Icon {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_Icon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_SessionSaveDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_SessionSaveDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_TimespreadColor {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_TimespreadColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_Tool {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_Tool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add new.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ToolAdd {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ToolAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ToolDelete {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ToolDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Down.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ToolDown {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ToolDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Up.
+        /// </summary>
+        public static string SettingsDialog_UI_Button_ToolUp {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_ToolUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ....
+        /// </summary>
+        public static string SettingsDialog_UI_Button_WorkingDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Button_WorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask before closing tabs.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_AskCloseTabs {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_AskCloseTabs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically pick for new files.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_AutoPick {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_AutoPick", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show column finder.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ColumnFinder {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ColumnFinder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Set last column width.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ColumnSize {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ColumnSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dark Mode (restart required).
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_DarkMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_DarkMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter tail enabled.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_FilterTail {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_FilterTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Follow tail enabled.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_FollowTail {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_FollowTail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use legacy file reader (slower).
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_LegacyReader {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_LegacyReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mask has priority before history.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_MaskPrio {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_MaskPrio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multi threaded filter.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_MultiThread {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_MultiThread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Re-open last used files.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_OpenLastFiles {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_OpenLastFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Activate Portable Mode.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_PortableMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_PortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reverse alpha.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ReverseAlpha {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ReverseAlpha", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save and restore filter and filter tabs.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_SaveFilter {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_SaveFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically save persistence files (.lxp).
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_SaveSessions {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_SaveSessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Error Message?.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow only 1 Instance.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_SingleInstance {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_SingleInstance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sync filter list enabled.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_SyncFilter {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_SyncFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pipe sysout to tab.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_Sysout {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_Sysout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show tail state on tabs.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_TailState {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_TailState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show time spread.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_TimeSpread {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_TimeSpread", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show timestamp control, if supported by columnizer.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_Timestamp {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_Timestamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Slower but more compatible with strange linefeeds and encodings.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ToolTip_LegacyReader {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_LegacyReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If this mode is activated, the save file will be loaded from the Executable Location.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_ToolTip_PortableMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_PortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HeaderName.
+        /// </summary>
+        public static string SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encoding to be used when no BOM header and no persistence data is available..
+        /// </summary>
+        public static string SettingsDialog_UI_ComboBox_ToolTip_Encoding {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_ComboBox_ToolTip_Encoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not create / delete marker for Portable Mode: {0}.
+        /// </summary>
+        public static string SettingsDialog_UI_CouldNotCreatePortableMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CouldNotCreatePortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer.
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight group.
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File name mask (RegEx).
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File name mask (RegEx).
+        /// </summary>
+        public static string SettingsDialog_UI_DataGridViewTextBoxColumn_FileName {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DataGridViewTextBoxColumn_FileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deactivate Portable Mode.
+        /// </summary>
+        public static string SettingsDialog_UI_DeActivatePortableMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_DeActivatePortableMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings could not be imported: {0}.
+        /// </summary>
+        public static string SettingsDialog_UI_Error_SettingsCouldNotBeImported {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Error_SettingsCouldNotBeImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to @&quot;Settings {0}|All files {1}.
+        /// </summary>
+        public static string SettingsDialog_UI_Filter_ExportSettings {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Filter_ExportSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose folder for LogExpert&apos;s session files.
+        /// </summary>
+        public static string SettingsDialog_UI_FolderBrowser_SessionSaveDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_FolderBrowser_SessionSaveDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select a working directory.
+        /// </summary>
+        public static string SettingsDialog_UI_FolderBrowser_WorkingDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_FolderBrowser_WorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CPU and stuff.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_CPUAndStuff {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_CPUAndStuff", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default filename pattern.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_DefaultFilenamePattern {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_DefaultFilenamePattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Defaults.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_Defaults {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_Defaults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display mode.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_DisplayMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_DisplayMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_Font {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_Font", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line buffer usage.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_LineBufferUsage {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_LineBufferUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Misc.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_Misc {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_Misc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mouse Drag Default.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_MouseDragDefault {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_MouseDragDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Persistence file location.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_PersistenceFileLocation {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_PersistenceFileLocation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugins.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_Plugins {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_Plugins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_Settings {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time spread display.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_TimeSpreadDisplay {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_TimeSpreadDisplay", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timestamp navigation control.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_TimestampNavigationControl {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_TimestampNavigationControl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tool settings.
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_ToolSettings {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_ToolSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to When opening multiple files....
+        /// </summary>
+        public static string SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Arguments:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Arguments {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Arguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default encoding.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_DefaultEncoding {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_DefaultEncoding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File polling interval (ms):.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_FilePollingInterval {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_FilePollingInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Font.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Font {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Font", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.&quot;;.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_HintMultiFile {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_HintMultiFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes will take effect on next file load.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Info {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lines/block.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_LinesPerBlock {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_LinesPerBlock", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max days:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_MaxDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_MaxDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum filter entries.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_MaximumFilterEntries {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_MaximumFilterEntries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum filter entries displayed.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum Line Length (restart required).
+        /// </summary>
+        public static string SettingsDialog_UI_Label_MaximumLineLengthRestartRequired {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_MaximumLineLengthRestartRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (&lt;filename&gt;, &lt;filename&gt;.1, &lt;filename&gt;.2, ...). Simply choose &apos;MultiFile&apos; from the File menu after loading the first file..
+        /// </summary>
+        public static string SettingsDialog_UI_Label_NoteMultifile {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_NoteMultifile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of blocks.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_NumberOfBlocks {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_NumberOfBlocks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pattern:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Pattern {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Pattern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to sessionSaveOwnDirLabel.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_SessionSaveOwnDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_SessionSaveOwnDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Program:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_Tool {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_Tool", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizer for output:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_ToolColumnizerForOutput {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_ToolColumnizerForOutput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_ToolName {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_ToolName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You can configure as many tools as you want. \r\nChecked tools will appear in the icon bar. All other tools are available in the tools menu..
+        /// </summary>
+        public static string SettingsDialog_UI_Label_ToolsDescription {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_ToolsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ! Changing the Maximum Line Length can impact performance and is not recommended !.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_WarningMaximumLineLength {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_WarningMaximumLineLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working dir:.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_WorkingDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_WorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ask what to do.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_AskWhatToDo {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_AskWhatToDo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Horizontal.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_HorizMouseDrag {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_HorizMouseDrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line view.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_LineView {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_LineView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load every file into a separate tab.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application startup directory.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_SessionApplicationStartupDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_SessionApplicationStartupDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Same directory as log file.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_SessionSameDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_SessionSameDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MyDocuments/LogExpert.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_SessionSaveDocuments {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_SessionSaveDocuments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Own directory.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_SessionSaveOwn {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_SessionSaveOwn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time view.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_TimeView {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_TimeView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This path is based on the executable and where it has been started from..
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Treat all files as one &apos;MultiFile.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vertical.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_VerticalMouseDrag {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_VerticalMouseDrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Vertical Inverted.
+        /// </summary>
+        public static string SettingsDialog_UI_RadioButton_VerticalMouseDragInverted {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_RadioButton_VerticalMouseDragInverted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings imported.
+        /// </summary>
+        public static string SettingsDialog_UI_SettingsImported {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_SettingsImported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Columnizers.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_Columnizers {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_Columnizers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to External Tools.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_ExternalTools {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_ExternalTools", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Highlight.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_Highlight {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_Highlight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Memory/CPU.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_Memory {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_Memory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MultiFile.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_MultiFile {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_MultiFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Plugins.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_Plugins {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_Plugins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Persistence.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_Sessions {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_Sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Timestamp features.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_TimestampFeatures {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_TimestampFeatures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View settings.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_ViewSettings {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_ViewSettings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Settings to file.
+        /// </summary>
+        public static string SettingsDialog_UI_Title_ExportSettings {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Title_ExportSettings", resourceCulture);
             }
         }
         
