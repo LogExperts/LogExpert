@@ -227,7 +227,7 @@ internal static class Program
                     proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
                     break;
                 default:
-                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_Pipe_UnkownIPCMessage, message.Type, payLoad));
+                    _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Program_Logger_Error_Pipe_UnknownIPCMessage, message.Type, payLoad));
                     break;
             }
         }
