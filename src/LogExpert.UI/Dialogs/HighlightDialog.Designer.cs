@@ -1,4 +1,4 @@
-﻿using LogExpert.UI.Controls;
+using LogExpert.UI.Controls;
 
 using System.Drawing;
 
@@ -30,53 +30,53 @@ partial class HighlightDialog
     /// Required method for Designer support - do not modify
     /// the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
+    private void InitializeComponent ()
     {
         components = new System.ComponentModel.Container();
-        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HighlightDialog));
-        listBoxHighlight = new System.Windows.Forms.ListBox();
-        btnAdd = new System.Windows.Forms.Button();
-        btnDelete = new System.Windows.Forms.Button();
-        btnMoveUp = new System.Windows.Forms.Button();
-        btnMoveDown = new System.Windows.Forms.Button();
-        labelForgroundColor = new System.Windows.Forms.Label();
-        labelBackgroundColor = new System.Windows.Forms.Label();
-        btnOk = new System.Windows.Forms.Button();
-        btnCancel = new System.Windows.Forms.Button();
-        textBoxSearchString = new System.Windows.Forms.TextBox();
-        labelSearchString = new System.Windows.Forms.Label();
-        btnApply = new System.Windows.Forms.Button();
-        btnCustomForeColor = new System.Windows.Forms.Button();
-        btnCustomBackColor = new System.Windows.Forms.Button();
-        checkBoxRegex = new System.Windows.Forms.CheckBox();
-        checkBoxCaseSensitive = new System.Windows.Forms.CheckBox();
-        checkBoxDontDirtyLed = new System.Windows.Forms.CheckBox();
-        groupBoxLineMatchCriteria = new System.Windows.Forms.GroupBox();
-        groupBoxColoring = new System.Windows.Forms.GroupBox();
-        checkBoxNoBackground = new System.Windows.Forms.CheckBox();
-        checkBoxBold = new System.Windows.Forms.CheckBox();
-        checkBoxWordMatch = new System.Windows.Forms.CheckBox();
+        var resources = new System.ComponentModel.ComponentResourceManager(typeof(HighlightDialog));
+        listBoxHighlight = new ListBox();
+        btnAdd = new Button();
+        btnDelete = new Button();
+        btnMoveUp = new Button();
+        btnMoveDown = new Button();
+        labelForgroundColor = new Label();
+        labelBackgroundColor = new Label();
+        btnOk = new Button();
+        btnCancel = new Button();
+        textBoxSearchString = new TextBox();
+        labelSearchString = new Label();
+        btnApply = new Button();
+        btnCustomForeColor = new Button();
+        btnCustomBackColor = new Button();
+        checkBoxRegex = new CheckBox();
+        checkBoxCaseSensitive = new CheckBox();
+        checkBoxDontDirtyLed = new CheckBox();
+        groupBoxLineMatchCriteria = new GroupBox();
+        groupBoxColoring = new GroupBox();
+        checkBoxNoBackground = new CheckBox();
+        checkBoxBold = new CheckBox();
+        checkBoxWordMatch = new CheckBox();
         colorBoxForeground = new ColorComboBox();
         colorBoxBackground = new ColorComboBox();
-        groupBoxActions = new System.Windows.Forms.GroupBox();
-        btnBookmarkComment = new System.Windows.Forms.Button();
-        btnSelectPlugin = new System.Windows.Forms.Button();
-        checkBoxPlugin = new System.Windows.Forms.CheckBox();
-        checkBoxStopTail = new System.Windows.Forms.CheckBox();
-        checkBoxBookmark = new System.Windows.Forms.CheckBox();
-        helpProvider = new System.Windows.Forms.HelpProvider();
-        groupBox4 = new System.Windows.Forms.GroupBox();
-        btnImportGroup = new System.Windows.Forms.Button();
-        btnExportGroup = new System.Windows.Forms.Button();
-        btnMoveGroupDown = new System.Windows.Forms.Button();
-        btnMoveGroupUp = new System.Windows.Forms.Button();
-        labelAssignNamesToGroups = new System.Windows.Forms.Label();
-        btnCopyGroup = new System.Windows.Forms.Button();
-        btnDeleteGroup = new System.Windows.Forms.Button();
-        btnNewGroup = new System.Windows.Forms.Button();
-        comboBoxGroups = new System.Windows.Forms.ComboBox();
-        toolTip = new System.Windows.Forms.ToolTip(components);
-        pnlBackground = new System.Windows.Forms.Panel();
+        groupBoxActions = new GroupBox();
+        btnBookmarkComment = new Button();
+        btnSelectPlugin = new Button();
+        checkBoxPlugin = new CheckBox();
+        checkBoxStopTail = new CheckBox();
+        checkBoxBookmark = new CheckBox();
+        helpProvider = new HelpProvider();
+        groupBox4 = new GroupBox();
+        btnImportGroup = new Button();
+        btnExportGroup = new Button();
+        btnMoveGroupDown = new Button();
+        btnMoveGroupUp = new Button();
+        labelAssignNamesToGroups = new Label();
+        btnCopyGroup = new Button();
+        btnDeleteGroup = new Button();
+        btnNewGroup = new Button();
+        comboBoxGroups = new ComboBox();
+        toolTip = new ToolTip(components);
+        pnlBackground = new Panel();
         groupBoxLineMatchCriteria.SuspendLayout();
         groupBoxColoring.SuspendLayout();
         groupBoxActions.SuspendLayout();
@@ -86,21 +86,21 @@ partial class HighlightDialog
         // 
         // listBoxHighlight
         // 
-        listBoxHighlight.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-        listBoxHighlight.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+        listBoxHighlight.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        listBoxHighlight.DrawMode = DrawMode.OwnerDrawFixed;
         listBoxHighlight.FormattingEnabled = true;
-        listBoxHighlight.Location = new Point(32, 160);
-        listBoxHighlight.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        listBoxHighlight.Location = new Point(32, 129);
+        listBoxHighlight.Margin = new Padding(4, 5, 4, 5);
         listBoxHighlight.Name = "listBoxHighlight";
-        listBoxHighlight.Size = new Size(487, 228);
+        listBoxHighlight.Size = new Size(413, 180);
         listBoxHighlight.TabIndex = 0;
         listBoxHighlight.SelectedIndexChanged += OnListBoxHighlightSelectedIndexChanged;
         // 
         // btnAdd
         // 
-        btnAdd.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnAdd.Location = new Point(529, 218);
-        btnAdd.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnAdd.Location = new Point(453, 187);
+        btnAdd.Margin = new Padding(4, 5, 4, 5);
         btnAdd.Name = "btnAdd";
         btnAdd.Size = new Size(158, 35);
         btnAdd.TabIndex = 1;
@@ -111,9 +111,9 @@ partial class HighlightDialog
         // 
         // btnDelete
         // 
-        btnDelete.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnDelete.Location = new Point(529, 263);
-        btnDelete.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnDelete.Location = new Point(453, 232);
+        btnDelete.Margin = new Padding(4, 5, 4, 5);
         btnDelete.Name = "btnDelete";
         btnDelete.Size = new Size(158, 35);
         btnDelete.TabIndex = 2;
@@ -124,9 +124,9 @@ partial class HighlightDialog
         // 
         // btnMoveUp
         // 
-        btnMoveUp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnMoveUp.Location = new Point(529, 160);
-        btnMoveUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnMoveUp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnMoveUp.Location = new Point(453, 129);
+        btnMoveUp.Margin = new Padding(4, 5, 4, 5);
         btnMoveUp.Name = "btnMoveUp";
         btnMoveUp.Size = new Size(75, 35);
         btnMoveUp.TabIndex = 3;
@@ -137,9 +137,9 @@ partial class HighlightDialog
         // 
         // btnMoveDown
         // 
-        btnMoveDown.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnMoveDown.Location = new Point(612, 160);
-        btnMoveDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnMoveDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnMoveDown.Location = new Point(536, 129);
+        btnMoveDown.Margin = new Padding(4, 5, 4, 5);
         btnMoveDown.Name = "btnMoveDown";
         btnMoveDown.Size = new Size(75, 35);
         btnMoveDown.TabIndex = 4;
@@ -152,7 +152,7 @@ partial class HighlightDialog
         // 
         labelForgroundColor.AutoSize = true;
         labelForgroundColor.Location = new Point(9, 38);
-        labelForgroundColor.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        labelForgroundColor.Margin = new Padding(4, 0, 4, 0);
         labelForgroundColor.Name = "labelForgroundColor";
         labelForgroundColor.Size = new Size(99, 15);
         labelForgroundColor.TabIndex = 6;
@@ -162,7 +162,7 @@ partial class HighlightDialog
         // 
         labelBackgroundColor.AutoSize = true;
         labelBackgroundColor.Location = new Point(9, 115);
-        labelBackgroundColor.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        labelBackgroundColor.Margin = new Padding(4, 0, 4, 0);
         labelBackgroundColor.Name = "labelBackgroundColor";
         labelBackgroundColor.Size = new Size(101, 15);
         labelBackgroundColor.TabIndex = 8;
@@ -170,10 +170,10 @@ partial class HighlightDialog
         // 
         // btnOk
         // 
-        btnOk.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-        btnOk.Location = new Point(449, 832);
-        btnOk.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnOk.DialogResult = DialogResult.OK;
+        btnOk.Location = new Point(372, 718);
+        btnOk.Margin = new Padding(4, 5, 4, 5);
         btnOk.Name = "btnOk";
         btnOk.Size = new Size(112, 35);
         btnOk.TabIndex = 9;
@@ -183,10 +183,10 @@ partial class HighlightDialog
         // 
         // btnCancel
         // 
-        btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        btnCancel.Location = new Point(576, 832);
-        btnCancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnCancel.DialogResult = DialogResult.Cancel;
+        btnCancel.Location = new Point(499, 718);
+        btnCancel.Margin = new Padding(4, 5, 4, 5);
         btnCancel.Name = "btnCancel";
         btnCancel.Size = new Size(112, 35);
         btnCancel.TabIndex = 10;
@@ -195,11 +195,11 @@ partial class HighlightDialog
         // 
         // textBoxSearchString
         // 
-        textBoxSearchString.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        textBoxSearchString.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         textBoxSearchString.Location = new Point(9, 55);
-        textBoxSearchString.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        textBoxSearchString.Margin = new Padding(4, 5, 4, 5);
         textBoxSearchString.Name = "textBoxSearchString";
-        textBoxSearchString.Size = new Size(639, 23);
+        textBoxSearchString.Size = new Size(575, 23);
         textBoxSearchString.TabIndex = 11;
         textBoxSearchString.TextChanged += ChangeToDirty;
         // 
@@ -207,7 +207,7 @@ partial class HighlightDialog
         // 
         labelSearchString.AutoSize = true;
         labelSearchString.Location = new Point(9, 31);
-        labelSearchString.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        labelSearchString.Margin = new Padding(4, 0, 4, 0);
         labelSearchString.Name = "labelSearchString";
         labelSearchString.Size = new Size(78, 15);
         labelSearchString.TabIndex = 12;
@@ -215,12 +215,12 @@ partial class HighlightDialog
         // 
         // btnApply
         // 
-        btnApply.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+        btnApply.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         btnApply.Enabled = false;
         btnApply.Image = (Image)resources.GetObject("btnApply.Image");
         btnApply.ImageAlign = ContentAlignment.MiddleRight;
-        btnApply.Location = new Point(529, 308);
-        btnApply.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnApply.Location = new Point(453, 277);
+        btnApply.Margin = new Padding(4, 5, 4, 5);
         btnApply.Name = "btnApply";
         btnApply.Size = new Size(158, 35);
         btnApply.TabIndex = 13;
@@ -231,9 +231,9 @@ partial class HighlightDialog
         // 
         // btnCustomForeColor
         // 
-        btnCustomForeColor.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnCustomForeColor.Location = new Point(247, 60);
-        btnCustomForeColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnCustomForeColor.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnCustomForeColor.Location = new Point(183, 60);
+        btnCustomForeColor.Margin = new Padding(4, 5, 4, 5);
         btnCustomForeColor.Name = "btnCustomForeColor";
         btnCustomForeColor.Size = new Size(78, 35);
         btnCustomForeColor.TabIndex = 14;
@@ -244,9 +244,9 @@ partial class HighlightDialog
         // 
         // btnCustomBackColor
         // 
-        btnCustomBackColor.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnCustomBackColor.Location = new Point(247, 137);
-        btnCustomBackColor.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnCustomBackColor.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnCustomBackColor.Location = new Point(183, 137);
+        btnCustomBackColor.Margin = new Padding(4, 5, 4, 5);
         btnCustomBackColor.Name = "btnCustomBackColor";
         btnCustomBackColor.Size = new Size(78, 35);
         btnCustomBackColor.TabIndex = 15;
@@ -259,9 +259,9 @@ partial class HighlightDialog
         // 
         checkBoxRegex.AutoSize = true;
         checkBoxRegex.Location = new Point(180, 95);
-        checkBoxRegex.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxRegex.Margin = new Padding(4, 5, 4, 5);
         checkBoxRegex.Name = "checkBoxRegex";
-        checkBoxRegex.Size = new Size(57, 19);
+        checkBoxRegex.Size = new Size(58, 19);
         checkBoxRegex.TabIndex = 16;
         checkBoxRegex.Text = "RegEx";
         toolTip.SetToolTip(checkBoxRegex, "Whether the string is a regular expresion");
@@ -273,7 +273,7 @@ partial class HighlightDialog
         // 
         checkBoxCaseSensitive.AutoSize = true;
         checkBoxCaseSensitive.Location = new Point(14, 95);
-        checkBoxCaseSensitive.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxCaseSensitive.Margin = new Padding(4, 5, 4, 5);
         checkBoxCaseSensitive.Name = "checkBoxCaseSensitive";
         checkBoxCaseSensitive.Size = new Size(99, 19);
         checkBoxCaseSensitive.TabIndex = 17;
@@ -286,7 +286,7 @@ partial class HighlightDialog
         // 
         checkBoxDontDirtyLed.AutoSize = true;
         checkBoxDontDirtyLed.Location = new Point(15, 38);
-        checkBoxDontDirtyLed.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxDontDirtyLed.Margin = new Padding(4, 5, 4, 5);
         checkBoxDontDirtyLed.Name = "checkBoxDontDirtyLed";
         checkBoxDontDirtyLed.Size = new Size(118, 19);
         checkBoxDontDirtyLed.TabIndex = 18;
@@ -297,23 +297,23 @@ partial class HighlightDialog
         // 
         // groupBoxLineMatchCriteria
         // 
-        groupBoxLineMatchCriteria.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        groupBoxLineMatchCriteria.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         groupBoxLineMatchCriteria.Controls.Add(textBoxSearchString);
         groupBoxLineMatchCriteria.Controls.Add(labelSearchString);
         groupBoxLineMatchCriteria.Controls.Add(checkBoxRegex);
         groupBoxLineMatchCriteria.Controls.Add(checkBoxCaseSensitive);
-        groupBoxLineMatchCriteria.Location = new Point(18, 437);
-        groupBoxLineMatchCriteria.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        groupBoxLineMatchCriteria.Location = new Point(18, 322);
+        groupBoxLineMatchCriteria.Margin = new Padding(4, 5, 4, 5);
         groupBoxLineMatchCriteria.Name = "groupBoxLineMatchCriteria";
-        groupBoxLineMatchCriteria.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-        groupBoxLineMatchCriteria.Size = new Size(671, 135);
+        groupBoxLineMatchCriteria.Padding = new Padding(4, 5, 4, 5);
+        groupBoxLineMatchCriteria.Size = new Size(607, 135);
         groupBoxLineMatchCriteria.TabIndex = 19;
         groupBoxLineMatchCriteria.TabStop = false;
         groupBoxLineMatchCriteria.Text = "Line match criteria";
         // 
         // groupBoxColoring
         // 
-        groupBoxColoring.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        groupBoxColoring.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         groupBoxColoring.Controls.Add(checkBoxNoBackground);
         groupBoxColoring.Controls.Add(checkBoxBold);
         groupBoxColoring.Controls.Add(checkBoxWordMatch);
@@ -323,11 +323,11 @@ partial class HighlightDialog
         groupBoxColoring.Controls.Add(btnCustomBackColor);
         groupBoxColoring.Controls.Add(labelBackgroundColor);
         groupBoxColoring.Controls.Add(colorBoxBackground);
-        groupBoxColoring.Location = new Point(18, 581);
-        groupBoxColoring.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        groupBoxColoring.Location = new Point(18, 467);
+        groupBoxColoring.Margin = new Padding(4, 5, 4, 5);
         groupBoxColoring.Name = "groupBoxColoring";
-        groupBoxColoring.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-        groupBoxColoring.Size = new Size(349, 286);
+        groupBoxColoring.Padding = new Padding(4, 5, 4, 5);
+        groupBoxColoring.Size = new Size(285, 286);
         groupBoxColoring.TabIndex = 20;
         groupBoxColoring.TabStop = false;
         groupBoxColoring.Text = "Coloring";
@@ -337,7 +337,7 @@ partial class HighlightDialog
         checkBoxNoBackground.AutoSize = true;
         checkBoxNoBackground.Enabled = false;
         checkBoxNoBackground.Location = new Point(141, 240);
-        checkBoxNoBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxNoBackground.Margin = new Padding(4, 5, 4, 5);
         checkBoxNoBackground.Name = "checkBoxNoBackground";
         checkBoxNoBackground.Size = new Size(109, 19);
         checkBoxNoBackground.TabIndex = 18;
@@ -350,7 +350,7 @@ partial class HighlightDialog
         // 
         checkBoxBold.AutoSize = true;
         checkBoxBold.Location = new Point(9, 205);
-        checkBoxBold.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxBold.Margin = new Padding(4, 5, 4, 5);
         checkBoxBold.Name = "checkBoxBold";
         checkBoxBold.Size = new Size(50, 19);
         checkBoxBold.TabIndex = 17;
@@ -363,7 +363,7 @@ partial class HighlightDialog
         // 
         checkBoxWordMatch.AutoSize = true;
         checkBoxWordMatch.Location = new Point(9, 240);
-        checkBoxWordMatch.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxWordMatch.Margin = new Padding(4, 5, 4, 5);
         checkBoxWordMatch.Name = "checkBoxWordMatch";
         checkBoxWordMatch.Size = new Size(89, 19);
         checkBoxWordMatch.TabIndex = 16;
@@ -374,45 +374,47 @@ partial class HighlightDialog
         // 
         // colorBoxForeground
         // 
-        colorBoxForeground.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        colorBoxForeground.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         colorBoxForeground.CustomColor = Color.Black;
-        colorBoxForeground.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-        colorBoxForeground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        colorBoxForeground.DrawMode = DrawMode.OwnerDrawFixed;
+        colorBoxForeground.DropDownStyle = ComboBoxStyle.DropDownList;
         colorBoxForeground.FormattingEnabled = true;
+        colorBoxForeground.Items.AddRange(new object[] { Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow });
         colorBoxForeground.Location = new Point(8, 63);
-        colorBoxForeground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        colorBoxForeground.Margin = new Padding(4, 5, 4, 5);
         colorBoxForeground.Name = "colorBoxForeground";
-        colorBoxForeground.Size = new Size(229, 24);
+        colorBoxForeground.Size = new Size(165, 24);
         colorBoxForeground.TabIndex = 5;
         colorBoxForeground.SelectedIndexChanged += ChangeToDirty;
         // 
         // colorBoxBackground
         // 
-        colorBoxBackground.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        colorBoxBackground.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         colorBoxBackground.CustomColor = Color.Black;
-        colorBoxBackground.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-        colorBoxBackground.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+        colorBoxBackground.DrawMode = DrawMode.OwnerDrawFixed;
+        colorBoxBackground.DropDownStyle = ComboBoxStyle.DropDownList;
         colorBoxBackground.FormattingEnabled = true;
+        colorBoxBackground.Items.AddRange(new object[] { Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow, Color.Black, Color.Black, Color.White, Color.Gray, Color.DarkGray, Color.Blue, Color.LightBlue, Color.DarkBlue, Color.Green, Color.LightGreen, Color.DarkGreen, Color.Olive, Color.Red, Color.Pink, Color.Purple, Color.IndianRed, Color.DarkCyan, Color.Yellow });
         colorBoxBackground.Location = new Point(9, 140);
-        colorBoxBackground.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        colorBoxBackground.Margin = new Padding(4, 5, 4, 5);
         colorBoxBackground.Name = "colorBoxBackground";
-        colorBoxBackground.Size = new Size(229, 24);
+        colorBoxBackground.Size = new Size(165, 24);
         colorBoxBackground.TabIndex = 7;
         colorBoxBackground.SelectedIndexChanged += ChangeToDirty;
         // 
         // groupBoxActions
         // 
-        groupBoxActions.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+        groupBoxActions.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
         groupBoxActions.Controls.Add(btnBookmarkComment);
         groupBoxActions.Controls.Add(btnSelectPlugin);
         groupBoxActions.Controls.Add(checkBoxPlugin);
         groupBoxActions.Controls.Add(checkBoxStopTail);
         groupBoxActions.Controls.Add(checkBoxBookmark);
         groupBoxActions.Controls.Add(checkBoxDontDirtyLed);
-        groupBoxActions.Location = new Point(377, 581);
-        groupBoxActions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        groupBoxActions.Location = new Point(313, 467);
+        groupBoxActions.Margin = new Padding(4, 5, 4, 5);
         groupBoxActions.Name = "groupBoxActions";
-        groupBoxActions.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        groupBoxActions.Padding = new Padding(4, 5, 4, 5);
         groupBoxActions.Size = new Size(312, 195);
         groupBoxActions.TabIndex = 21;
         groupBoxActions.TabStop = false;
@@ -420,9 +422,9 @@ partial class HighlightDialog
         // 
         // btnBookmarkComment
         // 
-        btnBookmarkComment.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+        btnBookmarkComment.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         btnBookmarkComment.Location = new Point(210, 69);
-        btnBookmarkComment.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnBookmarkComment.Margin = new Padding(4, 5, 4, 5);
         btnBookmarkComment.Name = "btnBookmarkComment";
         btnBookmarkComment.Size = new Size(81, 31);
         btnBookmarkComment.TabIndex = 23;
@@ -432,9 +434,9 @@ partial class HighlightDialog
         // 
         // btnSelectPlugin
         // 
-        btnSelectPlugin.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+        btnSelectPlugin.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         btnSelectPlugin.Location = new Point(210, 143);
-        btnSelectPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnSelectPlugin.Margin = new Padding(4, 5, 4, 5);
         btnSelectPlugin.Name = "btnSelectPlugin";
         btnSelectPlugin.Size = new Size(81, 31);
         btnSelectPlugin.TabIndex = 22;
@@ -446,7 +448,7 @@ partial class HighlightDialog
         // 
         checkBoxPlugin.AutoSize = true;
         checkBoxPlugin.Location = new Point(15, 148);
-        checkBoxPlugin.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxPlugin.Margin = new Padding(4, 5, 4, 5);
         checkBoxPlugin.Name = "checkBoxPlugin";
         checkBoxPlugin.Size = new Size(60, 19);
         checkBoxPlugin.TabIndex = 21;
@@ -459,9 +461,9 @@ partial class HighlightDialog
         // 
         checkBoxStopTail.AutoSize = true;
         checkBoxStopTail.Location = new Point(15, 111);
-        checkBoxStopTail.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxStopTail.Margin = new Padding(4, 5, 4, 5);
         checkBoxStopTail.Name = "checkBoxStopTail";
-        checkBoxStopTail.Size = new Size(109, 19);
+        checkBoxStopTail.Size = new Size(108, 19);
         checkBoxStopTail.TabIndex = 20;
         checkBoxStopTail.Text = "Stop Follow Tail";
         toolTip.SetToolTip(checkBoxStopTail, "When matching a line, stop automatic scrolling");
@@ -472,7 +474,7 @@ partial class HighlightDialog
         // 
         checkBoxBookmark.AutoSize = true;
         checkBoxBookmark.Location = new Point(15, 74);
-        checkBoxBookmark.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        checkBoxBookmark.Margin = new Padding(4, 5, 4, 5);
         checkBoxBookmark.Name = "checkBoxBookmark";
         checkBoxBookmark.Size = new Size(99, 19);
         checkBoxBookmark.TabIndex = 19;
@@ -488,7 +490,7 @@ partial class HighlightDialog
         // 
         // groupBox4
         // 
-        groupBox4.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        groupBox4.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         groupBox4.Controls.Add(btnImportGroup);
         groupBox4.Controls.Add(btnExportGroup);
         groupBox4.Controls.Add(btnMoveGroupDown);
@@ -499,19 +501,19 @@ partial class HighlightDialog
         groupBox4.Controls.Add(btnNewGroup);
         groupBox4.Controls.Add(comboBoxGroups);
         groupBox4.Location = new Point(18, 5);
-        groupBox4.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        groupBox4.Margin = new Padding(4, 5, 4, 5);
         groupBox4.Name = "groupBox4";
-        groupBox4.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-        groupBox4.Size = new Size(671, 129);
+        groupBox4.Padding = new Padding(4, 5, 4, 5);
+        groupBox4.Size = new Size(607, 114);
         groupBox4.TabIndex = 22;
         groupBox4.TabStop = false;
         groupBox4.Text = "Groups";
         // 
         // btnImportGroup
         // 
-        btnImportGroup.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnImportGroup.Location = new Point(333, 26);
-        btnImportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnImportGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnImportGroup.Location = new Point(269, 11);
+        btnImportGroup.Margin = new Padding(4, 5, 4, 5);
         btnImportGroup.Name = "btnImportGroup";
         btnImportGroup.Size = new Size(75, 35);
         btnImportGroup.TabIndex = 7;
@@ -522,9 +524,9 @@ partial class HighlightDialog
         // 
         // btnExportGroup
         // 
-        btnExportGroup.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnExportGroup.Location = new Point(333, 75);
-        btnExportGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnExportGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnExportGroup.Location = new Point(269, 53);
+        btnExportGroup.Margin = new Padding(4, 5, 4, 5);
         btnExportGroup.Name = "btnExportGroup";
         btnExportGroup.Size = new Size(75, 35);
         btnExportGroup.TabIndex = 8;
@@ -535,9 +537,9 @@ partial class HighlightDialog
         // 
         // btnMoveGroupDown
         // 
-        btnMoveGroupDown.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnMoveGroupDown.Location = new Point(582, 75);
-        btnMoveGroupDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnMoveGroupDown.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnMoveGroupDown.Location = new Point(518, 56);
+        btnMoveGroupDown.Margin = new Padding(4, 5, 4, 5);
         btnMoveGroupDown.Name = "btnMoveGroupDown";
         btnMoveGroupDown.Size = new Size(75, 35);
         btnMoveGroupDown.TabIndex = 6;
@@ -548,9 +550,9 @@ partial class HighlightDialog
         // 
         // btnMoveGroupUp
         // 
-        btnMoveGroupUp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-        btnMoveGroupUp.Location = new Point(499, 75);
-        btnMoveGroupUp.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnMoveGroupUp.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnMoveGroupUp.Location = new Point(435, 53);
+        btnMoveGroupUp.Margin = new Padding(4, 5, 4, 5);
         btnMoveGroupUp.Name = "btnMoveGroupUp";
         btnMoveGroupUp.Size = new Size(75, 35);
         btnMoveGroupUp.TabIndex = 5;
@@ -561,9 +563,10 @@ partial class HighlightDialog
         // 
         // labelAssignNamesToGroups
         // 
+        labelAssignNamesToGroups.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         labelAssignNamesToGroups.AutoSize = true;
-        labelAssignNamesToGroups.Location = new Point(9, 88);
-        labelAssignNamesToGroups.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+        labelAssignNamesToGroups.Location = new Point(8, 93);
+        labelAssignNamesToGroups.Margin = new Padding(4, 0, 4, 0);
         labelAssignNamesToGroups.Name = "labelAssignNamesToGroups";
         labelAssignNamesToGroups.Size = new Size(276, 15);
         labelAssignNamesToGroups.TabIndex = 4;
@@ -571,9 +574,9 @@ partial class HighlightDialog
         // 
         // btnCopyGroup
         // 
-        btnCopyGroup.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnCopyGroup.Location = new Point(582, 26);
-        btnCopyGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnCopyGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnCopyGroup.Location = new Point(518, 11);
+        btnCopyGroup.Margin = new Padding(4, 5, 4, 5);
         btnCopyGroup.Name = "btnCopyGroup";
         btnCopyGroup.Size = new Size(75, 35);
         btnCopyGroup.TabIndex = 3;
@@ -584,9 +587,9 @@ partial class HighlightDialog
         // 
         // btnDeleteGroup
         // 
-        btnDeleteGroup.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnDeleteGroup.Location = new Point(499, 26);
-        btnDeleteGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnDeleteGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnDeleteGroup.Location = new Point(435, 11);
+        btnDeleteGroup.Margin = new Padding(4, 5, 4, 5);
         btnDeleteGroup.Name = "btnDeleteGroup";
         btnDeleteGroup.Size = new Size(75, 35);
         btnDeleteGroup.TabIndex = 2;
@@ -597,9 +600,9 @@ partial class HighlightDialog
         // 
         // btnNewGroup
         // 
-        btnNewGroup.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-        btnNewGroup.Location = new Point(416, 26);
-        btnNewGroup.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        btnNewGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+        btnNewGroup.Location = new Point(352, 11);
+        btnNewGroup.Margin = new Padding(4, 5, 4, 5);
         btnNewGroup.Name = "btnNewGroup";
         btnNewGroup.Size = new Size(75, 35);
         btnNewGroup.TabIndex = 1;
@@ -611,13 +614,13 @@ partial class HighlightDialog
         // 
         // comboBoxGroups
         // 
-        comboBoxGroups.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+        comboBoxGroups.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         comboBoxGroups.DisplayMember = "GroupName";
-        comboBoxGroups.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-        comboBoxGroups.Location = new Point(14, 32);
-        comboBoxGroups.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        comboBoxGroups.DrawMode = DrawMode.OwnerDrawFixed;
+        comboBoxGroups.Location = new Point(14, 17);
+        comboBoxGroups.Margin = new Padding(4, 5, 4, 5);
         comboBoxGroups.Name = "comboBoxGroups";
-        comboBoxGroups.Size = new Size(311, 24);
+        comboBoxGroups.Size = new Size(247, 24);
         comboBoxGroups.TabIndex = 0;
         toolTip.SetToolTip(comboBoxGroups, "Choose a group to create different highlight settings. Type in a name to change in the name of a group.");
         comboBoxGroups.DrawItem += OnCmbBoxGroupDrawItem;
@@ -639,30 +642,30 @@ partial class HighlightDialog
         pnlBackground.Controls.Add(groupBoxColoring);
         pnlBackground.Controls.Add(groupBoxActions);
         pnlBackground.Controls.Add(groupBox4);
-        pnlBackground.Dock = System.Windows.Forms.DockStyle.Fill;
+        pnlBackground.Dock = DockStyle.Fill;
         pnlBackground.Location = new Point(0, 0);
         pnlBackground.Name = "pnlBackground";
-        pnlBackground.Size = new Size(708, 895);
+        pnlBackground.Size = new Size(644, 761);
         pnlBackground.TabIndex = 23;
         // 
         // HighlightDialog
         // 
         AcceptButton = btnOk;
         CancelButton = btnCancel;
-        ClientSize = new Size(708, 895);
+        ClientSize = new Size(644, 761);
         Controls.Add(pnlBackground);
         DoubleBuffered = true;
         helpProvider.SetHelpKeyword(this, "Highlighting.htm");
-        helpProvider.SetHelpNavigator(this, System.Windows.Forms.HelpNavigator.Topic);
+        helpProvider.SetHelpNavigator(this, HelpNavigator.Topic);
         helpProvider.SetHelpString(this, "");
         Icon = (Icon)resources.GetObject("$this.Icon");
-        Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+        Margin = new Padding(4, 5, 4, 5);
         MaximizeBox = false;
         MinimizeBox = false;
-        MinimumSize = new Size(660, 934);
+        MinimumSize = new Size(660, 800);
         Name = "HighlightDialog";
         helpProvider.SetShowHelp(this, true);
-        StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+        StartPosition = FormStartPosition.CenterParent;
         Text = "Highlighting and action triggers";
         Shown += OnHighlightDialogShown;
         groupBoxLineMatchCriteria.ResumeLayout(false);
