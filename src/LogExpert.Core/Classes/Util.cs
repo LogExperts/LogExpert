@@ -11,45 +11,14 @@ public class Util
 {
     #region Public methods
 
-    public static string GetNameFromPath (string fileName)
-    {
-        var i = fileName.LastIndexOf('\\');
+    public static string GetNameFromPath (string fileName) => fileName is null ? string.Empty : Path.GetFileName(fileName);
 
-        if (i < 0)
-        {
-            i = fileName.LastIndexOf('/');
-        }
 
-        if (i < 0)
-        {
-            i = -1;
-        }
+    public static string StripExtension (string fileName) => fileName is null ? string.Empty : Path.GetFileNameWithoutExtension(fileName);
 
-        return fileName[(i + 1)..];
-    }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
-    public static string StripExtension (string fileName)
-    {
-        var i = fileName.LastIndexOf('.');
+    public static string GetExtension (string fileName) => fileName is null ? string.Empty : Path.GetExtension(fileName).TrimStart('.');
 
-        if (i < 0)
-        {
-            i = fileName.Length - 1;
-        }
-
-        return fileName[..i];
-    }
-
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
-    public static string GetExtension (string fileName)
-    {
-        var i = fileName.LastIndexOf('.');
-
-        return i < 0 || i >= fileName.Length - 1
-            ? string.Empty
-            : fileName[(i + 1)..];
-    }
 
 
     public static string GetFileSizeAsText (long size)
@@ -106,9 +75,17 @@ public class Util
         return match;
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
     public static int DamerauLevenshteinDistance (string src, string dest)
     {
+        if (dest is null || dest.Length == 0)
+        {
+            return 0;
+        }
+        if (src is null || src.Length == 0)
+        {
+            return int.MaxValue;
+        }
+
         var d = new int[src.Length + 1, dest.Length + 1];
         int i, j, cost;
         var str1 = src.ToCharArray();
@@ -146,9 +123,12 @@ public class Util
         return d[str1.Length, str2.Length];
     }
 
-    //TODO Add Null Checks (https://github.com/LogExperts/LogExpert/issues/403)
+
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
+        s1 ??= string.Empty;
+        s2 ??= string.Empty;
+
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
         {
@@ -413,10 +393,15 @@ public class Util
         }
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
     [SupportedOSPlatform("windows")]
     public string? GetWordFromPos (int xPos, string text, Graphics g, Font font)
     {
+        if (text is null)
+            return null;
+        //todo check for null in referenced objects
+        ArgumentNullException.ThrowIfNull(g);
+        ArgumentNullException.ThrowIfNull(font);
+
         var words = text.Split([' ', '.', ':', ';']);
 
         var index = 0;
