@@ -1333,4 +1333,16 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="AboutBox_UI_Text" xml:space="preserve">
     <value>AboutBox</value>
   </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag" xml:space="preserve">
+    <value>Drag horizontal</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag" xml:space="preserve">
+    <value>Drag vertical</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemInvertedDrag" xml:space="preserve">
+    <value>Drag vertical inverted</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector" xml:space="preserve">
+    <value>Timestamp selector</value>
+  </data>
 </root>

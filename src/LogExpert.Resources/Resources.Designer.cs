@@ -319,6 +319,42 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Timestamp selector.
+        /// </summary>
+        public static string DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector {
+            get {
+                return ResourceManager.GetString("DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drag horizontal.
+        /// </summary>
+        public static string DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag {
+            get {
+                return ResourceManager.GetString("DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drag vertical inverted.
+        /// </summary>
+        public static string DateTimeDragControl_UI_ToolStripItem_toolStripItemInvertedDrag {
+            get {
+                return ResourceManager.GetString("DateTimeDragControl_UI_ToolStripItem_toolStripItemInvertedDrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drag vertical.
+        /// </summary>
+        public static string DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag {
+            get {
+                return ResourceManager.GetString("DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Deceased {
