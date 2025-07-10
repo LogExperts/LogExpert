@@ -199,7 +199,7 @@
   <data name="Program_UI_Error_ConfigFileNotFound" xml:space="preserve">
     <value>Config file not found</value>
   </data>
-  <data name="Program_UI_Error_InsufficiantRights" xml:space="preserve">
+  <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
     <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
