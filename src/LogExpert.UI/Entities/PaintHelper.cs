@@ -306,12 +306,12 @@ internal static class PaintHelper
         {
             DataGridViewAdvancedCellBorderStyle.None => 0,
             DataGridViewAdvancedCellBorderStyle.InsetDouble or DataGridViewAdvancedCellBorderStyle.OutsetDouble => 2,
-            DataGridViewAdvancedCellBorderStyle.NotSet => 1, // Default border size for NotSet
-            DataGridViewAdvancedCellBorderStyle.Single => 1, // Default border size for Single
-            DataGridViewAdvancedCellBorderStyle.Inset => 1, // Default border size for Inset
-            DataGridViewAdvancedCellBorderStyle.Outset => 1, // Default border size for Outset
-            DataGridViewAdvancedCellBorderStyle.OutsetPartial => 1, // Default border size for OutsetPartial
-            _ => 1
+            DataGridViewAdvancedCellBorderStyle.NotSet => 0, // Default border size for NotSet
+            DataGridViewAdvancedCellBorderStyle.Single => 0, // Default border size for Single
+            DataGridViewAdvancedCellBorderStyle.Inset => 0, // Default border size for Inset
+            DataGridViewAdvancedCellBorderStyle.Outset => 0, // Default border size for Outset
+            DataGridViewAdvancedCellBorderStyle.OutsetPartial => 0, // Default border size for OutsetPartial
+            _ => 0
         };
     }
 

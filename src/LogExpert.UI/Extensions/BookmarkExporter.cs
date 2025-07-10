@@ -54,7 +54,7 @@ internal static class BookmarkExporter
                     .Replace("\\\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase);
 
                 // Line is formatted: logfileName ";" bookmark.LineNum ";" bookmark.Text;
-                var parts = line.Split(';', 3, StringSplitOptions.RemoveEmptyEntries);
+                var parts = line.Split(';', 3, StringSplitOptions.None);
 
                 // parts[0] = fileStr
                 // parts[1] = line number
