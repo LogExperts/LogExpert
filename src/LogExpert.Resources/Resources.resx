@@ -1294,4 +1294,43 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_ComboBox_ToolTip_Language" xml:space="preserve">
     <value>Userinterface language</value>
   </data>
+  <data name="Eminus_UI_CannotParseJavaStackTraceLine" xml:space="preserve">
+    <value>Cannot parse Java stack trace line</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_LoadClassInEclipse" xml:space="preserve">
+    <value>Load class in Eclipse</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
+    <value>{0}Load class in Eclipse</value>
+  </data>
+  <data name="Title_LogExpert_Deserialize" xml:space="preserve">
+    <value>Deserialize</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
+    <value>Eclipse Remote Navigation</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Description" xml:space="preserve">
+    <value>Enter the host and the port where the Eclipse plugin is listening to. If a password is configured, enter the password too.</value>
+  </data>
+  <data name="AboutBox_UI_Label_Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="AboutBox_UI_Label_Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AboutBox_UI_Label_ProductName" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="AboutBox_UI_Text" xml:space="preserve">
+    <value>AboutBox</value>
+  </data>
 </root>

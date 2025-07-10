@@ -1291,4 +1291,43 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="SettingsDialog_UI_ComboBox_ToolTip_Language" xml:space="preserve">
     <value>Sprache des Userinterfaces</value>
   </data>
+  <data name="Eminus_UI_CannotParseJavaStackTraceLine" xml:space="preserve">
+    <value>Java Stacktrace Zeile kann nicht geparsed werden</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_LoadClassInEclipse" xml:space="preserve">
+    <value>Klasse in Eclipse laden</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
+    <value>{0}Klasse in Eclipse laden</value>
+  </data>
+  <data name="Title_LogExpert_Deserialize" xml:space="preserve">
+    <value>Deserialisieren</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
+    <value>Eclipse Remote Navigation</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Password" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Description" xml:space="preserve">
+    <value>Eingabe des Hosts und Ports auf den das Eclipseplugin hört. Sollte ein Password konfiguriert sein, dies bitte auch eingeben.</value>
+  </data>
+  <data name="AboutBox_UI_Label_Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="AboutBox_UI_Label_Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AboutBox_UI_Label_ProductName" xml:space="preserve">
+    <value>Produktname</value>
+  </data>
+  <data name="AboutBox_UI_Text" xml:space="preserve">
+    <value>Information</value>
+  </data>
 </root>

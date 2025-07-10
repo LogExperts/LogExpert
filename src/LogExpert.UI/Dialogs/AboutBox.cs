@@ -27,17 +27,13 @@ internal partial class AboutBox : Form
         usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
 
-        Text = $@"About {AssemblyTitle}";
-        labelProductName.Text = AssemblyProduct;
-        labelVersion.Text = AssemblyVersion;
-        labelCopyright.Text = AssemblyCopyright;
         var link = "https://github.com/LogExperts/LogExpert";
         _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));
         LoadUsedComponents();
     }
 
+    //TODO Jsons should be serialized on a central place and not in every UI component
     //Name, Version, License, Download, Source
-
     private void LoadUsedComponents ()
     {
         var json = File.ReadAllText($"{Application.StartupPath}files\\json\\usedComponents.json");
@@ -51,6 +47,11 @@ internal partial class AboutBox : Form
     private void LoadResources ()
     {
         logoPictureBox.Image = Resources.LogLover;
+        labelProductName.Text = AssemblyProduct;
+        labelVersion.Text = AssemblyVersion;
+        labelCopyright.Text = AssemblyCopyright;
+        okButton.Text = Resources.LogExpert_Common_UI_Button_OK;
+        Text = $"{Resources.AboutBox_UI_Text} {AssemblyTitle}";
     }
 
     #endregion
@@ -70,6 +71,7 @@ internal partial class AboutBox : Form
                     return titleAttribute.Title;
                 }
             }
+
             return Path.GetFileNameWithoutExtension(_assembly.Location);
         }
     }

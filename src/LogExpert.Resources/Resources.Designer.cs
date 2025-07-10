@@ -61,6 +61,42 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copyright.
+        /// </summary>
+        public static string AboutBox_UI_Label_Copyright {
+            get {
+                return ResourceManager.GetString("AboutBox_UI_Label_Copyright", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Product Name.
+        /// </summary>
+        public static string AboutBox_UI_Label_ProductName {
+            get {
+                return ResourceManager.GetString("AboutBox_UI_Label_ProductName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string AboutBox_UI_Label_Version {
+            get {
+                return ResourceManager.GetString("AboutBox_UI_Label_Version", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AboutBox.
+        /// </summary>
+        public static string AboutBox_UI_Text {
+            get {
+                return ResourceManager.GetString("AboutBox_UI_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Add {
@@ -299,6 +335,78 @@ namespace LogExpert {
             get {
                 object obj = ResourceManager.GetObject("Delete", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot parse Java stack trace line.
+        /// </summary>
+        public static string Eminus_UI_CannotParseJavaStackTraceLine {
+            get {
+                return ResourceManager.GetString("Eminus_UI_CannotParseJavaStackTraceLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}Load class in Eclipse.
+        /// </summary>
+        public static string Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse {
+            get {
+                return ResourceManager.GetString("Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Load class in Eclipse.
+        /// </summary>
+        public static string Eminus_UI_GetMenuText_LoadClassInEclipse {
+            get {
+                return ResourceManager.GetString("Eminus_UI_GetMenuText_LoadClassInEclipse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the host and the port where the Eclipse plugin is listening to. If a password is configured, enter the password too..
+        /// </summary>
+        public static string EminusConfigDlg_UI_Label_Description {
+            get {
+                return ResourceManager.GetString("EminusConfigDlg_UI_Label_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Host.
+        /// </summary>
+        public static string EminusConfigDlg_UI_Label_Host {
+            get {
+                return ResourceManager.GetString("EminusConfigDlg_UI_Label_Host", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password.
+        /// </summary>
+        public static string EminusConfigDlg_UI_Label_Password {
+            get {
+                return ResourceManager.GetString("EminusConfigDlg_UI_Label_Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Port.
+        /// </summary>
+        public static string EminusConfigDlg_UI_Label_Port {
+            get {
+                return ResourceManager.GetString("EminusConfigDlg_UI_Label_Port", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Eclipse Remote Navigation.
+        /// </summary>
+        public static string EminusConfigDlg_UI_Text {
+            get {
+                return ResourceManager.GetString("EminusConfigDlg_UI_Text", resourceCulture);
             }
         }
         
@@ -3571,6 +3679,15 @@ namespace LogExpert {
         public static string Title_LogExpert {
             get {
                 return ResourceManager.GetString("Title_LogExpert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialize.
+        /// </summary>
+        public static string Title_LogExpert_Deserialize {
+            get {
+                return ResourceManager.GetString("Title_LogExpert_Deserialize", resourceCulture);
             }
         }
         
