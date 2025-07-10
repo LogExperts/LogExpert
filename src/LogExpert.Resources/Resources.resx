@@ -939,110 +939,110 @@ Column restrict</value>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
     <value>This is a test exception thrown by the GUI thread</value>
   </data>
-  <data name="SettingsDialog_UI_Label_WarningMaximumLineLength" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelWarningMaximumLineLength" xml:space="preserve">
     <value>! Changing the Maximum Line Length can impact performance and is not recommended !</value>
   </data>
-  <data name="SettingsDialog_UI_Label_MaximumLineLengthRestartRequired" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelMaximumLineLength" xml:space="preserve">
     <value>Maximum Line Length (restart required)</value>
   </data>
-  <data name="SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntriesDisplayed" xml:space="preserve">
     <value>Maximum filter entries displayed</value>
   </data>
-  <data name="SettingsDialog_UI_Label_MaximumFilterEntries" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntries" xml:space="preserve">
     <value>Maximum filter entries</value>
   </data>
-  <data name="SettingsDialog_UI_Label_DefaultEncoding" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelDefaultEncoding" xml:space="preserve">
     <value>Default encoding</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Font" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelFont" xml:space="preserve">
     <value>Font</value>
   </data>
-  <data name="SettingsDialog_UI_Label_ToolsDescription" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelToolsDescription" xml:space="preserve">
     <value>You can configure as many tools as you want.
 Checked tools will appear in the icon bar. All other tools are available in the tools menu.</value>
   </data>
-  <data name="SettingsDialog_UI_Label_WorkingDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelWorkingDir" xml:space="preserve">
     <value>Working dir:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_ToolName" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelToolName" xml:space="preserve">
     <value>Name:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_ToolColumnizerForOutput" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelToolColumnizerForOutput" xml:space="preserve">
     <value>Columnizer for output:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Tool" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelTool" xml:space="preserve">
     <value>Program:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Arguments" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelArguments" xml:space="preserve">
     <value>Arguments:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_MaxDays" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelMaxDays" xml:space="preserve">
     <value>Max days:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Pattern" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelPattern" xml:space="preserve">
     <value>Pattern:</value>
   </data>
-  <data name="SettingsDialog_UI_Label_HintMultiFile" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelHintMultiFile" xml:space="preserve">
     <value>Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.</value>
   </data>
-  <data name="SettingsDialog_UI_Label_NoteMultifile" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelNoteMultiFile" xml:space="preserve">
     <value>Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (&lt;filename&gt;, &lt;filename&gt;.1, &lt;filename&gt;.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.</value>
   </data>
-  <data name="SettingsDialog_UI_Label_SessionSaveOwnDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelSessionSaveOwnDir" xml:space="preserve">
     <value>Place Holder Text, this will be replaced programmatically</value>
   </data>
-  <data name="SettingsDialog_UI_Label_FilePollingInterval" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelFilePollingInterval" xml:space="preserve">
     <value>File polling interval (ms):</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Info" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelInfo" xml:space="preserve">
     <value>Changes will take effect on next file load</value>
   </data>
-  <data name="SettingsDialog_UI_Label_NumberOfBlocks" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelNumberOfBlocks" xml:space="preserve">
     <value>Number of blocks</value>
   </data>
-  <data name="SettingsDialog_UI_Label_LinesPerBlock" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelLinesPerBlock" xml:space="preserve">
     <value>Lines/block</value>
   </data>
-  <data name="SettingsDialog_UI_Button_Color" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonTailColor" xml:space="preserve">
     <value>Color...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ChangeFont" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonChangeFont" xml:space="preserve">
     <value>Change...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_TimespreadColor" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonTimespreadColor" xml:space="preserve">
     <value>Color...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ToolDelete" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonToolDelete" xml:space="preserve">
     <value>Remove</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ToolAdd" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonToolAdd" xml:space="preserve">
     <value>Add new</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ToolDown" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonToolDown" xml:space="preserve">
     <value>Down</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ToolUp" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonToolUp" xml:space="preserve">
     <value>Up</value>
   </data>
-  <data name="SettingsDialog_UI_Button_WorkingDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonWorkingDir" xml:space="preserve">
     <value>...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_Icon" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonIcon" xml:space="preserve">
     <value>   Icon...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_Arguments" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonArguments" xml:space="preserve">
     <value>...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_Tool" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonTool" xml:space="preserve">
     <value>...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_Delete" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonDelete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="SettingsDialog_UI_Button_ConfigurePlugin" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonConfigPlugin" xml:space="preserve">
     <value>Configure...</value>
   </data>
-  <data name="SettingsDialog_UI_Button_SessionSaveDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_Button_buttonSessionSaveDir" xml:space="preserve">
     <value>...</value>
   </data>
   <data name="LogExpert_Common_UI_Button_Cancel" xml:space="preserve">
@@ -1057,181 +1057,181 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogExpert_Common_UI_Button_Import" xml:space="preserve">
     <value>Import...</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_Misc" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMisc" xml:space="preserve">
     <value>Misc</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_Defaults" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaults" xml:space="preserve">
     <value>Defaults</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_Font" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxFont" xml:space="preserve">
     <value>Font</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_TimeSpreadDisplay" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeSpreadDisplay" xml:space="preserve">
     <value>Time spread display</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_DisplayMode" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDisplayMode" xml:space="preserve">
     <value>Display mode</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_TimestampNavigationControl" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeStampNavigationControl" xml:space="preserve">
     <value>Timestamp navigation control</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_MouseDragDefault" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMouseDragDefaults" xml:space="preserve">
     <value>Mouse Drag Default</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_ToolSettings" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxToolSettings" xml:space="preserve">
     <value>Tool settings</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_DefaultFilenamePattern" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaultFileNamePattern" xml:space="preserve">
     <value>Default filename pattern</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxWhenOpeningMultiFile" xml:space="preserve">
     <value>When opening multiple files...</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_Plugins" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPlugins" xml:space="preserve">
     <value>Plugins</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_Settings" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxSettings" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_PersistenceFileLocation" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPersistantFileLocation" xml:space="preserve">
     <value>Persistence file location</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_CPUAndStuff" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxCPUAndStuff" xml:space="preserve">
     <value>CPU and stuff</value>
   </data>
-  <data name="SettingsDialog_UI_GroupBox_LineBufferUsage" xml:space="preserve">
+  <data name="SettingsDialog_UI_GroupBox_groupBoxLineBufferUsage" xml:space="preserve">
     <value>Line buffer usage</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowErrorMessageOnlyOneInstance" xml:space="preserve">
     <value>Show Error Message?</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ColumnSize" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnSize" xml:space="preserve">
     <value>Set last column width</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_TailState" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTailState" xml:space="preserve">
     <value>Show tail state on tabs</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_OpenLastFiles" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxOpenLastFiles" xml:space="preserve">
     <value>Re-open last used files</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_SingleInstance" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSingleInstance" xml:space="preserve">
     <value>Allow only 1 Instance</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_AskCloseTabs" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
     <value>Ask before closing tabs</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_DarkMode" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
     <value>Dark Mode (restart required)</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_FollowTail" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
     <value>Follow tail enabled</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ColumnFinder" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnFinder" xml:space="preserve">
     <value>Show column finder</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_SyncFilter" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSyncFilter" xml:space="preserve">
     <value>Sync filter list enabled</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_FilterTail" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFilterTail" xml:space="preserve">
     <value>Filter tail enabled</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ReverseAlpha" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxReverseAlpha" xml:space="preserve">
     <value>Reverse alpha</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_TimeSpread" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimeSpread" xml:space="preserve">
     <value>Show time spread</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_Timestamp" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimestamp" xml:space="preserve">
     <value>Show timestamp control, if supported by columnizer</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_Sysout" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSysout" xml:space="preserve">
     <value>Pipe sysout to tab</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_AutoPick" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAutoPick" xml:space="preserve">
     <value>Automatically pick for new files</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_MaskPrio" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMaskPrio" xml:space="preserve">
     <value>Mask has priority before history</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_PortableMode" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxPortableMode" xml:space="preserve">
     <value>Activate Portable Mode</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_SaveFilter" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveFilter" xml:space="preserve">
     <value>Save and restore filter and filter tabs</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_SaveSessions" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveSessions" xml:space="preserve">
     <value>Automatically save persistence files (.lxp)</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_LegacyReader" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxLegacyReader" xml:space="preserve">
     <value>Use legacy file reader (slower)</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_MultiThread" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMultiThread" xml:space="preserve">
     <value>Multi threaded filter</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_ViewSettings" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageViewSettings" xml:space="preserve">
     <value>View settings</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_TimestampFeatures" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageTimeStampFeatures" xml:space="preserve">
     <value>Timestamp features</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_ExternalTools" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageExternalTools" xml:space="preserve">
     <value>External Tools</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_Columnizers" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageColumnizers" xml:space="preserve">
     <value>Columnizers</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_Highlight" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageHighlightMask" xml:space="preserve">
     <value>Highlight</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_MultiFile" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageMultiFile" xml:space="preserve">
     <value>MultiFile</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_Plugins" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPagePlugins" xml:space="preserve">
     <value>Plugins</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_Sessions" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageSessions" xml:space="preserve">
     <value>Persistence</value>
   </data>
-  <data name="SettingsDialog_UI_TabPage_Memory" xml:space="preserve">
+  <data name="SettingsDialog_UI_TabPage_tabPageMemory" xml:space="preserve">
     <value>Memory/CPU</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_LineView" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLineView" xml:space="preserve">
     <value>Line view</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_TimeView" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTimeView" xml:space="preserve">
     <value>Time view</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_VerticalMouseDragInverted" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDragInverted" xml:space="preserve">
     <value>Vertical Inverted</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_HorizMouseDrag" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonHorizMouseDrag" xml:space="preserve">
     <value>Horizontal</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_VerticalMouseDrag" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDrag" xml:space="preserve">
     <value>Vertical</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_AskWhatToDo" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonAskWhatToDo" xml:space="preserve">
     <value>Ask what to do</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTreatAllFilesAsOneMultifile" xml:space="preserve">
     <value>Treat all files as one MultiFile</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLoadEveryFileIntoSeperatedTab" xml:space="preserve">
     <value>Load every file into a separate tab</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_SessionSaveOwn" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSaveOwn" xml:space="preserve">
     <value>Own directory</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_SessionSaveDocuments" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonsessionSaveDocuments" xml:space="preserve">
     <value>MyDocuments/LogExpert</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_SessionSameDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSameDir" xml:space="preserve">
     <value>Same directory as log file</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_SessionApplicationStartupDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionApplicationStartupDir" xml:space="preserve">
     <value>Application startup directory</value>
   </data>
-  <data name="SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir" xml:space="preserve">
     <value>This path is based on the executable and where it has been started from.</value>
   </data>
   <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask" xml:space="preserve">
@@ -1246,25 +1246,25 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup" xml:space="preserve">
     <value>Highlight group</value>
   </data>
-  <data name="SettingsDialog_UI_ComboBox_ToolTip_Encoding" xml:space="preserve">
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding" xml:space="preserve">
     <value>Encoding to be used when no BOM header and no persistence data is available.</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_PortableMode" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
     <value>If this mode is activated, the save file will be loaded from the Executable Location</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_LegacyReader" xml:space="preserve">
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader" xml:space="preserve">
     <value>Slower but more compatible with strange linefeeds and encodings</value>
   </data>
   <data name="SettingsDialog_Form_Text" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="SettingsDialog_UI_FolderBrowser_WorkingDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir" xml:space="preserve">
     <value>Select a working directory</value>
   </data>
   <data name="SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName" xml:space="preserve">
     <value>HeaderName</value>
   </data>
-  <data name="SettingsDialog_UI_FolderBrowser_SessionSaveDir" xml:space="preserve">
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir" xml:space="preserve">
     <value>Choose folder for LogExpert's session files</value>
   </data>
   <data name="SettingsDialog_UI_ActivatePortableMode" xml:space="preserve">
@@ -1288,10 +1288,10 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_SettingsImported" xml:space="preserve">
     <value>Settings imported</value>
   </data>
-  <data name="SettingsDialog_UI_Label_Language" xml:space="preserve">
+  <data name="SettingsDialog_UI_Label_labelLanguage" xml:space="preserve">
     <value>Language (requires restart):</value>
   </data>
-  <data name="SettingsDialog_UI_ComboBox_ToolTip_Language" xml:space="preserve">
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage" xml:space="preserve">
     <value>Userinterface language</value>
   </data>
   <data name="Eminus_UI_CannotParseJavaStackTraceLine" xml:space="preserve">

@@ -9,6 +9,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.Interface;
+using LogExpert.Extensions;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions;
@@ -37,6 +38,7 @@ internal partial class SettingsDialog : Form
         Preferences = prefs;
         _logTabWin = logTabWin; //TODO: uses only HighlightGroupList. Can we pass IList instead?
         InitializeComponent();
+
         LoadResources();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
@@ -68,130 +70,8 @@ internal partial class SettingsDialog : Form
         ApplyToolTips();
         ApplyFormTitle();
 
-        var textMap = new Dictionary<Control, string>
-        {
-            // General
-            { labelWarningMaximumLineLength, Resources.SettingsDialog_UI_Label_WarningMaximumLineLength },
-            { labelMaximumLineLength, Resources.SettingsDialog_UI_Label_MaximumLineLengthRestartRequired },
-            { labelMaximumFilterEntriesDisplayed, Resources.SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed },
-            { labelMaximumFilterEntries, Resources.SettingsDialog_UI_Label_MaximumFilterEntries },
-            { labelDefaultEncoding, Resources.SettingsDialog_UI_Label_DefaultEncoding },
-            { groupBoxMisc, Resources.SettingsDialog_UI_GroupBox_Misc },
-            { checkBoxShowErrorMessageOnlyOneInstance, Resources.SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance },
-            { checkBoxColumnSize, Resources.SettingsDialog_UI_CheckBox_ColumnSize },
-            { buttonTailColor, Resources.SettingsDialog_UI_Button_Color },
-            { checkBoxTailState, Resources.SettingsDialog_UI_CheckBox_TailState },
-            { checkBoxOpenLastFiles, Resources.SettingsDialog_UI_CheckBox_OpenLastFiles },
-            { checkBoxSingleInstance, Resources.SettingsDialog_UI_CheckBox_SingleInstance },
-            { checkBoxAskCloseTabs, Resources.SettingsDialog_UI_CheckBox_AskCloseTabs },
-            { groupBoxDefaults, Resources.SettingsDialog_UI_GroupBox_Defaults },
-            { checkBoxDarkMode, Resources.SettingsDialog_UI_CheckBox_DarkMode },
-            { checkBoxFollowTail, Resources.SettingsDialog_UI_CheckBox_FollowTail },
-            { checkBoxColumnFinder, Resources.SettingsDialog_UI_CheckBox_ColumnFinder },
-            { checkBoxSyncFilter, Resources.SettingsDialog_UI_CheckBox_SyncFilter },
-            { checkBoxFilterTail, Resources.SettingsDialog_UI_CheckBox_FilterTail },
-            { groupBoxFont, Resources.SettingsDialog_UI_GroupBox_Font },
-            { buttonChangeFont, Resources.SettingsDialog_UI_Button_ChangeFont },
-            { labelFont, Resources.SettingsDialog_UI_Label_Font },
-
-            // Tab Pages
-            { tabPageViewSettings, Resources.SettingsDialog_UI_TabPage_ViewSettings },
-            { tabPageTimeStampFeatures, Resources.SettingsDialog_UI_TabPage_TimestampFeatures },
-            { tabPageExternalTools, Resources.SettingsDialog_UI_TabPage_ExternalTools },
-            { tabPageColumnizers, Resources.SettingsDialog_UI_TabPage_Columnizers },
-            { tabPageHighlightMask, Resources.SettingsDialog_UI_TabPage_Highlight },
-            { tabPageMultiFile, Resources.SettingsDialog_UI_TabPage_MultiFile },
-            { tabPagePlugins, Resources.SettingsDialog_UI_TabPage_Plugins },
-            { tabPageSessions, Resources.SettingsDialog_UI_TabPage_Sessions },
-            { tabPageMemory, Resources.SettingsDialog_UI_TabPage_Memory },
-
-            // Timestamp/Time View
-            { groupBoxTimeSpreadDisplay, Resources.SettingsDialog_UI_GroupBox_TimeSpreadDisplay },
-            { groupBoxDisplayMode, Resources.SettingsDialog_UI_GroupBox_DisplayMode },
-            { radioButtonLineView, Resources.SettingsDialog_UI_RadioButton_LineView },
-            { radioButtonTimeView, Resources.SettingsDialog_UI_RadioButton_TimeView },
-            { checkBoxReverseAlpha, Resources.SettingsDialog_UI_CheckBox_ReverseAlpha },
-            { buttonTimespreadColor, Resources.SettingsDialog_UI_Button_TimespreadColor },
-            { checkBoxTimeSpread, Resources.SettingsDialog_UI_CheckBox_TimeSpread },
-            { groupBoxTimeStampNavigationControl, Resources.SettingsDialog_UI_GroupBox_TimestampNavigationControl },
-            { checkBoxTimestamp, Resources.SettingsDialog_UI_CheckBox_Timestamp },
-
-            // Mouse Drag
-            { groupBoxMouseDragDefaults, Resources.SettingsDialog_UI_GroupBox_MouseDragDefault },
-            { radioButtonVerticalMouseDragInverted, Resources.SettingsDialog_UI_RadioButton_VerticalMouseDragInverted },
-            { radioButtonHorizMouseDrag, Resources.SettingsDialog_UI_RadioButton_HorizMouseDrag },
-            { radioButtonVerticalMouseDrag, Resources.SettingsDialog_UI_RadioButton_VerticalMouseDrag },
-
-            // Tools Section
-            { labelToolsDescription, Resources.SettingsDialog_UI_Label_ToolsDescription },
-            { buttonToolDelete, Resources.SettingsDialog_UI_Button_ToolDelete },
-            { buttonToolAdd, Resources.SettingsDialog_UI_Button_ToolAdd },
-            { buttonToolDown, Resources.SettingsDialog_UI_Button_ToolDown },
-            { buttonToolUp, Resources.SettingsDialog_UI_Button_ToolUp },
-            { groupBoxToolSettings, Resources.SettingsDialog_UI_GroupBox_ToolSettings },
-            { labelWorkingDir, Resources.SettingsDialog_UI_Label_WorkingDir },
-            { buttonWorkingDir, Resources.SettingsDialog_UI_Button_WorkingDir },
-            { buttonIcon, Resources.SettingsDialog_UI_Button_Icon },
-            { labelToolName, Resources.SettingsDialog_UI_Label_ToolName },
-            { labelToolColumnizerForOutput, Resources.SettingsDialog_UI_Label_ToolColumnizerForOutput },
-            { checkBoxSysout, Resources.SettingsDialog_UI_CheckBox_Sysout },
-            { buttonArguments, Resources.SettingsDialog_UI_Button_Arguments },
-            { labelTool, Resources.SettingsDialog_UI_Label_Tool },
-            { buttonTool, Resources.SettingsDialog_UI_Button_Tool },
-            { labelArguments, Resources.SettingsDialog_UI_Label_Arguments },
-
-            // Columnizer/Highlight
-            { checkBoxAutoPick, Resources.SettingsDialog_UI_CheckBox_AutoPick },
-            { checkBoxMaskPrio, Resources.SettingsDialog_UI_CheckBox_MaskPrio },
-            { buttonDelete, Resources.SettingsDialog_UI_Button_Delete },
-
-            // MultiFile
-            { groupBoxDefaultFileNamePattern, Resources.SettingsDialog_UI_GroupBox_DefaultFilenamePattern },
-            { labelMaxDays, Resources.SettingsDialog_UI_Label_MaxDays },
-            { labelPattern, Resources.SettingsDialog_UI_Label_Pattern },
-            { labelHintMultiFile, Resources.SettingsDialog_UI_Label_HintMultiFile },
-            { labelNoteMultiFile, Resources.SettingsDialog_UI_Label_NoteMultifile },
-            { groupBoxWhenOpeningMultiFile, Resources.SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles },
-            { radioButtonAskWhatToDo, Resources.SettingsDialog_UI_RadioButton_AskWhatToDo },
-            { radioButtonTreatAllFilesAsOneMultifile, Resources.SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile },
-            { radioButtonLoadEveryFileIntoSeperatedTab, Resources.SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab },
-
-            // Plugin / Session / Memory
-            { groupBoxPlugins, Resources.SettingsDialog_UI_GroupBox_Plugins },
-            { groupBoxSettings, Resources.SettingsDialog_UI_GroupBox_Settings },
-            { buttonConfigPlugin, Resources.SettingsDialog_UI_Button_ConfigurePlugin },
-            { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_PortableMode },
-            { checkBoxSaveFilter, Resources.SettingsDialog_UI_CheckBox_SaveFilter },
-            { groupBoxPersistantFileLocation, Resources.SettingsDialog_UI_GroupBox_PersistenceFileLocation },
-            { labelSessionSaveOwnDir, Resources.SettingsDialog_UI_Label_SessionSaveOwnDir },
-            { buttonSessionSaveDir, Resources.SettingsDialog_UI_Button_SessionSaveDir },
-            { radioButtonSessionSaveOwn, Resources.SettingsDialog_UI_RadioButton_SessionSaveOwn },
-            { radioButtonsessionSaveDocuments, Resources.SettingsDialog_UI_RadioButton_SessionSaveDocuments },
-            { radioButtonSessionSameDir, Resources.SettingsDialog_UI_RadioButton_SessionSameDir },
-            { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_SessionApplicationStartupDir },
-            { checkBoxSaveSessions, Resources.SettingsDialog_UI_CheckBox_SaveSessions },
-            { groupBoxCPUAndStuff, Resources.SettingsDialog_UI_GroupBox_CPUAndStuff },
-            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_LegacyReader },
-            { checkBoxMultiThread, Resources.SettingsDialog_UI_CheckBox_MultiThread },
-            { labelFilePollingInterval, Resources.SettingsDialog_UI_Label_FilePollingInterval },
-            { groupBoxLineBufferUsage, Resources.SettingsDialog_UI_GroupBox_LineBufferUsage },
-            { labelInfo, Resources.SettingsDialog_UI_Label_Info },
-            { labelNumberOfBlocks, Resources.SettingsDialog_UI_Label_NumberOfBlocks },
-            { labelLinesPerBlock, Resources.SettingsDialog_UI_Label_LinesPerBlock },
-
-            // Dialog buttons
-            { buttonCancel, Resources.LogExpert_Common_UI_Button_Cancel },
-            { buttonOk, Resources.LogExpert_Common_UI_Button_OK },
-            { buttonExport, Resources.LogExpert_Common_UI_Button_Export },
-            { buttonImport, Resources.LogExpert_Common_UI_Button_Import },
-        };
-
-
-
         // Form title
         Text = Resources.SettingsDialog_Form_Text;
-
-
     }
 
     private void ApplyFormTitle ()
@@ -209,7 +89,15 @@ internal partial class SettingsDialog : Form
 
     private void ApplyTextResources ()
     {
-        foreach (var entry in GetTextResourceMap())
+        var map = ResourceHelper.GenerateTextMapFromNaming(this, nameof(SettingsDialog), "UI");
+
+        // Add exceptions or unrelated entries manually:
+        map[buttonCancel] = Resources.LogExpert_Common_UI_Button_Cancel;
+        map[buttonOk] = Resources.LogExpert_Common_UI_Button_OK;
+        map[buttonExport] = Resources.LogExpert_Common_UI_Button_Export;
+        map[buttonImport] = Resources.LogExpert_Common_UI_Button_Import;
+
+        foreach (var entry in map)
         {
             entry.Key.Text = entry.Value;
         }
@@ -418,7 +306,7 @@ internal partial class SettingsDialog : Form
         FolderBrowserDialog dlg = new()
         {
             RootFolder = Environment.SpecialFolder.MyComputer,
-            Description = Resources.SettingsDialog_UI_FolderBrowser_WorkingDir
+            Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir
         };
 
         if (!string.IsNullOrEmpty(textBox.Text))
@@ -985,7 +873,7 @@ internal partial class SettingsDialog : Form
         }
 
         dlg.ShowNewFolderButton = true;
-        dlg.Description = Resources.SettingsDialog_UI_FolderBrowser_SessionSaveDir;
+        dlg.Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir;
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
@@ -1251,135 +1139,7 @@ internal partial class SettingsDialog : Form
 
     #endregion
 
-    #region Resourse Map
-
-    /// <summary>
-    /// Creates a mapping between UI controls and their corresponding text resources.
-    /// </summary>
-    /// <remarks>This method is used to associate UI controls with their respective text resources,
-    /// facilitating localization and dynamic text updates within the application.</remarks>
-    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the key is a <see cref="Control"/> and the value is a <see
-    /// cref="string"/> representing the text resource associated with the control.</returns>
-    private Dictionary<Control, string> GetTextResourceMap ()
-    {
-        return new Dictionary<Control, string>
-        {
-            // General
-            { labelWarningMaximumLineLength, Resources.SettingsDialog_UI_Label_WarningMaximumLineLength },
-            { labelMaximumLineLength, Resources.SettingsDialog_UI_Label_MaximumLineLengthRestartRequired },
-            { labelMaximumFilterEntriesDisplayed, Resources.SettingsDialog_UI_Label_MaximumFilterEntriesDisplayed },
-            { labelMaximumFilterEntries, Resources.SettingsDialog_UI_Label_MaximumFilterEntries },
-            { labelDefaultEncoding, Resources.SettingsDialog_UI_Label_DefaultEncoding },
-            { groupBoxMisc, Resources.SettingsDialog_UI_GroupBox_Misc },
-            { checkBoxShowErrorMessageOnlyOneInstance, Resources.SettingsDialog_UI_CheckBox_ShowErrorMessageOnlyOneInstance },
-            { checkBoxColumnSize, Resources.SettingsDialog_UI_CheckBox_ColumnSize },
-            { buttonTailColor, Resources.SettingsDialog_UI_Button_Color },
-            { checkBoxTailState, Resources.SettingsDialog_UI_CheckBox_TailState },
-            { checkBoxOpenLastFiles, Resources.SettingsDialog_UI_CheckBox_OpenLastFiles },
-            { checkBoxSingleInstance, Resources.SettingsDialog_UI_CheckBox_SingleInstance },
-            { checkBoxAskCloseTabs, Resources.SettingsDialog_UI_CheckBox_AskCloseTabs },
-            { groupBoxDefaults, Resources.SettingsDialog_UI_GroupBox_Defaults },
-            { checkBoxDarkMode, Resources.SettingsDialog_UI_CheckBox_DarkMode },
-            { checkBoxFollowTail, Resources.SettingsDialog_UI_CheckBox_FollowTail },
-            { checkBoxColumnFinder, Resources.SettingsDialog_UI_CheckBox_ColumnFinder },
-            { checkBoxSyncFilter, Resources.SettingsDialog_UI_CheckBox_SyncFilter },
-            { checkBoxFilterTail, Resources.SettingsDialog_UI_CheckBox_FilterTail },
-            { groupBoxFont, Resources.SettingsDialog_UI_GroupBox_Font },
-            { buttonChangeFont, Resources.SettingsDialog_UI_Button_ChangeFont },
-            { labelFont, Resources.SettingsDialog_UI_Label_Font },
-
-            // Tab Pages
-            { tabPageViewSettings, Resources.SettingsDialog_UI_TabPage_ViewSettings },
-            { tabPageTimeStampFeatures, Resources.SettingsDialog_UI_TabPage_TimestampFeatures },
-            { tabPageExternalTools, Resources.SettingsDialog_UI_TabPage_ExternalTools },
-            { tabPageColumnizers, Resources.SettingsDialog_UI_TabPage_Columnizers },
-            { tabPageHighlightMask, Resources.SettingsDialog_UI_TabPage_Highlight },
-            { tabPageMultiFile, Resources.SettingsDialog_UI_TabPage_MultiFile },
-            { tabPagePlugins, Resources.SettingsDialog_UI_TabPage_Plugins },
-            { tabPageSessions, Resources.SettingsDialog_UI_TabPage_Sessions },
-            { tabPageMemory, Resources.SettingsDialog_UI_TabPage_Memory },
-
-            // Timestamp/Time View
-            { groupBoxTimeSpreadDisplay, Resources.SettingsDialog_UI_GroupBox_TimeSpreadDisplay },
-            { groupBoxDisplayMode, Resources.SettingsDialog_UI_GroupBox_DisplayMode },
-            { radioButtonLineView, Resources.SettingsDialog_UI_RadioButton_LineView },
-            { radioButtonTimeView, Resources.SettingsDialog_UI_RadioButton_TimeView },
-            { checkBoxReverseAlpha, Resources.SettingsDialog_UI_CheckBox_ReverseAlpha },
-            { buttonTimespreadColor, Resources.SettingsDialog_UI_Button_TimespreadColor },
-            { checkBoxTimeSpread, Resources.SettingsDialog_UI_CheckBox_TimeSpread },
-            { groupBoxTimeStampNavigationControl, Resources.SettingsDialog_UI_GroupBox_TimestampNavigationControl },
-            { checkBoxTimestamp, Resources.SettingsDialog_UI_CheckBox_Timestamp },
-
-            // Mouse Drag
-            { groupBoxMouseDragDefaults, Resources.SettingsDialog_UI_GroupBox_MouseDragDefault },
-            { radioButtonVerticalMouseDragInverted, Resources.SettingsDialog_UI_RadioButton_VerticalMouseDragInverted },
-            { radioButtonHorizMouseDrag, Resources.SettingsDialog_UI_RadioButton_HorizMouseDrag },
-            { radioButtonVerticalMouseDrag, Resources.SettingsDialog_UI_RadioButton_VerticalMouseDrag },
-
-            // Tools Section
-            { labelToolsDescription, Resources.SettingsDialog_UI_Label_ToolsDescription },
-            { buttonToolDelete, Resources.SettingsDialog_UI_Button_ToolDelete },
-            { buttonToolAdd, Resources.SettingsDialog_UI_Button_ToolAdd },
-            { buttonToolDown, Resources.SettingsDialog_UI_Button_ToolDown },
-            { buttonToolUp, Resources.SettingsDialog_UI_Button_ToolUp },
-            { groupBoxToolSettings, Resources.SettingsDialog_UI_GroupBox_ToolSettings },
-            { labelWorkingDir, Resources.SettingsDialog_UI_Label_WorkingDir },
-            { buttonWorkingDir, Resources.SettingsDialog_UI_Button_WorkingDir },
-            { buttonIcon, Resources.SettingsDialog_UI_Button_Icon },
-            { labelToolName, Resources.SettingsDialog_UI_Label_ToolName },
-            { labelToolColumnizerForOutput, Resources.SettingsDialog_UI_Label_ToolColumnizerForOutput },
-            { checkBoxSysout, Resources.SettingsDialog_UI_CheckBox_Sysout },
-            { buttonArguments, Resources.SettingsDialog_UI_Button_Arguments },
-            { labelTool, Resources.SettingsDialog_UI_Label_Tool },
-            { buttonTool, Resources.SettingsDialog_UI_Button_Tool },
-            { labelArguments, Resources.SettingsDialog_UI_Label_Arguments },
-
-            // Columnizer/Highlight
-            { checkBoxAutoPick, Resources.SettingsDialog_UI_CheckBox_AutoPick },
-            { checkBoxMaskPrio, Resources.SettingsDialog_UI_CheckBox_MaskPrio },
-            { buttonDelete, Resources.SettingsDialog_UI_Button_Delete },
-
-            // MultiFile
-            { groupBoxDefaultFileNamePattern, Resources.SettingsDialog_UI_GroupBox_DefaultFilenamePattern },
-            { labelMaxDays, Resources.SettingsDialog_UI_Label_MaxDays },
-            { labelPattern, Resources.SettingsDialog_UI_Label_Pattern },
-            { labelHintMultiFile, Resources.SettingsDialog_UI_Label_HintMultiFile },
-            { labelNoteMultiFile, Resources.SettingsDialog_UI_Label_NoteMultifile },
-            { groupBoxWhenOpeningMultiFile, Resources.SettingsDialog_UI_GroupBox_WhenOpeningMultipleFiles },
-            { radioButtonAskWhatToDo, Resources.SettingsDialog_UI_RadioButton_AskWhatToDo },
-            { radioButtonTreatAllFilesAsOneMultifile, Resources.SettingsDialog_UI_RadioButton_TreatAllFilesAsOneMultiFile },
-            { radioButtonLoadEveryFileIntoSeperatedTab, Resources.SettingsDialog_UI_RadioButton_LoadEveryFileIntoSeparateTab },
-
-            // Plugin / Session / Memory
-            { groupBoxPlugins, Resources.SettingsDialog_UI_GroupBox_Plugins },
-            { groupBoxSettings, Resources.SettingsDialog_UI_GroupBox_Settings },
-            { buttonConfigPlugin, Resources.SettingsDialog_UI_Button_ConfigurePlugin },
-            { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_PortableMode },
-            { checkBoxSaveFilter, Resources.SettingsDialog_UI_CheckBox_SaveFilter },
-            { groupBoxPersistantFileLocation, Resources.SettingsDialog_UI_GroupBox_PersistenceFileLocation },
-            { labelSessionSaveOwnDir, Resources.SettingsDialog_UI_Label_SessionSaveOwnDir },
-            { buttonSessionSaveDir, Resources.SettingsDialog_UI_Button_SessionSaveDir },
-            { radioButtonSessionSaveOwn, Resources.SettingsDialog_UI_RadioButton_SessionSaveOwn },
-            { radioButtonsessionSaveDocuments, Resources.SettingsDialog_UI_RadioButton_SessionSaveDocuments },
-            { radioButtonSessionSameDir, Resources.SettingsDialog_UI_RadioButton_SessionSameDir },
-            { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_SessionApplicationStartupDir },
-            { checkBoxSaveSessions, Resources.SettingsDialog_UI_CheckBox_SaveSessions },
-            { groupBoxCPUAndStuff, Resources.SettingsDialog_UI_GroupBox_CPUAndStuff },
-            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_LegacyReader },
-            { checkBoxMultiThread, Resources.SettingsDialog_UI_CheckBox_MultiThread },
-            { labelFilePollingInterval, Resources.SettingsDialog_UI_Label_FilePollingInterval },
-            { groupBoxLineBufferUsage, Resources.SettingsDialog_UI_GroupBox_LineBufferUsage },
-            { labelInfo, Resources.SettingsDialog_UI_Label_Info },
-            { labelNumberOfBlocks, Resources.SettingsDialog_UI_Label_NumberOfBlocks },
-            { labelLinesPerBlock, Resources.SettingsDialog_UI_Label_LinesPerBlock },
-
-            // Dialog buttons
-            { buttonCancel, Resources.LogExpert_Common_UI_Button_Cancel },
-            { buttonOk, Resources.LogExpert_Common_UI_Button_OK },
-            { buttonExport, Resources.LogExpert_Common_UI_Button_Export },
-            { buttonImport, Resources.LogExpert_Common_UI_Button_Import },
-        };
-    }
+    #region Resources Map
 
     /// <summary>
     /// Creates a mapping of UI controls to their corresponding tooltip text.
@@ -1392,11 +1152,11 @@ internal partial class SettingsDialog : Form
     {
         return new Dictionary<Control, string>
         {
-            { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_Language },
-            { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_Encoding },
-            { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_PortableMode },
-            { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_SessionApplicationStartupDir },
-            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_LegacyReader }
+            { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage },
+            { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
+            { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
+            { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
+            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
         };
     }
 

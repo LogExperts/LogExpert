@@ -166,7 +166,7 @@ internal static class Program
         }
         catch (SecurityException se)
         {
-            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficiantRights, se.Message), Resources.Title_LogExpert_Error);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.Program_UI_Error_InsufficientRights, se.Message), Resources.Title_LogExpert_Error);
             cts.Cancel();
         }
     }

@@ -2,7 +2,6 @@ using System.Runtime.Versioning;
 
 namespace LogExpert.UI.Extensions;
 
-
 internal static class Utils
 {
     [SupportedOSPlatform("windows")]
