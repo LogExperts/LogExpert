@@ -17,9 +17,17 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <!--<OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>--><!--TODO: Normalize this across solution-->
     <SignAssembly>true</SignAssembly>
+    <PackageProjectUrl>https://github.com/LogExperts/LogExpert</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/LogExperts/LogExpert</RepositoryUrl>
+    <PackageTags>LogExpert, Columnizer, Logging, Windows, Winforms</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v.1.20.0</PackageReleaseNotes>
+    <PackageVersion>1.20.0.0</PackageVersion>
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
     <Product>LogExpert</Product>
     <Copyright>Copyright © LogExpert 2025</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <IsTestProject>false</IsTestProject>
     <UseWindowsForms>false</UseWindowsForms>
     <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
@@ -49,6 +57,7 @@
   <ItemGroup Label="Links">
     <Compile Include="..\Solution Items\AssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
     <None Include="..\Solution Items\Key.snk" Link="Key.snk" />
+    <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

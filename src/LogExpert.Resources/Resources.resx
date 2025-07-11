@@ -188,9 +188,19 @@
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Title_LogExpert" xml:space="preserve">
+    <value>LogExpert</value>
+    <comment>LogExpert</comment>
+  </data>
   <data name="LogLover" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\gif\LogLover.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>Logexpert Logo</comment>
+  </data>
+  <data name="Program_UI_Error_ConfigFileNotFound" xml:space="preserve">
+    <value>Config file not found</value>
+  </data>
+  <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
+    <value>Insufficient system rights for LogExpert. Maybe you have started it from a network drive. Please start LogExpert from a local drive.\n ({0})</value>
   </data>
   <data name="Pro_Filter" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\bmp\Pro_Filter.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -207,5 +217,1132 @@
   </data>
   <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Title_LogExpert_Error" xml:space="preserve">
+    <value>LogExpert Error</value>
+    <comment>LogExpert Error Title</comment>
+  </data>
+  <data name="Program_Logger_Error_Pipe_TimeoutException" xml:space="preserve">
+    <value>Timeout connecting to pipe server</value>
+    <comment>Timeout Exception thrown from the Named Pipe</comment>
+  </data>
+  <data name="Program_Logger_Warn_Error_Pipe_IOException" xml:space="preserve">
+    <value>An I/O error occurred while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="Program_Logger_Warn_Pipe_UnauthorizedAccessException" xml:space="preserve">
+    <value>Unauthorized access while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="Program_Logger_Warn_Pipe_CommonError" xml:space="preserve">
+    <value>Pipe server error: {0}</value>
+  </data>
+  <data name="Program_Logger_Error_Payload_InvalidCommand" xml:space="preserve">
+    <value>Invalid payload command: null</value>
+  </data>
+  <data name="Program_Logger_Error_Pipe_UnknownIPCMessage" xml:space="preserve">
+    <value>Unknown IPC Message Type: {0}; with payload: {1}</value>
+  </data>
+  <data name="Program_UI_Error_Pipe_CannotConnectToFirstInstance" xml:space="preserve">
+    <value>Cannot open connection to first instance ({0})</value>
+  </data>
+  <data name="Program_Logger_Error_MutexError" xml:space="preserve">
+    <value>Mutex error, giving up: {0}</value>
+  </data>
+  <data name="Program_Logger_Error_IPCChannel_ClientError" xml:space="preserve">
+    <value>IpcClientChannel error, giving up: {0}</value>
+  </data>
+  <data name="Program_Logger_Error_IPCChannel_ClientError_Default" xml:space="preserve">
+    <value>IpcClientChannel error: {0}</value>
+  </data>
+  <data name="Program_Logger_Warn_Pipe_InvalidOperationException" xml:space="preserve">
+    <value>Invalid Operation while connecting to the pipe server: {0}</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LoadingFilesIntoLogTab" xml:space="preserve">
+    <value>Loading files into existing LogTabWindow</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Warn_GUIThreadDisposedSettingNewOne" xml:space="preserve">
+    <value>first GUI thread window is disposed. Setting a new one.</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_NoWindowsLeftCreatingNewOne" xml:space="preserve">
+    <value>No windows left. New created window will be the new 'first' GUI window</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_CreatingNewWindow" xml:space="preserve">
+    <value>Creating new LogTabWindow</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_LastTabWindowClosed" xml:space="preserve">
+    <value>Last LogTabWindow was closed</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_AddWindow" xml:space="preserve">
+    <value>Adding window to list</value>
+  </data>
+  <data name="LogExpertProxy_Logger_Info_RemoveWindow" xml:space="preserve">
+    <value>Removing window from list</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsImported" xml:space="preserve">
+    <value>Settings imported</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_FileAccessError" xml:space="preserve">
+    <value>Error while trying to access file: {0}, exception: {1}</value>
+  </data>
+  <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>Settings could not be imported: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>Export Settings to file</value>
+  </data>
+  <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
+    <value>Settings (*.json)|*.json|All files (*.*)</value>
+  </data>
+  <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
+    <value>Copy of</value>
+  </data>
+  <data name="HighlightDialog_UI_NewGroup_BaseName" xml:space="preserve">
+    <value>New group</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Error during add of highlight entry: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringAddOfHighLightEntry" xml:space="preserve">
+    <value>Error during add of entry.
+{0}</value>
+  </data>
+  <data name="HighlightDialog_RegexError" xml:space="preserve">
+    <value>Regex value is null or whitespace</value>
+  </data>
+  <data name="HighlightDialog_UI_DefaultGroupName" xml:space="preserve">
+    <value>[Default]</value>
+  </data>
+  <data name="HighlightDialog_Logger_Error_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Error during save of save highlight entry: {0}</value>
+  </data>
+  <data name="HighlightDialog_UI_ErrorDuringSavingOfHighlightEntry" xml:space="preserve">
+    <value>Error during save of entry.\r\n{0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadingSettings" xml:space="preserve">
+    <value>Loading settings</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsStandardMode" xml:space="preserve">
+    <value>Load settings standard mode</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_LoadSettingsPortableMode" xml:space="preserve">
+    <value>Load settings portable mode</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_FileSystemErrorExMessage" xml:space="preserve">
+    <value>File system error: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_AccessDeniedExMessage" xml:space="preserve">
+    <value>Access denied: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_UnexpectedErrorExMessage" xml:space="preserve">
+    <value>Unexpected error: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Error_ErrorWhileDeserializingConfigData" xml:space="preserve">
+    <value>Error while deserializing config data: {0}</value>
+  </data>
+  <data name="ConfigManager_Logger_Info_SavingSettings" xml:space="preserve">
+    <value>Saving settings</value>
+  </data>
+  <data name="Lockfinder_Exception_NoProcessesAreLockingThePathSpecified" xml:space="preserve">
+    <value>No processes are locking the path specified</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker" xml:space="preserve">
+    <value>Could not begin restart session. Unable to determine file locker.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotRegisterResource" xml:space="preserve">
+    <value>Could not register resource.</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResource" xml:space="preserve">
+    <value>Could not list processes locking resource</value>
+  </data>
+  <data name="Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult" xml:space="preserve">
+    <value>Could not list processes locking resource. Failed to get size of result.</value>
+  </data>
+  <data name="Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle" xml:space="preserve">
+    <value>RmEndSession: {0}</value>
+  </data>
+  <data name="PaintHelper_HeaderText_LineNumberColumn" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_SettingColumnizer_currentColumnizerGetName" xml:space="preserve">
+    <value>Setting columnizer {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FinishedLoading" xml:space="preserve">
+    <value>Finished loading.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_RefreshingFilterViewBecauseOfReload" xml:space="preserve">
+    <value>Refreshing filter view because of reload.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_HandlingFileNotFoundEvent" xml:space="preserve">
+    <value>Handling file not found event.</value>
+  </data>
+  <data name="LogWindow_UI_SureToClose" xml:space="preserve">
+    <value>Sure to close?</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NewFileCreated" xml:space="preserve">
+    <value>new File created.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_ReloadingInvoked" xml:space="preserve">
+    <value>Reloading invoked.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_GotFileSizeChangedEventPrevLines0CurrLines1" xml:space="preserve">
+    <value>Got FileSizeChanged event. prevLines:{0}, curr lines: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_SelectionChangedTrigger" xml:space="preserve">
+    <value>Selection changed trigger</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SelCountSelectedLines" xml:space="preserve">
+    <value>{0} selected lines</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InSelectionChangedTrigger_SignalSelcount" xml:space="preserve">
+    <value>Error in selectionChangedTrigger_Signal selcount {0}, Exception: {1}</value>
+  </data>
+  <data name="LogWindow_UI_Text_Frozen" xml:space="preserve">
+    <value>Frozen</value>
+  </data>
+  <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
+    <value>Freeze left columns until here ({0})</value>
+  </data>
+  <data name="LogWindow_Logger_Info_NoPersistenceDataForFileNameFound" xml:space="preserve">
+    <value>No persistence data for {0} found.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_DetectedMultiFileNameListInPersistenceOptions" xml:space="preserve">
+    <value>Detected MultiFile name list in persistence options</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingPersistenceData" xml:space="preserve">
+    <value>Error loading persistence data: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingBookmarks" xml:space="preserve">
+    <value>Error loading bookmarks: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_PersistenceDataForFileNameIsOutdatedItWasDiscarded" xml:space="preserve">
+    <value>Persistence data for {0} is outdated. It was discarded.</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SettingSplitterDistance" xml:space="preserve">
+    <value>Error setting splitter distance: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
+    <value>Invalid regular expression</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingFile" xml:space="preserve">
+    <value>Loading file...</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FileNotFound" xml:space="preserve">
+    <value>File not found</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadingFileBecauseItHasBeenRespawned" xml:space="preserve">
+    <value>Reloading file because it has been respawned.</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_PreventingReloadBecauseOfRecursiveCalls" xml:space="preserve">
+    <value>Preventing reload because of recursive calls.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_ReloadNewFileCounter_reloadOverloadCounter" xml:space="preserve">
+    <value>ReloadNewFile(): counter = {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForLoadingToBeComplete" xml:space="preserve">
+    <value>Waiting for loading to be complete.</value>
+  </data>
+  <data name="LogWindow_Logger_Error_InUpdateProgressCallback" xml:space="preserve">
+    <value>Error in UpdateProgress Callback: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusText_LoadingWithParameter" xml:space="preserve">
+    <value>Loading {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LoadingStartedCallback" xml:space="preserve">
+    <value>Error LoadingStarted Callback: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FileLoadingComplete" xml:space="preserve">
+    <value>File loading complete.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WaitingForSignal" xml:space="preserve">
+    <value>Waiting for signal</value>
+  </data>
+  <data name="LogWindow_Logger_Info_WakeupSignalReceived" xml:space="preserve">
+    <value>Wakeup signal received.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_EventsInQueue" xml:space="preserve">
+    <value>{0} events in queue</value>
+  </data>
+  <data name="LogWindow_Logger_Error_LineCountOfEventIsShouldBeGreaterThanLastLineCount" xml:space="preserve">
+    <value>Line count of event is: {0}, should be greater than last line count: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateGridNewRowCount" xml:space="preserve">
+    <value>UpdateGrid(): new RowCount={0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_UpdateGridRolloverTrueRollover" xml:space="preserve">
+    <value>UpdateGrid(): Rollover=true, Rollover offset={0}, currLineNum was {1}, new currLineNum={2}</value>
+  </data>
+  <data name="Logger_Error_In_Function" xml:space="preserve">
+    <value>Error in {0}: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_SetColumnizerInternal" xml:space="preserve">
+    <value>SetColumnizerInternal(): {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_WhileResizingColumns" xml:space="preserve">
+    <value>Error while resizing columns: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
+    <value>Time diff is {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
+    <value>Not found: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromBeginningOfFile" xml:space="preserve">
+    <value>Started from beginning of file</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_StartedFromEndOfFile" xml:space="preserve">
+    <value>Started from end of file</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_SearchingPressESCToCancel" xml:space="preserve">
+    <value>Searching... Press ESC to cancel.</value>
+  </data>
+  <data name="LogWindow_UI_ThereAreSomeCommentsInTheBookmarksReallyRemoveBookmarks" xml:space="preserve">
+    <value>There are some comments in the bookmarks. Really remove bookmarks?</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
+    <value>Error while importing bookmark list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ImportBookmarkList" xml:space="preserve">
+    <value>Choose a file to load bookmarks from</value>
+  </data>
+  <data name="LogWindow_UI_ImportExportBookmarkList_Filter" xml:space="preserve">
+    <value>CSV file (*.csv)|*.csv|Bookmark file (*.bmk)|*.bmk</value>
+  </data>
+  <data name="LogWindow_UI_ErrorWhileExportingBookmarkList" xml:space="preserve">
+    <value>Error while exporting bookmark list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
+    <value>Choose a file to save bookmarks into</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLastLineNumEnter" xml:space="preserve">
+    <value>GetTimestampForLine({0}) enter</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_GetTimestampForLineLeaveWithLineNumLastLineNum" xml:space="preserve">
+    <value>GetTimestampForLine() leave with lineNum={0}</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Clip" xml:space="preserve">
+    <value>{0}-&gt;Clip</value>
+  </data>
+  <data name="LogWindow_UI_CopyMarkedLinesToTab_Copy" xml:space="preserve">
+    <value>{0}-&gt;C</value>
+  </data>
+  <data name="LogWindow_UI_ToggleBookmark_ThereCommentAttachedRemoveIt" xml:space="preserve">
+    <value>There's a comment attached to the bookmark. Really remove the bookmark?</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_AddBookmarkOverlays" xml:space="preserve">
+    <value>AddBookmarkOverlay() r.Location={0}, width={1}, scroll_offset={2}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile" xml:space="preserve">
+    <value>Unexpected issue truncating file</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_TryToTruncate_UnexpectedIssueTruncatingFileExMessage" xml:space="preserve">
+    <value>Unexpected issue truncating file: {0}</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
+    <value>Truncate failed: file is locked by {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_CloseLogWindow_ErrorWhileDeletingTempFile" xml:space="preserve">
+    <value>Error while deleting temp file {0}: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_CloseLogWindow_DeletingTempFile" xml:space="preserve">
+    <value>Deleting temp file {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ErrorSavingPersistence" xml:space="preserve">
+    <value>Error saving persistence: {0}</value>
+  </data>
+  <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
+    <value>Unexpected error while saving persistence: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFilesAsMulti_FileName" xml:space="preserve">
+    <value>LoadFilesAsMulti: File: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_PickedNewColumnizer" xml:space="preserve">
+    <value>Picked new columnizer {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_LoadFile_LoadingLogfile" xml:space="preserve">
+    <value>Loading logfile: {0}</value>
+  </data>
+  <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
+    <value>Cannot load file
+{0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_TestStatisticsCalledWithStartLine" xml:space="preserve">
+    <value>TestStatistics() called with start line {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_TestStatisticDebugInfo" xml:space="preserve">
+    <value>TestStatistic(): i={0} searchLine={1}</value>
+  </data>
+  <data name="LogWindow_Logger_Debug_TestStatistic_DebugInfo_FoundBlock" xml:space="preserve">
+    <value>Found block: {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_TestStatistic_Ended" xml:space="preserve">
+    <value>TestStatistics() ended</value>
+  </data>
+  <data name="LogWindow_Logger_Warn_FilterRestore_ColumnizerNameNotFound" xml:space="preserve">
+    <value>FilterRestore(): Columnizer {0} not found</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_WritePipeToTab_WritingToTempFile" xml:space="preserve">
+    <value>Writing to temp file... Press ESC to cancel.</value>
+  </data>
+  <data name="LogWindow_UI_WriteFilterToTab_NamePrefix_ForFilter" xml:space="preserve">
+    <value>-&gt;F</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_HideAdvanced" xml:space="preserve">
+    <value>Hide advanced...</value>
+  </data>
+  <data name="LogWindow_UI_Text_ShowAdvancedFilterPanel_ShowAdvanced" xml:space="preserve">
+    <value>Show advanced...</value>
+  </data>
+  <data name="LogWindow_Logger_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
+    <value>Error occured while clearing filter list: {0}</value>
+  </data>
+  <data name="LogWindow_UI_FilterCount_ZeroValue" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
+    <value>Search result not found</value>
+  </data>
+  <data name="LogWindow_Logger_Error_SelectLine_WhileSelectingLine" xml:space="preserve">
+    <value>Error while selecting line: {0}</value>
+  </data>
+  <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
+    <value>Exception while filtering. Please report to developer: 
+{0}
+{1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_Filter_SingleThreadedFilterDuration" xml:space="preserve">
+    <value>Single threaded filter duration: {0} ms.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
+    <value>Filter duration: {0} ms.</value>
+  </data>
+  <data name="LogWindow_Logger_Info_MultiThreadedFilter_Duration" xml:space="preserve">
+    <value>Multi threaded filter duration: {0} ms.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
+    <value>Filtering... Press ESC to cancel.</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineText_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>   {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_UpdateEditColumnDisplay" xml:space="preserve">
+    <value>SelStart: {0}, SelLen: {1}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_StartEditMode_EditControlInLogWindowWasNull" xml:space="preserve">
+    <value>Edit control in logWindow was null</value>
+  </data>
+  <data name="LogWindow_Logger_Info_FreeFromTimeSync_DeSyncingWindow" xml:space="preserve">
+    <value>De-Syncing window for {0}</value>
+  </data>
+  <data name="LogWindow_Logger_Info_AddToTimeSync_SyncingWindow" xml:space="preserve">
+    <value>Syncing window for {0} to {1}</value>
+  </data>
+  <data name="LogWindow_UI_ColumnComboBox_ToolTip" xml:space="preserve">
+    <value>Select column to scroll to</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnName" xml:space="preserve">
+    <value>Column name:</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToClipboard" xml:space="preserve">
+    <value>Copy to clipboard</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_CopyToNewTab" xml:space="preserve">
+    <value>Copy to new tab</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_CopyToNewTab" xml:space="preserve">
+    <value>Copy marked lines into a new tab window</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Scroll all tabs to current timestamp</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
+    <value>Scolls all open tabs to the selected timestamp, if possible</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
+    <value>Time synced files</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreeThisWindowFromTimeSync" xml:space="preserve">
+    <value>Free this window from time sync</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_LocateFilteredLineInOriginalFile" xml:space="preserve">
+    <value>Locate filtered line in original file</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToggleBoomark" xml:space="preserve">
+    <value>Toggle Boomark</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_BookmarkComment" xml:space="preserve">
+    <value>Bookmark comment...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkEditMode" xml:space="preserve">
+    <value>Mark/Edit-Mode</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
+    <value>Temp Highlights</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RemoveAll" xml:space="preserve">
+    <value>Remove all</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MakeAllPermanent" xml:space="preserve">
+    <value>Make all permanent</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkCurrentFilterRange" xml:space="preserve">
+    <value>Mark current filter range</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Color" xml:space="preserve">
+    <value>Color...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveToLastColumn" xml:space="preserve">
+    <value>Move to last column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FreezeLeftColumnsUntilHere" xml:space="preserve">
+    <value>Freeze left columns until here</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveLeft" xml:space="preserve">
+    <value>Move left</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MoveRight" xml:space="preserve">
+    <value>Move right</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HideColumn" xml:space="preserve">
+    <value>Hide column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_RestoreColumns" xml:space="preserve">
+    <value>Restore columns</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ScrollToColumn" xml:space="preserve">
+    <value>Scroll to column...</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileFullLine" xml:space="preserve">
+    <value>Highlight selection in log file (full line)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_HighlightSelectionInLogFileWordMode" xml:space="preserve">
+    <value>Highlight selection in log file (word mode)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterForSelection" xml:space="preserve">
+    <value>Filter for selection</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetSelectedTextAsBookmarkComment" xml:space="preserve">
+    <value>Set selected text as bookmark comment</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_MarkFilterHitsInLogView" xml:space="preserve">
+    <value>Mark filter hits in log view</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_SetBookmarksOnSelectedLines" xml:space="preserve">
+    <value>Set bookmarks on selected lines</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_HideColumn" xml:space="preserve">
+    <value>Hide this column</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_MoveToLastColumn" xml:space="preserve">
+    <value>Move this column to the last position</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_BookmarkComment" xml:space="preserve">
+    <value>Edit the comment for a bookmark</value>
+  </data>
+  <data name="LogWindow_UI_Button_Column" xml:space="preserve">
+    <value>Columns...</value>
+  </data>
+  <data name="LogWindow_UI_Button_SaveFilter" xml:space="preserve">
+    <value>Save filter</value>
+  </data>
+  <data name="LogWindow_UI_Button_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="LogWindow_UI_Button_ShowAdvanced" xml:space="preserve">
+    <value>Show advanced...</value>
+  </data>
+  <data name="LogWindow_UI_Button_Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Search" xml:space="preserve">
+    <value>Start the filter search</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ShowAdvanced" xml:space="preserve">
+    <value>Toggel the advanced filter options panel</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_Column" xml:space="preserve">
+    <value>Choose columns for 'Column restrict'</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterDown" xml:space="preserve">
+    <value>Move the selected entry down in the list</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterUp" xml:space="preserve">
+    <value>Move the selected entry up in the list</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ColumnRestrict" xml:space="preserve">
+    <value>Column restrict</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_RangeSearch" xml:space="preserve">
+    <value>Range search</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_InvertMatch" xml:space="preserve">
+    <value>Invert Match</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_AutoHide" xml:space="preserve">
+    <value>Auto hide</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterOnLoad" xml:space="preserve">
+    <value>Auto start</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterSync" xml:space="preserve">
+    <value>Sync</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterTail" xml:space="preserve">
+    <value>Filter tail</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterRegex" xml:space="preserve">
+    <value>Regex</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_FilterCaseSensitive" xml:space="preserve">
+    <value>Case sensitive</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_ColumnRestrict" xml:space="preserve">
+    <value>Restrict search to columns</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_RangeSearch" xml:space="preserve">
+    <value>Enable a special search mode which filters all content between the 2 given search terms.</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_InvertMatch" xml:space="preserve">
+    <value>Invert the search result</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_AutoHide" xml:space="preserve">
+    <value>Hides the filter list after loading a filter</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterOnLoad" xml:space="preserve">
+    <value>Start immediate filtering after loading a saved filter</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterSync" xml:space="preserve">
+    <value>Sync the current selected line in the filter view to the selection in the log file view</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterTail" xml:space="preserve">
+    <value>Filter tailed file content (keeps filter view up to date on file changes)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterRegex" xml:space="preserve">
+    <value>Use regular expressions. (right-click for RegEx helper window)</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ToolTip_FilterCaseSensitive" xml:space="preserve">
+    <value>Makes the filter case sensitive</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_FilterRange" xml:space="preserve">
+    <value>2nd search string ('end string') when using the range search</value>
+  </data>
+  <data name="LogWindow_UI_Label_ColumnNames" xml:space="preserve">
+    <value>column names</value>
+  </data>
+  <data name="LogWindow_UI_Label_TextFilter" xml:space="preserve">
+    <value>Text &amp;filter:</value>
+  </data>
+  <data name="LogWindow_UI_Label_Fuzzyness" xml:space="preserve">
+    <value>Fuzzyness</value>
+  </data>
+  <data name="LogWindow_UI_Label_BackSpread" xml:space="preserve">
+    <value>Back Spread</value>
+  </data>
+  <data name="LogWindow_UI_Label_ForeSpread" xml:space="preserve">
+    <value>Fore Spread</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_Fuzzy" xml:space="preserve">
+    <value>Fuzzy search level (0 = fuzzy off)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterBackSpread" xml:space="preserve">
+    <value>Add preceding lines to search result (Drag up/down, press Shift for finer pitch)</value>
+  </data>
+  <data name="LogWindow_UI_KnobControl_FilterForeSpread" xml:space="preserve">
+    <value>Add following lines to search result (Drag up/down, press Shift for finer pitch)</value>
+  </data>
+  <data name="LogWindow_UI_ToolStripMenuItem_FilterToNewTab" xml:space="preserve">
+    <value>Filter to new tab</value>
+  </data>
+  <data name="LogWindow_UI_Button_FilterToTab" xml:space="preserve">
+    <value>Filter to Tab</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_FilterToTab" xml:space="preserve">
+    <value>Launch a new tab with filtered content</value>
+  </data>
+  <data name="LogWindow_UI_Button_ToolTip_ToggleHighlightPanel" xml:space="preserve">
+    <value>Open or close a list with saved filters</value>
+  </data>
+  <data name="LogWindow_UI_ListBox_ToolTip_Filter" xml:space="preserve">
+    <value>Doubleclick to load a saved filter</value>
+  </data>
+  <data name="LogWindow_UI_ComboBox_ToolTip_Filter" xml:space="preserve">
+    <value>Search string for the filter</value>
+  </data>
+  <data name="LogTabWindow_Logger_Error_RegExErrorWhileFindingColumnizer" xml:space="preserve">
+    <value>RegEx-error while finding columnizer: {0}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_InvertMatch" xml:space="preserve">
+    <value>(Invert match)</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict" xml:space="preserve">
+    <value>
+Column restrict</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_ToolTip_Filter" xml:space="preserve">
+    <value>Filter: {0} {1}{2}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard" xml:space="preserve">
+    <value>Clipboard</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn" xml:space="preserve">
+    <value>Pasted on {0}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_EncodingIsNotValid" xml:space="preserve">
+    <value>Encoding {0} is not a valid encoding</value>
+  </data>
+  <data name="LogExpert_Common_Error_InsufficientRights_For_Parameter_ErrorMessage" xml:space="preserve">
+    <value>Insufficient rights {0}: {1} </value>
+  </data>
+  <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
+    <value>Error during {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
+    <value>lines</value>
+  </data>
+  <data name="LogTabWindow_StatusLineText_UpperCase_Lines" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_ThePreferencesHaveChanged" xml:space="preserve">
+    <value>The preferences have changed</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_StartingExternalToolWithSysoutRedirection" xml:space="preserve">
+    <value>Starting external tool with sysout redirection: {0} {1}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_StartingExternalTool" xml:space="preserve">
+    <value>Starting external tool: {0} {1}</value>
+  </data>
+  <data name="LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix" xml:space="preserve">
+    <value>-&gt;E</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestException_ThisIsATestExceptionThrownByAnAsyncDelegate" xml:space="preserve">
+    <value>This is a test exception thrown by an async delegate</value>
+  </data>
+  <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
+    <value>This is a test exception thrown by a background thread</value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_DeserializeDockContent_LayoutDataContainsNonExistingLogWindowForFileName" xml:space="preserve">
+    <value>Layout data contains non-existing LogWindow for {0}</value>
+  </data>
+  <data name="LogTabWindow_Logger_Info_OnLogTabWindowDragEnter_DraggingSomethingOverLogExpertFormats" xml:space="preserve">
+    <value>Dragging something over LogExpert. Formats: </value>
+  </data>
+  <data name="LogTabWindow_Logger_Debug_OnLogWindowDragDrop_DroppedFormats" xml:space="preserve">
+    <value>Dropped formats: </value>
+  </data>
+  <data name="LogTabWindow_Logger_Warn_OnLogWindowSyncModeChanged_ReceivedSyncModeChangedEventWhileDisposingEventIgnored" xml:space="preserve">
+    <value>Received SyncModeChanged event while disposing. Event ignored.</value>
+  </data>
+  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+    <value>LogExpert session {0}</value>
+  </data>
+  <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
+    <value>This is a test exception thrown by the GUI thread</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelWarningMaximumLineLength" xml:space="preserve">
+    <value>! Changing the Maximum Line Length can impact performance and is not recommended !</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumLineLength" xml:space="preserve">
+    <value>Maximum Line Length (restart required)</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntriesDisplayed" xml:space="preserve">
+    <value>Maximum filter entries displayed</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaximumFilterEntries" xml:space="preserve">
+    <value>Maximum filter entries</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelDefaultEncoding" xml:space="preserve">
+    <value>Default encoding</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelFont" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolsDescription" xml:space="preserve">
+    <value>You can configure as many tools as you want.
+Checked tools will appear in the icon bar. All other tools are available in the tools menu.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelWorkingDir" xml:space="preserve">
+    <value>Working dir:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolName" xml:space="preserve">
+    <value>Name:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelToolColumnizerForOutput" xml:space="preserve">
+    <value>Columnizer for output:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelTool" xml:space="preserve">
+    <value>Program:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelArguments" xml:space="preserve">
+    <value>Arguments:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaxDays" xml:space="preserve">
+    <value>Max days:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelPattern" xml:space="preserve">
+    <value>Pattern:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelHintMultiFile" xml:space="preserve">
+    <value>Hint: Pressing the Shift key while dropping files onto LogExpert will switch the behaviour from single to multi and vice versa.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelNoteMultiFile" xml:space="preserve">
+    <value>Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (&lt;filename&gt;, &lt;filename&gt;.1, &lt;filename&gt;.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelSessionSaveOwnDir" xml:space="preserve">
+    <value>Place Holder Text, this will be replaced programmatically</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelFilePollingInterval" xml:space="preserve">
+    <value>File polling interval (ms):</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelInfo" xml:space="preserve">
+    <value>Changes will take effect on next file load</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelNumberOfBlocks" xml:space="preserve">
+    <value>Number of blocks</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelLinesPerBlock" xml:space="preserve">
+    <value>Lines/block</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTailColor" xml:space="preserve">
+    <value>Color...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonChangeFont" xml:space="preserve">
+    <value>Change...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTimespreadColor" xml:space="preserve">
+    <value>Color...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolDelete" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolAdd" xml:space="preserve">
+    <value>Add new</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolDown" xml:space="preserve">
+    <value>Down</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonToolUp" xml:space="preserve">
+    <value>Up</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonWorkingDir" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonIcon" xml:space="preserve">
+    <value>   Icon...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonArguments" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonTool" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonDelete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonConfigPlugin" xml:space="preserve">
+    <value>Configure...</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonSessionSaveDir" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Export" xml:space="preserve">
+    <value>Export...</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Import" xml:space="preserve">
+    <value>Import...</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMisc" xml:space="preserve">
+    <value>Misc</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaults" xml:space="preserve">
+    <value>Defaults</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxFont" xml:space="preserve">
+    <value>Font</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeSpreadDisplay" xml:space="preserve">
+    <value>Time spread display</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDisplayMode" xml:space="preserve">
+    <value>Display mode</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxTimeStampNavigationControl" xml:space="preserve">
+    <value>Timestamp navigation control</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxMouseDragDefaults" xml:space="preserve">
+    <value>Mouse Drag Default</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxToolSettings" xml:space="preserve">
+    <value>Tool settings</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxDefaultFileNamePattern" xml:space="preserve">
+    <value>Default filename pattern</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxWhenOpeningMultiFile" xml:space="preserve">
+    <value>When opening multiple files...</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPlugins" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxPersistantFileLocation" xml:space="preserve">
+    <value>Persistence file location</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxCPUAndStuff" xml:space="preserve">
+    <value>CPU and stuff</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxLineBufferUsage" xml:space="preserve">
+    <value>Line buffer usage</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowErrorMessageOnlyOneInstance" xml:space="preserve">
+    <value>Show Error Message?</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnSize" xml:space="preserve">
+    <value>Set last column width</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTailState" xml:space="preserve">
+    <value>Show tail state on tabs</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxOpenLastFiles" xml:space="preserve">
+    <value>Re-open last used files</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSingleInstance" xml:space="preserve">
+    <value>Allow only 1 Instance</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
+    <value>Ask before closing tabs</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
+    <value>Dark Mode (restart required)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
+    <value>Follow tail enabled</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxColumnFinder" xml:space="preserve">
+    <value>Show column finder</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSyncFilter" xml:space="preserve">
+    <value>Sync filter list enabled</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxFilterTail" xml:space="preserve">
+    <value>Filter tail enabled</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxReverseAlpha" xml:space="preserve">
+    <value>Reverse alpha</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimeSpread" xml:space="preserve">
+    <value>Show time spread</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxTimestamp" xml:space="preserve">
+    <value>Show timestamp control, if supported by columnizer</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSysout" xml:space="preserve">
+    <value>Pipe sysout to tab</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxAutoPick" xml:space="preserve">
+    <value>Automatically pick for new files</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMaskPrio" xml:space="preserve">
+    <value>Mask has priority before history</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxPortableMode" xml:space="preserve">
+    <value>Activate Portable Mode</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveFilter" xml:space="preserve">
+    <value>Save and restore filter and filter tabs</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxSaveSessions" xml:space="preserve">
+    <value>Automatically save persistence files (.lxp)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxLegacyReader" xml:space="preserve">
+    <value>Use legacy file reader (slower)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxMultiThread" xml:space="preserve">
+    <value>Multi threaded filter</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageViewSettings" xml:space="preserve">
+    <value>View settings</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageTimeStampFeatures" xml:space="preserve">
+    <value>Timestamp features</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageExternalTools" xml:space="preserve">
+    <value>External Tools</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageColumnizers" xml:space="preserve">
+    <value>Columnizers</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageHighlightMask" xml:space="preserve">
+    <value>Highlight</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMultiFile" xml:space="preserve">
+    <value>MultiFile</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPagePlugins" xml:space="preserve">
+    <value>Plugins</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageSessions" xml:space="preserve">
+    <value>Persistence</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMemory" xml:space="preserve">
+    <value>Memory/CPU</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLineView" xml:space="preserve">
+    <value>Line view</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTimeView" xml:space="preserve">
+    <value>Time view</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDragInverted" xml:space="preserve">
+    <value>Vertical Inverted</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonHorizMouseDrag" xml:space="preserve">
+    <value>Horizontal</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonVerticalMouseDrag" xml:space="preserve">
+    <value>Vertical</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonAskWhatToDo" xml:space="preserve">
+    <value>Ask what to do</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonTreatAllFilesAsOneMultifile" xml:space="preserve">
+    <value>Treat all files as one MultiFile</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonLoadEveryFileIntoSeperatedTab" xml:space="preserve">
+    <value>Load every file into a separate tab</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSaveOwn" xml:space="preserve">
+    <value>Own directory</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonsessionSaveDocuments" xml:space="preserve">
+    <value>MyDocuments/LogExpert</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionSameDir" xml:space="preserve">
+    <value>Same directory as log file</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonSessionApplicationStartupDir" xml:space="preserve">
+    <value>Application startup directory</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir" xml:space="preserve">
+    <value>This path is based on the executable and where it has been started from.</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask" xml:space="preserve">
+    <value>File name mask (RegEx)</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileName" xml:space="preserve">
+    <value>File name mask (RegEx)</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer" xml:space="preserve">
+    <value>Columnizer</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup" xml:space="preserve">
+    <value>Highlight group</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding" xml:space="preserve">
+    <value>Encoding to be used when no BOM header and no persistence data is available.</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
+    <value>If this mode is activated, the save file will be loaded from the Executable Location</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader" xml:space="preserve">
+    <value>Slower but more compatible with strange linefeeds and encodings</value>
+  </data>
+  <data name="SettingsDialog_Form_Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir" xml:space="preserve">
+    <value>Select a working directory</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName" xml:space="preserve">
+    <value>HeaderName</value>
+  </data>
+  <data name="SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir" xml:space="preserve">
+    <value>Choose folder for LogExpert's session files</value>
+  </data>
+  <data name="SettingsDialog_UI_ActivatePortableMode" xml:space="preserve">
+    <value>Activate Portable Mode</value>
+  </data>
+  <data name="SettingsDialog_UI_DeActivatePortableMode" xml:space="preserve">
+    <value>Deactivate Portable Mode</value>
+  </data>
+  <data name="SettingsDialog_UI_CouldNotCreatePortableMode" xml:space="preserve">
+    <value>Could not create / delete marker for Portable Mode: {0}</value>
+  </data>
+  <data name="SettingsDialog_UI_Title_ExportSettings" xml:space="preserve">
+    <value>Export Settings to file</value>
+  </data>
+  <data name="SettingsDialog_UI_Filter_ExportSettings" xml:space="preserve">
+    <value>Settings {0}|All files {1}</value>
+  </data>
+  <data name="SettingsDialog_UI_Error_SettingsCouldNotBeImported" xml:space="preserve">
+    <value>Settings could not be imported: {0}</value>
+  </data>
+  <data name="SettingsDialog_UI_SettingsImported" xml:space="preserve">
+    <value>Settings imported</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelLanguage" xml:space="preserve">
+    <value>Language (requires restart):</value>
+  </data>
+  <data name="SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage" xml:space="preserve">
+    <value>Userinterface language</value>
+  </data>
+  <data name="Eminus_UI_CannotParseJavaStackTraceLine" xml:space="preserve">
+    <value>Cannot parse Java stack trace line</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_LoadClassInEclipse" xml:space="preserve">
+    <value>Load class in Eclipse</value>
+  </data>
+  <data name="Eminus_UI_GetMenuText_DISABLEDLoadClassInEclipse" xml:space="preserve">
+    <value>{0}Load class in Eclipse</value>
+  </data>
+  <data name="Title_LogExpert_Deserialize" xml:space="preserve">
+    <value>Deserialize</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Text" xml:space="preserve">
+    <value>Eclipse Remote Navigation</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="EminusConfigDlg_UI_Label_Description" xml:space="preserve">
+    <value>Enter the host and the port where the Eclipse plugin is listening to. If a password is configured, enter the password too.</value>
+  </data>
+  <data name="AboutBox_UI_Label_Copyright" xml:space="preserve">
+    <value>Copyright</value>
+  </data>
+  <data name="AboutBox_UI_Label_Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AboutBox_UI_Label_ProductName" xml:space="preserve">
+    <value>Product Name</value>
+  </data>
+  <data name="AboutBox_UI_Text" xml:space="preserve">
+    <value>AboutBox</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemHorizontalDrag" xml:space="preserve">
+    <value>Drag horizontal</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag" xml:space="preserve">
+    <value>Drag vertical</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ToolStripItem_toolStripItemInvertedDrag" xml:space="preserve">
+    <value>Drag vertical inverted</value>
+  </data>
+  <data name="DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector" xml:space="preserve">
+    <value>Timestamp selector</value>
   </data>
 </root>

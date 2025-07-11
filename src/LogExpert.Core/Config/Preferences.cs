@@ -93,6 +93,8 @@ public class Preferences
 
     public string DefaultEncoding { get; set; }
 
+    public string DefaultLanguage { get; set; }
+
     public bool FilterSync { get; set; } = true;
 
     public bool FilterTail { get; set; } = true;

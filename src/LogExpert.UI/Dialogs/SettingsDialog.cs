@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Runtime.Versioning;
+using System.Security;
 using System.Text;
 
 using LogExpert.Core.Classes;
@@ -7,6 +9,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Enums;
 using LogExpert.Core.Interface;
+using LogExpert.Extensions;
 using LogExpert.UI.Controls.LogTabWindow;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions;
@@ -21,6 +24,7 @@ internal partial class SettingsDialog : Form
 
     private readonly Image _emptyImage = new Bitmap(16, 16);
     private readonly LogTabWindow _logTabWin;
+    private const string DEFAULT_FONT_NAME = "Courier New";
 
     private ILogExpertPluginConfigurator _selectedPlugin;
     private ToolEntry _selectedTool;
@@ -34,6 +38,8 @@ internal partial class SettingsDialog : Form
         Preferences = prefs;
         _logTabWin = logTabWin; //TODO: uses only HighlightGroupList. Can we pass IList instead?
         InitializeComponent();
+
+        LoadResources();
 
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -58,13 +64,57 @@ internal partial class SettingsDialog : Form
 
     #region Private Methods
 
+    private void LoadResources ()
+    {
+        ApplyTextResources();
+        ApplyToolTips();
+        ApplyFormTitle();
+
+        // Form title
+        Text = Resources.SettingsDialog_Form_Text;
+    }
+
+    private void ApplyFormTitle ()
+    {
+        Text = Resources.SettingsDialog_Form_Text;
+    }
+
+    private void ApplyToolTips ()
+    {
+        foreach (var entry in GetToolTipMap())
+        {
+            toolTip.SetToolTip(entry.Key, entry.Value);
+        }
+    }
+
+    private void ApplyTextResources ()
+    {
+        var map = ResourceHelper.GenerateTextMapFromNaming(this, nameof(SettingsDialog), "UI");
+
+        // Add exceptions or unrelated entries manually:
+        map[buttonCancel] = Resources.LogExpert_Common_UI_Button_Cancel;
+        map[buttonOk] = Resources.LogExpert_Common_UI_Button_OK;
+        map[buttonExport] = Resources.LogExpert_Common_UI_Button_Export;
+        map[buttonImport] = Resources.LogExpert_Common_UI_Button_Import;
+
+        foreach (var entry in map)
+        {
+            entry.Key.Text = entry.Value;
+        }
+
+        dataGridViewTextBoxColumnFileMask.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask;
+        dataGridViewComboBoxColumnColumnizer.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_Columnizer;
+        dataGridViewTextBoxColumnFileName.HeaderText = Resources.SettingsDialog_UI_DataGridViewTextBoxColumn_FileName;
+        dataGridViewComboBoxColumnHighlightGroup.HeaderText = Resources.SettingsDialog_UI_DataGridViewComboBoxColumn_HighlightGroup;
+    }
+
     private void FillDialog ()
     {
         Preferences ??= new Preferences();
 
         if (Preferences.FontName == null)
         {
-            Preferences.FontName = "Courier New";
+            Preferences.FontName = DEFAULT_FONT_NAME;
         }
 
         if (Math.Abs(Preferences.FontSize) < 0.1)
@@ -118,13 +168,13 @@ internal partial class SettingsDialog : Form
             case SessionSaveLocation.OwnDir:
                 {
                     radioButtonSessionSaveOwn.Checked = true;
+                    break;
                 }
-                break;
             case SessionSaveLocation.SameDir:
                 {
                     radioButtonSessionSameDir.Checked = true;
+                    break;
                 }
-                break;
             case SessionSaveLocation.DocumentsDir:
                 {
                     radioButtonsessionSaveDocuments.Checked = true;
@@ -135,6 +185,12 @@ internal partial class SettingsDialog : Form
                     radioButtonSessionApplicationStartupDir.Checked = true;
                     break;
                 }
+            case SessionSaveLocation.LoadedSessionFile:
+                // intentionally left blank
+                break;
+            default:
+                // intentionally left blank
+                break;
         }
 
         //overwrite preferences save location in portable mode to always be application startup directory
@@ -164,10 +220,11 @@ internal partial class SettingsDialog : Form
         FillToolListbox();
         FillMultifileSettings();
         FillEncodingList();
-
-        var temp = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        FillLanguageList();
 
         comboBoxEncoding.SelectedItem = Encoding.GetEncoding(Preferences.DefaultEncoding);
+        comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
+
         checkBoxMaskPrio.Checked = Preferences.MaskPrio;
         checkBoxAutoPick.Checked = Preferences.AutoPick;
         checkBoxAskCloseTabs.Checked = Preferences.AskForClose;
@@ -183,7 +240,7 @@ internal partial class SettingsDialog : Form
 
     private void DisplayFontName ()
     {
-        labelFont.Text = Preferences.FontName + @" " + (int)Preferences.FontSize;
+        labelFont.Text = $"{Preferences.FontName} {(int)Preferences.FontSize}";
         labelFont.Font = new Font(new FontFamily(Preferences.FontName), Preferences.FontSize);
     }
 
@@ -208,12 +265,14 @@ internal partial class SettingsDialog : Form
         Preferences.MultiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
     }
 
-    private void OnBtnToolClickInternal (TextBox textBox)
+    private static void OnBtnToolClickInternal (TextBox textBox)
     {
-        OpenFileDialog dlg = new();
-        dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        OpenFileDialog dlg = new()
+        {
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+        };
 
-        if (string.IsNullOrEmpty(textBox.Text) == false)
+        if (!string.IsNullOrEmpty(textBox.Text))
         {
             FileInfo info = new(textBox.Text);
             if (info.Directory != null && info.Directory.Exists)
@@ -242,12 +301,12 @@ internal partial class SettingsDialog : Form
         }
     }
 
-    private void OnBtnWorkingDirClick (TextBox textBox)
+    private static void OnBtnWorkingDirClick (TextBox textBox)
     {
         FolderBrowserDialog dlg = new()
         {
             RootFolder = Environment.SpecialFolder.MyComputer,
-            Description = @"Select a working directory"
+            Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserWorkingDir
         };
 
         if (!string.IsNullOrEmpty(textBox.Text))
@@ -273,13 +332,13 @@ internal partial class SettingsDialog : Form
         }
     }
 
-    private void FillColumnizerForToolsList (ComboBox comboBox, string columnizerName)
+    private static void FillColumnizerForToolsList (ComboBox comboBox, string columnizerName)
     {
         var selIndex = 0;
         comboBox.Items.Clear();
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
             var index = comboBox.Items.Add(columnizer.GetName());
             if (columnizer.GetName().Equals(columnizerName, StringComparison.Ordinal))
@@ -301,35 +360,35 @@ internal partial class SettingsDialog : Form
         var comboColumn = (DataGridViewComboBoxColumn)dataGridViewColumnizer.Columns[1];
         comboColumn.Items.Clear();
 
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
+        //var textColumn = (DataGridViewTextBoxColumn)dataGridViewColumnizer.Columns[0];
 
-        IList<ILogLineColumnizer> columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
+        var columnizers = PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers;
 
-        foreach (ILogLineColumnizer columnizer in columnizers)
+        foreach (var columnizer in columnizers)
         {
-            comboColumn.Items.Add(columnizer.GetName());
+            _ = comboColumn.Items.Add(columnizer.GetName());
         }
         //comboColumn.DisplayMember = "Name";
         //comboColumn.ValueMember = "Columnizer";
 
-        foreach (ColumnizerMaskEntry maskEntry in Preferences.ColumnizerMaskList)
+        foreach (var maskEntry in Preferences.ColumnizerMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (ILogLineColumnizer logColumnizer in columnizers)
+            foreach (var logColumnizer in columnizers)
             {
-                cell.Items.Add(logColumnizer.GetName());
+                _ = cell.Items.Add(logColumnizer.GetName());
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
-            ILogLineColumnizer columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
+            var columnizer = ColumnizerPicker.DecideColumnizerByName(maskEntry.ColumnizerName,
                 PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
 
             row.Cells[1].Value = columnizer.GetName();
-            dataGridViewColumnizer.Rows.Add(row);
+            _ = dataGridViewColumnizer.Rows.Add(row);
         }
 
         var count = dataGridViewColumnizer.RowCount;
@@ -349,33 +408,33 @@ internal partial class SettingsDialog : Form
         comboColumn.Items.Clear();
 
         //TODO Remove if not necessary
-        var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
+        //var textColumn = (DataGridViewTextBoxColumn)dataGridViewHighlightMask.Columns[0];
 
-        foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+        foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
         {
-            comboColumn.Items.Add(group.GroupName);
+            _ = comboColumn.Items.Add(group.GroupName);
         }
 
-        foreach (HighlightMaskEntry maskEntry in Preferences.HighlightMaskList)
+        foreach (var maskEntry in Preferences.HighlightMaskList)
         {
             DataGridViewRow row = new();
-            row.Cells.Add(new DataGridViewTextBoxCell());
+            _ = row.Cells.Add(new DataGridViewTextBoxCell());
             DataGridViewComboBoxCell cell = new();
 
-            foreach (HighlightGroup group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
+            foreach (var group in (IList<HighlightGroup>)_logTabWin.HighlightGroupList)
             {
-                cell.Items.Add(group.GroupName);
+                _ = cell.Items.Add(group.GroupName);
             }
 
-            row.Cells.Add(cell);
+            _ = row.Cells.Add(cell);
             row.Cells[0].Value = maskEntry.Mask;
 
-            HighlightGroup currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
+            var currentGroup = _logTabWin.FindHighlightGroup(maskEntry.HighlightGroupName);
             var highlightGroupList = _logTabWin.HighlightGroupList;
             currentGroup ??= highlightGroupList.Count > 0 ? highlightGroupList[0] : new HighlightGroup();
 
             row.Cells[1].Value = currentGroup.GroupName;
-            dataGridViewHighlightMask.Rows.Add(row);
+            _ = dataGridViewHighlightMask.Rows.Add(row);
         }
 
         var count = dataGridViewHighlightMask.RowCount;
@@ -396,9 +455,11 @@ internal partial class SettingsDialog : Form
         {
             if (!row.IsNewRow)
             {
-                ColumnizerMaskEntry entry = new();
-                entry.Mask = (string)row.Cells[0].Value;
-                entry.ColumnizerName = (string)row.Cells[1].Value;
+                ColumnizerMaskEntry entry = new()
+                {
+                    Mask = (string)row.Cells[0].Value,
+                    ColumnizerName = (string)row.Cells[1].Value
+                };
                 Preferences.ColumnizerMaskList.Add(entry);
             }
         }
@@ -412,9 +473,11 @@ internal partial class SettingsDialog : Form
         {
             if (!row.IsNewRow)
             {
-                HighlightMaskEntry entry = new();
-                entry.Mask = (string)row.Cells[0].Value;
-                entry.HighlightGroupName = (string)row.Cells[1].Value;
+                HighlightMaskEntry entry = new()
+                {
+                    Mask = (string)row.Cells[0].Value,
+                    HighlightGroupName = (string)row.Cells[1].Value
+                };
                 Preferences.HighlightMaskList.Add(entry);
             }
         }
@@ -424,27 +487,27 @@ internal partial class SettingsDialog : Form
     {
         listBoxPlugin.Items.Clear();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
             }
         }
 
-        foreach (IFileSystemPlugin entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredFileSystemPlugins)
         {
-            listBoxPlugin.Items.Add(entry);
+            _ = listBoxPlugin.Items.Add(entry);
             if (entry is ILogExpertPluginConfigurator configurator)
             {
                 configurator.StartConfig();
@@ -458,7 +521,7 @@ internal partial class SettingsDialog : Form
     {
         _selectedPlugin?.HideConfigForm();
 
-        foreach (IContextMenuEntry entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredContextMenuPlugins)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -466,7 +529,7 @@ internal partial class SettingsDialog : Form
             }
         }
 
-        foreach (IKeywordAction entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
+        foreach (var entry in PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions)
         {
             if (entry is ILogExpertPluginConfigurator configurator)
             {
@@ -479,9 +542,9 @@ internal partial class SettingsDialog : Form
     {
         listBoxTools.Items.Clear();
 
-        foreach (ToolEntry tool in Preferences.ToolEntries)
+        foreach (var tool in Preferences.ToolEntries)
         {
-            listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
+            _ = listBoxTools.Items.Add(tool.Clone(), tool.IsFavourite);
         }
 
         if (listBoxTools.Items.Count > 0)
@@ -509,6 +572,9 @@ internal partial class SettingsDialog : Form
                     radioButtonAskWhatToDo.Checked = true;
                     break;
                 }
+            default:
+                //intentionally left blank
+                break;
         }
 
         textBoxMultifilePattern.Text = Preferences.MultiFileOptions.FormatPattern; //TODO: Impport settings file throws an exception. Fix or I caused it?
@@ -558,12 +624,12 @@ internal partial class SettingsDialog : Form
     {
         if (_selectedTool != null)
         {
-            Icon icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
+            var icon = NativeMethods.LoadIconFromExe(_selectedTool.IconFile, _selectedTool.IconIndex);
             if (icon != null)
             {
                 Image image = icon.ToBitmap();
                 buttonIcon.Image = image;
-                NativeMethods.DestroyIcon(icon.Handle);
+                _ = NativeMethods.DestroyIcon(icon.Handle);
                 icon.Dispose();
             }
             else
@@ -573,18 +639,37 @@ internal partial class SettingsDialog : Form
         }
     }
 
+    /// <summary>
+    /// Populates the encoding list in the combo box with a predefined set of character encodings.
+    /// </summary>
+    /// <remarks>This method clears any existing items in the combo box and adds a selection of common
+    /// encodings, including ASCII, Default (UTF-8), ISO-8859-1, UTF-8, Unicode, and Windows-1252. The value member of the combo
+    /// box is set to a specific header name defined in the resources.</remarks>
     private void FillEncodingList ()
     {
         comboBoxEncoding.Items.Clear();
 
-        comboBoxEncoding.Items.Add(Encoding.ASCII);
-        comboBoxEncoding.Items.Add(Encoding.Default);
-        comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
-        comboBoxEncoding.Items.Add(Encoding.UTF8);
-        comboBoxEncoding.Items.Add(Encoding.Unicode);
-        comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
+        _ = comboBoxEncoding.Items.Add(Encoding.ASCII);
+        _ = comboBoxEncoding.Items.Add(Encoding.Default);
+        _ = comboBoxEncoding.Items.Add(Encoding.GetEncoding("iso-8859-1"));
+        _ = comboBoxEncoding.Items.Add(Encoding.UTF8);
+        _ = comboBoxEncoding.Items.Add(Encoding.Unicode);
+        _ = comboBoxEncoding.Items.Add(CodePagesEncodingProvider.Instance.GetEncoding(1252));
 
-        comboBoxEncoding.ValueMember = "HeaderName";
+        comboBoxEncoding.ValueMember = Resources.SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName;
+    }
+
+    /// <summary>
+    /// Populates the language selection list with available language options.
+    /// </summary>
+    /// <remarks>Clears any existing items in the language selection list and adds predefined language
+    /// options. Currently, it includes English (United States) and German (Germany).</remarks>
+    private void FillLanguageList ()
+    {
+        comboBoxLanguage.Items.Clear();
+
+        _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("en-US").Name); // Add English as default
+        _ = comboBoxLanguage.Items.Add(CultureInfo.GetCultureInfo("de-DE").Name);
     }
 
     #endregion
@@ -622,18 +707,11 @@ internal partial class SettingsDialog : Form
         Preferences.FilterTail = checkBoxFilterTail.Checked;
         Preferences.FollowTail = checkBoxFollowTail.Checked;
 
-        if (radioButtonVerticalMouseDrag.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Vertical;
-        }
-        else if (radioButtonVerticalMouseDragInverted.Checked)
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.InvertedVertical;
-        }
-        else
-        {
-            Preferences.TimestampControlDragOrientation = DragOrientationsEnum.Horizontal;
-        }
+        Preferences.TimestampControlDragOrientation = radioButtonVerticalMouseDrag.Checked
+            ? DragOrientationsEnum.Vertical
+            : radioButtonVerticalMouseDragInverted.Checked
+                ? DragOrientationsEnum.InvertedVertical
+                : DragOrientationsEnum.Horizontal;
 
         SaveColumnizerList();
 
@@ -652,22 +730,13 @@ internal partial class SettingsDialog : Form
         Preferences.SaveSessions = checkBoxSaveSessions.Checked;
         Preferences.SessionSaveDirectory = labelSessionSaveOwnDir.Text;
 
-        if (radioButtonsessionSaveDocuments.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.DocumentsDir;
-        }
-        else if (radioButtonSessionSaveOwn.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.OwnDir;
-        }
-        else if (radioButtonSessionApplicationStartupDir.Checked)
-        {
-            Preferences.SaveLocation = SessionSaveLocation.ApplicationStartupDir;
-        }
-        else
-        {
-            Preferences.SaveLocation = SessionSaveLocation.SameDir;
-        }
+        Preferences.SaveLocation = radioButtonsessionSaveDocuments.Checked
+            ? SessionSaveLocation.DocumentsDir
+            : radioButtonSessionSaveOwn.Checked
+                ? SessionSaveLocation.OwnDir
+                : radioButtonSessionApplicationStartupDir.Checked
+                    ? SessionSaveLocation.ApplicationStartupDir
+                    : SessionSaveLocation.SameDir;
 
         Preferences.SaveFilters = checkBoxSaveFilter.Checked;
         Preferences.BufferCount = (int)upDownBlockCount.Value;
@@ -675,6 +744,7 @@ internal partial class SettingsDialog : Form
         Preferences.PollingInterval = (int)upDownPollingInterval.Value;
         Preferences.MultiThreadFilter = checkBoxMultiThread.Checked;
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem != null ? (comboBoxEncoding.SelectedItem as Encoding).HeaderName : Encoding.Default.HeaderName;
+        Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
         Preferences.UseLegacyReader = checkBoxLegacyReader.Checked;
 
@@ -715,7 +785,7 @@ internal partial class SettingsDialog : Form
         if (dataGridViewColumnizer.CurrentRow != null && !dataGridViewColumnizer.CurrentRow.IsNewRow)
         {
             var index = dataGridViewColumnizer.CurrentRow.Index;
-            dataGridViewColumnizer.EndEdit();
+            _ = dataGridViewColumnizer.EndEdit();
             dataGridViewColumnizer.Rows.RemoveAt(index);
         }
     }
@@ -803,7 +873,7 @@ internal partial class SettingsDialog : Form
         }
 
         dlg.ShowNewFolderButton = true;
-        dlg.Description = @"Choose folder for LogExpert's session files";
+        dlg.Description = Resources.SettingsDialog_UI_FolderBrowser_folderBrowserSessionSaveDir;
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
@@ -819,9 +889,9 @@ internal partial class SettingsDialog : Form
             {
                 case CheckState.Checked when !File.Exists(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName):
                     {
-                        if (Directory.Exists(ConfigManager.PortableModeDir) == false)
+                        if (!Directory.Exists(ConfigManager.PortableModeDir))
                         {
-                            Directory.CreateDirectory(ConfigManager.PortableModeDir);
+                            _ = Directory.CreateDirectory(ConfigManager.PortableModeDir);
                         }
 
                         using (File.Create(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName))
@@ -834,28 +904,52 @@ internal partial class SettingsDialog : Form
                         File.Delete(ConfigManager.PortableModeDir + Path.DirectorySeparatorChar + ConfigManager.PortableModeSettingsFileName);
                         break;
                     }
+
+                case CheckState.Unchecked:
+                    //intentionally left blank
+                    break;
+                case CheckState.Checked:
+                    //intentionally left blank
+                    break;
+                case CheckState.Indeterminate:
+                    //intentionally left blank
+                    break;
+                default:
+                    //intentionally left blank
+                    break;
             }
 
             switch (checkBoxPortableMode.CheckState)
             {
                 case CheckState.Unchecked:
                     {
-                        checkBoxPortableMode.Text = @"Activate Portable Mode";
+                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_ActivatePortableMode;
                         Preferences.PortableMode = false;
                         break;
                     }
-
                 case CheckState.Checked:
                     {
                         Preferences.PortableMode = true;
-                        checkBoxPortableMode.Text = @"Deactivate Portable Mode";
+                        checkBoxPortableMode.Text = Resources.SettingsDialog_UI_DeActivatePortableMode;
                         break;
                     }
+                case CheckState.Indeterminate:
+                    //intentionally left blank
+                    break;
+                default:
+                    //intentionally left blank
+                    break;
             }
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is UnauthorizedAccessException
+                                                    or IOException
+                                                    or ArgumentException
+                                                    or ArgumentNullException
+                                                    or PathTooLongException
+                                                    or DirectoryNotFoundException
+                                                    or NotSupportedException)
         {
-            MessageBox.Show($@"Could not create / delete marker for Portable Mode: {exception}", @"Error", MessageBoxButtons.OK);
+            _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_CouldNotCreatePortableMode, exception), Resources.Title_LogExpert_Error, MessageBoxButtons.OK);
         }
 
     }
@@ -918,7 +1012,7 @@ internal partial class SettingsDialog : Form
     [SupportedOSPlatform("windows")]
     private void OnBtnToolAddClick (object sender, EventArgs e)
     {
-        listBoxTools.Items.Add(new ToolEntry());
+        _ = listBoxTools.Items.Add(new ToolEntry());
         listBoxTools.SelectedIndex = listBoxTools.Items.Count - 1;
     }
 
@@ -981,7 +1075,7 @@ internal partial class SettingsDialog : Form
     private void OnMultiFilePatternTextChanged (object sender, EventArgs e)
     {
         var pattern = textBoxMultifilePattern.Text;
-        upDownMultifileDays.Enabled = pattern.Contains("$D", System.StringComparison.Ordinal);
+        upDownMultifileDays.Enabled = pattern.Contains("$D", StringComparison.Ordinal);
     }
 
     [SupportedOSPlatform("windows")]
@@ -989,13 +1083,13 @@ internal partial class SettingsDialog : Form
     {
         SaveFileDialog dlg = new()
         {
-            Title = @"Export Settings to file",
+            Title = @Resources.SettingsDialog_UI_Title_ExportSettings,
             DefaultExt = "json",
             AddExtension = true,
-            Filter = @"Settings (*.json)|*.json|All files (*.*)|*.*"
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Filter_ExportSettings, "(*.json)|*.json", "(*.*)|*.*")
         };
 
-        DialogResult result = dlg.ShowDialog();
+        var result = dlg.ShowDialog();
 
         if (result == DialogResult.OK)
         {
@@ -1025,17 +1119,45 @@ internal partial class SettingsDialog : Form
             {
                 fileInfo = new FileInfo(dlg.FileName);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is ArgumentException
+                                          or ArgumentNullException
+                                          or PathTooLongException
+                                          or SecurityException
+                                          or NotSupportedException
+                                          or UnauthorizedAccessException)
             {
-                MessageBox.Show(this, $@"Settings could not be imported: {ex}", @"LogExpert");
+                _ = MessageBox.Show(this, string.Format(CultureInfo.InvariantCulture, Resources.SettingsDialog_UI_Error_SettingsCouldNotBeImported, ex), Resources.Title_LogExpert_Error);
                 return;
             }
 
             ConfigManager.Import(fileInfo, dlg.ImportFlags);
             Preferences = ConfigManager.Settings.Preferences;
             FillDialog();
-            MessageBox.Show(this, @"Settings imported", @"LogExpert");
+            _ = MessageBox.Show(this, Resources.SettingsDialog_UI_SettingsImported, Resources.Title_LogExpert);
         }
+    }
+
+    #endregion
+
+    #region Resources Map
+
+    /// <summary>
+    /// Creates a mapping of UI controls to their corresponding tooltip text.
+    /// </summary>
+    /// <remarks>This method initializes a dictionary with predefined tooltips for specific UI controls.
+    /// Additional tooltips can be added to the dictionary as needed.</remarks>
+    /// <returns>A <see cref="Dictionary{TKey, TValue}"/> where the keys are <see cref="Control"/> objects and the values are
+    /// strings representing the tooltip text for each control.</returns>
+    private Dictionary<Control, string> GetToolTipMap ()
+    {
+        return new Dictionary<Control, string>
+        {
+            { comboBoxLanguage, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipLanguage },
+            { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
+            { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
+            { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
+            { checkBoxLegacyReader, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipLegacyReader }
+        };
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.UI.Dialogs.Eminus;
@@ -21,6 +22,7 @@ internal partial class EminusConfigDlg : Form
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        LoadResources();
 
         TopLevel = false;
         Config = config;
@@ -30,6 +32,15 @@ internal partial class EminusConfigDlg : Form
         passwordTextBox.Text = config.Password;
 
         ResumeLayout();
+    }
+
+    private void LoadResources ()
+    {
+        Text = Resources.EminusConfigDlg_UI_Text;
+        labelHost.Text = Resources.EminusConfigDlg_UI_Label_Host;
+        labelPort.Text = Resources.EminusConfigDlg_UI_Label_Port;
+        labelPassword.Text = Resources.EminusConfigDlg_UI_Label_Password;
+        labelDescription.Text = Resources.EminusConfigDlg_UI_Label_Description;
     }
 
     #endregion
@@ -47,7 +58,7 @@ internal partial class EminusConfigDlg : Form
         Config.Host = hostTextBox.Text;
         try
         {
-            Config.Port = short.Parse(portTextBox.Text);
+            Config.Port = short.Parse(portTextBox.Text, NumberStyles.None, CultureInfo.InvariantCulture);
         }
         catch (FormatException)
         {

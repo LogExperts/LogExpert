@@ -16,16 +16,23 @@ internal static class BookmarkExporter
     public static void ExportBookmarkList (SortedList<int, Bookmark> bookmarkList, string logfileName, string fileName)
     {
         ArgumentNullException.ThrowIfNull(bookmarkList, nameof(bookmarkList));
-        FileStream fs = new(fileName, FileMode.Create, FileAccess.Write);
-        StreamWriter writer = new(fs);
+        using FileStream fs = new(fileName, FileMode.Create, FileAccess.Write);
+        using StreamWriter writer = new(fs);
+
         writer.WriteLine("Log file name;Line number;Comment");
+
         foreach (var bookmark in bookmarkList.Values)
         {
-            var line = $"{logfileName};{bookmark.LineNum};{bookmark.Text.Replace(replacementForNewLine, @"\" + replacementForNewLine, StringComparison.OrdinalIgnoreCase).Replace("\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase)}";
+            var text = bookmark.Text ?? string.Empty;
+
+            text = text
+                .Replace(replacementForNewLine, @"\" + replacementForNewLine, StringComparison.OrdinalIgnoreCase)
+                .Replace("\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase);
+
+            var line = $"{logfileName};{bookmark.LineNum};{text}";
+
             writer.WriteLine(line);
         }
-        writer.Close();
-        fs.Close();
     }
 
     public static void ImportBookmarkList (string logfileName, string fileName, SortedList<int, Bookmark> bookmarkList)
@@ -42,24 +49,20 @@ internal static class BookmarkExporter
             try
             {
                 var line = reader.ReadLine();
-                line = line.Replace(replacementForNewLine, "\r\n", StringComparison.OrdinalIgnoreCase).Replace("\\\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase);
+                line = line
+                    .Replace(replacementForNewLine, "\r\n", StringComparison.OrdinalIgnoreCase)
+                    .Replace("\\\r\n", replacementForNewLine, StringComparison.OrdinalIgnoreCase);
 
                 // Line is formatted: logfileName ";" bookmark.LineNum ";" bookmark.Text;
-                var firstSeparator = line.IndexOf(';', StringComparison.OrdinalIgnoreCase);
-                var secondSeparator = line.IndexOf(';', firstSeparator + 1);
+                var parts = line.Split(';', 3, StringSplitOptions.None);
 
-                var fileStr = line[..firstSeparator];
-                var lineStr = line.Substring(firstSeparator + 1, secondSeparator - firstSeparator - 1);
-                var comment = line[(secondSeparator + 1)..];
-
-                if (int.TryParse(lineStr, out var lineNum))
+                // parts[0] = fileStr
+                // parts[1] = line number
+                // parts[2] = comment
+                if (int.TryParse(parts[1], out var lineNum) && parts[0] == logfileName)
                 {
-                    Bookmark bookmark = new(lineNum, comment);
+                    Bookmark bookmark = new(lineNum, parts[2]);
                     bookmarkList.Add(lineNum, bookmark);
-                }
-                else
-                {
-                    //!!!log error: skipping a line entry
                 }
             }
             catch

@@ -2,7 +2,7 @@ using System.Text;
 
 namespace LogExpert.Core.EventArguments;
 
-public class GuiStateArgs : System.EventArgs
+public class GuiStateEventArgs : EventArgs
 {
     #region Properties
 

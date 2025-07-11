@@ -64,19 +64,19 @@ namespace LogExpert.UI.Controls.LogWindow
             advancedBackPanel = new Panel();
             advancedFilterSplitContainer = new SplitContainer();
             pnlProFilter = new Panel();
-            columnButton = new Button();
+            btnColumn = new Button();
             columnRestrictCheckBox = new CheckBox();
             rangeCheckBox = new CheckBox();
             filterRangeComboBox = new ComboBox();
             columnNamesLabel = new Label();
-            fuzzyLabel = new Label();
-            fuzzyKnobControl = new KnobControl();
+            lblfuzzy = new Label();
+            knobControlFuzzy = new KnobControl();
             invertFilterCheckBox = new CheckBox();
             pnlProFilterLabel = new Panel();
             lblBackSpread = new Label();
-            filterKnobBackSpread = new KnobControl();
+            knobControlFilterBackSpread = new KnobControl();
             lblForeSpread = new Label();
-            filterKnobForeSpread = new KnobControl();
+            knobControlFilterForeSpread = new KnobControl();
             btnFilterToTab = new Button();
             panelBackgroundAdvancedFilterSplitContainer = new Panel();
             btnToggleHighlightPanel = new Button();
@@ -88,25 +88,25 @@ namespace LogExpert.UI.Controls.LogWindow
             markFilterHitsInLogViewToolStripMenuItem = new ToolStripMenuItem();
             highlightSplitContainerBackPanel = new Panel();
             hideFilterListOnLoadCheckBox = new CheckBox();
-            filterDownButton = new Button();
-            filterUpButton = new Button();
+            btnFilterDown = new Button();
+            btnFilterUp = new Button();
             filterOnLoadCheckBox = new CheckBox();
-            saveFilterButton = new Button();
-            deleteFilterButton = new Button();
-            filterListBox = new ListBox();
+            bntSaveFilter = new Button();
+            btnDeleteFilter = new Button();
+            listBoxFilter = new ListBox();
             filterListContextMenuStrip = new ContextMenuStrip(components);
             colorToolStripMenuItem = new ToolStripMenuItem();
             pnlFilterInput = new Panel();
             filterSplitContainer = new SplitContainer();
-            filterComboBox = new ComboBox();
+            comboBoxFilter = new ComboBox();
             lblTextFilter = new Label();
-            advancedButton = new Button();
+            btnAdvanced = new Button();
             syncFilterCheckBox = new CheckBox();
             lblFilterCount = new Label();
             filterTailCheckBox = new CheckBox();
             filterRegexCheckBox = new CheckBox();
             filterCaseSensitiveCheckBox = new CheckBox();
-            filterSearchButton = new Button();
+            btnFilterSearch = new Button();
             bookmarkContextMenuStrip = new ContextMenuStrip(components);
             deleteBookmarksToolStripMenuItem = new ToolStripMenuItem();
             columnContextMenuStrip = new ContextMenuStrip(components);
@@ -222,7 +222,6 @@ namespace LogExpert.UI.Controls.LogWindow
             columnComboBox.Name = "columnComboBox";
             columnComboBox.Size = new Size(181, 21);
             columnComboBox.TabIndex = 1;
-            helpToolTip.SetToolTip(columnComboBox, "Select column to scroll to");
             columnComboBox.SelectionChangeCommitted += OnColumnComboBoxSelectionChangeCommitted;
             columnComboBox.KeyDown += OnColumnComboBoxKeyDown;
             columnComboBox.PreviewKeyDown += OnColumnComboBoxPreviewKeyDown;
@@ -462,19 +461,19 @@ namespace LogExpert.UI.Controls.LogWindow
             // pnlProFilter
             // 
             pnlProFilter.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            pnlProFilter.Controls.Add(columnButton);
+            pnlProFilter.Controls.Add(btnColumn);
             pnlProFilter.Controls.Add(columnRestrictCheckBox);
             pnlProFilter.Controls.Add(rangeCheckBox);
             pnlProFilter.Controls.Add(filterRangeComboBox);
             pnlProFilter.Controls.Add(columnNamesLabel);
-            pnlProFilter.Controls.Add(fuzzyLabel);
-            pnlProFilter.Controls.Add(fuzzyKnobControl);
+            pnlProFilter.Controls.Add(lblfuzzy);
+            pnlProFilter.Controls.Add(knobControlFuzzy);
             pnlProFilter.Controls.Add(invertFilterCheckBox);
             pnlProFilter.Controls.Add(pnlProFilterLabel);
             pnlProFilter.Controls.Add(lblBackSpread);
-            pnlProFilter.Controls.Add(filterKnobBackSpread);
+            pnlProFilter.Controls.Add(knobControlFilterBackSpread);
             pnlProFilter.Controls.Add(lblForeSpread);
-            pnlProFilter.Controls.Add(filterKnobForeSpread);
+            pnlProFilter.Controls.Add(knobControlFilterForeSpread);
             pnlProFilter.Controls.Add(btnFilterToTab);
             pnlProFilter.Location = new Point(0, 3);
             pnlProFilter.Name = "pnlProFilter";
@@ -483,15 +482,15 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // columnButton
             // 
-            columnButton.Enabled = false;
-            columnButton.Location = new Point(750, 41);
-            columnButton.Name = "columnButton";
-            columnButton.Size = new Size(85, 35);
-            columnButton.TabIndex = 15;
-            columnButton.Text = "Columns...";
-            helpToolTip.SetToolTip(columnButton, "Choose columns for 'Column restrict'");
-            columnButton.UseVisualStyleBackColor = true;
-            columnButton.Click += OnColumnButtonClick;
+            btnColumn.Enabled = false;
+            btnColumn.Location = new Point(750, 41);
+            btnColumn.Name = "columnButton";
+            btnColumn.Size = new Size(85, 35);
+            btnColumn.TabIndex = 15;
+            btnColumn.Text = "Columns...";
+            helpToolTip.SetToolTip(btnColumn, "Choose columns for 'Column restrict'");
+            btnColumn.UseVisualStyleBackColor = true;
+            btnColumn.Click += OnColumnButtonClick;
             // 
             // columnRestrictCheckBox
             // 
@@ -539,27 +538,27 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // fuzzyLabel
             // 
-            fuzzyLabel.AutoSize = true;
-            fuzzyLabel.Location = new Point(502, 38);
-            fuzzyLabel.Name = "fuzzyLabel";
-            fuzzyLabel.Size = new Size(56, 13);
-            fuzzyLabel.TabIndex = 11;
-            fuzzyLabel.Text = "Fuzzyness";
+            lblfuzzy.AutoSize = true;
+            lblfuzzy.Location = new Point(502, 38);
+            lblfuzzy.Name = "fuzzyLabel";
+            lblfuzzy.Size = new Size(56, 13);
+            lblfuzzy.TabIndex = 11;
+            lblfuzzy.Text = "Fuzzyness";
             // 
             // fuzzyKnobControl
             // 
-            fuzzyKnobControl.DragSensitivity = 6;
-            fuzzyKnobControl.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            fuzzyKnobControl.Location = new Point(521, 7);
-            fuzzyKnobControl.Margin = new Padding(2);
-            fuzzyKnobControl.MaxValue = 0;
-            fuzzyKnobControl.MinValue = 0;
-            fuzzyKnobControl.Name = "fuzzyKnobControl";
-            fuzzyKnobControl.Size = new Size(17, 29);
-            fuzzyKnobControl.TabIndex = 10;
-            helpToolTip.SetToolTip(fuzzyKnobControl, "Fuzzy search level (0 = fuzzy off)");
-            fuzzyKnobControl.Value = 0;
-            fuzzyKnobControl.ValueChanged += OnFuzzyKnobControlValueChanged;
+            knobControlFuzzy.DragSensitivity = 6;
+            knobControlFuzzy.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            knobControlFuzzy.Location = new Point(521, 7);
+            knobControlFuzzy.Margin = new Padding(2);
+            knobControlFuzzy.MaxValue = 0;
+            knobControlFuzzy.MinValue = 0;
+            knobControlFuzzy.Name = "fuzzyKnobControl";
+            knobControlFuzzy.Size = new Size(17, 29);
+            knobControlFuzzy.TabIndex = 10;
+            helpToolTip.SetToolTip(knobControlFuzzy, "Fuzzy search level (0 = fuzzy off)");
+            knobControlFuzzy.Value = 0;
+            knobControlFuzzy.ValueChanged += OnFuzzyKnobControlValueChanged;
             // 
             // invertFilterCheckBox
             // 
@@ -593,17 +592,17 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterKnobBackSpread
             // 
-            filterKnobBackSpread.DragSensitivity = 3;
-            filterKnobBackSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            filterKnobBackSpread.Location = new Point(313, 7);
-            filterKnobBackSpread.Margin = new Padding(2);
-            filterKnobBackSpread.MaxValue = 0;
-            filterKnobBackSpread.MinValue = 0;
-            filterKnobBackSpread.Name = "filterKnobBackSpread";
-            filterKnobBackSpread.Size = new Size(17, 29);
-            filterKnobBackSpread.TabIndex = 5;
-            helpToolTip.SetToolTip(filterKnobBackSpread, "Add preceding lines to search result (Drag up/down, press Shift for finer pitch)");
-            filterKnobBackSpread.Value = 0;
+            knobControlFilterBackSpread.DragSensitivity = 3;
+            knobControlFilterBackSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            knobControlFilterBackSpread.Location = new Point(313, 7);
+            knobControlFilterBackSpread.Margin = new Padding(2);
+            knobControlFilterBackSpread.MaxValue = 0;
+            knobControlFilterBackSpread.MinValue = 0;
+            knobControlFilterBackSpread.Name = "filterKnobBackSpread";
+            knobControlFilterBackSpread.Size = new Size(17, 29);
+            knobControlFilterBackSpread.TabIndex = 5;
+            helpToolTip.SetToolTip(knobControlFilterBackSpread, "Add preceding lines to search result (Drag up/down, press Shift for finer pitch)");
+            knobControlFilterBackSpread.Value = 0;
             // 
             // lblForeSpread
             // 
@@ -616,17 +615,17 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterKnobForeSpread
             // 
-            filterKnobForeSpread.DragSensitivity = 3;
-            filterKnobForeSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            filterKnobForeSpread.Location = new Point(420, 7);
-            filterKnobForeSpread.Margin = new Padding(2);
-            filterKnobForeSpread.MaxValue = 0;
-            filterKnobForeSpread.MinValue = 0;
-            filterKnobForeSpread.Name = "filterKnobForeSpread";
-            filterKnobForeSpread.Size = new Size(17, 29);
-            filterKnobForeSpread.TabIndex = 1;
-            helpToolTip.SetToolTip(filterKnobForeSpread, "Add following lines to search result (Drag up/down, press Shift for finer pitch)");
-            filterKnobForeSpread.Value = 0;
+            knobControlFilterForeSpread.DragSensitivity = 3;
+            knobControlFilterForeSpread.Font = new Font("Verdana", 6F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            knobControlFilterForeSpread.Location = new Point(420, 7);
+            knobControlFilterForeSpread.Margin = new Padding(2);
+            knobControlFilterForeSpread.MaxValue = 0;
+            knobControlFilterForeSpread.MinValue = 0;
+            knobControlFilterForeSpread.Name = "filterKnobForeSpread";
+            knobControlFilterForeSpread.Size = new Size(17, 29);
+            knobControlFilterForeSpread.TabIndex = 1;
+            helpToolTip.SetToolTip(knobControlFilterForeSpread, "Add following lines to search result (Drag up/down, press Shift for finer pitch)");
+            knobControlFilterForeSpread.Value = 0;
             // 
             // btnFilterToTab
             // 
@@ -756,12 +755,12 @@ namespace LogExpert.UI.Controls.LogWindow
             // highlightSplitContainerBackPanel
             // 
             highlightSplitContainerBackPanel.Controls.Add(hideFilterListOnLoadCheckBox);
-            highlightSplitContainerBackPanel.Controls.Add(filterDownButton);
-            highlightSplitContainerBackPanel.Controls.Add(filterUpButton);
+            highlightSplitContainerBackPanel.Controls.Add(btnFilterDown);
+            highlightSplitContainerBackPanel.Controls.Add(btnFilterUp);
             highlightSplitContainerBackPanel.Controls.Add(filterOnLoadCheckBox);
-            highlightSplitContainerBackPanel.Controls.Add(saveFilterButton);
-            highlightSplitContainerBackPanel.Controls.Add(deleteFilterButton);
-            highlightSplitContainerBackPanel.Controls.Add(filterListBox);
+            highlightSplitContainerBackPanel.Controls.Add(bntSaveFilter);
+            highlightSplitContainerBackPanel.Controls.Add(btnDeleteFilter);
+            highlightSplitContainerBackPanel.Controls.Add(listBoxFilter);
             highlightSplitContainerBackPanel.Dock = DockStyle.Fill;
             highlightSplitContainerBackPanel.Location = new Point(0, 0);
             highlightSplitContainerBackPanel.Name = "highlightSplitContainerBackPanel";
@@ -782,29 +781,29 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterDownButton
             // 
-            filterDownButton.BackgroundImage = LogExpert.Resources.ArrowDown;
-            filterDownButton.BackgroundImageLayout = ImageLayout.Stretch;
-            filterDownButton.Location = new Point(296, 85);
-            filterDownButton.Name = "filterDownButton";
-            filterDownButton.Size = new Size(35, 35);
-            filterDownButton.TabIndex = 19;
-            helpToolTip.SetToolTip(filterDownButton, "Move the selected entry down in the list");
-            filterDownButton.UseVisualStyleBackColor = true;
-            filterDownButton.SizeChanged += OnButtonSizeChanged;
-            filterDownButton.Click += OnFilterDownButtonClick;
+            btnFilterDown.BackgroundImage = LogExpert.Resources.ArrowDown;
+            btnFilterDown.BackgroundImageLayout = ImageLayout.Stretch;
+            btnFilterDown.Location = new Point(296, 85);
+            btnFilterDown.Name = "filterDownButton";
+            btnFilterDown.Size = new Size(35, 35);
+            btnFilterDown.TabIndex = 19;
+            helpToolTip.SetToolTip(btnFilterDown, "Move the selected entry down in the list");
+            btnFilterDown.UseVisualStyleBackColor = true;
+            btnFilterDown.SizeChanged += OnButtonSizeChanged;
+            btnFilterDown.Click += OnFilterDownButtonClick;
             // 
             // filterUpButton
             // 
-            filterUpButton.BackgroundImage = LogExpert.Resources.ArrowUp;
-            filterUpButton.BackgroundImageLayout = ImageLayout.Stretch;
-            filterUpButton.Location = new Point(258, 85);
-            filterUpButton.Name = "filterUpButton";
-            filterUpButton.Size = new Size(35, 35);
-            filterUpButton.TabIndex = 18;
-            helpToolTip.SetToolTip(filterUpButton, "Move the selected entry up in the list");
-            filterUpButton.UseVisualStyleBackColor = true;
-            filterUpButton.SizeChanged += OnButtonSizeChanged;
-            filterUpButton.Click += OnFilterUpButtonClick;
+            btnFilterUp.BackgroundImage = LogExpert.Resources.ArrowUp;
+            btnFilterUp.BackgroundImageLayout = ImageLayout.Stretch;
+            btnFilterUp.Location = new Point(258, 85);
+            btnFilterUp.Name = "filterUpButton";
+            btnFilterUp.Size = new Size(35, 35);
+            btnFilterUp.TabIndex = 18;
+            helpToolTip.SetToolTip(btnFilterUp, "Move the selected entry up in the list");
+            btnFilterUp.UseVisualStyleBackColor = true;
+            btnFilterUp.SizeChanged += OnButtonSizeChanged;
+            btnFilterUp.Click += OnFilterUpButtonClick;
             // 
             // filterOnLoadCheckBox
             // 
@@ -821,40 +820,40 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // saveFilterButton
             // 
-            saveFilterButton.Location = new Point(258, 11);
-            saveFilterButton.Name = "saveFilterButton";
-            saveFilterButton.Size = new Size(75, 35);
-            saveFilterButton.TabIndex = 16;
-            saveFilterButton.Text = "Save filter";
-            saveFilterButton.UseVisualStyleBackColor = true;
-            saveFilterButton.Click += OnSaveFilterButtonClick;
+            bntSaveFilter.Location = new Point(258, 11);
+            bntSaveFilter.Name = "saveFilterButton";
+            bntSaveFilter.Size = new Size(75, 35);
+            bntSaveFilter.TabIndex = 16;
+            bntSaveFilter.Text = "Save filter";
+            bntSaveFilter.UseVisualStyleBackColor = true;
+            bntSaveFilter.Click += OnSaveFilterButtonClick;
             // 
             // deleteFilterButton
             // 
-            deleteFilterButton.Location = new Point(258, 47);
-            deleteFilterButton.Name = "deleteFilterButton";
-            deleteFilterButton.Size = new Size(75, 35);
-            deleteFilterButton.TabIndex = 3;
-            deleteFilterButton.Text = "Delete";
-            deleteFilterButton.UseVisualStyleBackColor = true;
-            deleteFilterButton.Click += OnDeleteFilterButtonClick;
+            btnDeleteFilter.Location = new Point(258, 47);
+            btnDeleteFilter.Name = "deleteFilterButton";
+            btnDeleteFilter.Size = new Size(75, 35);
+            btnDeleteFilter.TabIndex = 3;
+            btnDeleteFilter.Text = "Delete";
+            btnDeleteFilter.UseVisualStyleBackColor = true;
+            btnDeleteFilter.Click += OnDeleteFilterButtonClick;
             // 
             // filterListBox
             // 
-            filterListBox.ContextMenuStrip = filterListContextMenuStrip;
-            filterListBox.Dock = DockStyle.Left;
-            filterListBox.DrawMode = DrawMode.OwnerDrawFixed;
-            filterListBox.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            filterListBox.FormattingEnabled = true;
-            filterListBox.IntegralHeight = false;
-            filterListBox.ItemHeight = 25;
-            filterListBox.Location = new Point(0, 0);
-            filterListBox.Name = "filterListBox";
-            filterListBox.Size = new Size(252, 469);
-            filterListBox.TabIndex = 0;
-            helpToolTip.SetToolTip(filterListBox, "Doubleclick to load a saved filter");
-            filterListBox.DrawItem += OnFilterListBoxDrawItem;
-            filterListBox.MouseDoubleClick += OnFilterListBoxMouseDoubleClick;
+            listBoxFilter.ContextMenuStrip = filterListContextMenuStrip;
+            listBoxFilter.Dock = DockStyle.Left;
+            listBoxFilter.DrawMode = DrawMode.OwnerDrawFixed;
+            listBoxFilter.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            listBoxFilter.FormattingEnabled = true;
+            listBoxFilter.IntegralHeight = false;
+            listBoxFilter.ItemHeight = 25;
+            listBoxFilter.Location = new Point(0, 0);
+            listBoxFilter.Name = "filterListBox";
+            listBoxFilter.Size = new Size(252, 469);
+            listBoxFilter.TabIndex = 0;
+            helpToolTip.SetToolTip(listBoxFilter, "Doubleclick to load a saved filter");
+            listBoxFilter.DrawItem += OnFilterListBoxDrawItem;
+            listBoxFilter.MouseDoubleClick += OnFilterListBoxMouseDoubleClick;
             // 
             // filterListContextMenuStrip
             // 
@@ -887,19 +886,19 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSplitContainer.Panel1
             // 
-            filterSplitContainer.Panel1.Controls.Add(filterComboBox);
+            filterSplitContainer.Panel1.Controls.Add(comboBoxFilter);
             filterSplitContainer.Panel1.Controls.Add(lblTextFilter);
             filterSplitContainer.Panel1MinSize = 200;
             // 
             // filterSplitContainer.Panel2
             // 
-            filterSplitContainer.Panel2.Controls.Add(advancedButton);
+            filterSplitContainer.Panel2.Controls.Add(btnAdvanced);
             filterSplitContainer.Panel2.Controls.Add(syncFilterCheckBox);
             filterSplitContainer.Panel2.Controls.Add(lblFilterCount);
             filterSplitContainer.Panel2.Controls.Add(filterTailCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterRegexCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
-            filterSplitContainer.Panel2.Controls.Add(filterSearchButton);
+            filterSplitContainer.Panel2.Controls.Add(btnFilterSearch);
             filterSplitContainer.Panel2MinSize = 550;
             filterSplitContainer.Size = new Size(1855, 46);
             filterSplitContainer.SplitterDistance = 518;
@@ -911,16 +910,16 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterComboBox
             // 
-            filterComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            filterComboBox.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            filterComboBox.FormattingEnabled = true;
-            filterComboBox.Location = new Point(89, 5);
-            filterComboBox.Name = "filterComboBox";
-            filterComboBox.Size = new Size(426, 26);
-            filterComboBox.TabIndex = 4;
-            helpToolTip.SetToolTip(filterComboBox, "Search string for the filter");
-            filterComboBox.TextChanged += OnFilterComboBoxTextChanged;
-            filterComboBox.KeyDown += OnFilterComboBoxKeyDown;
+            comboBoxFilter.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            comboBoxFilter.Font = new Font("Courier New", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            comboBoxFilter.FormattingEnabled = true;
+            comboBoxFilter.Location = new Point(89, 5);
+            comboBoxFilter.Name = "filterComboBox";
+            comboBoxFilter.Size = new Size(426, 26);
+            comboBoxFilter.TabIndex = 4;
+            helpToolTip.SetToolTip(comboBoxFilter, "Search string for the filter");
+            comboBoxFilter.TextChanged += OnFilterComboBoxTextChanged;
+            comboBoxFilter.KeyDown += OnFilterComboBoxKeyDown;
             // 
             // lblTextFilter
             // 
@@ -933,17 +932,17 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // advancedButton
             // 
-            advancedButton.DialogResult = DialogResult.Cancel;
-            advancedButton.Image = (Image)resources.GetObject("advancedButton.Image");
-            advancedButton.ImageAlign = ContentAlignment.MiddleRight;
-            advancedButton.Location = new Point(539, 5);
-            advancedButton.Name = "advancedButton";
-            advancedButton.Size = new Size(110, 35);
-            advancedButton.TabIndex = 17;
-            advancedButton.Text = "Show advanced...";
-            helpToolTip.SetToolTip(advancedButton, "Toggel the advanced filter options panel");
-            advancedButton.UseVisualStyleBackColor = true;
-            advancedButton.Click += OnAdvancedButtonClick;
+            btnAdvanced.DialogResult = DialogResult.Cancel;
+            btnAdvanced.Image = (Image)resources.GetObject("advancedButton.Image");
+            btnAdvanced.ImageAlign = ContentAlignment.MiddleRight;
+            btnAdvanced.Location = new Point(539, 5);
+            btnAdvanced.Name = "advancedButton";
+            btnAdvanced.Size = new Size(110, 35);
+            btnAdvanced.TabIndex = 17;
+            btnAdvanced.Text = "Show advanced...";
+            helpToolTip.SetToolTip(btnAdvanced, "Toggel the advanced filter options panel");
+            btnAdvanced.UseVisualStyleBackColor = true;
+            btnAdvanced.Click += OnAdvancedButtonClick;
             // 
             // syncFilterCheckBox
             // 
@@ -1006,16 +1005,16 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // filterSearchButton
             // 
-            filterSearchButton.Image = (Image)resources.GetObject("filterSearchButton.Image");
-            filterSearchButton.ImageAlign = ContentAlignment.MiddleRight;
-            filterSearchButton.Location = new Point(3, 5);
-            filterSearchButton.Name = "filterSearchButton";
-            filterSearchButton.Size = new Size(128, 35);
-            filterSearchButton.TabIndex = 11;
-            filterSearchButton.Text = "Search";
-            helpToolTip.SetToolTip(filterSearchButton, "Start the filter search");
-            filterSearchButton.UseVisualStyleBackColor = true;
-            filterSearchButton.Click += OnFilterSearchButtonClick;
+            btnFilterSearch.Image = (Image)resources.GetObject("filterSearchButton.Image");
+            btnFilterSearch.ImageAlign = ContentAlignment.MiddleRight;
+            btnFilterSearch.Location = new Point(3, 5);
+            btnFilterSearch.Name = "filterSearchButton";
+            btnFilterSearch.Size = new Size(128, 35);
+            btnFilterSearch.TabIndex = 11;
+            btnFilterSearch.Text = "Search";
+            helpToolTip.SetToolTip(btnFilterSearch, "Start the filter search");
+            btnFilterSearch.UseVisualStyleBackColor = true;
+            btnFilterSearch.Click += OnFilterSearchButtonClick;
             // 
             // bookmarkContextMenuStrip
             // 
@@ -1216,14 +1215,14 @@ namespace LogExpert.UI.Controls.LogWindow
 		private System.Windows.Forms.SplitContainer advancedFilterSplitContainer;
 		private System.Windows.Forms.Panel pnlProFilter;
 		private System.Windows.Forms.Button btnFilterToTab;
-		private KnobControl filterKnobForeSpread;
+		private KnobControl knobControlFilterForeSpread;
 		private System.Windows.Forms.Label lblForeSpread;
-		private KnobControl filterKnobBackSpread;
+		private KnobControl knobControlFilterBackSpread;
 		private System.Windows.Forms.Label lblBackSpread;
 		private System.Windows.Forms.Panel pnlProFilterLabel;
 		private System.Windows.Forms.CheckBox invertFilterCheckBox;
-		private System.Windows.Forms.Label fuzzyLabel;
-		private KnobControl fuzzyKnobControl;
+		private System.Windows.Forms.Label lblfuzzy;
+		private KnobControl knobControlFuzzy;
 		private System.Windows.Forms.CheckBox rangeCheckBox;
 		private System.Windows.Forms.ComboBox filterRangeComboBox;
 		private System.Windows.Forms.ContextMenuStrip dataGridContextMenuStrip;
@@ -1236,7 +1235,7 @@ namespace LogExpert.UI.Controls.LogWindow
 		private System.Windows.Forms.ContextMenuStrip bookmarkContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem deleteBookmarksToolStripMenuItem;
 		private System.Windows.Forms.CheckBox columnRestrictCheckBox;
-		private System.Windows.Forms.Button columnButton;
+		private System.Windows.Forms.Button btnColumn;
 		private System.Windows.Forms.ContextMenuStrip columnContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem freezeLeftColumnsUntilHereToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem moveToLastColumnToolStripMenuItem;
@@ -1257,17 +1256,17 @@ namespace LogExpert.UI.Controls.LogWindow
 		private System.Windows.Forms.SplitContainer highlightSplitContainer;
 		private System.Windows.Forms.Button btnToggleHighlightPanel;
 		private System.Windows.Forms.Panel highlightSplitContainerBackPanel;
-		private System.Windows.Forms.Button saveFilterButton;
-		private System.Windows.Forms.Button deleteFilterButton;
-		private System.Windows.Forms.ListBox filterListBox;
+		private System.Windows.Forms.Button bntSaveFilter;
+		private System.Windows.Forms.Button btnDeleteFilter;
+		private System.Windows.Forms.ListBox listBoxFilter;
 		private System.Windows.Forms.ContextMenuStrip filterContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem setBookmarksOnSelectedLinesToolStripMenuItem;
 		private System.Windows.Forms.CheckBox filterOnLoadCheckBox;
 		private System.Windows.Forms.ToolStripMenuItem markCurrentFilterRangeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem syncTimestampsToToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem freeThisWindowFromTimeSyncToolStripMenuItem;
-		private System.Windows.Forms.Button filterDownButton;
-		private System.Windows.Forms.Button filterUpButton;
+		private System.Windows.Forms.Button btnFilterDown;
+		private System.Windows.Forms.Button btnFilterUp;
 		private System.Windows.Forms.ContextMenuStrip filterListContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem colorToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem filterToTabToolStripMenuItem;
@@ -1284,14 +1283,14 @@ namespace LogExpert.UI.Controls.LogWindow
 		private System.Windows.Forms.Label lblColumnName;
         private System.Windows.Forms.SplitContainer filterSplitContainer;
         private System.Windows.Forms.Label lblTextFilter;
-        private System.Windows.Forms.ComboBox filterComboBox;
-        private System.Windows.Forms.Button advancedButton;
+        private System.Windows.Forms.ComboBox comboBoxFilter;
+        private System.Windows.Forms.Button btnAdvanced;
         private System.Windows.Forms.CheckBox syncFilterCheckBox;
         private System.Windows.Forms.Label lblFilterCount;
         private System.Windows.Forms.CheckBox filterTailCheckBox;
         private System.Windows.Forms.CheckBox filterRegexCheckBox;
         private System.Windows.Forms.CheckBox filterCaseSensitiveCheckBox;
-        private System.Windows.Forms.Button filterSearchButton;
+        private System.Windows.Forms.Button btnFilterSearch;
         private System.Windows.Forms.Panel panelBackgroundAdvancedFilterSplitContainer;
         private ToolStripSeparator pluginSeparator;
         private ToolStripSeparator menuToolStripSeparator1;

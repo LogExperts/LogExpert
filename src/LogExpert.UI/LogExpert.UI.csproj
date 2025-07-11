@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs" />
   </ItemGroup>
 
 </Project>

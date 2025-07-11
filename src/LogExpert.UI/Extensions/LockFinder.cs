@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using System.Globalization;
+using System.Runtime.Versioning;
 
 // Expanded with some helpers from: https://code.msdn.microsoft.com/windowsapps/How-to-know-the-process-704839f4/
-// Uses Windows Restart Manager. 
+// Uses Windows Restart Manager.
 // A more involved and cross platform solution to this problem is here: https://github.com/cklutz/LockCheck
 
 
@@ -17,21 +16,19 @@ internal class LockFinder
     /// Method <c>FindLockedProcessName</c> Retrieve the first process name
     /// that is locking the file at the specified path
     /// </summary>
-    /// <param name="path">The path of a file with a write lock held by a 
+    /// <param name="path">The path of a file with a write lock held by a
     /// process</param>
     /// <resturns>The name of the first process found with a lock</resturns>
     /// <exception cref="Exception">
     /// Thrown when the file path is not locked
     /// </exception>
-    static public string FindLockedProcessName (string path)
+    [SupportedOSPlatform("windows")]
+    public static string FindLockedProcessName (string path)
     {
         var list = FindLockProcesses(path);
-        if (list.Count == 0)
-        {
-            throw new Exception(
-            "No processes are locking the path specified");
-        }
-        return list[0].ProcessName;
+        return list.Count == 0
+            ? throw new Exception(Resources.Lockfinder_Exception_NoProcessesAreLockingThePathSpecified)
+            : list[0].ProcessName;
     }
 
     /// <summary>
@@ -41,23 +38,23 @@ internal class LockFinder
     /// <param name="path">The path of a file being checked if a write lock
     /// held by a process</param>
     /// <returns>true when one or more processes with lock</returns>
-    static public bool CheckIfFileIsLocked (string path)
+    [SupportedOSPlatform("windows")]
+    public static bool CheckIfFileIsLocked (string path)
     {
         var list = FindLockProcesses(path);
-        if (list.Count > 0)
-        { return true; }
-        return false;
+        return list.Count > 0;
     }
 
     /// <summary>
     /// Used to find processes holding a lock on the file. This would cause
     /// other usage, such as file truncation or write opretions to throw
-    /// IOException if an exclusive lock is attempted. 
+    /// IOException if an exclusive lock is attempted.
     /// </summary>
     /// <param name="path">Path being checked</param>
     /// <returns>List of processes holding file lock to path</returns>
     /// <exception cref="Exception"></exception>
-    static public List<Process> FindLockProcesses (string path)
+    [SupportedOSPlatform("windows")]
+    public static List<Process> FindLockProcesses (string path)
     {
         var key = Guid.NewGuid().ToString();
         var processes = new List<Process>();
@@ -65,8 +62,7 @@ internal class LockFinder
         var res = NativeMethods.RmStartSession(out var handle, 0, key);
         if (res != 0)
         {
-            throw new Exception("Could not begin restart session. " +
-                                "Unable to determine file locker.");
+            throw new Exception(Resources.Lockfinder_Exception_CouldNotBeginRestartSessionUnableToDetermineFileLocker);
         }
 
         try
@@ -75,19 +71,17 @@ internal class LockFinder
             uint lpdwRebootReasons = NativeMethods.RmRebootReasonNone;
             string[] resources = [path];
 
-            res = NativeMethods.RmRegisterResources(handle, (uint)resources.Length,
-                                        resources, 0, null, 0, null);
+            res = NativeMethods.RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
             if (res != 0)
             {
-                throw new Exception("Could not register resource.");
+                throw new Exception(Resources.Lockfinder_Exception_CouldNotRegisterResource);
             }
-            res = NativeMethods.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null,
-                            ref lpdwRebootReasons);
+
+            res = NativeMethods.RmGetList(handle, out var pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
             const int ERROR_MORE_DATA = 234;
             if (res == ERROR_MORE_DATA)
             {
-                var processInfo =
-                    new NativeMethods.RM_PROCESS_INFO[pnProcInfoNeeded];
+                var processInfo = new NativeMethods.RM_PROCESS_INFO[pnProcInfoNeeded];
                 pnProcInfo = pnProcInfoNeeded;
                 // Get the list.
                 res = NativeMethods.RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, processInfo, ref lpdwRebootReasons);
@@ -106,22 +100,21 @@ internal class LockFinder
                 }
                 else
                 {
-                    throw new Exception("Could not list processes locking resource");
+                    throw new Exception(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResource);
                 }
             }
             else if (res != 0)
             {
-                throw new Exception("Could not list processes locking resource." +
-                                    "Failed to get size of result.");
+                throw new Exception(Resources.Lockfinder_Exception_CouldNotListProcessesLockingResourceFailedToGetSizeOfResult);
             }
         }
-        catch (Exception exception)
+        catch (Exception e)
         {
-            Trace.WriteLine(exception.Message);
+            Trace.WriteLine(e.Message);
         }
         finally
         {
-            Trace.WriteLine($"RmEndSession: {NativeMethods.RmEndSession(handle)}");
+            Trace.WriteLine(string.Format(CultureInfo.InvariantCulture, Resources.Lockfinder_Trace_RmEndSessionNativeMethodsRmEndSessionHandle, NativeMethods.RmEndSession(handle)));
         }
 
         return processes;

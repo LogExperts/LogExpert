@@ -6,13 +6,18 @@
     <title>LogExpert ColumnizerLib</title>
     <authors>Zarunbal, Hagen Raab, Hirogen, RandallFlagg and others</authors>
     <owners>Zarunbal, Hirogen</owners>
-    <license>MIT</license>
-    <projectUrl>https://github.com/LogExperts/LogExpert</projectUrl>
+    <license type="MIT"></license>
+    <projectUrl url="https://github.com/LogExperts/LogExpert">https://github.com/LogExperts/LogExpert</projectUrl>
+    <repository type="git" url="https://github.com/LogExperts/LogExpert"></repository>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <bugTrackerUrl>https://github.com/LogExperts/LogExpert/issues</bugTrackerUrl>
-    <releaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v$version$</releaseNotes>
+    <releaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v.$version$</releaseNotes>
     <description>Columnizer Lib for Logexpert plugins</description>
+    <readme>docs\README.md</readme>
     <copyright>Copyright 2025</copyright>
     <tags>LogExpert Columnizer</tags>
   </metadata>
+  <files>
+    <file src="\..\..\README.md" target="docs\"></file>
+  </files>
 </package>

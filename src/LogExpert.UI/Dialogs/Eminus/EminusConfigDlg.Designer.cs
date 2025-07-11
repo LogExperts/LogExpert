@@ -1,4 +1,4 @@
-﻿namespace LogExpert
+namespace LogExpert
 {
   partial class EminusConfigDlg
   {
@@ -31,10 +31,10 @@
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EminusConfigDlg));
       this.hostTextBox = new System.Windows.Forms.TextBox();
       this.passwordTextBox = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
-      this.label2 = new System.Windows.Forms.Label();
-      this.label3 = new System.Windows.Forms.Label();
-      this.label4 = new System.Windows.Forms.Label();
+      this.labelHost = new System.Windows.Forms.Label();
+      this.labelPort = new System.Windows.Forms.Label();
+      this.labelPassword = new System.Windows.Forms.Label();
+      this.labelDescription = new System.Windows.Forms.Label();
       this.portTextBox = new System.Windows.Forms.MaskedTextBox();
       this.SuspendLayout();
       // 
@@ -55,45 +55,45 @@
       // 
       // label1
       // 
-      this.label1.AutoSize = true;
-      this.label1.Location = new System.Drawing.Point(17, 72);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(29, 13);
-      this.label1.TabIndex = 5;
-      this.label1.Text = "Host";
+      this.labelHost.AutoSize = true;
+      this.labelHost.Location = new System.Drawing.Point(17, 72);
+      this.labelHost.Name = "host";
+      this.labelHost.Size = new System.Drawing.Size(29, 13);
+      this.labelHost.TabIndex = 5;
+      this.labelHost.Text = "Host";
       // 
       // label2
       // 
-      this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(17, 99);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(26, 13);
-      this.label2.TabIndex = 6;
-      this.label2.Text = "Port";
+      this.labelPort.AutoSize = true;
+      this.labelPort.Location = new System.Drawing.Point(17, 99);
+      this.labelPort.Name = "port";
+      this.labelPort.Size = new System.Drawing.Size(26, 13);
+      this.labelPort.TabIndex = 6;
+      this.labelPort.Text = "Port";
       // 
       // label3
       // 
-      this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(17, 126);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(53, 13);
-      this.label3.TabIndex = 7;
-      this.label3.Text = "Password";
+      this.labelPassword.AutoSize = true;
+      this.labelPassword.Location = new System.Drawing.Point(17, 126);
+      this.labelPassword.Name = "password";
+      this.labelPassword.Size = new System.Drawing.Size(53, 13);
+      this.labelPassword.TabIndex = 7;
+      this.labelPassword.Text = "Password";
       // 
       // label4
       // 
-      this.label4.Location = new System.Drawing.Point(13, 13);
-      this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(276, 41);
-      this.label4.TabIndex = 8;
-      this.label4.Text = "Enter the host and the port where the Eclipse plugin is listening to. If a passwo" +
+      this.labelDescription.Location = new System.Drawing.Point(13, 13);
+      this.labelDescription.Name = "description";
+      this.labelDescription.Size = new System.Drawing.Size(276, 41);
+      this.labelDescription.TabIndex = 8;
+      this.labelDescription.Text = "Enter the host and the port where the Eclipse plugin is listening to. If a passwo" +
           "rd is configured, enter the password too.";
       // 
       // portTextBox
       // 
       this.portTextBox.Location = new System.Drawing.Point(76, 96);
       this.portTextBox.Mask = "99999";
-      this.portTextBox.Name = "portTextBox";
+      this.portTextBox.Name = "port";
       this.portTextBox.Size = new System.Drawing.Size(100, 20);
       this.portTextBox.TabIndex = 1;
       // 
@@ -102,10 +102,10 @@
       this.ClientSize = new System.Drawing.Size(295, 187);
       this.ControlBox = false;
       this.Controls.Add(this.portTextBox);
-      this.Controls.Add(this.label4);
-      this.Controls.Add(this.label3);
-      this.Controls.Add(this.label2);
-      this.Controls.Add(this.label1);
+      this.Controls.Add(this.labelDescription);
+      this.Controls.Add(this.labelPassword);
+      this.Controls.Add(this.labelPort);
+      this.Controls.Add(this.labelHost);
       this.Controls.Add(this.passwordTextBox);
       this.Controls.Add(this.hostTextBox);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -126,10 +126,10 @@
 
     private System.Windows.Forms.TextBox hostTextBox;
     private System.Windows.Forms.TextBox passwordTextBox;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.Label label2;
-    private System.Windows.Forms.Label label3;
-    private System.Windows.Forms.Label label4;
+    private System.Windows.Forms.Label labelHost;
+    private System.Windows.Forms.Label labelPort;
+    private System.Windows.Forms.Label labelPassword;
+    private System.Windows.Forms.Label labelDescription;
     private System.Windows.Forms.MaskedTextBox portTextBox;
   }
 }
