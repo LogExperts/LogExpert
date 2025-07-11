@@ -23,9 +23,11 @@ internal partial class AboutBox : Form
     {
         InitializeComponent();
 
-        LoadResources();
         usedComponentsDataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         _assembly = Assembly.GetExecutingAssembly();
+
+        //resources need the assembly to be set
+        LoadResources();
 
         var link = "https://github.com/LogExperts/LogExpert";
         _ = linkLabelURL.Links.Add(new LinkLabel.Link(0, link.Length, link));

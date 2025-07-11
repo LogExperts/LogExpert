@@ -4298,7 +4298,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         FilterComplete();
 
         //fx.BeginInvoke(_filterParams, _filterResultList, _lastFilterLinesList, _filterHitList, FilterComplete, null);
-        CheckForFilterDirty();
+        //This needs to be invoked, because there is a potential CrossThreadException
+        _ = BeginInvoke(CheckForFilterDirty);
     }
 
     private void MultiThreadedFilter (FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
