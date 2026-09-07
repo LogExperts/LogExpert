@@ -10,6 +10,14 @@ namespace LogExpert.Core.Config;
 [Serializable]
 public class Preferences
 {
+    private SelectionHighlightSettings _selectionHighlight = new();
+
+    public SelectionHighlightSettings SelectionHighlight
+    {
+        get => _selectionHighlight;
+        set => _selectionHighlight = value ?? new();
+    }
+
     /// <summary>
     /// List of highlight groups for syntax highlighting and text coloring.
     /// </summary>

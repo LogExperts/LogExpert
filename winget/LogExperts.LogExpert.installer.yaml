@@ -2,15 +2,17 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.10.0.schema.json
 
 PackageIdentifier: LogExperts.LogExpert
-PackageVersion: 1.40.3
+PackageVersion: 1.43.0
 InstallerType: inno
+Scope: machine
+ProductCode: '{9C6E17B8-912C-45F9-9E7F-49CEAD8D6D7A}_is1'
 Dependencies:
   PackageDependencies:
   - PackageIdentifier: Microsoft.DotNet.DesktopRuntime.10
 Installers:
 - Architecture: x64
-  InstallerUrl: https://github.com/LogExperts/LogExpert/releases/download/v1.40.3/LogExpert-Setup-1.40.3.exe
-  InstallerSha256: f32bde3703da1db0c1a963d37ee0eeab029bb18cbe3b8730ea12eda0eaafe2fa
+  InstallerUrl: https://github.com/LogExperts/LogExpert/releases/download/v1.43.0/LogExpert-Setup-1.43.0.exe
+  InstallerSha256: 7b6decd54626f22ed3ff8b1249222a1c572093a4dca4303b672935d3dcd4de98
 ManifestType: installer
 ManifestVersion: 1.10.0
-ReleaseDate: 2026-06-12
+ReleaseDate: 2026-08-28

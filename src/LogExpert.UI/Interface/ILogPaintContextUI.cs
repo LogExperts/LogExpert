@@ -1,4 +1,5 @@
 using ColumnizerLib;
+using LogExpert.Core.Config;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
@@ -21,6 +22,8 @@ internal interface ILogPaintContextUI : ILogLineSource
     Font BoldFont { get; }
 
     Color BookmarkColor { get; }
+
+    SelectionHighlightSettings SelectionHighlight { get; }
 
     #endregion
 

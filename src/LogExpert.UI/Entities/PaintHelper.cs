@@ -44,12 +44,9 @@ internal static class PaintHelper
             var entry = logPaintCtx.FindHighlightEntry(line, true);
             e.Graphics.SetClip(e.CellBounds);
 
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
-            {
-                using var brush = GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
-                e.Graphics.FillRectangle(brush, e.CellBounds);
-            }
-            else
+            var selection = SelectionPainter.GetStyle(logPaintCtx.SelectionHighlight,
+                e.State.HasFlag(DataGridViewElementStates.Selected), focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
+            if (!selection.PaintBackground(e))
             {
                 e.CellStyle.BackColor = GetBackColorFromHighlightEntry(entry, Application.IsDarkModeEnabled);
                 e.PaintBackground(e.ClipBounds, false);
@@ -57,11 +54,12 @@ internal static class PaintHelper
 
             if (DebugOptions.DisableWordHighlight)
             {
+                e.CellStyle.SelectionForeColor = selection.Foreground(e.CellStyle.ForeColor);
                 e.PaintContent(e.CellBounds);
             }
             else
             {
-                PaintCell(logPaintCtx, e, entry);
+                PaintCell(logPaintCtx, e, entry, selection);
             }
 
             if (e.ColumnIndex == 0)
@@ -110,14 +108,7 @@ internal static class PaintHelper
     [SupportedOSPlatform("windows")]
     public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)
     {
-        if (focused)
-        {
-            return new SolidBrush(selectionColor);
-        }
-
-        return darkMode
-            ? new SolidBrush(Color.FromArgb(255, 90, 90, 90)) // dark gray
-            : new SolidBrush(Color.FromArgb(255, 170, 170, 170)); // light gray
+        return new SolidBrush(SelectionPainter.GetStyle(new(), true, focused, selectionColor, darkMode).Background);
     }
 
     [SupportedOSPlatform("windows")]
@@ -374,13 +365,13 @@ internal static class PaintHelper
     #region Private Methods
 
     [SupportedOSPlatform("windows")]
-    private static void PaintCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private static void PaintCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
-        PaintHighlightedCell(logPaintCtx, e, groundEntry);
+        PaintHighlightedCell(logPaintCtx, e, groundEntry, selection);
     }
 
     [SupportedOSPlatform("windows")]
-    private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
         var value = e.Value ?? string.Empty;
 
@@ -476,15 +467,8 @@ internal static class PaintHelper
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
-            var foreColor = matchEntry.HighlightEntry.ForegroundColor;
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
-            {
-                if (foreColor.Equals(Color.Black))
-                {
-                    foreColor = Color.White;
-                }
-            }
-            else
+            var foreColor = selection.Foreground(matchEntry.HighlightEntry.ForegroundColor);
+            if (!selection.FillBackground)
             {
                 if (bgBrush != null && !matchEntry.HighlightEntry.NoBackground)
                 {

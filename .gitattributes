@@ -6,6 +6,9 @@
 # "Solution Items" contains a space, which .gitattributes cannot express in a path.)
 usedComponents.json text eol=lf
 
+# Git executes hooks with its shell, including on Windows.
+.githooks/* text eol=lf
+
 # Line-ending test fixtures (src/LogExpert.Tests/TestData). Their whole point is
 # byte-exact terminators (bare \r, mixed \n/\r\n/\r), so git must NOT normalize
 # EOLs on them — otherwise core.autocrlf would rewrite \r\n<->\n and corrupt the

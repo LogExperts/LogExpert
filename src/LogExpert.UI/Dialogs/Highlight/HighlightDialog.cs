@@ -3,6 +3,7 @@ using System.Runtime.Versioning;
 using System.Security;
 
 using ColumnizerLib;
+using LogExpert.Core.Config;
 
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Entities;
@@ -20,6 +21,7 @@ internal partial class HighlightDialog : Form
 
     private HighlightGroup _currentGroup;
     private List<HighlightGroup> _highlightGroupList;
+    private Color? _selectionColor;
 
     #endregion
 
@@ -37,6 +39,9 @@ internal partial class HighlightDialog : Form
         ApplyResources();
 
         ConfigManager = configManager;
+        _selectionColor = configManager.Settings.Preferences.SelectionHighlight.CustomColor;
+        checkBoxSelectionOutline.Checked = configManager.Settings.Preferences.SelectionHighlight.Outline;
+        UpdateSelectionColorPreview();
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
 
@@ -65,6 +70,10 @@ internal partial class HighlightDialog : Form
 
         labelAssignNamesToGroups.Text = Resources.HighlightDialog_UI_Label_AssignNamesToGroups;
         groupBoxGroups.Text = Resources.HighlightDialog_UI_GroupBox_Groups;
+        groupBoxSelection.Text = Resources.HighlightDialog_UI_SelectionHighlight;
+        checkBoxSelectionOutline.Text = Resources.HighlightDialog_UI_OutlineSelectedBlocks;
+        btnSelectionColor.Text = Resources.HighlightDialog_UI_ChangeSelectionColor;
+        btnResetSelectionColor.Text = Resources.HighlightDialog_UI_ResetSelectionColor;
     }
 
     #endregion
@@ -94,9 +103,39 @@ internal partial class HighlightDialog : Form
 
     private IConfigManager ConfigManager { get; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public SelectionHighlightSettings SelectionHighlight => new()
+    {
+        Outline = checkBoxSelectionOutline.Checked,
+        CustomColor = _selectionColor
+    };
+
     #endregion
 
     #region Event handling Methods
+
+    private void OnSelectionColorClick (object sender, EventArgs e)
+    {
+        using var dialog = new ColorDialog { Color = _selectionColor ?? SystemColors.Highlight, FullOpen = true };
+        if (dialog.ShowDialog(this) == DialogResult.OK)
+        {
+            _selectionColor = dialog.Color;
+            UpdateSelectionColorPreview();
+        }
+    }
+
+    private void OnResetSelectionColorClick (object sender, EventArgs e)
+    {
+        _selectionColor = null;
+        UpdateSelectionColorPreview();
+    }
+
+    private void UpdateSelectionColorPreview ()
+    {
+        btnSelectionColor.BackColor = _selectionColor ?? SystemColors.Highlight;
+        btnSelectionColor.ForeColor = PaintHelper.GetForeColorBasedOnBackColor(btnSelectionColor.BackColor);
+        btnResetSelectionColor.Enabled = _selectionColor.HasValue;
+    }
 
     private void OnAddButtonClick (object sender, EventArgs e)
     {

@@ -719,3 +719,11 @@ http-client.private.env.json
 ######## END JET BRAINS git ignore https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
 /AgentFiles/*
 /.claude/*
+/tools/LogExpert-test-results/*
+
+# Local scratch notes (tickets, checklists, working docs)
+.scratch/
+
+# graphify knowledge-graph outputs and extraction cache. Unanchored so it also
+# catches src/graphify-out/, where the AST/semantic cache lands.
+graphify-out/

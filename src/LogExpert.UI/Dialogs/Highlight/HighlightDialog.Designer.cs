@@ -53,6 +53,11 @@ partial class HighlightDialog
         toolTip = new ToolTip(components);
         pnlBackground = new Panel();
         groupBoxGroups = new GroupBox();
+        groupBoxSelection = new GroupBox();
+        checkBoxSelectionOutline = new CheckBox();
+        btnSelectionColor = new Button();
+        btnResetSelectionColor = new Button();
+        selectionControls = new FlowLayoutPanel();
         pnlBackground.SuspendLayout();
         groupBoxGroups.SuspendLayout();
         SuspendLayout();
@@ -139,7 +144,7 @@ partial class HighlightDialog
         // 
         btnOk.Anchor = AnchorStyles.Top;
         btnOk.DialogResult = DialogResult.OK;
-        btnOk.Location = new Point(387, 364);
+        btnOk.Location = new Point(387, 480);
         btnOk.Margin = new Padding(4, 5, 4, 5);
         btnOk.Name = "btnOk";
         btnOk.Size = new Size(85, 35);
@@ -152,7 +157,7 @@ partial class HighlightDialog
         // 
         btnCancel.Anchor = AnchorStyles.Top;
         btnCancel.DialogResult = DialogResult.Cancel;
-        btnCancel.Location = new Point(478, 364);
+        btnCancel.Location = new Point(478, 480);
         btnCancel.Margin = new Padding(4, 5, 4, 5);
         btnCancel.Name = "btnCancel";
         btnCancel.Size = new Size(85, 35);
@@ -168,7 +173,7 @@ partial class HighlightDialog
         // btnExportGroup
         // 
         btnExportGroup.Anchor = AnchorStyles.Top;
-        btnExportGroup.Location = new Point(108, 364);
+        btnExportGroup.Location = new Point(108, 480);
         btnExportGroup.Margin = new Padding(4, 5, 4, 5);
         btnExportGroup.Name = "btnExportGroup";
         btnExportGroup.Size = new Size(85, 35);
@@ -181,7 +186,7 @@ partial class HighlightDialog
         // btnImportGroup
         // 
         btnImportGroup.Anchor = AnchorStyles.Top;
-        btnImportGroup.Location = new Point(12, 364);
+        btnImportGroup.Location = new Point(12, 480);
         btnImportGroup.Margin = new Padding(4, 5, 4, 5);
         btnImportGroup.Name = "btnImportGroup";
         btnImportGroup.Size = new Size(85, 35);
@@ -297,9 +302,10 @@ partial class HighlightDialog
         pnlBackground.Controls.Add(btnOk);
         pnlBackground.Controls.Add(btnCancel);
         pnlBackground.Controls.Add(groupBoxGroups);
+        pnlBackground.Controls.Add(groupBoxSelection);
         pnlBackground.Location = new Point(0, 0);
         pnlBackground.Name = "pnlBackground";
-        pnlBackground.Size = new Size(576, 511);
+        pnlBackground.Size = new Size(576, 528);
         pnlBackground.TabIndex = 23;
         // 
         // groupBoxGroups
@@ -320,12 +326,38 @@ partial class HighlightDialog
         groupBoxGroups.TabIndex = 22;
         groupBoxGroups.TabStop = false;
         groupBoxGroups.Text = "Groups";
+        // Selection appearance is application-wide, separate from the group editor.
+        groupBoxSelection.Location = new Point(12, 364);
+        groupBoxSelection.Size = new Size(552, 108);
+        groupBoxSelection.TabIndex = 8;
+        groupBoxSelection.Controls.Add(selectionControls);
+        selectionControls.Dock = DockStyle.Fill;
+        selectionControls.Padding = new Padding(6);
+        selectionControls.Controls.Add(checkBoxSelectionOutline);
+        selectionControls.Controls.Add(btnSelectionColor);
+        selectionControls.Controls.Add(btnResetSelectionColor);
+        selectionControls.SetFlowBreak(checkBoxSelectionOutline, true);
+        checkBoxSelectionOutline.Name = "checkBoxSelectionOutline";
+        checkBoxSelectionOutline.AutoSize = true;
+        checkBoxSelectionOutline.TabIndex = 0;
+        btnSelectionColor.AutoSize = true;
+        btnSelectionColor.Name = "btnSelectionColor";
+        btnSelectionColor.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        btnSelectionColor.Padding = new Padding(4);
+        btnSelectionColor.TabIndex = 1;
+        btnSelectionColor.Click += OnSelectionColorClick;
+        btnResetSelectionColor.AutoSize = true;
+        btnResetSelectionColor.Name = "btnResetSelectionColor";
+        btnResetSelectionColor.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        btnResetSelectionColor.Padding = new Padding(4);
+        btnResetSelectionColor.TabIndex = 2;
+        btnResetSelectionColor.Click += OnResetSelectionColorClick;
         // 
         // HighlightDialog
         // 
         AcceptButton = btnOk;
         CancelButton = btnCancel;
-        ClientSize = new Size(576, 411);
+        ClientSize = new Size(576, 528);
         Controls.Add(pnlBackground);
         DoubleBuffered = true;
         helpProvider.SetHelpKeyword(this, "Highlighting.htm");
@@ -335,7 +367,7 @@ partial class HighlightDialog
         Margin = new Padding(4, 5, 4, 5);
         MaximizeBox = false;
         MinimizeBox = false;
-        MinimumSize = new Size(592, 430);
+        MinimumSize = new Size(592, 567);
         Name = "HighlightDialog";
         helpProvider.SetShowHelp(this, true);
         StartPosition = FormStartPosition.CenterParent;
@@ -348,6 +380,11 @@ partial class HighlightDialog
     }
 
     #endregion
+    private GroupBox groupBoxSelection;
+    private FlowLayoutPanel selectionControls;
+    private CheckBox checkBoxSelectionOutline;
+    private Button btnSelectionColor;
+    private Button btnResetSelectionColor;
 
     private System.Windows.Forms.ListBox listBoxHighlight;
     private System.Windows.Forms.Button btnAdd;

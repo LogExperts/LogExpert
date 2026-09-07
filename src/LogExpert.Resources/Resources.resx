@@ -2265,4 +2265,16 @@ Restart LogExpert to apply changes?</value>
   <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
     <value>Sysout for the Tool was configured, but there is no active logfile the Tool will be started without the Sysout Pipe</value>
   </data>
+  <data name="HighlightDialog_UI_SelectionHighlight" xml:space="preserve">
+    <value>Selection highlight (all groups)</value>
+  </data>
+  <data name="HighlightDialog_UI_OutlineSelectedBlocks" xml:space="preserve">
+    <value>Outline selected blocks</value>
+  </data>
+  <data name="HighlightDialog_UI_ChangeSelectionColor" xml:space="preserve">
+    <value>Change selection highlight color...</value>
+  </data>
+  <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
+    <value>Use system color</value>
+  </data>
 </root>

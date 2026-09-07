@@ -1,0 +1,30 @@
+#!/bin/sh
+# Git passes the commit-message filename as the first argument.
+set -eu
+
+# PowerShell/GUI clients may not put Git for Windows utilities on PATH.
+PATH="$PATH:/usr/bin:/bin"
+export PATH
+
+message=$1
+temporary=$(mktemp "${message}.clean.XXXXXX")
+trap 'rm -f "$temporary"' EXIT
+trap 'exit 1' HUP INT TERM
+
+# Match specific conversation/session URL paths, keeping ordinary project links.
+# Remove the entire matching line, including any Markdown label or trailer key.
+awk '
+{
+    line = tolower($0)
+    if (line ~ /^[[:space:]]*co-authored-by[[:space:]]*:/) next
+    if (line ~ /https?:\/\/(www\.)?(chatgpt\.com|chat\.openai\.com)\/(c|share|codex\/tasks)\//) next
+    if (line ~ /https?:\/\/(www\.)?claude\.ai\/(chat|share|code)\//) next
+    if (line ~ /https?:\/\/(www\.)?cursor\.com\/(agents|background-agent)\//) next
+    if (line ~ /https?:\/\/(www\.)?gemini\.google\.com\/(app|share)\//) next
+    if (line ~ /https?:\/\/copilot\.microsoft\.com\/(chats|shares)\//) next
+    if (line ~ /https?:\/\/github\.com\/[^/[:space:]]+\/[^/[:space:]]+\/(sessions|copilot\/tasks)\//) next
+    print
+}
+' "$message" > "$temporary"
+
+cat "$temporary" > "$message"

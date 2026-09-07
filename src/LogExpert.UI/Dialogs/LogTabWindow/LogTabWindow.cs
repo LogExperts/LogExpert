@@ -915,7 +915,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void ShowHighlightSettingsDialog ()
     {
-        HighlightDialog dlg = new(ConfigManager)
+        using HighlightDialog dlg = new(ConfigManager)
         {
             KeywordActionList = PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions,
             Owner = this,
@@ -931,6 +931,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             HighlightGroupList = dlg.HighlightGroupList;
             FillHighlightComboBox();
             ConfigManager.Settings.Preferences.HighlightGroupList = HighlightGroupList;
+            ConfigManager.Settings.Preferences.SelectionHighlight = dlg.SelectionHighlight;
             ConfigManager.Save(SettingsFlags.HighlightSettings);
             OnHighlightSettingsChanged();
         }

@@ -23,6 +23,21 @@ namespace LogExpert {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
+        public static string HighlightDialog_UI_SelectionHighlight {
+            get { return ResourceManager.GetString("HighlightDialog_UI_SelectionHighlight", resourceCulture); }
+        }
+
+        public static string HighlightDialog_UI_OutlineSelectedBlocks {
+            get { return ResourceManager.GetString("HighlightDialog_UI_OutlineSelectedBlocks", resourceCulture); }
+        }
+
+        public static string HighlightDialog_UI_ChangeSelectionColor {
+            get { return ResourceManager.GetString("HighlightDialog_UI_ChangeSelectionColor", resourceCulture); }
+        }
+
+        public static string HighlightDialog_UI_ResetSelectionColor {
+            get { return ResourceManager.GetString("HighlightDialog_UI_ResetSelectionColor", resourceCulture); }
+        }
         
         private static global::System.Resources.ResourceManager resourceMan;
         

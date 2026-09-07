@@ -421,6 +421,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public Preferences Preferences => ConfigManager.Settings.Preferences;
 
+    SelectionHighlightSettings ILogPaintContextUI.SelectionHighlight => Preferences.SelectionHighlight;
+
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public string GivenFileName { get; set; }
 
@@ -2237,6 +2239,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void OnParentHighlightSettingsChanged (object sender, EventArgs e)
     {
+        dataGridView.SelectionHighlight = Preferences.SelectionHighlight;
+        filterGridView.SelectionHighlight = Preferences.SelectionHighlight;
         var groupName = _guiStateArgs.HighlightGroupName;
         SetCurrentHighlightGroup(groupName);
     }
@@ -3514,12 +3518,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    private void PaintCell (DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private void PaintCell (DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
-        PaintHighlightedCell(e, groundEntry);
+        PaintHighlightedCell(e, groundEntry, selection);
     }
 
-    private void PaintHighlightedCell (DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private void PaintHighlightedCell (DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
         var column = e.Value as IColumnMemory;
 
@@ -3618,15 +3622,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
-            var foreColor = segment.ForeColor;
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
-            {
-                if (foreColor.Equals(Color.Black))
-                {
-                    foreColor = Color.White;
-                }
-            }
-            else
+            var foreColor = selection.Foreground(segment.ForeColor);
+            if (!selection.FillBackground)
             {
                 if (bgBrush != null && !segment.NoBackground)
                 {
@@ -6256,12 +6253,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             var entry = FindFirstNoWordMatchHighlightEntry(line);
             e.Graphics.SetClip(e.CellBounds);
 
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
-            {
-                using var brush = PaintHelper.GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
-                e.Graphics.FillRectangle(brush, e.CellBounds);
-            }
-            else
+            var selection = SelectionPainter.GetStyle(Preferences.SelectionHighlight,
+                e.State.HasFlag(DataGridViewElementStates.Selected), focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
+            if (!selection.PaintBackground(e))
             {
                 e.CellStyle.BackColor = PaintHelper.GetBackColorFromHighlightEntry(entry, Application.IsDarkModeEnabled);
                 e.PaintBackground(e.ClipBounds, false);
@@ -6269,11 +6263,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             if (DebugOptions.DisableWordHighlight)
             {
+                e.CellStyle.SelectionForeColor = selection.Foreground(e.CellStyle.ForeColor);
                 e.PaintContent(e.CellBounds);
             }
             else
             {
-                PaintCell(e, entry);
+                PaintCell(e, entry, selection);
             }
 
             if (columnIndex == 0)
@@ -7346,6 +7341,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, bool isLoadTime, SettingsFlags flags)
     {
+        dataGridView.SelectionHighlight = Preferences.SelectionHighlight;
+        filterGridView.SelectionHighlight = Preferences.SelectionHighlight;
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
             font ??= Preferences.Font ?? new Font(FontFamily.GenericMonospace, 9f);

@@ -246,6 +246,10 @@ internal class TimeSpreadCalculator
                 OnCalcDone(EventArgs.Empty);
             }
         }
+        else
+        {
+            OnCalcDone(EventArgs.Empty);
+        }
     }
 
     //TODO Refactor this method
@@ -349,6 +353,10 @@ internal class TimeSpreadCalculator
                 CalcValuesViaTime(_maxDiff, _average);
                 OnCalcDone(EventArgs.Empty);
             }
+        }
+        else
+        {
+            OnCalcDone(EventArgs.Empty);
         }
     }
 

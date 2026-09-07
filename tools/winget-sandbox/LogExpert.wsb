@@ -1,0 +1,18 @@
+<Configuration>
+  <Networking>Enable</Networking>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>G:\Github\LogExpert\winget</HostFolder>
+      <SandboxFolder>C:\Manifest</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+    <MappedFolder>
+      <HostFolder>G:\Github\LogExpert\tools\winget-sandbox</HostFolder>
+      <SandboxFolder>C:\SandboxTools</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>powershell.exe -NoProfile -ExecutionPolicy Bypass -NoExit -File C:\SandboxTools\Test-Manifest.ps1</Command>
+  </LogonCommand>
+</Configuration>

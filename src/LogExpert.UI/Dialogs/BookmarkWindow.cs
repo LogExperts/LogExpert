@@ -197,6 +197,11 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
 
     public void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)
     {
+        if (_logPaintContext != null)
+        {
+            bookmarkDataGridView.SelectionHighlight = _logPaintContext.SelectionHighlight;
+            bookmarkDataGridView.Invalidate();
+        }
         if ((flags & SettingsFlags.GuiOrColors) == SettingsFlags.GuiOrColors)
         {
             SetFont(font);
@@ -218,6 +223,7 @@ internal partial class BookmarkWindow : DockContent, ISharedToolWindow, IBookmar
             {
                 _logView = ctx.LogView;
                 _logPaintContext = (ILogPaintContextUI)ctx.LogPaintContext;
+                bookmarkDataGridView.SelectionHighlight = _logPaintContext.SelectionHighlight;
             }
 
             SetColumnizer(ctx.LogView.CurrentColumnizer);

@@ -2231,4 +2231,16 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
     <value>Sysout für das Tool wurde konfiguriert, aber es gibt keine aktive Logdatei. Das Tool wird ohne die Sysout-Pipe gestartet</value>
   </data>
+  <data name="HighlightDialog_UI_SelectionHighlight" xml:space="preserve">
+    <value>Auswahlhervorhebung (alle Gruppen)</value>
+  </data>
+  <data name="HighlightDialog_UI_OutlineSelectedBlocks" xml:space="preserve">
+    <value>Ausgewählte Blöcke umranden</value>
+  </data>
+  <data name="HighlightDialog_UI_ChangeSelectionColor" xml:space="preserve">
+    <value>Farbe der Auswahlhervorhebung ändern...</value>
+  </data>
+  <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
+    <value>Systemfarbe verwenden</value>
+  </data>
 </root>

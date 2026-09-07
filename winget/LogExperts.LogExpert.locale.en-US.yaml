@@ -2,7 +2,7 @@
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.10.0.schema.json
 
 PackageIdentifier: LogExperts.LogExpert
-PackageVersion: 1.40.3
+PackageVersion: 1.43.0
 PackageLocale: en-US
 Publisher: LogExperts
 PublisherUrl: https://github.com/LogExperts
@@ -17,7 +17,7 @@ Tags:
 - logger-interface
 - logging
 - winforms
-ReleaseNotesUrl: https://github.com/LogExperts/LogExpert/releases/tag/v1.40.3
+ReleaseNotesUrl: https://github.com/LogExperts/LogExpert/releases/tag/v1.43.0
 Documentations:
 - DocumentLabel: Wiki
   DocumentUrl: https://github.com/LogExperts/LogExpert/wiki
