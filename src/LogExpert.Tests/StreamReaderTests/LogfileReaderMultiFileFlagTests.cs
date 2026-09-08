@@ -69,6 +69,24 @@ internal sealed class LogfileReaderMultiFileFlagTests
     }
 
     [Test]
+    public void SingleFileCtor_MultiFileTrue_LoadsIndexBeforeExtension ()
+    {
+        var options = new MultiFileOptions { FormatPattern = "*$J(.).log" };
+        File.Copy(Path.Combine(_testDataDirectory, "app.1.log"), Path.Combine(_testDirectory, "app.1.log"));
+        File.Copy(Path.Combine(_testDataDirectory, "app.2.log"), Path.Combine(_testDirectory, "app.2.log"));
+        using var reader = CreateSingleFileReader(multiFile: true, options);
+
+        reader.ReadFiles();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(reader.IsMultiFile, Is.True);
+            Assert.That(reader.GetLogFileInfoList().Select(file => Path.GetFileName(file.FullName)),
+                Is.EqualTo(new[] { "app.2.log", "app.1.log", "app.log" }));
+        });
+    }
+
+    [Test]
     public void MultiFileCtor_AlwaysMultiFile ()
     {
         using var reader = new LogfileReader(
@@ -91,7 +109,7 @@ internal sealed class LogfileReaderMultiFileFlagTests
         });
     }
 
-    private LogfileReader CreateSingleFileReader (bool multiFile)
+    private LogfileReader CreateSingleFileReader (bool multiFile, MultiFileOptions? options = null)
     {
         return new LogfileReader(
             _logFile,
@@ -99,7 +117,7 @@ internal sealed class LogfileReaderMultiFileFlagTests
             multiFile,
             bufferCount: 40,
             linesPerBuffer: 50,
-            new MultiFileOptions(),
+            options ?? new MultiFileOptions(),
             ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,

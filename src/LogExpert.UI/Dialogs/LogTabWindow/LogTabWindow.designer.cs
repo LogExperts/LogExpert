@@ -269,9 +269,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // multiFileEnabledStripMenuItem
             // 
-            multiFileEnabledStripMenuItem.BackColor = SystemColors.Control;
             multiFileEnabledStripMenuItem.CheckOnClick = true;
-            multiFileEnabledStripMenuItem.ForeColor = SystemColors.ControlDarkDark;
             multiFileEnabledStripMenuItem.Name = "multiFileEnabledStripMenuItem";
             multiFileEnabledStripMenuItem.Size = new Size(165, 22);
             multiFileEnabledStripMenuItem.Text = "Enable MultiFile";
@@ -279,8 +277,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // multifileMaskToolStripMenuItem
             // 
-            multifileMaskToolStripMenuItem.BackColor = SystemColors.Control;
-            multifileMaskToolStripMenuItem.ForeColor = SystemColors.ControlDarkDark;
             multifileMaskToolStripMenuItem.Name = "multifileMaskToolStripMenuItem";
             multifileMaskToolStripMenuItem.Size = new Size(165, 22);
             multifileMaskToolStripMenuItem.Text = "File name mask...";

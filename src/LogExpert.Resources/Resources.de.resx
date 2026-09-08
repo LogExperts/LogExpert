@@ -1680,12 +1680,16 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Muster syntax:
 
 * = alle Zeichen (wildcard)
-$D(&amp;lt;date&amp;gt;) = Datumsmuster
+$D(&lt;date&gt;) = Datumsmuster
 $I = Dateiindexnummer
-$J = Dateiindexnummer, versteckt wenn 09
-$J(&amp;lt;prefix&amp;gt;) = Wie $J, jedoch wird ein &amp;lt;prefix&amp;gt; hinzugefügt when es nicht 0 ist
+$J = Dateiindexnummer, versteckt wenn null
+$J(&lt;prefix&gt;) = Wie $J, jedoch wird ein &lt;prefix&gt; hinzugefügt wenn es nicht 0 ist
 
-&amp;lt;date&amp;gt;:
+Beispiele:
+*$J(.) → app.log, app.log.1, app.log.2
+*$J(.).log → app.log, app.1.log, app.2.log
+
+&lt;date&gt;:
 DD = Tag
 MM = Monat
 YY[YY] = Jahr
