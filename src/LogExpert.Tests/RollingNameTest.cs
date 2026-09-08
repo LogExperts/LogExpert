@@ -35,7 +35,7 @@ internal class RollingNameTest
     [TestCase("engine.log", "engine.1.log", "*$J(.).log")]
     [TestCase("engine.log.1", "engine.log.2", "*$J(.)")]
     [TestCase("engine.1.log", "engine.2.log", "*$J(.).log")]
-    [TestCase("app.log", "app1.log", "*$I.log")]
+    [TestCase("engine1.log", "engine2.log", "*$I.log")]
     [TestCase("engine_2010-06-12.1.log", "engine_2010-06-12.2.log", "*$D(yyyy-MM-dd)$J(.).log")]
     [TestCase("engine_2010-06-12.log", "engine_2010-06-12.log.1", "*$D(yyyy-MM-dd).log$J(.)")]
     public void TestFilenameAnd1(string fileName, string expectedResult, string formatString)

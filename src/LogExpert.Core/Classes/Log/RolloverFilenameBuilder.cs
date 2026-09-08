@@ -118,7 +118,7 @@ public class RolloverFilenameBuilder
         {
             fileName = fileName.Remove(_indexPartGroup.Index, _indexPartGroup.Length);
 
-            if (Index > 0 || (!_hideZeroIndex && _indexGroup.Length > 0))
+            if (!_hideZeroIndex || Index > 0)
             {
                 var format = "D" + _indexGroup.Length;
                 fileName = fileName.Insert(_indexPartGroup.Index, Index.ToString(format));
@@ -178,10 +178,11 @@ public class RolloverFilenameBuilder
 
         fmt = fmt.Replace("*", ".*?", StringComparison.Ordinal);
         _hideZeroIndex = fmt.Contains("$J", StringComparison.Ordinal);
-        const string indexPattern = "(?'indexPart'(?'index'[\\d]*))";
+        const string indexPattern = "(?'indexPart'(?'index'[\\d]+))";
+        const string hiddenZeroIndexPattern = "(?'indexPart'(?'index'[\\d]*))";
         var conditionalIndexPattern = _condContent != null
             ? $"(?'indexPart'(?:{Regex.Escape(_condContent)}(?'index'[\\d]+)|(?'index')))"
-            : indexPattern;
+            : hiddenZeroIndexPattern;
         fmt = fmt.Replace("$I", indexPattern, StringComparison.Ordinal);
         fmt = fmt.Replace("$J", conditionalIndexPattern, StringComparison.Ordinal);
 

@@ -10,7 +10,7 @@ namespace LogExpert.Configuration;
 public static class LegacyPreferencesMigrator
 {
     /// <summary>Current schema version. Bumped whenever a new migration step is added.</summary>
-    public const int CURRENT_SETTINGS_VERSION = 2;
+    public const int CURRENT_SETTINGS_VERSION = 1;
 
     /// <summary>
     /// Migrates the given <see cref="Settings"/> in place. Returns <see langword="true"/> if any
@@ -26,13 +26,6 @@ public static class LegacyPreferencesMigrator
         {
             MigrateToV1(settings);
             settings.SettingsVersion = 1;
-            changed = true;
-        }
-
-        if (settings.SettingsVersion < 2)
-        {
-            MigrateToV2(settings);
-            settings.SettingsVersion = 2;
             changed = true;
         }
 
@@ -63,13 +56,4 @@ public static class LegacyPreferencesMigrator
 #pragma warning restore CS0618
     }
 
-    private static void MigrateToV2 (Settings settings)
-    {
-        // Before the parser fix, the trailing .log in this pattern was ignored, making it behave
-        // like *$J(.). Preserve that behavior for existing saved preferences.
-        if (settings.Preferences?.MultiFileOptions?.FormatPattern == "*$J(.).log")
-        {
-            settings.Preferences.MultiFileOptions.FormatPattern = "*$J(.)";
-        }
-    }
 }
