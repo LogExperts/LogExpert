@@ -55,7 +55,7 @@ internal interface IFileOperationService
     /// <summary>
     /// Public entry point that invokes AddFileTabs on the UI thread.
     /// </summary>
-    void LoadFiles (string[] fileNames);
+    void LoadFiles (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// Resolves multi-file preference and returns a MultiFileDecision.
@@ -67,7 +67,7 @@ internal interface IFileOperationService
     /// <summary>
     /// Iterates file names; routes .lxj files to a callback, adds all others via AddFileTab.
     /// </summary>
-    void AddFileTabs (string[] fileNames);
+    void AddFileTabs (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// Creates temp file from clipboard text, calls AddTempFileTab.
@@ -87,7 +87,7 @@ internal interface IFileOperationService
     /// <summary>
     /// Loads startup files or last-open files. Startup files take precedence.
     /// </summary>
-    void LoadStartupFiles (IList<string> lastOpenFiles, string[]? startupFileNames);
+    void LoadStartupFiles (IList<string> lastOpenFiles, string[]? startupFileNames, int? targetLine = null);
 
     /// <summary>
     /// Duplicate-tab detection, delegates to TabController.

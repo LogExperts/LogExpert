@@ -59,13 +59,13 @@ internal class LogExpertProxy : ILogExpertProxy
 
     #region Public methods
 
-    public void LoadFiles (string[] fileNames)
+    public void LoadFiles (string[] fileNames, int? targetLine = null)
     {
         // Use most recently ACTIVATED window, fallback to most recently created
         var logWin = _mostRecentActiveWindow ?? _windowList[^1];
         _logger.Info($"Loading files in {(_mostRecentActiveWindow != null ? "most recently activated" : "most recently created")} window");
         _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
-        logWin.LoadFiles(fileNames);
+        logWin.LoadFiles(fileNames, targetLine);
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ internal class LogExpertProxy : ILogExpertProxy
     }
 
     [SupportedOSPlatform("windows")]
-    public void NewWindow (string[] fileNames)
+    public void NewWindow (string[] fileNames, int? targetLine = null)
     {
         if (_firstLogTabWindow.IsDisposed)
         {
@@ -91,22 +91,22 @@ internal class LogExpertProxy : ILogExpertProxy
             if (_windowList.Count == 0)
             {
                 _logger.Info("### NewWindow: No windows left. New created window will be the new 'first' GUI window");
-                LoadFiles(fileNames);
+                LoadFiles(fileNames, targetLine);
             }
             else
             {
                 _firstLogTabWindow = _windowList[^1];
-                NewWindow(fileNames);
+                NewWindow(fileNames, targetLine);
             }
         }
         else
         {
-            _ = _firstLogTabWindow.Invoke(new NewWindowFx(NewWindowWorker), [fileNames]);
+            _ = _firstLogTabWindow.Invoke(new NewWindowFx(NewWindowWorker), [fileNames, targetLine]);
         }
     }
 
     [SupportedOSPlatform("windows")]
-    public void NewWindowOrLockedWindow (string[] fileNames)
+    public void NewWindowOrLockedWindow (string[] fileNames, int? targetLine = null)
     {
         // Lock Instance has priority
         // Check for locked window first
@@ -116,7 +116,7 @@ internal class LogExpertProxy : ILogExpertProxy
             {
                 _logger.Info("Loading files in locked window");
                 _ = logWin.Invoke(new MethodInvoker(logWin.SetForeground));
-                logWin.LoadFiles(fileNames);
+                logWin.LoadFiles(fileNames, targetLine);
                 return;
             }
         }
@@ -124,11 +124,11 @@ internal class LogExpertProxy : ILogExpertProxy
         // No locked window found
         // Load in most recent window (not new window)
         _logger.Info("No locked window, loading files in most recent window");
-        LoadFiles(fileNames); // Uses most recent window
+        LoadFiles(fileNames, targetLine); // Uses most recent window
     }
 
     [SupportedOSPlatform("windows")]
-    public void NewWindowWorker (string[] fileNames)
+    public void NewWindowWorker (string[] fileNames, int? targetLine = null)
     {
         IConfigManager configManager = ConfigManager.Instance;
         var logWin = AbstractLogTabWindow.Create(fileNames.Length > 0
@@ -136,7 +136,8 @@ internal class LogExpertProxy : ILogExpertProxy
                                                     : null,
                                                     _logWindowIndex++,
                                                     true,
-                                                    configManager);
+                                                    configManager,
+                                                    targetLine);
         logWin.LogExpertProxy = this;
         AddWindow(logWin);
         logWin.Show();
@@ -192,5 +193,5 @@ internal class LogExpertProxy : ILogExpertProxy
         LastWindowClosed?.Invoke(this, new EventArgs());
     }
 
-    private delegate void NewWindowFx (string[] fileNames);
+    private delegate void NewWindowFx (string[] fileNames, int? targetLine = null);
 }

@@ -131,6 +131,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private bool _isErrorShowing;
     private bool _isLoadError;
     private bool _isLoading;
+    private bool _isReadyForLineNavigation;
+    private int? _pendingTargetLine;
     private bool _isSearching;
 
     private List<int> _lastFilterLinesList = [];
@@ -814,6 +816,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
         _waitingForClose = true;
+        CancelPendingLineNavigation();
         _logWindowCoordinator.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
         _logFileReader?.DeleteAllContent();
 
@@ -839,7 +842,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _ = Invoke(new MethodInvoker(LoadPersistenceData));
             _ = Invoke(new MethodInvoker(SetGuiAfterLoading));
             _ = _loadingFinishedEvent.Set();
-            _ = _externaLoadingFinishedEvent.Set();
             _timeSpreadCalc.SetLineCount(_logFileReader.LineCount);
 
             if (_reloadMemento != null)
@@ -856,6 +858,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             HandleChangedFilterList();
 
             _ = Invoke(new MethodInvoker(RunHighlightBookmarkScan));
+            Invoke(() =>
+            {
+                _isReadyForLineNavigation = true;
+                ApplyPendingLineNavigation();
+            });
+            _ = _externaLoadingFinishedEvent.Set();
         }
 
         _reloadMemento = null;
@@ -2752,6 +2760,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
+        _isReadyForLineNavigation = false;
         _isLoading = true;
         FireCancelHandlers(); // reload cancels the jobs of the old content, not the window lifetime
         _searchCts?.Cancel();
@@ -2778,6 +2787,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void LogfileDead ()
     {
+        CancelPendingLineNavigation();
         _isDeadFile = true;
 
         //this.logFileReader.FileSizeChanged -= this.FileSizeChangedHandler;
@@ -5727,6 +5737,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             catch (LogFileException lfe)
             {
+                _ = Invoke(new MethodInvoker(CancelPendingLineNavigation));
                 _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.Logger_Error_In_Function, nameof(LoadFile), lfe));
                 _ = MessageBox.Show(string.Format(CultureInfo.InvariantCulture, Resources.LogWindow_UI_LoadFile_CannotLoadFile, lfe.Message), Resources.LogExpert_Common_UI_Title_LogExpert);
                 _ = BeginInvoke(new FunctionWith1BoolParam(Close), true);
@@ -5931,6 +5942,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public void CloseLogWindow ()
     {
         _isClosing = true;
+        CancelPendingLineNavigation();
 
         CancelHighlightBookmarkScan();
         StopTimespreadThread();
@@ -6412,6 +6424,50 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             StatusLineText(Resources.LogWindow_UI_StatusLineText_UnexpectedIssueTruncatingFile);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Selects a one-based line after loading and Session File restoration, or immediately
+    /// when ready. Called on the UI thread; a newer request replaces a pending one.
+    /// </summary>
+    public void RequestGotoLine (int targetLine)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(targetLine, 1);
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
+        {
+            return;
+        }
+
+        _pendingTargetLine = targetLine;
+        if (_isReadyForLineNavigation)
+        {
+            ApplyPendingLineNavigation();
+        }
+    }
+
+    private void ApplyPendingLineNavigation ()
+    {
+        var targetLine = _pendingTargetLine;
+        _pendingTargetLine = null;
+        if (!targetLine.HasValue || IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
+        {
+            return;
+        }
+
+        FollowTailChanged(false, false);
+        if (dataGridView.RowCount > 0)
+        {
+            dataGridView.ClearSelection();
+            GotoLine(targetLine.Value - 1);
+            // Scrolling to the last row can automatically turn follow-tail back on.
+            FollowTailChanged(false, false);
+        }
+    }
+
+    private void CancelPendingLineNavigation ()
+    {
+        _pendingTargetLine = null;
+        _isReadyForLineNavigation = false;
     }
 
     public void GotoLine (int line)
@@ -7319,6 +7375,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void Reload ()
     {
+        CancelPendingLineNavigation();
         SavePersistenceData(false);
 
         _reloadMemento = new ReloadMemento
