@@ -10,24 +10,24 @@
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="DockPanelSuite.ThemeVS2015" Version="3.1.1" />
     <PackageVersion Include="GitVersion.Core" Version="6.3.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="NAudio" Version="2.3.0" />
+    <PackageVersion Include="NAudio" Version="3.0.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="NLog" Version="6.1.3" />
+    <PackageVersion Include="NLog" Version="6.2.0" />
     <PackageVersion Include="NuGet.CommandLine" Version="6.14.0" />
-    <PackageVersion Include="NuGet.Versioning" Version="7.6.0" />
+    <PackageVersion Include="NuGet.Versioning" Version="7.9.0" />
     <PackageVersion Include="Nuke.Common" Version="9.0.4" />
     <PackageVersion Include="Nuke.GitHub" Version="7.0.0" />
     <PackageVersion Include="NUnit" Version="4.6.1" />
     <PackageVersion Include="NUnit.ConsoleRunner" Version="3.20.1" />
-    <PackageVersion Include="NUnit3TestAdapter" Version="6.2.0" />
-    <PackageVersion Include="SSH.NET" Version="2025.1.0" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.8" />
-    <PackageVersion Include="System.Drawing.Common" Version="10.0.8" />
-    <PackageVersion Include="System.Resources.Extensions" Version="10.0.8" />
-    <PackageVersion Include="Vanara.PInvoke.RstrtMgr" Version="5.0.5" />
-    <PackageVersion Include="Vanara.PInvoke.Shell32" Version="5.0.5" />
-    <PackageVersion Include="Vanara.PInvoke.User32" Version="5.0.5" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="6.3.0" />
+    <PackageVersion Include="SSH.NET" Version="2026.0.0" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.11" />
+    <PackageVersion Include="System.Drawing.Common" Version="10.0.11" />
+    <PackageVersion Include="System.Resources.Extensions" Version="10.0.11" />
+    <PackageVersion Include="Vanara.PInvoke.RstrtMgr" Version="5.0.7" />
+    <PackageVersion Include="Vanara.PInvoke.Shell32" Version="5.0.7" />
+    <PackageVersion Include="Vanara.PInvoke.User32" Version="5.0.7" />
   </ItemGroup>
 </Project>
