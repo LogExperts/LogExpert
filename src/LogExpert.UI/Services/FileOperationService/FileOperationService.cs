@@ -80,6 +80,10 @@ internal sealed class FileOperationService (
             }
 
             _tabController.ActivateWindow(existingWindow);
+            if (request.TargetLine is int existingTarget)
+            {
+                existingWindow.RequestGotoLine(existingTarget);
+            }
             return existingWindow;
         }
 
@@ -101,6 +105,12 @@ internal sealed class FileOperationService (
         if (request.FileName.EndsWith(".lxp", StringComparison.Ordinal))
         {
             logWindow.ForcedPersistenceFileName = request.FileName;
+        }
+
+        // Register before starting the asynchronous load, including very small files.
+        if (request.TargetLine is int targetLine)
+        {
+            logWindow.RequestGotoLine(targetLine);
         }
 
         _ = Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
@@ -276,7 +286,7 @@ internal sealed class FileOperationService (
         return MultiFileDecision.MultiFile;
     }
 
-    public void AddFileTabs (string[] fileNames)
+    public void AddFileTabs (string[] fileNames, int? targetLine = null)
     {
         foreach (var fileName in fileNames.Where(filename => !string.IsNullOrEmpty(filename)))
         {
@@ -286,7 +296,7 @@ internal sealed class FileOperationService (
             }
             else
             {
-                _ = AddFileTab(new FileTabRequest { FileName = fileName });
+                _ = AddFileTab(new FileTabRequest { FileName = fileName, TargetLine = targetLine });
             }
         }
     }
@@ -330,9 +340,9 @@ internal sealed class FileOperationService (
         });
     }
 
-    public void LoadFiles (string[] fileNames)
+    public void LoadFiles (string[] fileNames, int? targetLine = null)
     {
-        AddFileTabs(fileNames);
+        AddFileTabs(fileNames, targetLine);
     }
 
     public void SaveLastOpenFilesList ()
@@ -352,11 +362,18 @@ internal sealed class FileOperationService (
         }
     }
 
-    public void LoadStartupFiles (IList<string> lastOpenFiles, string[]? startupFileNames)
+    public void LoadStartupFiles (IList<string> lastOpenFiles, string[]? startupFileNames, int? targetLine = null)
     {
         if (startupFileNames != null && startupFileNames.Length > 0)
         {
-            _ = LoadFilesWithOption(startupFileNames, false);
+            if (targetLine.HasValue)
+            {
+                AddFileTabs(startupFileNames, targetLine);
+            }
+            else
+            {
+                _ = LoadFilesWithOption(startupFileNames, false);
+            }
             return;
         }
 

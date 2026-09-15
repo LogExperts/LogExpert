@@ -13,6 +13,7 @@ using LogExpert.Classes;
 using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
+using LogExpert.Core.Interfaces;
 using LogExpert.PluginRegistry;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions.LogWindow;
@@ -67,26 +68,8 @@ internal static class Program
         CancellationTokenSource cts = new();
         try
         {
-            Option<FileInfo?> configOption = new("--config", "-c")
-            {
-                Description = "A configuration (settings) file"
-            };
-            Option<FileInfo?> legacyConfigOption = new("-config")
-            {
-                Hidden = true
-            };
-            Argument<string[]> filesArgument = new("files")
-            {
-                Description = "Log files (.log etc.) or session files (.lxj) to open"
-            };
-            RootCommand rootCommand = new("LogExpert — log file viewer.")
-            {
-                configOption,
-                legacyConfigOption,
-                filesArgument
-            };
-
-            ParseResult parseResult = rootCommand.Parse(args);
+            var options = new CommandLineOptions();
+            ParseResult parseResult = options.Parse(args);
 
             if (parseResult.Errors.Count > 0)
             {
@@ -96,7 +79,7 @@ internal static class Program
                 return;
             }
 
-            FileInfo? configFile = parseResult.GetValue(configOption) ?? parseResult.GetValue(legacyConfigOption);
+            FileInfo? configFile = parseResult.GetValue(options.ConfigOption) ?? parseResult.GetValue(options.LegacyConfigOption);
 
             if (configFile is not null)
             {
@@ -139,8 +122,9 @@ internal static class Program
             try
             {
                 Mutex mutex = new(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
-                string[] positionalFiles = parseResult.GetValue(filesArgument) ?? [];
+                string[] positionalFiles = parseResult.GetValue(options.FilesArgument) ?? [];
                 var absoluteFilePaths = GenerateAbsoluteFilePaths(positionalFiles);
+                var targetLine = parseResult.GetValue(options.LineOption);
 
                 if (isCreated)
                 {
@@ -153,7 +137,8 @@ internal static class Program
                             : null,
                         1,
                         false,
-                        ConfigManager.Instance);
+                        ConfigManager.Instance,
+                        targetLine);
 
                     // first instance
                     var wi = WindowsIdentity.GetCurrent();
@@ -176,7 +161,7 @@ internal static class Program
                         try
                         {
                             var wi = WindowsIdentity.GetCurrent();
-                            var command = SerializeCommandIntoNonFormattedJSON(absoluteFilePaths, settings.Preferences.AllowOnlyOneInstance);
+                            var command = SerializeCommandIntoNonFormattedJSON(absoluteFilePaths, settings.Preferences.AllowOnlyOneInstance, targetLine);
                             SendCommandToServer(command);
                             ipcSucceeded = true;
                             break;
@@ -267,12 +252,12 @@ internal static class Program
         CultureInfo.CurrentCulture = defaultCulture;
     }
 
-    private static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance)
+    internal static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance, int? targetLine = null)
     {
         var message = new IpcMessage()
         {
             Type = allowOnlyOneInstance ? IpcMessageType.NewWindowOrLockedWindow : IpcMessageType.NewWindow,
-            Payload = JObject.FromObject(new LoadPayload { Files = [.. fileNames] })
+            Payload = JObject.FromObject(new LoadPayload { Files = [.. fileNames], TargetLine = targetLine })
         };
 
         return JsonConvert.SerializeObject(message, Formatting.None);
@@ -307,22 +292,38 @@ internal static class Program
     }
 
     [SupportedOSPlatform("windows")]
-    private static void SendMessageToProxy (IpcMessage message, LogExpertProxy proxy)
+    internal static void SendMessageToProxy (IpcMessage message, ILogExpertProxy proxy)
     {
-        var payLoad = message.Payload.ToObject<LoadPayload>();
+        LoadPayload? payLoad;
+        try
+        {
+            var target = message?.Payload?.GetValue(nameof(LoadPayload.TargetLine), StringComparison.OrdinalIgnoreCase);
+            if (target != null && target.Type is not JTokenType.Integer and not JTokenType.Null)
+            {
+                _logger.Error("Invalid IPC target: the line number must be an integer.");
+                return;
+            }
+
+            payLoad = message?.Payload?.ToObject<LoadPayload>();
+        }
+        catch (JsonException ex)
+        {
+            _logger.Error(ex, "Invalid IPC load payload.");
+            return;
+        }
 
         if (CheckPayload(payLoad))
         {
             switch (message.Type)
             {
                 case IpcMessageType.Load:
-                    proxy.LoadFiles([.. payLoad.Files]);
+                    proxy.LoadFiles([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 case IpcMessageType.NewWindow:
-                    proxy.NewWindow([.. payLoad.Files]);
+                    proxy.NewWindow([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 case IpcMessageType.NewWindowOrLockedWindow:
-                    proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
+                    proxy.NewWindowOrLockedWindow([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 default:
                     _logger.Error($"Unknown IPC Message Type: {message.Type} with payload: {payLoad}");
@@ -336,6 +337,12 @@ internal static class Program
         if (payLoad == null)
         {
             _logger.Error("Invalid payload command: null");
+            return false;
+        }
+
+        if (payLoad.GetValidationError() is string error)
+        {
+            _logger.Error($"Invalid IPC load payload: {error}");
             return false;
         }
 

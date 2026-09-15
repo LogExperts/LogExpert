@@ -8,19 +8,19 @@ public interface ILogExpertProxy
     /// Load the given files into the existing window.
     /// </summary>
     /// <param name="fileNames"></param>
-    void LoadFiles (string[] fileNames);
+    void LoadFiles (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// Open a new LogExpert window and load the given files.
     /// </summary>
     /// <param name="fileNames"></param>
-    void NewWindow (string[] fileNames);
+    void NewWindow (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// load given files into the locked window or open a new window if no window is locked.
     /// </summary>
     /// <param name="fileNames"></param>
-    void NewWindowOrLockedWindow (string[] fileNames);
+    void NewWindowOrLockedWindow (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// Called from LogTabWindow when the window is about to be closed.

@@ -39,6 +39,32 @@ Requirements
 * <https://dotnet.microsoft.com/en-us/download>
 * .NET 10 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.0-windows-x64-installer>)
 
+## Command line
+
+Open a log at a specific line:
+
+```text
+LogExpert.exe "C:\logs\application.log" --line 1234
+LogExpert.exe "C:\logs\application.log" -n 1234
+```
+
+Line numbers start at 1, as in Go to Line. Supply the option once, with an integer
+from 1 through 2147483647 and exactly one log file. Sessions (`.lxj`) and Session
+Files (`.lxp`) are not supported with this option. Missing, invalid, repeated, or
+out-of-range values produce a command-line error before files are opened.
+
+LogExpert waits for normal loading and Session File restoration, then selects and
+reveals the requested line with follow-tail disabled. A number beyond the end
+selects the last line; an empty file keeps an empty selection. The same behavior
+applies when forwarding to an existing instance: the existing routing preferences
+choose the window, and an already-open log is reused. While it loads, the latest
+line request wins. Navigation is applied once, so later reloads do not repeat it.
+
+This option uses the loaded log's line numbering, including any preprocessing or
+combined rollover view. It does not load only part of a large file or map physical
+file lines. Rotation, truncation, or other edits can make an external tool's line
+number stale. Commands without `--line` / `-n` keep their existing behavior.
+
 ## CI
 
 This is a continous integration build. So always the latest and greates changes. It should be stable but no promises. Can be viewed as Beta.

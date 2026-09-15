@@ -12,6 +12,9 @@ internal sealed record FileTabRequest
     /// </summary>
     public required string FileName { get; init; }
 
+    /// <summary>Optional one-based line to select after loading and Session File restoration.</summary>
+    public int? TargetLine { get; init; }
+
     /// <summary>
     /// Whether this is a temporary file (filter results, clipboard paste).
     /// </summary>

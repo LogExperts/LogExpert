@@ -65,6 +65,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly bool _showInstanceNumbers;
 
     private readonly string[] _startupFileNames;
+    private readonly int? _startupTargetLine;
 
     [SupportedOSPlatform("windows")]
     private readonly StringFormat _tabStringFormat = new();
@@ -80,7 +81,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogTabWindow (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager)
+    public LogTabWindow (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager, int? targetLine = null)
     {
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -124,6 +125,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         externalToolsToolStrip.Location = new Point(0, 54);
 
         _startupFileNames = fileNames;
+        _startupTargetLine = targetLine;
         _instanceNumber = instanceNumber;
         _showInstanceNumbers = showInstanceNumbers;
 
@@ -532,9 +534,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    public void LoadFiles (string[] fileNames)
+    public void LoadFiles (string[] fileNames, int? targetLine = null)
     {
-        Invoke(() => _fileOperationService.AddFileTabs(fileNames));
+        Invoke(() => _fileOperationService.AddFileTabs(fileNames, targetLine));
     }
 
     [SupportedOSPlatform("windows")]
@@ -1735,7 +1737,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         var lastOpenFiles = ObjectClone.Clone(ConfigManager.Settings.LastOpenFilesList);
-        _fileOperationService.LoadStartupFiles(lastOpenFiles, _startupFileNames);
+        _fileOperationService.LoadStartupFiles(lastOpenFiles, _startupFileNames, _startupTargetLine);
 
         FillHighlightComboBox();
         FillToolLauncherBar();
