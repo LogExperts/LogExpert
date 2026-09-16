@@ -181,7 +181,7 @@ public class ControlCharRendererTests
         {
             Assert.That(seg.SourceStart, Is.EqualTo(expectedStart),
                 $"Segment starts at {seg.SourceStart}, expected {expectedStart}.");
-            reconstructed.Append(raw.AsSpan(seg.SourceStart, seg.SourceLength));
+            _ = reconstructed.Append(raw.AsSpan(seg.SourceStart, seg.SourceLength));
             expectedStart = seg.SourceStart + seg.SourceLength;
         }
 

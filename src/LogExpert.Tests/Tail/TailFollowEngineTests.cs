@@ -17,7 +17,7 @@ public class TailFollowEngineTests
         engine.Post(new LogEventArgs { LineCount = 42 });
 
         Assert.That(sink.WaitUntil(calls => calls.Count >= 2), Is.True, "sink was never called");
-        Assert.That(sink.Calls, Is.EqualTo(new[] { "lines:42", "count:42" }));
+        Assert.That(sink.Calls, Is.EqualTo(["lines:42", "count:42"]));
     }
 
     [Test]
@@ -29,7 +29,7 @@ public class TailFollowEngineTests
         engine.Post(new LogEventArgs { IsRollover = true, RolloverOffset = 17, LineCount = 5 });
 
         Assert.That(sink.WaitUntil(calls => calls.Count >= 3), Is.True, "sink was never called");
-        Assert.That(sink.Calls, Is.EqualTo(new[] { "shift:17", "lines:5", "count:5" }));
+        Assert.That(sink.Calls, Is.EqualTo(["shift:17", "lines:5", "count:5"]));
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class TailFollowEngineTests
         Assert.That(sink.WaitUntil(calls => calls.Count >= 4), Is.True, "worker died after the sink failure");
         // The faulted event still reports its line count (the time spread bar always learns it),
         // and the next event is processed normally.
-        Assert.That(sink.Calls, Is.EqualTo(new[] { "lines:1", "count:1", "lines:2", "count:2" }));
+        Assert.That(sink.Calls, Is.EqualTo(["lines:1", "count:1", "lines:2", "count:2"]));
     }
 
     [Test]

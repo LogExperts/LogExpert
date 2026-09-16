@@ -510,7 +510,7 @@ internal class FileOperationServiceTests : IDisposable
     public void LoadDroppedFiles_CombinedChoice_ReadsAccessibleSelectedFiles (int unavailableIndex, bool lockFile, int expectedLines)
     {
         var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(directory);
+        _ = Directory.CreateDirectory(directory);
         var first = Path.Join(directory, "a.log");
         var second = Path.Join(directory, "b.txt");
         File.WriteAllText(first, "first\n");
@@ -545,6 +545,7 @@ internal class FileOperationServiceTests : IDisposable
                     File.Delete(unavailableFile);
                 }
             }
+
             _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.MultiFile);
             Assert.That(lineCount, Is.EqualTo(expectedLines));
         }
@@ -568,14 +569,14 @@ internal class FileOperationServiceTests : IDisposable
 
         service.LoadDroppedFiles(["a.log", "b.log"], false, () => MultiFileDecision.Cancel);
 
-        Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(new[] { "b.log" }));
+        Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(["b.log"]));
     }
 
     [Test]
     public void LoadDroppedFiles_CombinedSessionAndLog_DoesNotOpenUnselectedRotations ()
     {
         var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(directory);
+        _ = Directory.CreateDirectory(directory);
         var log = Path.Join(directory, "b.log");
         var session = Path.Join(directory, "session.lxj");
         File.WriteAllText(log, "selected\n");
@@ -593,8 +594,8 @@ internal class FileOperationServiceTests : IDisposable
         try
         {
             _sut.LoadDroppedFiles([session, log], false, () => MultiFileDecision.MultiFile);
-            Assert.That(observed, Is.EqualTo(new[] { "selected" }));
-            Assert.That(_projectCallbackCalls.Select(call => call.FileName), Is.EqualTo(new[] { session }));
+            Assert.That(observed, Is.EqualTo(["selected"]));
+            Assert.That(_projectCallbackCalls.Select(call => call.FileName), Is.EqualTo([session]));
         }
         finally
         {
@@ -606,7 +607,7 @@ internal class FileOperationServiceTests : IDisposable
     public void LoadDroppedFiles_CombinedSelectionAfterTruncation_KeepsOnlySelectedPaths ()
     {
         var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
-        Directory.CreateDirectory(directory);
+        _ = Directory.CreateDirectory(directory);
         var first = Path.Join(directory, "a.log");
         var second = Path.Join(directory, "b.log");
         File.WriteAllText(first, "first\n");
@@ -622,7 +623,7 @@ internal class FileOperationServiceTests : IDisposable
                 ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
             reader.ReadFiles();
             File.WriteAllText(second, "short\n");
-            reader.ShiftBuffers();
+            _ = reader.ShiftBuffers();
             paths = reader.GetLogFileInfoList().Select(info => info.FullName).ToArray();
             observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
         };
@@ -631,8 +632,8 @@ internal class FileOperationServiceTests : IDisposable
             _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.Cancel);
             Assert.Multiple(() =>
             {
-                Assert.That(paths, Is.EqualTo(new[] { first, second }));
-                Assert.That(observed, Is.EqualTo(new[] { "first", "short" }));
+                Assert.That(paths, Is.EqualTo([first, second]));
+                Assert.That(observed, Is.EqualTo(["first", "short"]));
             });
         }
         finally
@@ -1035,7 +1036,7 @@ internal class FileOperationServiceTests : IDisposable
         // Assert — restoring tabs must not empty the persisted list: SaveLastOpenFilesList owns it,
         // so a crash mid-session still leaves the files to restore next time
         _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Never);
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "file1.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["file1.log"]));
     }
 
     [Test]
@@ -1136,7 +1137,7 @@ internal class FileOperationServiceTests : IDisposable
         _sut.SaveLastOpenFilesList();
 
         // Assert — the saved list holds the current tabs only, not the stale ones
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "current.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["current.log"]));
     }
 
     [Test]
@@ -1160,7 +1161,7 @@ internal class FileOperationServiceTests : IDisposable
         secondService.SaveLastOpenFilesList();
 
         // Assert
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "first.log", "second.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["first.log", "second.log"]));
     }
 
     [Test]

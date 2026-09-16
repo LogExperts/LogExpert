@@ -170,7 +170,7 @@ internal class MenuToolbarControllerTests : IDisposable
 
                 Assert.That(
                     CheckedEncodingRowNames(),
-                    Is.EqualTo(new[] { EncodingMenuBuilder.RowName(encoding) }).AsCollection,
+                    Is.EqualTo([EncodingMenuBuilder.RowName(encoding)]).AsCollection,
                     $"'{encoding.HeaderName}' did not check exactly its own row");
             }
         });

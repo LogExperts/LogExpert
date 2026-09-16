@@ -34,7 +34,7 @@ internal sealed class LineNavigationTests : IDisposable
     public void SetUp ()
     {
         _directory = Path.Join(Path.GetTempPath(), "LogExpertLineTests", Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(_directory);
+        _ = Directory.CreateDirectory(_directory);
         _fileName = Path.Join(_directory, "application.log");
         File.WriteAllLines(_fileName, Enumerable.Range(1, 100).Select(i => $"Log line {i}"));
         _settings = new Settings();
@@ -45,10 +45,10 @@ internal sealed class LineNavigationTests : IDisposable
         _settings.Preferences.OpenLastFiles = false;
         _settings.Preferences.SaveLocation = SessionSaveLocation.SameDir;
         _config = new Mock<IConfigManager>();
-        _config.Setup(c => c.Settings).Returns(_settings);
-        _config.Setup(c => c.ActiveConfigDir).Returns(_directory);
-        _config.Setup(c => c.ActiveSessionDir).Returns(_directory);
-        PluginRegistry.PluginRegistry.Create(_directory, 50);
+        _ = _config.Setup(c => c.Settings).Returns(_settings);
+        _ = _config.Setup(c => c.ActiveConfigDir).Returns(_directory);
+        _ = _config.Setup(c => c.ActiveSessionDir).Returns(_directory);
+        _ = PluginRegistry.PluginRegistry.Create(_directory, 50);
     }
 
     [TearDown]
@@ -59,6 +59,7 @@ internal sealed class LineNavigationTests : IDisposable
         {
             _window.LogExpertProxy = null;
         }
+
         _window?.Close();
         _window?.Dispose();
         _window = null;
@@ -85,7 +86,7 @@ internal sealed class LineNavigationTests : IDisposable
     public void Startup_SavedPositionAndTail_ExplicitTargetWins (bool savedFollowTail)
     {
         _settings.Preferences.SaveSessions = true;
-        Persister.SavePersistenceData(_fileName, new PersistenceData
+        _ = Persister.SavePersistenceData(_fileName, new PersistenceData
         {
             FileName = _fileName,
             CurrentLine = 85,
@@ -244,6 +245,7 @@ internal sealed class LineNavigationTests : IDisposable
             Application.DoEvents();
             Thread.Sleep(1);
         }
+
         Assert.That(condition(), Is.True, "The Log Window did not finish the requested operation.");
     }
 }

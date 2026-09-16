@@ -214,7 +214,7 @@ internal class TabControllerTests : IDisposable
         var result = _tabController.GetAllWindowsFromDockPanel();
 
         // Assert
-        Assert.That(result, Is.EqualTo(new[] { firstWindow, secondWindow, thirdWindow }));
+        Assert.That(result, Is.EqualTo([firstWindow, secondWindow, thirdWindow]));
     }
 
     #endregion

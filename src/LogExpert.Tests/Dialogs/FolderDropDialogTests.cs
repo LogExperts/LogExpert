@@ -37,7 +37,7 @@ public class FolderDropDialogTests
         Assert.Multiple(() =>
         {
             Assert.That(dialog.DialogResult, Is.EqualTo(DialogResult.OK));
-            Assert.That(dialog.SelectedFiles, Is.EqualTo(new[] { files[1] }));
+            Assert.That(dialog.SelectedFiles, Is.EqualTo([files[1]]));
         });
     }
 
@@ -60,7 +60,7 @@ public class FolderDropDialogTests
         Assert.That(open.Enabled, Is.False);
         all.PerformClick();
         open.PerformClick();
-        Assert.That(dialog.SelectedFiles, Is.EqualTo(new[] { files[1] }));
+        Assert.That(dialog.SelectedFiles, Is.EqualTo([files[1]]));
     }
 
     [Test]
@@ -73,7 +73,7 @@ public class FolderDropDialogTests
         var grid = (DataGridView)dialog.Controls.Find("filesGrid", true).Single();
         grid[0, 1].Value = true;
         ((Button)dialog.Controls.Find("openButton", true).Single()).PerformClick();
-        Assert.That(dialog.SelectedFiles, Is.EqualTo(new[] { files[1] }));
+        Assert.That(dialog.SelectedFiles, Is.EqualTo([files[1]]));
     }
 
     [Test]
@@ -105,6 +105,7 @@ public class FolderDropDialogTests
         {
             ((Button)dialog.Controls.Find("cancelButton", true).Single()).PerformClick();
         }
+
         completion.SetResult(new DroppedFileDiscoveryResult(true, [@"C:\logs\late.log"], []));
         Application.DoEvents();
         Assert.That(dialog.SelectedFiles, Is.Empty);
@@ -152,7 +153,7 @@ public class FolderDropDialogTests
         Assert.That(grid.RowCount, Is.EqualTo(1));
         ((Button)dialog.Controls.Find("selectAllButton", true).Single()).PerformClick();
         ((Button)dialog.Controls.Find("openButton", true).Single()).PerformClick();
-        Assert.That(dialog.SelectedFiles, Is.EqualTo(new[] { @"C:\logs\099999.txt" }));
+        Assert.That(dialog.SelectedFiles, Is.EqualTo([@"C:\logs\099999.txt"]));
     }
 
     [Test]
@@ -171,6 +172,6 @@ public class FolderDropDialogTests
         ((Button)dialog.Controls.Find("previousPageButton", true).Single()).PerformClick();
         Assert.That(grid[0, 0].Value, Is.True);
         ((Button)dialog.Controls.Find("openButton", true).Single()).PerformClick();
-        Assert.That(dialog.SelectedFiles, Is.EqualTo(new[] { @"C:\logs\000000.txt", @"C:\logs\000500.txt" }));
+        Assert.That(dialog.SelectedFiles, Is.EqualTo([@"C:\logs\000000.txt", @"C:\logs\000500.txt"]));
     }
 }

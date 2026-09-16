@@ -12,7 +12,7 @@ namespace LogExpert.Tests.StreamReaderTests;
 [TestFixture]
 internal sealed class LogfileReaderMultiFileFlagTests
 {
-    private static readonly string _testDataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData");
+    private static readonly string _testDataDirectory = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "TestData");
 
     private string _testDirectory = null!;
     private string _logFile = null!;
@@ -20,12 +20,12 @@ internal sealed class LogfileReaderMultiFileFlagTests
     [SetUp]
     public void SetUp ()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
         _ = Directory.CreateDirectory(_testDirectory);
-        _logFile = Path.Combine(_testDirectory, "app.log");
+        _logFile = Path.Join(_testDirectory, "app.log");
 
-        File.Copy(Path.Combine(_testDataDirectory, "app.log"), _logFile);
-        File.Copy(Path.Combine(_testDataDirectory, "app.log.1"), _logFile + ".1");
+        File.Copy(Path.Join(_testDataDirectory, "app.log"), _logFile);
+        File.Copy(Path.Join(_testDataDirectory, "app.log.1"), _logFile + ".1");
 
         _ = PluginRegistry.PluginRegistry.Create(_testDirectory, 500);
     }

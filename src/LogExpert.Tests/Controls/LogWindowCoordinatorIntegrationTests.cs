@@ -34,7 +34,7 @@ public class LogWindowCoordinatorIntegrationTests : IDisposable
         }
 
         // Ensure PluginRegistry is initialized with default columnizers
-        PluginRegistry.PluginRegistry.Create(Path.GetTempPath(), 250);
+        _ = PluginRegistry.PluginRegistry.Create(Path.GetTempPath(), 250);
 
         _coordinatorMock = new Mock<ILogWindowCoordinator>();
         _configManagerMock = new Mock<IConfigManager>();

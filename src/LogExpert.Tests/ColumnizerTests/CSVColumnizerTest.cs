@@ -274,7 +274,7 @@ public class CSVColumnizerTest
 
         // Simulate GUI calling Selected() (normally done in SetColumnizerInternal)
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
         csvColumnizer.Selected(callbackMock.Object);
 
         // Verify CsvColumnizer state after Selected()
@@ -310,7 +310,7 @@ public class CSVColumnizerTest
 
         // Simulate GUI calling Selected()
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
         csvColumnizer.Selected(callbackMock.Object);
 
         // CsvColumnizer should have valid state
@@ -342,7 +342,7 @@ public class CSVColumnizerTest
 
         // Verify _firstLine survived allocator block recycling (the CsvLogLine fix)
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
         csvColumnizer.Selected(callbackMock.Object);
 
         // With auto-detection, comma delimiter should be detected, giving 18 columns
@@ -400,7 +400,7 @@ public class CSVColumnizerTest
 
         // Simulate GUI calling Selected()
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader.GetLogLineMemory(0));
         csvColumnizer.Selected(callbackMock.Object);
 
         Assert.That(csvColumnizer.GetColumnCount(), Is.EqualTo(3), "Should detect 3 columns with comma delimiter");
@@ -442,7 +442,7 @@ public class CSVColumnizerTest
         Assert.That(line.FullLine.ToString(), Does.Contain("2021-12-12"));
 
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(line);
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(line);
         csvColumnizer.Selected(callbackMock.Object);
 
         Assert.That(csvColumnizer.GetColumnCount(), Is.EqualTo(3));
@@ -509,7 +509,7 @@ public class CSVColumnizerTest
 
         // Step 3: Simulate GUI calling Selected + SplitLine
         var callbackMock = new Mock<ILogLineMemoryColumnizerCallback>();
-        callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader2.GetLogLineMemory(0));
+        _ = callbackMock.Setup(c => c.GetLogLineMemory(0)).Returns(reader2.GetLogLineMemory(0));
         csvColumnizer.Selected(callbackMock.Object);
 
         Assert.That(csvColumnizer.GetColumnCount(), Is.EqualTo(3));
