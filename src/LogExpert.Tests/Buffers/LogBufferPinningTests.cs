@@ -89,6 +89,7 @@ internal class LogBufferPinningTests
             {
                 buf.AddLine(new LogLine($"line {i * 10 + j}".AsMemory(), i * 10 + j), (i * 10 + j) * 10);
             }
+
             buf.Size = 100;
             index.Add(buf);
         }
@@ -123,6 +124,7 @@ internal class LogBufferPinningTests
             {
                 buf.AddLine(new LogLine($"line {i * 10 + j}".AsMemory(), i * 10 + j), (i * 10 + j) * 10);
             }
+
             buf.Size = 100;
             index.Add(buf);
         }
@@ -144,6 +146,7 @@ internal class LogBufferPinningTests
             {
                 buf.AddLine(new LogLine($"line {i * 10 + j}".AsMemory(), i * 10 + j), (i * 10 + j) * 10);
             }
+
             buf.Size = 100;
             index.Add(buf);
         }

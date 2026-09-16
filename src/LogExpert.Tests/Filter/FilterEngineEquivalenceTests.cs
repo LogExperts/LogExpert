@@ -37,8 +37,8 @@ public class FilterEngineEquivalenceTests
         {
             Assert.That(run.Outcome, Is.EqualTo(FilterRunOutcome.Completed));
             // Hit 1 contributes 0..2, hit 5 contributes 4..6.
-            Assert.That(run.ResultLines, Is.EqualTo(new[] { 0, 1, 2, 4, 5, 6 }));
-            Assert.That(run.HitLines, Is.EqualTo(new[] { 1, 5 }));
+            Assert.That(run.ResultLines, Is.EqualTo([0, 1, 2, 4, 5, 6]));
+            Assert.That(run.HitLines, Is.EqualTo([1, 5]));
         });
     }
 
@@ -61,8 +61,8 @@ public class FilterEngineEquivalenceTests
         {
             Assert.That(run.Outcome, Is.EqualTo(FilterRunOutcome.Completed));
             // Hit 4 contributes 2..6, hit 5 contributes only 7 — one deduplicated span.
-            Assert.That(run.ResultLines, Is.EqualTo(new[] { 2, 3, 4, 5, 6, 7 }));
-            Assert.That(run.HitLines, Is.EqualTo(new[] { 4, 5 }));
+            Assert.That(run.ResultLines, Is.EqualTo([2, 3, 4, 5, 6, 7]));
+            Assert.That(run.HitLines, Is.EqualTo([4, 5]));
         });
     }
 
@@ -148,7 +148,7 @@ public class FilterEngineEquivalenceTests
         Assert.Multiple(() =>
         {
             Assert.That(run.Outcome, Is.EqualTo(FilterRunOutcome.Cancelled));
-            Assert.That(run.HitLines, Is.EqualTo(new[] { 0 }), "partial results stand on cancel");
+            Assert.That(run.HitLines, Is.EqualTo([0]), "partial results stand on cancel");
         });
     }
 
@@ -166,7 +166,7 @@ public class FilterEngineEquivalenceTests
 
         var run = engine.Run(filterParams, callback, CancellationToken.None);
 
-        Assert.That(run.HitLines, Is.EqualTo(new[] { 1, 3 }),
+        Assert.That(run.HitLines, Is.EqualTo([1, 3]),
             "the snapshot taken at entry governs the whole run");
     }
 
@@ -192,7 +192,7 @@ public class FilterEngineEquivalenceTests
 
         var run = engine.Run(filterParams, callback, CancellationToken.None);
 
-        Assert.That(run.HitLines, Is.EqualTo(new[] { 0 }),
+        Assert.That(run.HitLines, Is.EqualTo([0]),
             "lines appended after Run entry belong to the tail path");
     }
 
@@ -206,8 +206,8 @@ public class FilterEngineEquivalenceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(run.ResultLines, Is.EqualTo(new[] { 0, 1 }), "line 0 is a valid hit; back spread clamps at the file start");
-            Assert.That(run.HitLines, Is.EqualTo(new[] { 0 }));
+            Assert.That(run.ResultLines, Is.EqualTo([0, 1]), "line 0 is a valid hit; back spread clamps at the file start");
+            Assert.That(run.HitLines, Is.EqualTo([0]));
         });
     }
 
@@ -221,8 +221,8 @@ public class FilterEngineEquivalenceTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(run.ResultLines, Is.EqualTo(new[] { 1, 2 }), "fore spread clamps at the last line");
-            Assert.That(run.HitLines, Is.EqualTo(new[] { 2 }));
+            Assert.That(run.ResultLines, Is.EqualTo([1, 2]), "fore spread clamps at the last line");
+            Assert.That(run.HitLines, Is.EqualTo([2]));
         });
     }
 

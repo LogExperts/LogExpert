@@ -46,7 +46,7 @@ public class AudioPlayerTests
     [Test]
     public void Play_NonExistentPath_FallsBackSilently ()
     {
-        var missing = Path.Combine(Path.GetTempPath(), $"definitely-missing-{Guid.NewGuid():N}.wav");
+        var missing = Path.Join(Path.GetTempPath(), $"definitely-missing-{Guid.NewGuid():N}.wav");
         Assert.DoesNotThrow(() => AudioPlayer.Play(missing));
     }
 

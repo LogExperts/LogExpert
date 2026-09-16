@@ -20,9 +20,9 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
     [SetUp]
     public void SetUp ()
     {
-        _testDirectory = Path.Combine(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
+        _testDirectory = Path.Join(Path.GetTempPath(), "LogExpertTests", Guid.NewGuid().ToString());
         _ = Directory.CreateDirectory(_testDirectory);
-        _logFile = Path.Combine(_testDirectory, "app.log");
+        _logFile = Path.Join(_testDirectory, "app.log");
         File.WriteAllLines(_logFile, Enumerable.Range(1, 100).Select(index => $"Line {index}"), Encoding.UTF8);
 
         _ = PluginRegistry.PluginRegistry.Create(_testDirectory, 500);
@@ -43,10 +43,10 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
         using var loadingFinished = new ManualResetEventSlim(false);
         using var newFileReported = new ManualResetEventSlim(false);
         var progressReporterMock = new Mock<ILoadProgressReporter>();
-        progressReporterMock
+        _ = progressReporterMock
             .Setup(reporter => reporter.ReportLoadingFinished())
             .Callback(() => loadingFinished.Set());
-        progressReporterMock
+        _ = progressReporterMock
             .Setup(reporter => reporter.ReportNewFile(It.IsAny<string>(), It.IsAny<long>(), It.IsAny<long>()))
             .Callback(() => newFileReported.Set());
 

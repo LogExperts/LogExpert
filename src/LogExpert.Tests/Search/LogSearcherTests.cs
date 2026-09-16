@@ -353,7 +353,7 @@ public class LogSearcherTests
         {
             Assert.That(result.Outcome, Is.EqualTo(SearchOutcome.NotFound));
             // Segment counter resets on wrap, matching a progress bar whose maximum is the line count.
-            Assert.That(scanReports, Is.EqualTo(new[] { 1000, 2000, 1000, 2000 }));
+            Assert.That(scanReports, Is.EqualTo([1000, 2000, 1000, 2000]));
         });
     }
 

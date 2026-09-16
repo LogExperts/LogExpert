@@ -31,9 +31,9 @@ public class FilterAccumulatorTests
         Assert.Multiple(() =>
         {
             // Hit 7 contributes only 8,9 — 5..7 were already taken by the seeded run.
-            Assert.That(expansion, Is.EqualTo(new[] { 8, 9 }), "AddHit returns the hit's expansion (Filter Pipes write it out)");
-            Assert.That(resultLines, Is.EqualTo(new[] { 3, 4, 5, 6, 7, 8, 9 }), "the adopted list instance is the accumulator's state");
-            Assert.That(hitLines, Is.EqualTo(new[] { 5, 7 }));
+            Assert.That(expansion, Is.EqualTo([8, 9]), "AddHit returns the hit's expansion (Filter Pipes write it out)");
+            Assert.That(resultLines, Is.EqualTo([3, 4, 5, 6, 7, 8, 9]), "the adopted list instance is the accumulator's state");
+            Assert.That(hitLines, Is.EqualTo([5, 7]));
         });
     }
 
@@ -42,15 +42,15 @@ public class FilterAccumulatorTests
     {
         var accumulator = new FilterAccumulator();
 
-        accumulator.AddHit(5, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
-        accumulator.AddHit(7, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
-        accumulator.AddHit(50, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
+        _ = accumulator.AddHit(5, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
+        _ = accumulator.AddHit(7, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
+        _ = accumulator.AddHit(50, spreadBefore: 2, spreadBehind: 2, lineCount: 100);
 
         Assert.Multiple(() =>
         {
             // Hit 5 contributes 3..7; hit 7 contributes only 8,9 (5..7 already taken); hit 50 contributes 48..52.
-            Assert.That(accumulator.ResultLines, Is.EqualTo(new[] { 3, 4, 5, 6, 7, 8, 9, 48, 49, 50, 51, 52 }));
-            Assert.That(accumulator.HitLines, Is.EqualTo(new[] { 5, 7, 50 }));
+            Assert.That(accumulator.ResultLines, Is.EqualTo([3, 4, 5, 6, 7, 8, 9, 48, 49, 50, 51, 52]));
+            Assert.That(accumulator.HitLines, Is.EqualTo([5, 7, 50]));
             Assert.That(accumulator.History, Is.EqualTo(accumulator.ResultLines),
                 "history below the window size mirrors the result lines");
         });

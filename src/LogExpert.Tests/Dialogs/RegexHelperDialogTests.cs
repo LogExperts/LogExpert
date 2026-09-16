@@ -27,7 +27,7 @@ public class RegexHelperDialogTests
 
         dialog.OnButtonOkClick(dialog, EventArgs.Empty);
 
-        Assert.That(dialog.ExpressionHistoryList, Is.EqualTo(new[] { "new-pattern", "old-a", "old-b" }));
+        Assert.That(dialog.ExpressionHistoryList, Is.EqualTo(["new-pattern", "old-a", "old-b"]));
     }
 
     [Test]
@@ -42,7 +42,7 @@ public class RegexHelperDialogTests
 
         dialog.OnButtonOkClick(dialog, EventArgs.Empty);
 
-        Assert.That(dialog.ExpressionHistoryList, Is.EqualTo(new[] { "repeat", "old-a", "old-b" }));
+        Assert.That(dialog.ExpressionHistoryList, Is.EqualTo(["repeat", "old-a", "old-b"]));
     }
 
     [Test]

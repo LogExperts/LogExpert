@@ -2277,4 +2277,58 @@ Restart LogExpert to apply changes?</value>
   <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
     <value>Use system color</value>
   </data>
+  <data name="FolderDrop_Title" xml:space="preserve">
+    <value>Open files from folders</value>
+  </data>
+  <data name="FolderDrop_Discovering" xml:space="preserve">
+    <value>Discovering files… Cancel to open nothing.</value>
+  </data>
+  <data name="FolderDrop_Instructions" xml:space="preserve">
+    <value>Select the files to open. No files are selected automatically.</value>
+  </data>
+  <data name="FolderDrop_Filter" xml:space="preserve">
+    <value>Filter paths:</value>
+  </data>
+  <data name="FolderDrop_SelectAll" xml:space="preserve">
+    <value>Select all matching</value>
+  </data>
+  <data name="FolderDrop_SelectNone" xml:space="preserve">
+    <value>Select none</value>
+  </data>
+  <data name="FolderDrop_Open" xml:space="preserve">
+    <value>Open selected</value>
+  </data>
+  <data name="FolderDrop_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FolderDrop_Path" xml:space="preserve">
+    <value>Full path</value>
+  </data>
+  <data name="FolderDrop_Select" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="FolderDrop_Summary" xml:space="preserve">
+    <value>{0:N0} files; {1:N0} matching; {2:N0} selected.</value>
+  </data>
+  <data name="FolderDrop_Empty" xml:space="preserve">
+    <value>No eligible files were found. Automatically discovered .lxp and .lxj files are excluded.</value>
+  </data>
+  <data name="FolderDrop_Skipped" xml:space="preserve">
+    <value>{0:N0} locations were skipped:</value>
+  </data>
+  <data name="FolderDrop_DirectoryLink" xml:space="preserve">
+    <value>Directory link skipped (junction or symbolic link).</value>
+  </data>
+  <data name="FolderDrop_Failed" xml:space="preserve">
+    <value>Could not prepare the dropped files: {0}</value>
+  </data>
+  <data name="FolderDrop_Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="FolderDrop_Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="FolderDrop_Page" xml:space="preserve">
+    <value>{0:N0}–{1:N0} of {2:N0} matches</value>
+  </data>
 </root>

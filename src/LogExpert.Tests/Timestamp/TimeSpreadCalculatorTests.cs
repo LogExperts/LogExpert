@@ -61,12 +61,12 @@ public class TimeSpreadCalculatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo(new[] { 1, 2, 3, 4 }));
-            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(new[]
-            {
+            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo([1, 2, 3, 4]));
+            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(
+            [
                 StartTime.AddSeconds(30), StartTime.AddSeconds(60),
                 StartTime.AddSeconds(90), StartTime.AddSeconds(120)
-            }));
+            ]));
             Assert.That(entries.Select(e => e.Diff), Is.All.Zero);
             Assert.That(entries.Skip(1).Select(e => e.Value).Distinct().Count(), Is.EqualTo(1));
         });
@@ -79,12 +79,12 @@ public class TimeSpreadCalculatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo(new[] { 1, 2, 3, 4 }));
-            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(new[]
-            {
+            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo([1, 2, 3, 4]));
+            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(
+            [
                 StartTime.AddSeconds(30), StartTime.AddSeconds(60),
                 StartTime.AddSeconds(150), StartTime.AddSeconds(180)
-            }));
+            ]));
             Assert.That(entries[1].Value, Is.EqualTo(255));
             Assert.That(entries[2].Value, Is.LessThan(entries[1].Value));
             Assert.That(entries[3].Value, Is.EqualTo(255));
@@ -98,11 +98,11 @@ public class TimeSpreadCalculatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo(new[] { 1, 3 }));
-            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(new[]
-            {
+            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo([1, 3]));
+            Assert.That(entries.Select(e => e.Timestamp), Is.EqualTo(
+            [
                 StartTime.AddSeconds(30), StartTime.AddSeconds(90)
-            }));
+            ]));
         });
     }
 
@@ -116,9 +116,9 @@ public class TimeSpreadCalculatorTests
         // The initial two samples are omitted by the spread display. One line remains per bin.
         Assert.Multiple(() =>
         {
-            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo(new[] { 2, 3, 4, 5, 6 }));
+            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo([2, 3, 4, 5, 6]));
             Assert.That(entries.Select(e => (e.Timestamp - StartTime).TotalMilliseconds),
-                Is.EqualTo(new[] { 2 * spacing, 3 * spacing, 4 * spacing, 5 * spacing, 6 * spacing }));
+                Is.EqualTo([2 * spacing, 3 * spacing, 4 * spacing, 5 * spacing, 6 * spacing]));
             Assert.That(entries.Select(e => e.Diff), Is.All.EqualTo(1));
             Assert.That(entries.Select(e => e.Value), Is.All.EqualTo(198));
         });
@@ -131,11 +131,11 @@ public class TimeSpreadCalculatorTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo(new[] { 2, 2, 2, 3, 4, 5, 6 }));
+            Assert.That(entries.Select(e => e.LineNum), Is.EqualTo([2, 2, 2, 3, 4, 5, 6]));
             Assert.That(entries.Select(e => (e.Timestamp - StartTime).TotalSeconds),
-                Is.EqualTo(new[] { 2, 3, 4, 5, 6, 7, 8 }));
-            Assert.That(entries.Select(e => e.Diff), Is.EqualTo(new[] { 1, 0, 0, 1, 1, 1, 1 }));
-            Assert.That(entries.Select(e => e.Value), Is.EqualTo(new[] { 122, 255, 255, 122, 122, 122, 122 }));
+                Is.EqualTo([2, 3, 4, 5, 6, 7, 8]));
+            Assert.That(entries.Select(e => e.Diff), Is.EqualTo([1, 0, 0, 1, 1, 1, 1]));
+            Assert.That(entries.Select(e => e.Value), Is.EqualTo([122, 255, 255, 122, 122, 122, 122]));
         });
     }
 

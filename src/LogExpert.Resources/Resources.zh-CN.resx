@@ -2137,4 +2137,58 @@ YY[YY] = 年
   <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
     <value>已配置该工具的 Sysout，但没有活动日志文件，该工具将在没有 Sysout 管道的情况下启动</value>
   </data>
+  <data name="FolderDrop_Title" xml:space="preserve">
+    <value>打开文件夹中的文件</value>
+  </data>
+  <data name="FolderDrop_Discovering" xml:space="preserve">
+    <value>正在查找文件…取消后不会打开任何文件。</value>
+  </data>
+  <data name="FolderDrop_Instructions" xml:space="preserve">
+    <value>请选择要打开的文件。默认不选择任何文件。</value>
+  </data>
+  <data name="FolderDrop_Filter" xml:space="preserve">
+    <value>筛选路径：</value>
+  </data>
+  <data name="FolderDrop_SelectAll" xml:space="preserve">
+    <value>选择所有匹配的文件</value>
+  </data>
+  <data name="FolderDrop_SelectNone" xml:space="preserve">
+    <value>取消全部选择</value>
+  </data>
+  <data name="FolderDrop_Open" xml:space="preserve">
+    <value>打开所选文件</value>
+  </data>
+  <data name="FolderDrop_Cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="FolderDrop_Path" xml:space="preserve">
+    <value>完整路径</value>
+  </data>
+  <data name="FolderDrop_Select" xml:space="preserve">
+    <value>打开</value>
+  </data>
+  <data name="FolderDrop_Summary" xml:space="preserve">
+    <value>共 {0:N0} 个文件；匹配 {1:N0} 个；已选 {2:N0} 个。</value>
+  </data>
+  <data name="FolderDrop_Empty" xml:space="preserve">
+    <value>未找到符合条件的文件。自动发现的 .lxp 和 .lxj 文件已排除。</value>
+  </data>
+  <data name="FolderDrop_Skipped" xml:space="preserve">
+    <value>已跳过 {0:N0} 个位置：</value>
+  </data>
+  <data name="FolderDrop_DirectoryLink" xml:space="preserve">
+    <value>已跳过目录链接（联接或符号链接）。</value>
+  </data>
+  <data name="FolderDrop_Failed" xml:space="preserve">
+    <value>无法准备拖放的文件：{0}</value>
+  </data>
+  <data name="FolderDrop_Previous" xml:space="preserve">
+    <value>上一页</value>
+  </data>
+  <data name="FolderDrop_Next" xml:space="preserve">
+    <value>下一页</value>
+  </data>
+  <data name="FolderDrop_Page" xml:space="preserve">
+    <value>显示第 {0:N0}–{1:N0} 个，共 {2:N0} 个匹配文件</value>
+  </data>
 </root>

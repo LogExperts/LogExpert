@@ -205,7 +205,7 @@ internal class SessionHandlerTests : IDisposable
     public void LoadProject_NonexistentFile_ReturnsError ()
     {
         // Arrange
-        var fakePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
+        var fakePath = Path.Join(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
 
         // Act
         var outcome = _sut.LoadSession(fakePath);
@@ -389,7 +389,7 @@ internal class SessionHandlerTests : IDisposable
 
         // Assert
         Assert.That(_closeAllTabsCallCount, Is.EqualTo(1), "close must be invoked exactly once");
-        Assert.That(_callOrder, Is.EqualTo(new[] { "close", "addtab:C:\\logs\\app.log" }),
+        Assert.That(_callOrder, Is.EqualTo(["close", "addtab:C:\\logs\\app.log"]),
                     "existing tabs must be closed before the new windows are opened");
         Assert.That(result.OpenedTabs, Is.True);
         Assert.That(result.OpenInNewWindowFiles, Is.Null);
@@ -572,7 +572,7 @@ internal class SessionHandlerTests : IDisposable
     public void SaveProject_ValidData_ReturnsTrueAndNullError ()
     {
         // Arrange
-        var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
+        var tempFile = Path.Join(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
         var sessionData = new SessionData
         {
             FileNames = ["C:\\logs\\app.log"],
@@ -662,7 +662,7 @@ internal class SessionHandlerTests : IDisposable
             TabLayoutXml = layoutXml!
         };
 
-        var tempFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
+        var tempFile = Path.Join(Path.GetTempPath(), Guid.NewGuid() + ".lxj");
         SessionPersister.SaveSessionData(tempFile, sessionData);
         return tempFile;
     }

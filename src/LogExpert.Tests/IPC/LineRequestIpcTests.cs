@@ -35,6 +35,7 @@ internal sealed class LineRequestIpcTests
         {
             proxy.Verify(p => p.NewWindow(files, 1234), Times.Once);
         }
+
         proxy.VerifyNoOtherCalls();
     }
     [TestCase("{\"Files\":[\"application.log\"],\"TargetLine\":0}")]
@@ -104,13 +105,13 @@ internal sealed class LineRequestIpcTests
         var window = new Mock<ILogTabWindow>();
         var proxy = new LogExpertProxy(window.Object);
         object[]? forwardedArguments = null;
-        window.Setup(w => w.Invoke(It.IsAny<Delegate>(), It.IsAny<object[]>()))
+        _ = window.Setup(w => w.Invoke(It.IsAny<Delegate>(), It.IsAny<object[]>()))
             .Callback((Delegate _, object[] args) => forwardedArguments = args);
 
         proxy.NewWindow(["application.log"], 42);
 
         Assert.That(forwardedArguments, Has.Length.EqualTo(2));
-        Assert.That(forwardedArguments![0], Is.EqualTo(new[] { "application.log" }));
+        Assert.That(forwardedArguments![0], Is.EqualTo(["application.log"]));
         Assert.That(forwardedArguments[1], Is.EqualTo(42));
     }
 }

@@ -232,7 +232,7 @@ public class TimestampLocatorTests
 
         _ = locator.FindBackward(2, 3, roundToSeconds: false);
 
-        Assert.That(callback.PositionedAt, Is.EqualTo(new[] { 2, 1, 0 }));
+        Assert.That(callback.PositionedAt, Is.EqualTo([2, 1, 0]));
     }
 
     [Test]
@@ -409,7 +409,7 @@ public class TimestampLocatorTests
 
         _ = locator.FindForward(0, 3, roundToSeconds: false);
 
-        Assert.That(callback.PositionedAt, Is.EqualTo(new[] { 0, 1, 2 }));
+        Assert.That(callback.PositionedAt, Is.EqualTo([0, 1, 2]));
     }
 
     [Test]
@@ -520,7 +520,7 @@ public class TimestampLocatorTests
     [TestCase(1, TestName = "FindLine_RangeOfTwoLines_FindsTheSecond")]
     public void FindLine_NarrowRange_StillFindsTheExactLine (int targetLine)
     {
-        var lines = targetLine == 0 ? new[] { "2026-01-01 10:00:00" } : new[] { "2026-01-01 10:00:00", "2026-01-01 10:00:01" };
+        var lines = targetLine == 0 ? new[] { "2026-01-01 10:00:00" } : ["2026-01-01 10:00:00", "2026-01-01 10:00:01"];
         var locator = LocatorOver(lines);
 
         var line = locator.FindLine(At(lines[targetLine]), fromLine: 0, lineCount: lines.Length, roundToSeconds: false);

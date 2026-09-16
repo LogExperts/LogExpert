@@ -2,8 +2,11 @@ using System.Runtime.Versioning;
 using System.Text;
 
 using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.ProgressReporters;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
@@ -472,6 +475,173 @@ internal class FileOperationServiceTests : IDisposable
         _configManagerMock.Verify(cm => cm.AddToFileHistory(It.IsAny<string>()), Times.Never);
     }
 
+    [TestCase(MultiFileDecision.SingleFiles)]
+    [TestCase(MultiFileDecision.MultiFile)]
+    [TestCase(MultiFileDecision.Cancel)]
+    public void LoadDroppedFiles_Ask_UsesOnlyTheConfirmedSelection (MultiFileDecision choice)
+    {
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        string[] selected = [@"C:\logs\nested\b.log", @"C:\logs\a.log"];
+        string[]? combined = null;
+        _sut.FileOpened += (_, e) => combined = e.MultiFileNames;
+
+        _sut.LoadDroppedFiles(selected, invertLogic: true, () => choice);
+
+        string[] expected = [@"C:\logs\a.log", @"C:\logs\nested\b.log"];
+        if (choice == MultiFileDecision.SingleFiles)
+        {
+            Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(expected));
+        }
+        else if (choice == MultiFileDecision.MultiFile)
+        {
+            Assert.That(combined, Is.EqualTo(expected));
+        }
+        else
+        {
+            Assert.That(_factoryCalls, Is.Empty);
+        }
+    }
+
+    [TestCase(-1, false, 2)]
+    [TestCase(0, false, 1)]
+    [TestCase(1, false, 1)]
+    [TestCase(0, true, 1)]
+    [TestCase(1, true, 1)]
+    public void LoadDroppedFiles_CombinedChoice_ReadsAccessibleSelectedFiles (int unavailableIndex, bool lockFile, int expectedLines)
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+        var first = Path.Join(directory, "a.log");
+        var second = Path.Join(directory, "b.txt");
+        File.WriteAllText(first, "first\n");
+        File.WriteAllText(second, "second\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        var lineCount = -1;
+        FileStream? lockedFile = null;
+        _sut.FileOpened += (_, e) =>
+        {
+            if (e.MultiFileNames == null)
+            {
+                return;
+            }
+            // Exercise the same reader endpoint used by LogWindow.LoadFilesAsMulti.
+            using var reader = new LogfileReader(e.MultiFileNames,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+            reader.ReadFiles();
+            lineCount = reader.GetLogLineMemories(0, 10).Length;
+        };
+        try
+        {
+            if (unavailableIndex >= 0)
+            {
+                var unavailableFile = unavailableIndex == 0 ? first : second;
+                if (lockFile)
+                {
+                    lockedFile = new FileStream(unavailableFile, FileMode.Open, FileAccess.Read, FileShare.None);
+                }
+                else
+                {
+                    File.Delete(unavailableFile);
+                }
+            }
+
+            _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.MultiFile);
+            Assert.That(lineCount, Is.EqualTo(expectedLines));
+        }
+        finally
+        {
+            lockedFile?.Dispose();
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void LoadDroppedFiles_UnavailableFile_DoesNotBlockRemainingSelection (bool accessDenied)
+    {
+        _settings.Preferences.MultiFileOption = MultiFileOption.SingleFiles;
+        var service = new FileOperationService(_configManagerMock.Object, _tabControllerMock.Object,
+            _ledServiceMock.Object, _pluginRegistryMock.Object,
+            (request, encoding) => request.FileName == "a.log"
+                ? throw (accessDenied ? new UnauthorizedAccessException() : new IOException())
+                : _factory(request, encoding), () => null, (_, _) => { });
+
+        service.LoadDroppedFiles(["a.log", "b.log"], false, () => MultiFileDecision.Cancel);
+
+        Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(["b.log"]));
+    }
+
+    [Test]
+    public void LoadDroppedFiles_CombinedSessionAndLog_DoesNotOpenUnselectedRotations ()
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+        var log = Path.Join(directory, "b.log");
+        var session = Path.Join(directory, "session.lxj");
+        File.WriteAllText(log, "selected\n");
+        File.WriteAllText(log + ".1", "unselected\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        string[] observed = [];
+        _sut.FileOpened += (_, e) =>
+        {
+            using var reader = new LogfileReader(e.MultiFileNames!,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+            reader.ReadFiles();
+            observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
+        };
+        try
+        {
+            _sut.LoadDroppedFiles([session, log], false, () => MultiFileDecision.MultiFile);
+            Assert.That(observed, Is.EqualTo(["selected"]));
+            Assert.That(_projectCallbackCalls.Select(call => call.FileName), Is.EqualTo([session]));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
+    public void LoadDroppedFiles_CombinedSelectionAfterTruncation_KeepsOnlySelectedPaths ()
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+        var first = Path.Join(directory, "a.log");
+        var second = Path.Join(directory, "b.log");
+        File.WriteAllText(first, "first\n");
+        File.WriteAllText(second, "second line before truncation\n");
+        File.WriteAllText(second + ".1", "unselected\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.MultiFile;
+        string[] observed = [];
+        string[] paths = [];
+        _sut.FileOpened += (_, e) =>
+        {
+            using var reader = new LogfileReader(e.MultiFileNames!,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+            reader.ReadFiles();
+            File.WriteAllText(second, "short\n");
+            _ = reader.ShiftBuffers();
+            paths = reader.GetLogFileInfoList().Select(info => info.FullName).ToArray();
+            observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
+        };
+        try
+        {
+            _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.Cancel);
+            Assert.Multiple(() =>
+            {
+                Assert.That(paths, Is.EqualTo([first, second]));
+                Assert.That(observed, Is.EqualTo(["first", "short"]));
+            });
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     [Test]
     public void LoadFilesWithOption_SingleFile_CallsAddFileTab ()
     {
@@ -866,7 +1036,7 @@ internal class FileOperationServiceTests : IDisposable
         // Assert — restoring tabs must not empty the persisted list: SaveLastOpenFilesList owns it,
         // so a crash mid-session still leaves the files to restore next time
         _configManagerMock.Verify(cm => cm.ClearLastOpenFilesList(), Times.Never);
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "file1.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["file1.log"]));
     }
 
     [Test]
@@ -967,7 +1137,7 @@ internal class FileOperationServiceTests : IDisposable
         _sut.SaveLastOpenFilesList();
 
         // Assert — the saved list holds the current tabs only, not the stale ones
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "current.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["current.log"]));
     }
 
     [Test]
@@ -991,7 +1161,7 @@ internal class FileOperationServiceTests : IDisposable
         secondService.SaveLastOpenFilesList();
 
         // Assert
-        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(new[] { "first.log", "second.log" }));
+        Assert.That(_settings.LastOpenFilesList, Is.EqualTo(["first.log", "second.log"]));
     }
 
     [Test]

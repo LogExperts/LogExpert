@@ -16,7 +16,7 @@ internal sealed class CommandLineOptionsTests
         var result = options.Parse(["application.log", option, "1234"]);
 
         Assert.That(result.Errors, Is.Empty);
-        Assert.That(result.GetValue(options.FilesArgument), Is.EqualTo(new[] { "application.log" }));
+        Assert.That(result.GetValue(options.FilesArgument), Is.EqualTo(["application.log"]));
         Assert.That(result.GetValue(options.LineOption), Is.EqualTo(1234));
     }
 

@@ -23,16 +23,16 @@ public class SelectionPainterTests
     {
         var settings = new SelectionHighlightSettings { Outline = outline, CustomColor = Color.Magenta };
         var context = new Mock<ILogPaintContextUI>();
-        context.SetupGet(c => c.SelectionHighlight).Returns(settings);
-        context.Setup(c => c.GetLogLineMemory(It.IsAny<int>())).Returns(new LogLine("WORD plain", 0));
-        context.Setup(c => c.FindHighlightEntry(It.IsAny<ITextValueMemory>(), true))
+        _ = context.SetupGet(c => c.SelectionHighlight).Returns(settings);
+        _ = context.Setup(c => c.GetLogLineMemory(It.IsAny<int>())).Returns(new LogLine("WORD plain", 0));
+        _ = context.Setup(c => c.FindHighlightEntry(It.IsAny<ITextValueMemory>(), true))
             .Returns(new HighlightEntry { BackgroundColor = Color.LightSalmon, ForegroundColor = Color.Black });
-        context.Setup(c => c.FindHighlightMatches(It.IsAny<ITextValueMemory>())).Returns(() => new List<HighlightMatchEntry>
+        _ = context.Setup(c => c.FindHighlightMatches(It.IsAny<ITextValueMemory>())).Returns(() => new List<HighlightMatchEntry>
         {
             new() { StartPos = 0, Length = 4, HighlightEntry = new() { IsWordMatch = true, BackgroundColor = Color.Yellow, ForegroundColor = Color.Red } }
         });
-        context.SetupGet(c => c.NormalFont).Returns(() => new Font("Consolas", 10));
-        context.SetupGet(c => c.BoldFont).Returns(() => new Font("Consolas", 10, FontStyle.Bold));
+        _ = context.SetupGet(c => c.NormalFont).Returns(() => new Font("Consolas", 10));
+        _ = context.SetupGet(c => c.BoldFont).Returns(() => new Font("Consolas", 10, FontStyle.Bold));
         using var form = new Form { ClientSize = new Size(320, 180) };
         using var grid = new BufferedDataGridView
         {
@@ -40,7 +40,7 @@ public class SelectionPainterTests
             ColumnHeadersVisible = false, CellBorderStyle = DataGridViewCellBorderStyle.None,
             SelectionMode = DataGridViewSelectionMode.FullRowSelect, SelectionHighlight = settings
         };
-        grid.Columns.Add(new DataGridViewTextBoxColumn { Width = 280 });
+        _ = grid.Columns.Add(new DataGridViewTextBoxColumn { Width = 280 });
         grid.RowCount = 2;
         grid.CellValueNeeded += (_, e) => e.Value = new Column { FullValue = "WORD plain".AsMemory() };
         grid.CellPainting += (_, e) => PaintHelper.CellPainting(context.Object, grid.Focused, e.RowIndex, e.ColumnIndex, e);
@@ -68,9 +68,9 @@ public class SelectionPainterTests
             SelectionMode = DataGridViewSelectionMode.FullRowSelect,
             SelectionHighlight = new() { Outline = true, CustomColor = Color.Magenta }
         };
-        grid.Columns.Add("a", "A");
-        grid.Columns.Add("b", "B");
-        grid.Rows.Add(4);
+        _ = grid.Columns.Add("a", "A");
+        _ = grid.Columns.Add("b", "B");
+        _ = grid.Rows.Add(4);
         // Supply highlighted content beneath the selection overlay.
         grid.DefaultCellStyle.BackColor = Color.Khaki;
         grid.DefaultCellStyle.SelectionBackColor = Color.Khaki;
@@ -136,7 +136,7 @@ public class SelectionPainterTests
     {
         using var grid = CreateGrid();
         grid.SelectionMode = DataGridViewSelectionMode.CellSelect;
-        grid.Columns.Add("hidden", "Hidden");
+        _ = grid.Columns.Add("hidden", "Hidden");
         grid.Columns[2].Visible = false;
         grid.Columns[1].DisplayIndex = 0;
         grid[0, 0].Selected = true;
@@ -164,9 +164,9 @@ public class SelectionPainterTests
     private static DataGridView CreateGrid ()
     {
         var grid = new DataGridView { AllowUserToAddRows = false, SelectionMode = DataGridViewSelectionMode.FullRowSelect };
-        grid.Columns.Add("a", "A");
-        grid.Columns.Add("b", "B");
-        grid.Rows.Add(4);
+        _ = grid.Columns.Add("a", "A");
+        _ = grid.Columns.Add("b", "B");
+        _ = grid.Rows.Add(4);
         grid.ClearSelection();
         return grid;
     }

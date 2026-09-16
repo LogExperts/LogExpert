@@ -115,7 +115,7 @@ public class ControlCharStyleFormatterTests
     [TestCase(-1)]
     public void Format_OutOfScopeCodepoint_Throws (int codepoint)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
+        _ = Assert.Throws<ArgumentOutOfRangeException>(
             () => ControlCharStyleFormatter.Format(codepoint, ControlCharStyle.ControlPictures));
     }
 }

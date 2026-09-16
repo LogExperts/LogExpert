@@ -63,7 +63,7 @@ public class HighlightEvaluatorTests
 
         var result = HighlightEvaluator.FindMatchingEntries(entries, Line("warn: an error occurred"));
 
-        Assert.That(result, Is.EqualTo(new[] { error, warn }));
+        Assert.That(result, Is.EqualTo([error, warn]));
     }
 
     [Test]
