@@ -153,7 +153,7 @@ public class MarkerBarTests
         bar.SetBuckets([[new MarkerBucket(4, 20, 29, 2, 24, Color.Orange.ToArgb())], [], [], []], 16, false);
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
-        var path = Path.Combine(TestContext.CurrentContext.WorkDirectory, "marker-bar.png");
+        var path = Path.Join(TestContext.CurrentContext.WorkDirectory, "marker-bar.png");
         image.Save(path, System.Drawing.Imaging.ImageFormat.Png);
         TestContext.AddTestAttachment(path);
         Assert.That(File.Exists(path), Is.True);
