@@ -85,6 +85,14 @@ public class BookmarkDataProvider : IBookmarkData
         }
     }
 
+    public int[] GetBookmarkLineNumbers ()
+    {
+        lock (_bookmarkListLock)
+        {
+            return [.. BookmarkList.Keys];
+        }
+    }
+
     public Entities.Bookmark GetBookmarkForLine (int lineNum)
     {
         lock (_bookmarkListLock)
@@ -148,19 +156,22 @@ public class BookmarkDataProvider : IBookmarkData
 
     public void ShiftBookmarks (int offset)
     {
-        SortedList<int, Entities.Bookmark> newBookmarkList = [];
-
-        foreach (var bookmark in BookmarkList.Values)
+        lock (_bookmarkListLock)
         {
-            var line = bookmark.LineNum - offset;
-            if (line >= 0)
-            {
-                bookmark.LineNum = line;
-                newBookmarkList.Add(line, bookmark);
-            }
-        }
+            SortedList<int, Entities.Bookmark> newBookmarkList = [];
 
-        BookmarkList = newBookmarkList;
+            foreach (var bookmark in BookmarkList.Values)
+            {
+                var line = bookmark.LineNum - offset;
+                if (line >= 0)
+                {
+                    bookmark.LineNum = line;
+                    newBookmarkList.Add(line, bookmark);
+                }
+            }
+
+            BookmarkList = newBookmarkList;
+        }
     }
 
     public int FindPrevBookmarkIndex (int lineNum)

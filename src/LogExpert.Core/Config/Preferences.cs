@@ -156,6 +156,16 @@ public class Preferences
 
     public bool ShowBubbles { get; set; } = true;
 
+    public bool ShowMarkerBar { get; set; }
+
+    public bool ShowHighlightMarkers { get; set; } = true;
+
+    public bool ShowBookmarkMarkers { get; set; } = true;
+
+    public bool ShowSearchMarkers { get; set; } = true;
+
+    public bool ShowFilterMarkers { get; set; } = true;
+
     public bool ShowColumnFinder { get; set; }
 
     public Color ShowTailColor { get; set; } = Color.FromKnownColor(KnownColor.Blue);

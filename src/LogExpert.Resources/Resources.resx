@@ -2331,4 +2331,31 @@ Restart LogExpert to apply changes?</value>
   <data name="FolderDrop_Page" xml:space="preserve">
     <value>{0:N0}–{1:N0} of {2:N0} matches</value>
   </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
+    <value>Marker bar</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar" xml:space="preserve">
+    <value>Show marker bar</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers" xml:space="preserve">
+    <value>Show highlight markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers" xml:space="preserve">
+    <value>Show bookmark markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers" xml:space="preserve">
+    <value>Show search markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
+    <value>Show filter markers</value>
+  </data>
+  <data name="MarkerBar_Highlights" xml:space="preserve"><value>Highlights</value></data>
+  <data name="MarkerBar_Bookmarks" xml:space="preserve"><value>Bookmarks</value></data>
+  <data name="MarkerBar_SearchHits" xml:space="preserve"><value>Search hits</value></data>
+  <data name="MarkerBar_FilterHits" xml:space="preserve"><value>Filter hits</value></data>
+  <data name="MarkerBar_ClearSearch" xml:space="preserve"><value>Clear search</value></data>
+  <data name="MarkerBar_Discovering" xml:space="preserve"><value>Discovering markers…</value></data>
+  <data name="MarkerBar_ToolTip" xml:space="preserve"><value>{0}: lines {1}–{2}, {3} matching lines</value></data>
+  <data name="MarkerBar_ScanFailed" xml:space="preserve"><value>Marker discovery failed: {0}</value></data>
+  <data name="MarkerBar_Title" xml:space="preserve"><value>Marker bar</value></data>
 </root>

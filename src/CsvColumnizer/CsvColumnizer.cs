@@ -17,7 +17,7 @@ namespace CsvColumnizer;
 /// The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
 /// the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
 /// </summary>
-public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IColumnizerConfiguratorMemory, IPreProcessColumnizerMemory, IColumnizerPriorityMemory
+public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IColumnizerConfiguratorMemory, IPreProcessColumnizerMemory, IColumnizerPriorityMemory, ICloneable
 {
     #region Fields
 
@@ -218,6 +218,35 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     public void DeSelected (ILogLineMemoryColumnizerCallback callback)
     {
         // nothing to do
+    }
+
+    public object Clone ()
+    {
+        CsvColumnizerConfig config = new()
+        {
+            CommentChar = _config.CommentChar,
+            DelimiterChar = _config.DelimiterChar,
+            EscapeChar = _config.EscapeChar,
+            HasFieldNames = _config.HasFieldNames,
+            MinColumns = _config.MinColumns,
+            QuoteChar = _config.QuoteChar,
+            VersionBuild = _config.VersionBuild
+        };
+        config.ConfigureReaderConfiguration();
+
+        CsvColumnizer clone = new()
+        {
+            _config = config,
+            _isValidCsv = _isValidCsv,
+            _firstLine = _firstLine == null ? null : new CsvLogLine(_firstLine.FullLine.ToString(), _firstLine.LineNumber)
+        };
+
+        foreach (var column in _columnList)
+        {
+            clone._columnList.Add(new CsvColumn(column.Name));
+        }
+
+        return clone;
     }
 
     public void Configure (ILogLineMemoryColumnizerCallback callback, string configDir)

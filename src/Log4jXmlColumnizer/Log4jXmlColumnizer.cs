@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 [assembly: SupportedOSPlatform("windows")]
 namespace Log4jXmlColumnizer;
 
-public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfiguratorMemory, IColumnizerPriorityMemory
+public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfiguratorMemory, IColumnizerPriorityMemory, ICloneable
 {
     #region Fields
 
@@ -276,6 +276,24 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
                 _config = new Log4jXmlColumnizerConfig(GetAllColumnNames());
             }
         }
+    }
+
+    public object Clone ()
+    {
+        Log4jXmlColumnizer clone = new()
+        {
+            _config = new Log4jXmlColumnizerConfig(GetAllColumnNames())
+            {
+                LocalTimestamps = _config.LocalTimestamps,
+                ColumnList = [.. _config.ColumnList.Select(entry => new Log4jColumnEntry(entry.ColumnName, entry.ColumnIndex, entry.MaxLen)
+                {
+                    Visible = entry.Visible
+                })]
+            },
+            _timeOffset = _timeOffset
+        };
+
+        return clone;
     }
 
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
