@@ -23,94 +23,7 @@ namespace LogExpert {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
-        public static string HighlightDialog_UI_SelectionHighlight {
-            get { return ResourceManager.GetString("HighlightDialog_UI_SelectionHighlight", resourceCulture); }
-        }
-
-        public static string HighlightDialog_UI_OutlineSelectedBlocks {
-            get { return ResourceManager.GetString("HighlightDialog_UI_OutlineSelectedBlocks", resourceCulture); }
-        }
-
-        public static string HighlightDialog_UI_ChangeSelectionColor {
-            get { return ResourceManager.GetString("HighlightDialog_UI_ChangeSelectionColor", resourceCulture); }
-        }
-
-        public static string HighlightDialog_UI_ResetSelectionColor {
-            get { return ResourceManager.GetString("HighlightDialog_UI_ResetSelectionColor", resourceCulture); }
-        }
         
-        public static string FolderDrop_Title {
-            get { return ResourceManager.GetString("FolderDrop_Title", resourceCulture); }
-        }
-
-        public static string FolderDrop_Discovering {
-            get { return ResourceManager.GetString("FolderDrop_Discovering", resourceCulture); }
-        }
-
-        public static string FolderDrop_Instructions {
-            get { return ResourceManager.GetString("FolderDrop_Instructions", resourceCulture); }
-        }
-
-        public static string FolderDrop_Filter {
-            get { return ResourceManager.GetString("FolderDrop_Filter", resourceCulture); }
-        }
-
-        public static string FolderDrop_SelectAll {
-            get { return ResourceManager.GetString("FolderDrop_SelectAll", resourceCulture); }
-        }
-
-        public static string FolderDrop_SelectNone {
-            get { return ResourceManager.GetString("FolderDrop_SelectNone", resourceCulture); }
-        }
-
-        public static string FolderDrop_Open {
-            get { return ResourceManager.GetString("FolderDrop_Open", resourceCulture); }
-        }
-
-        public static string FolderDrop_Cancel {
-            get { return ResourceManager.GetString("FolderDrop_Cancel", resourceCulture); }
-        }
-
-        public static string FolderDrop_Path {
-            get { return ResourceManager.GetString("FolderDrop_Path", resourceCulture); }
-        }
-
-        public static string FolderDrop_Select {
-            get { return ResourceManager.GetString("FolderDrop_Select", resourceCulture); }
-        }
-
-        public static string FolderDrop_Summary {
-            get { return ResourceManager.GetString("FolderDrop_Summary", resourceCulture); }
-        }
-
-        public static string FolderDrop_Empty {
-            get { return ResourceManager.GetString("FolderDrop_Empty", resourceCulture); }
-        }
-
-        public static string FolderDrop_Skipped {
-            get { return ResourceManager.GetString("FolderDrop_Skipped", resourceCulture); }
-        }
-
-        public static string FolderDrop_DirectoryLink {
-            get { return ResourceManager.GetString("FolderDrop_DirectoryLink", resourceCulture); }
-        }
-
-        public static string FolderDrop_Failed {
-            get { return ResourceManager.GetString("FolderDrop_Failed", resourceCulture); }
-        }
-
-        public static string FolderDrop_Previous {
-            get { return ResourceManager.GetString("FolderDrop_Previous", resourceCulture); }
-        }
-
-        public static string FolderDrop_Next {
-            get { return ResourceManager.GetString("FolderDrop_Next", resourceCulture); }
-        }
-
-        public static string FolderDrop_Page {
-            get { return ResourceManager.GetString("FolderDrop_Page", resourceCulture); }
-        }
-
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
@@ -872,6 +785,168 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string FolderDrop_Cancel {
+            get {
+                return ResourceManager.GetString("FolderDrop_Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Directory link skipped (junction or symbolic link)..
+        /// </summary>
+        public static string FolderDrop_DirectoryLink {
+            get {
+                return ResourceManager.GetString("FolderDrop_DirectoryLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Discovering files… Cancel to open nothing..
+        /// </summary>
+        public static string FolderDrop_Discovering {
+            get {
+                return ResourceManager.GetString("FolderDrop_Discovering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No eligible files were found. Automatically discovered .lxp and .lxj files are excluded..
+        /// </summary>
+        public static string FolderDrop_Empty {
+            get {
+                return ResourceManager.GetString("FolderDrop_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not prepare the dropped files: {0}.
+        /// </summary>
+        public static string FolderDrop_Failed {
+            get {
+                return ResourceManager.GetString("FolderDrop_Failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter paths:.
+        /// </summary>
+        public static string FolderDrop_Filter {
+            get {
+                return ResourceManager.GetString("FolderDrop_Filter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the files to open. No files are selected automatically..
+        /// </summary>
+        public static string FolderDrop_Instructions {
+            get {
+                return ResourceManager.GetString("FolderDrop_Instructions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Next.
+        /// </summary>
+        public static string FolderDrop_Next {
+            get {
+                return ResourceManager.GetString("FolderDrop_Next", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open selected.
+        /// </summary>
+        public static string FolderDrop_Open {
+            get {
+                return ResourceManager.GetString("FolderDrop_Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0}–{1:N0} of {2:N0} matches.
+        /// </summary>
+        public static string FolderDrop_Page {
+            get {
+                return ResourceManager.GetString("FolderDrop_Page", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Full path.
+        /// </summary>
+        public static string FolderDrop_Path {
+            get {
+                return ResourceManager.GetString("FolderDrop_Path", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        public static string FolderDrop_Previous {
+            get {
+                return ResourceManager.GetString("FolderDrop_Previous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string FolderDrop_Select {
+            get {
+                return ResourceManager.GetString("FolderDrop_Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select all matching.
+        /// </summary>
+        public static string FolderDrop_SelectAll {
+            get {
+                return ResourceManager.GetString("FolderDrop_SelectAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select none.
+        /// </summary>
+        public static string FolderDrop_SelectNone {
+            get {
+                return ResourceManager.GetString("FolderDrop_SelectNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} locations were skipped:.
+        /// </summary>
+        public static string FolderDrop_Skipped {
+            get {
+                return ResourceManager.GetString("FolderDrop_Skipped", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0:N0} files; {1:N0} matching; {2:N0} selected..
+        /// </summary>
+        public static string FolderDrop_Summary {
+            get {
+                return ResourceManager.GetString("FolderDrop_Summary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open files from folders.
+        /// </summary>
+        public static string FolderDrop_Title {
+            get {
+                return ResourceManager.GetString("FolderDrop_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Line number:.
         /// </summary>
         public static string GotoLineDialog_UI_Label_LineNumber {
@@ -985,6 +1060,15 @@ namespace LogExpert {
         public static string HighlightDialog_UI_Button_SelectPlugin {
             get {
                 return ResourceManager.GetString("HighlightDialog_UI_Button_SelectPlugin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Change selection highlight color....
+        /// </summary>
+        public static string HighlightDialog_UI_ChangeSelectionColor {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_ChangeSelectionColor", resourceCulture);
             }
         }
         
@@ -1107,7 +1191,7 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Settings (*.json)|*.json|All files (*.*).
+        ///   Looks up a localized string similar to Settings (*.json)|*.json|All files (*.*)|*.*.
         /// </summary>
         public static string HighlightDialog_UI_Export_Filter {
             get {
@@ -1229,6 +1313,33 @@ namespace LogExpert {
         public static string HighlightDialog_UI_OpenFileFilter_Audio {
             get {
                 return ResourceManager.GetString("HighlightDialog_UI_OpenFileFilter_Audio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Outline selected blocks.
+        /// </summary>
+        public static string HighlightDialog_UI_OutlineSelectedBlocks {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_OutlineSelectedBlocks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use system color.
+        /// </summary>
+        public static string HighlightDialog_UI_ResetSelectionColor {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_ResetSelectionColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection highlight (all groups).
+        /// </summary>
+        public static string HighlightDialog_UI_SelectionHighlight {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_SelectionHighlight", resourceCulture);
             }
         }
         
@@ -5281,15 +5392,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Color mode (restart required).
-        /// </summary>
-        public static string SettingsDialog_UI_Label_labelColorMode {
-            get {
-                return ResourceManager.GetString("SettingsDialog_UI_Label_labelColorMode", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Filter tail enabled.
         /// </summary>
         public static string SettingsDialog_UI_CheckBox_checkBoxFilterTail {
@@ -5781,6 +5883,15 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Label_labelArguments {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Label_labelArguments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color mode (restart required).
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelColorMode {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelColorMode", resourceCulture);
             }
         }
         
