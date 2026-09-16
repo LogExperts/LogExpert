@@ -4,9 +4,9 @@ using System.Text;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Log.ProgressReporters;
-using LogExpert.Core.Enums;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
@@ -509,10 +509,10 @@ internal class FileOperationServiceTests : IDisposable
     [TestCase(1, true, 1)]
     public void LoadDroppedFiles_CombinedChoice_ReadsAccessibleSelectedFiles (int unavailableIndex, bool lockFile, int expectedLines)
     {
-        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
         Directory.CreateDirectory(directory);
-        var first = Path.Combine(directory, "a.log");
-        var second = Path.Combine(directory, "b.txt");
+        var first = Path.Join(directory, "a.log");
+        var second = Path.Join(directory, "b.txt");
         File.WriteAllText(first, "first\n");
         File.WriteAllText(second, "second\n");
         _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
@@ -574,10 +574,10 @@ internal class FileOperationServiceTests : IDisposable
     [Test]
     public void LoadDroppedFiles_CombinedSessionAndLog_DoesNotOpenUnselectedRotations ()
     {
-        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
         Directory.CreateDirectory(directory);
-        var log = Path.Combine(directory, "b.log");
-        var session = Path.Combine(directory, "session.lxj");
+        var log = Path.Join(directory, "b.log");
+        var session = Path.Join(directory, "session.lxj");
         File.WriteAllText(log, "selected\n");
         File.WriteAllText(log + ".1", "unselected\n");
         _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
@@ -605,10 +605,10 @@ internal class FileOperationServiceTests : IDisposable
     [Test]
     public void LoadDroppedFiles_CombinedSelectionAfterTruncation_KeepsOnlySelectedPaths ()
     {
-        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
         Directory.CreateDirectory(directory);
-        var first = Path.Combine(directory, "a.log");
-        var second = Path.Combine(directory, "b.log");
+        var first = Path.Join(directory, "a.log");
+        var second = Path.Join(directory, "b.log");
         File.WriteAllText(first, "first\n");
         File.WriteAllText(second, "second line before truncation\n");
         File.WriteAllText(second + ".1", "unselected\n");
