@@ -527,7 +527,7 @@ internal class FileOperationServiceTests : IDisposable
             // Exercise the same reader endpoint used by LogWindow.LoadFilesAsMulti.
             using var reader = new LogfileReader(e.MultiFileNames,
                 new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
-                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance);
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
             reader.ReadFiles();
             lineCount = reader.GetLogLineMemories(0, 10).Length;
         };
@@ -569,6 +569,76 @@ internal class FileOperationServiceTests : IDisposable
         service.LoadDroppedFiles(["a.log", "b.log"], false, () => MultiFileDecision.Cancel);
 
         Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(new[] { "b.log" }));
+    }
+
+    [Test]
+    public void LoadDroppedFiles_CombinedSessionAndLog_DoesNotOpenUnselectedRotations ()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(directory);
+        var log = Path.Combine(directory, "b.log");
+        var session = Path.Combine(directory, "session.lxj");
+        File.WriteAllText(log, "selected\n");
+        File.WriteAllText(log + ".1", "unselected\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        string[] observed = [];
+        _sut.FileOpened += (_, e) =>
+        {
+            using var reader = new LogfileReader(e.MultiFileNames!,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+            reader.ReadFiles();
+            observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
+        };
+        try
+        {
+            _sut.LoadDroppedFiles([session, log], false, () => MultiFileDecision.MultiFile);
+            Assert.That(observed, Is.EqualTo(new[] { "selected" }));
+            Assert.That(_projectCallbackCalls.Select(call => call.FileName), Is.EqualTo(new[] { session }));
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
+    public void LoadDroppedFiles_CombinedSelectionAfterTruncation_KeepsOnlySelectedPaths ()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(directory);
+        var first = Path.Combine(directory, "a.log");
+        var second = Path.Combine(directory, "b.log");
+        File.WriteAllText(first, "first\n");
+        File.WriteAllText(second, "second line before truncation\n");
+        File.WriteAllText(second + ".1", "unselected\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.MultiFile;
+        string[] observed = [];
+        string[] paths = [];
+        _sut.FileOpened += (_, e) =>
+        {
+            using var reader = new LogfileReader(e.MultiFileNames!,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+            reader.ReadFiles();
+            File.WriteAllText(second, "short\n");
+            reader.ShiftBuffers();
+            paths = reader.GetLogFileInfoList().Select(info => info.FullName).ToArray();
+            observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
+        };
+        try
+        {
+            _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.Cancel);
+            Assert.Multiple(() =>
+            {
+                Assert.That(paths, Is.EqualTo(new[] { first, second }));
+                Assert.That(observed, Is.EqualTo(new[] { "first", "short" }));
+            });
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
     }
 
     [Test]

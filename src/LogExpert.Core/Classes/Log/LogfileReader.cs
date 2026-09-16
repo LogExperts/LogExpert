@@ -95,7 +95,8 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         ReaderType readerType,
         IPluginRegistry pluginRegistry,
         int maximumLineLength,
-        ILoadProgressReporter? progressReporter = null)
+        ILoadProgressReporter? progressReporter = null,
+        bool useExplicitFileList = false)
         : this(
               fileNames,
               encodingOptions,
@@ -106,7 +107,8 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
               readerType,
               pluginRegistry,
               maximumLineLength,
-              progressReporter)
+              progressReporter,
+              useExplicitFileList)
     {
         // In this overload, we assume multiFile is always true.
     }
@@ -122,7 +124,8 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         ReaderType readerType,
         IPluginRegistry pluginRegistry,
         int maximumLineLength,
-        ILoadProgressReporter? progressReporter = null)
+        ILoadProgressReporter? progressReporter = null,
+        bool useExplicitFileList = false)
     {
         // Validate input: at least one file must be provided.
         if (fileNames == null || fileNames.Length < 1)
@@ -152,7 +155,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         ILogFileInfo fileInfo = null;
 
         IsMultiFile = multiFile;
-        _hasExplicitFileList = fileNames.Length > 1;
+        _hasExplicitFileList = useExplicitFileList || fileNames.Length > 1;
         _fileName = fileNames[0];
 
         IEnumerable<string> names = _hasExplicitFileList ? fileNames : IsMultiFile
@@ -304,6 +307,11 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     //TODO: Make this private
     public void ReadFiles ()
     {
+        ReadFiles(notifyChanges: true);
+    }
+
+    private void ReadFiles (bool notifyChanges)
+    {
         FileSize = 0;
 
         _isDeleted = false;
@@ -340,15 +348,18 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
             LineCount = 0;
         }
 
-        LogEventArgs args = new()
+        if (notifyChanges)
         {
-            PrevFileSize = 0,
-            PrevLineCount = 0,
-            LineCount = LineCount,
-            FileSize = FileSize
-        };
+            LogEventArgs args = new()
+            {
+                PrevFileSize = 0,
+                PrevLineCount = 0,
+                LineCount = LineCount,
+                FileSize = FileSize
+            };
 
-        OnFileSizeChanged(args);
+            OnFileSizeChanged(args);
+        }
     }
 
     /// <summary>
@@ -367,6 +378,14 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     //TODO: Make this private
     public int ShiftBuffers ()
     {
+        if (_hasExplicitFileList)
+        {
+            // A selected batch keeps its paths after truncation; rollover discovery could
+            // discard selected files and introduce unselected siblings.
+            ReadFiles(notifyChanges: false);
+            return 0;
+        }
+
         _logger.Info(CultureInfo.InvariantCulture, "ShiftBuffers() begin for {0}{1}", _fileName, IsMultiFile ? " (MultiFile)" : "");
 
         using var writeLock = BufferIndex.AcquireWriteLock();
