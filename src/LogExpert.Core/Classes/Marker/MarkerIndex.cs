@@ -123,8 +123,9 @@ public sealed class MarkerIndex : IDisposable
 
     private void Scan (ILogfileReader reader, MarkerCriteria criteria,
         Func<int, ILogLineMemory, IReadOnlyList<ITextValueMemory>>? columns,
-        MarkerSnapshot previous, int lineCount, int generation, CancellationTokenSource cts)
+        MarkerSnapshot previous, int lineCount, int generation, CancellationTokenSource cancellationSource)
     {
+        using var scanCancellation = cancellationSource;
         var start = Math.Max(0, previous.ScannedLineCount - 1);
         List<MarkerLine[]> chunks = [];
         List<MarkerLine> pending = new(MATCH_CHUNK_SIZE);
@@ -147,16 +148,16 @@ public sealed class MarkerIndex : IDisposable
 
             for (var batchStart = start; batchStart < lineCount;)
             {
-                cts.Token.ThrowIfCancellationRequested();
+                scanCancellation.Token.ThrowIfCancellationRequested();
                 var batchEnd = (int)Math.Min((long)batchStart + READ_BATCH_SIZE, lineCount);
                 // Pin before reading and release after this small batch, never for the whole file.
                 using var pin = (reader as IBufferPinning)?.PinRange(batchStart, batchEnd - 1);
                 for (var lineNumber = batchStart; lineNumber < batchEnd; lineNumber++)
                 {
-                    cts.Token.ThrowIfCancellationRequested();
+                    scanCancellation.Token.ThrowIfCancellationRequested();
                     var line = reader.GetLogLineMemory(lineNumber)
                         ?? throw new IOException();
-                    var match = criteria.Match(lineNumber, line, columns, cts.Token);
+                    var match = criteria.Match(lineNumber, line, columns, scanCancellation.Token);
                     if (match.HasValue)
                     {
                         pending.Add(match.Value);
@@ -173,7 +174,7 @@ public sealed class MarkerIndex : IDisposable
                 batchStart = batchEnd;
             }
         }
-        catch (OperationCanceledException) when (cts.IsCancellationRequested)
+        catch (OperationCanceledException) when (scanCancellation.IsCancellationRequested)
         {
             // Reset/disposal owns invalidation; the generation check below rejects this result.
         }
@@ -198,8 +199,6 @@ public sealed class MarkerIndex : IDisposable
                     _scanCts = null;
                 }
             }
-
-            cts.Dispose();
         }
     }
 }

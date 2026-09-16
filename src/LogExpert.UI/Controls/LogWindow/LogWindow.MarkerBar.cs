@@ -67,7 +67,7 @@ internal partial class LogWindow
             _markerBar.ClearBuckets();
         }
 
-        tableLayoutPanel1.ColumnStyles[2].Width = visibility.ShowMarkerBar ? (int)Math.Round(28 * DeviceDpi / 96d) : 0;
+        tableLayoutPanel1.ColumnStyles[2].Width = visibility.ShowMarkerBar ? (int)Math.Round(28d * DeviceDpi / 96d) : 0;
         _markerBar.Visible = visibility.ShowMarkerBar;
         _markerBar.BackColor = dataGridView.BackgroundColor;
         _markerBar.ForeColor = dataGridView.ForeColor;
