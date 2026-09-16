@@ -1,6 +1,9 @@
 using System.Globalization;
 using System.Reflection;
 
+using ColumnizerLib;
+
+using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Marker;
 using LogExpert.UI.Controls.LogWindow;
 
@@ -14,16 +17,33 @@ namespace LogExpert.Tests.UI;
 public class MarkerBarTests
 {
     [Test]
+    public void Paint_BoldOnlyHighlightUsesTheCurrentForeground ()
+    {
+        var criteria = MarkerCriteria.ForHighlights([new HighlightEntry { SearchText = "hit", IsBold = true }]);
+        var match = criteria.Match(0, new LogLine("hit", 0));
+        Assert.That(match, Is.Not.Null);
+        using var bar = CreateBar(40, 10);
+        bar.BackColor = Color.White;
+        bar.ForeColor = Color.Green;
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Highlights] = MarkerBucket.Aggregate([match!.Value], 1, 10) }, 10, false);
+
+        using var image = new Bitmap(bar.Width, bar.Height);
+        bar.DrawToBitmap(image, bar.ClientRectangle);
+
+        Assert.That(image.GetPixel(5, 0).ToArgb(), Is.EqualTo(Color.Green.ToArgb()));
+    }
+
+    [Test]
     public void Paint_RendersEachLaneBucketWithItsColor ()
     {
         using var bar = CreateBar(40, 10);
-        bar.SetBuckets(
-        [
-            [new MarkerBucket(2, 10, 19, 1, 12, Color.Red.ToArgb())],
-            [new MarkerBucket(2, 20, 29, 1, 22, Color.Green.ToArgb())],
-            [new MarkerBucket(2, 30, 39, 1, 32, Color.Blue.ToArgb())],
-            [new MarkerBucket(2, 40, 49, 1, 42, Color.Purple.ToArgb())]
-        ], 10, discovering: false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>
+        {
+            [MarkerSource.Highlights] = [new MarkerBucket(2, 10, 19, 1, 12, Color.Red.ToArgb())],
+            [MarkerSource.Bookmarks] = [new MarkerBucket(2, 20, 29, 1, 22, Color.Green.ToArgb())],
+            [MarkerSource.Search] = [new MarkerBucket(2, 30, 39, 1, 32, Color.Blue.ToArgb())],
+            [MarkerSource.Filter] = [new MarkerBucket(2, 40, 49, 1, 42, Color.Purple.ToArgb())]
+        }, 10, discovering: false);
 
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
@@ -41,7 +61,7 @@ public class MarkerBarTests
     public void MouseUp_OnBucketRaisesTargetLine_AndEmptyClickDoesNothing ()
     {
         using var bar = CreateBar(40, 10);
-        bar.SetBuckets([[new MarkerBucket(2, 10, 19, 3, 14, Color.Red.ToArgb())], [], [], []], 10, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Highlights] = [new MarkerBucket(2, 10, 19, 3, 14, Color.Red.ToArgb())] }, 10, false);
         var selected = new List<int>();
         bar.LineSelected += (_, args) => selected.Add(args.Line);
 
@@ -55,7 +75,7 @@ public class MarkerBarTests
     public void MouseMove_TooltipIncludesCategoryRangeAndCount ()
     {
         using var bar = CreateBar(40, 10);
-        bar.SetBuckets([[new MarkerBucket(2, 10, 19, 3, 14, Color.Red.ToArgb())], [], [], []], 10, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Highlights] = [new MarkerBucket(2, 10, 19, 3, 14, Color.Red.ToArgb())] }, 10, false);
 
         RaiseMouse(bar, "OnMouseMove", new MouseEventArgs(MouseButtons.None, 0, 5, 2, 0));
 
@@ -68,7 +88,7 @@ public class MarkerBarTests
     public void SmallOddWidth_AndResizeWithStaleHeight_DoNotSelectBuckets ()
     {
         using var bar = CreateBar(5, 10);
-        bar.SetBuckets([[new MarkerBucket(2, 10, 19, 1, 14, Color.Red.ToArgb())], [], [], []], 10, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Highlights] = [new MarkerBucket(2, 10, 19, 1, 14, Color.Red.ToArgb())] }, 10, false);
         var selected = new List<int>();
         bar.LineSelected += (_, args) => selected.Add(args.Line);
 
@@ -85,13 +105,13 @@ public class MarkerBarTests
     public void SmallOddWidth_RendersEachLaneWithinItsVisibleColumn ()
     {
         using var bar = CreateBar(5, 10);
-        bar.SetBuckets(
-        [
-            [new MarkerBucket(2, 10, 19, 1, 10, Color.Red.ToArgb())],
-            [new MarkerBucket(2, 20, 29, 1, 20, Color.Green.ToArgb())],
-            [new MarkerBucket(2, 30, 39, 1, 30, Color.Blue.ToArgb())],
-            [new MarkerBucket(2, 40, 49, 1, 40, Color.Purple.ToArgb())]
-        ], 10, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>
+        {
+            [MarkerSource.Highlights] = [new MarkerBucket(2, 10, 19, 1, 10, Color.Red.ToArgb())],
+            [MarkerSource.Bookmarks] = [new MarkerBucket(2, 20, 29, 1, 20, Color.Green.ToArgb())],
+            [MarkerSource.Search] = [new MarkerBucket(2, 30, 39, 1, 30, Color.Blue.ToArgb())],
+            [MarkerSource.Filter] = [new MarkerBucket(2, 40, 49, 1, 40, Color.Purple.ToArgb())]
+        }, 10, false);
 
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
@@ -113,7 +133,7 @@ public class MarkerBarTests
         using var bar = CreateBar(40, 10);
         bar.BackColor = Color.FromArgb(red, green, blue);
         bar.ForeColor = Color.White;
-        bar.SetBuckets([[], [], [], []], 10, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>(), 10, false);
 
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
@@ -131,7 +151,7 @@ public class MarkerBarTests
         bar.BottomInset = bottomInset;
         var bucketHeight = height - topInset - bottomInset;
         var pixel = bucketHeight - 1;
-        bar.SetBuckets([[], [], [], [new MarkerBucket(pixel, 90, 99, 1, 95, Color.Orange.ToArgb())]], bucketHeight, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Filter] = [new MarkerBucket(pixel, 90, 99, 1, 95, Color.Orange.ToArgb())] }, bucketHeight, false);
         var selected = new List<int>();
         bar.LineSelected += (_, args) => selected.Add(args.Line);
 
@@ -150,7 +170,7 @@ public class MarkerBarTests
     public void DrawToBitmap_ProducesMarkerBarArtifact ()
     {
         using var bar = CreateBar(80, 16);
-        bar.SetBuckets([[new MarkerBucket(4, 20, 29, 2, 24, Color.Orange.ToArgb())], [], [], []], 16, false);
+        bar.SetBuckets(new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>> { [MarkerSource.Highlights] = [new MarkerBucket(4, 20, 29, 2, 24, Color.Orange.ToArgb())] }, 16, false);
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
         var path = Path.Join(TestContext.CurrentContext.WorkDirectory, "marker-bar.png");

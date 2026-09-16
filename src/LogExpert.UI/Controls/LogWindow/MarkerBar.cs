@@ -9,9 +9,10 @@ namespace LogExpert.UI.Controls.LogWindow;
 /// <summary>Renders prepared marker buckets. It has no reader, matching logic or scan lifecycle.</summary>
 internal sealed class MarkerBar : Control
 {
+    private static readonly MarkerSource[] _sourceOrder = [MarkerSource.Highlights, MarkerSource.Bookmarks, MarkerSource.Search, MarkerSource.Filter];
     private readonly ToolTip _toolTip = new();
     private readonly ContextMenuStrip _menu = new();
-    private IReadOnlyList<MarkerBucket>[] _lanes = [[], [], [], []];
+    private IReadOnlyDictionary<MarkerSource, IReadOnlyList<MarkerBucket>> _lanes = new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>();
     private int _bucketHeight;
     private bool _discovering;
     private string _tooltipText = string.Empty;
@@ -36,7 +37,7 @@ internal sealed class MarkerBar : Control
     internal int BottomInset { get; set; }
     internal int BucketHeight => Math.Max(0, ClientSize.Height - TopInset - BottomInset);
 
-    internal void SetBuckets (IReadOnlyList<MarkerBucket>[] lanes, int height, bool discovering)
+    internal void SetBuckets (IReadOnlyDictionary<MarkerSource, IReadOnlyList<MarkerBucket>> lanes, int height, bool discovering)
     {
         _lanes = lanes;
         _bucketHeight = height;
@@ -56,7 +57,7 @@ internal sealed class MarkerBar : Control
 
     internal void ClearBuckets ()
     {
-        _lanes = [[], [], [], []];
+        _lanes = new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>();
         _tooltipText = string.Empty;
         _toolTip.SetToolTip(this, null);
         Invalidate();
@@ -72,10 +73,10 @@ internal sealed class MarkerBar : Control
 
         using var brush = new SolidBrush(ForeColor);
         using var separator = new Pen(SystemColors.ControlDark);
-        for (var lane = 0; lane < 4; lane++)
+        for (var lane = 0; lane < _sourceOrder.Length; lane++)
         {
-            var left = lane * ClientSize.Width / 4;
-            var right = (lane + 1) * ClientSize.Width / 4;
+            var left = lane * ClientSize.Width / _sourceOrder.Length;
+            var right = (lane + 1) * ClientSize.Width / _sourceOrder.Length;
             if (lane > 0)
             {
                 e.Graphics.DrawLine(separator, left, TopInset, left, TopInset + BucketHeight);
@@ -86,9 +87,14 @@ internal sealed class MarkerBar : Control
                 continue;
             }
 
-            foreach (var bucket in _lanes[lane])
+            foreach (var bucket in _lanes.GetValueOrDefault(_sourceOrder[lane]) ?? [])
             {
                 brush.Color = Color.FromArgb(bucket.ColorArgb);
+                // Bold-only rules inherit the current foreground when no color is specified.
+                if (brush.Color.A == 0)
+                {
+                    brush.Color = ForeColor;
+                }
                 var inset = right - left > 1 ? 1 : 0;
                 e.Graphics.FillRectangle(brush, left + inset, TopInset + bucket.Pixel, right - left - inset, 1);
             }
@@ -97,9 +103,12 @@ internal sealed class MarkerBar : Control
         if (_discovering)
         {
             brush.Color = ForeColor;
+            var scale = DeviceDpi / 96f;
+            var diameter = 2 * scale;
             for (var dot = -1; dot <= 1; dot++)
             {
-                e.Graphics.FillEllipse(brush, Width / 2 + dot * 4 - 1, Math.Max(2, TopInset / 2), 2, 2);
+                e.Graphics.FillEllipse(brush, Width / 2f + dot * 4 * scale - diameter / 2,
+                    Math.Max(diameter, TopInset / 2f), diameter, diameter);
             }
         }
     }
@@ -118,7 +127,7 @@ internal sealed class MarkerBar : Control
         base.OnMouseMove(e);
         var hit = HitTest(e.Location);
         var text = hit.HasValue
-            ? string.Format(CultureInfo.CurrentCulture, Resources.MarkerBar_ToolTip, CategoryName(hit.Value.Lane),
+            ? string.Format(CultureInfo.CurrentCulture, Resources.MarkerBar_ToolTip, CategoryName(hit.Value.Source),
                 hit.Value.Bucket.FirstLine + 1, hit.Value.Bucket.LastLine + 1, hit.Value.Bucket.Count)
             : Resources.MarkerBar_Title;
         if (_discovering)
@@ -133,33 +142,34 @@ internal sealed class MarkerBar : Control
         }
     }
 
-    private (int Lane, MarkerBucket Bucket)? HitTest (Point point)
+    private (MarkerSource Source, MarkerBucket Bucket)? HitTest (Point point)
     {
         if (ClientSize.Width <= 0 || point.X < 0 || point.X >= ClientSize.Width || _bucketHeight != BucketHeight)
         {
             return null;
         }
 
-        var lane = Math.Min(3, ((point.X + 1) * 4 - 1) / ClientSize.Width);
+        var lane = Math.Min(_sourceOrder.Length - 1, ((point.X + 1) * _sourceOrder.Length - 1) / ClientSize.Width);
+        var source = _sourceOrder[lane];
         var pixel = point.Y - TopInset;
-        foreach (var bucket in _lanes[lane])
+        foreach (var bucket in _lanes.GetValueOrDefault(source) ?? [])
         {
             if (bucket.Pixel == pixel)
             {
-                return (lane, bucket);
+                return (source, bucket);
             }
         }
 
         return null;
     }
 
-    private static string CategoryName (int lane)
+    private static string CategoryName (MarkerSource source)
     {
-        return lane switch
+        return source switch
         {
-            0 => Resources.MarkerBar_Highlights,
-            1 => Resources.MarkerBar_Bookmarks,
-            2 => Resources.MarkerBar_SearchHits,
+            MarkerSource.Highlights => Resources.MarkerBar_Highlights,
+            MarkerSource.Bookmarks => Resources.MarkerBar_Bookmarks,
+            MarkerSource.Search => Resources.MarkerBar_SearchHits,
             _ => Resources.MarkerBar_FilterHits
         };
     }

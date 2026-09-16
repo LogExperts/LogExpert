@@ -6,21 +6,24 @@ using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Marker;
 using LogExpert.Core.Entities;
 
-namespace LogExpert.Persister.Tests.Marker;
+using NUnit.Framework;
+
+namespace LogExpert.Tests.Marker;
 
 [TestFixture]
 public class MarkerCriteriaTests
 {
-    [TestCase(false)]
-    [TestCase(true)]
-    public void Highlights_MatchDisplayedColumnsForBothRuleKinds (bool wordMatch)
+    [TestCase(false, false)]
+    [TestCase(true, true)]
+    public void Highlights_OnlyWordRulesMatchDisplayedColumns (bool wordMatch, bool expected)
     {
         var criteria = MarkerCriteria.ForHighlights([
             new HighlightEntry { SearchText = "^error$", IsRegex = true, IsWordMatch = wordMatch, BackgroundColor = Color.Yellow }
         ]);
         var match = criteria.Match(0, new LogLine("{\"message\":\"error\"}", 0), (_, _) => [new LogLine("error", 0)]);
-        Assert.That(match, Is.EqualTo(new MarkerLine(0, Color.Yellow.ToArgb())));
+        Assert.That(match.HasValue, Is.EqualTo(expected));
     }
+
     [TestCase(false, false, "ERROR", true)]
     [TestCase(false, true, "ERROR", false)]
     [TestCase(true, true, "^error$", true)]

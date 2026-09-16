@@ -61,7 +61,6 @@ public sealed class MarkerCriteria
         {
             cancellationToken.ThrowIfCancellationRequested();
             var entry = _entries[priority];
-            var background = (!entry.IsWordMatch || !entry.NoBackground) && entry.BackgroundColor.A > 0;
             if (!IsVisual(entry))
             {
                 continue;
@@ -77,18 +76,11 @@ public sealed class MarkerCriteria
             else
             {
                 matched = HighlightEvaluator.IsMatch(entry, line);
-                if (!matched)
-                {
-                    columns ??= getColumns?.Invoke(lineNumber, line)
-                        ?? [new Column { FullValue = line.FullLine }];
-                    matched = columns.Any(column => HighlightEvaluator.IsMatch(entry, column));
-                }
             }
 
             if (matched)
             {
-                var color = background ? entry.BackgroundColor
-                    : entry.ForegroundColor.A > 0 ? entry.ForegroundColor : Color.Gray;
+                var color = HasBackground(entry) ? entry.BackgroundColor : entry.ForegroundColor;
                 return new MarkerLine(lineNumber, color.ToArgb(), priority);
             }
         }
@@ -98,8 +90,13 @@ public sealed class MarkerCriteria
 
     private static bool IsVisual (HighlightEntry entry)
     {
-        return !entry.IsSearchHit && (((!entry.IsWordMatch || !entry.NoBackground) && entry.BackgroundColor.A > 0)
+        return !entry.IsSearchHit && (HasBackground(entry)
             || entry.ForegroundColor.A > 0 || entry.IsBold);
+    }
+
+    private static bool HasBackground (HighlightEntry entry)
+    {
+        return (!entry.IsWordMatch || !entry.NoBackground) && entry.BackgroundColor.A > 0;
     }
 
     private static bool HasVisibleWordMatch (HighlightEntry entry, ITextValueMemory column)

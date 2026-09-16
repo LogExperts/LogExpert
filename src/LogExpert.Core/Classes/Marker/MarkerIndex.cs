@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using ColumnizerLib;
 
 using LogExpert.Core.Interfaces;
@@ -156,7 +158,7 @@ public sealed class MarkerIndex : IDisposable
                 {
                     scanCancellation.Token.ThrowIfCancellationRequested();
                     var line = reader.GetLogLineMemory(lineNumber)
-                        ?? throw new IOException();
+                        ?? throw new IOException(string.Format(CultureInfo.CurrentCulture, Resources.MarkerBar_LineUnavailable, lineNumber + 1));
                     var match = criteria.Match(lineNumber, line, columns, scanCancellation.Token);
                     if (match.HasValue)
                     {

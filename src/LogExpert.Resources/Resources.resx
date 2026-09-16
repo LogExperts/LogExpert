@@ -2349,6 +2349,12 @@ Restart LogExpert to apply changes?</value>
   <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
     <value>Show filter markers</value>
   </data>
+  <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
+    <value>Could not create a parsing snapshot for columnizer '{0}'.</value>
+  </data>
+  <data name="MarkerBar_LineUnavailable" xml:space="preserve">
+    <value>Could not read log line {0} while discovering markers.</value>
+  </data>
   <data name="MarkerBar_Highlights" xml:space="preserve"><value>Highlights</value></data>
   <data name="MarkerBar_Bookmarks" xml:space="preserve"><value>Bookmarks</value></data>
   <data name="MarkerBar_SearchHits" xml:space="preserve"><value>Search hits</value></data>

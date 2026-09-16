@@ -219,15 +219,14 @@ public sealed class MarkerWindowTests : IDisposable
         Assert.That(HasMarker(bar, 2, 21, 101), Is.False);
     }
 
-    [TestCase(false)]
-    [TestCase(true)]
-    public void JsonColumns_DiscoveryMatchesOffscreenValuesWithoutMutatingTheGridParser (bool wordMatch)
+    [Test]
+    public void JsonWordHighlights_DiscoveryMatchesOffscreenValuesWithoutMutatingTheGridParser ()
     {
         File.WriteAllLines(_fileName, Enumerable.Repeat("{\"message\":\"ok\"}", 999).Append("{\"extra\":\"error\"}"));
         _settings.Preferences.FollowTail = false;
         _settings.Preferences.HighlightGroupList[0].HighlightEntryList = [new HighlightEntry
         {
-            SearchText = "^error$", IsRegex = true, IsWordMatch = wordMatch, BackgroundColor = Color.Red
+            SearchText = "^error$", IsRegex = true, IsWordMatch = true, BackgroundColor = Color.Red
         }];
         var log = Open();
         log.RequestGotoLine(1);

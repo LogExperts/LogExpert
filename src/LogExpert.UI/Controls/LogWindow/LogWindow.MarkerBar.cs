@@ -15,26 +15,21 @@ internal partial class LogWindow
 {
     private readonly MarkerIndex _highlightMarkers = new();
     private readonly MarkerIndex _searchMarkers = new();
-    private readonly Lock _markerFilterLock = new();
     private readonly Lock _markerStateLock = new();
     private readonly MarkerBar _markerBar = new() { Name = "markerBar" };
     private readonly System.Windows.Forms.Timer _markerTimer = new() { Interval = 250 };
     private SearchParams? _markerSearch;
     private bool _searchMarkersCleared;
     private (bool Bar, bool Highlights, bool Bookmarks, bool Search, bool Filter) _markerVisibility;
-    private int _markerRebuild = 3;
+    private MarkerSource _markerRebuild = MarkerSource.All;
+    // Criteria/file generation, rendered data changes, and edits to the unfinished last line are distinct.
     private int _markerGeneration;
     private int _markerRevision;
     private int _markerContentRevision;
     private int _markerHighlightContentRevision = -1;
     private int _markerSearchContentRevision = -1;
     private int _markerTailPending;
-    private int _markerFrameGeneration = -1;
-    private int _markerFrameRevision = -1;
-    private int _markerFrameLineCount = -1;
-    private int _markerFrameHeight = -1;
-    private MarkerSnapshot? _markerFrameHighlights;
-    private MarkerSnapshot? _markerFrameSearch;
+    private MarkerFrame? _markerFrame;
     private MarkerSnapshot? _markerReportedHighlightError;
     private MarkerSnapshot? _markerReportedSearchError;
     private bool _markerRendering;
@@ -59,9 +54,9 @@ internal partial class LogWindow
             Preferences.ShowBookmarkMarkers, Preferences.ShowSearchMarkers, Preferences.ShowFilterMarkers);
         if (_markerVisibility != visibility)
         {
-            var sources = _markerVisibility.Bar != visibility.ShowMarkerBar ? 3
-                : (_markerVisibility.Highlights != visibility.ShowHighlightMarkers ? 1 : 0)
-                  | (_markerVisibility.Search != visibility.ShowSearchMarkers ? 2 : 0);
+            var sources = _markerVisibility.Bar != visibility.ShowMarkerBar ? MarkerSource.All
+                : (_markerVisibility.Highlights != visibility.ShowHighlightMarkers ? MarkerSource.Highlights : MarkerSource.None)
+                  | (_markerVisibility.Search != visibility.ShowSearchMarkers ? MarkerSource.Search : MarkerSource.None);
             _markerVisibility = visibility;
             InvalidateMarkerCriteria(sources);
             _markerBar.ClearBuckets();
@@ -74,22 +69,22 @@ internal partial class LogWindow
     }
 
     // May be called by the reader or tail worker: invalidate before any queued UI work.
-    private void InvalidateMarkerCriteria (int sources)
+    private void InvalidateMarkerCriteria (MarkerSource sources)
     {
         lock (_markerStateLock)
         {
             Interlocked.Increment(ref _markerGeneration);
-            if ((sources & 1) != 0)
+            if ((sources & MarkerSource.Highlights) != 0)
             {
                 _highlightMarkers.Reset(null, null);
             }
 
-            if ((sources & 2) != 0)
+            if ((sources & MarkerSource.Search) != 0)
             {
                 _searchMarkers.Reset(null, null);
             }
 
-            Interlocked.Or(ref _markerRebuild, sources);
+            _markerRebuild |= sources;
         }
         MarkMarkerDataChanged();
     }
@@ -113,27 +108,28 @@ internal partial class LogWindow
         _markerSearch = new SearchParams();
         _markerSearch.CopyFrom(search);
         _searchMarkersCleared = false;
-        InvalidateMarkerCriteria(2);
+        InvalidateMarkerCriteria(MarkerSource.Search);
         _markerBar.ClearBuckets();
     }
 
     private void OnClearSearchMarkers (object? sender, EventArgs eventArgs)
     {
         _searchMarkersCleared = true;
-        InvalidateMarkerCriteria(2);
+        InvalidateMarkerCriteria(MarkerSource.Search);
         _markerBar.ClearBuckets();
     }
 
     private void ConfigureMarkerIndexes ()
     {
-        int sources;
+        MarkerSource sources;
         int generation;
         lock (_markerStateLock)
         {
-            sources = Interlocked.Exchange(ref _markerRebuild, 0);
+            sources = _markerRebuild;
+            _markerRebuild = MarkerSource.None;
             generation = _markerGeneration;
         }
-        if (sources == 0)
+        if (sources == MarkerSource.None)
         {
             return;
         }
@@ -141,7 +137,7 @@ internal partial class LogWindow
         var reader = _logFileReader;
         MarkerCriteria? highlightCriteria = null;
         Func<int, ILogLineMemory, IReadOnlyList<ITextValueMemory>>? columns = null;
-        if ((sources & 1) != 0 && _markerVisibility.Bar && _markerVisibility.Highlights && reader != null)
+        if ((sources & MarkerSource.Highlights) != 0 && _markerVisibility.Bar && _markerVisibility.Highlights && reader != null)
         {
             lock (_currentHighlightGroupLock)
             {
@@ -160,18 +156,18 @@ internal partial class LogWindow
         {
             if (generation != _markerGeneration)
             {
-                Interlocked.Or(ref _markerRebuild, sources);
+                _markerRebuild |= sources;
                 return;
             }
 
-            if ((sources & 1) != 0)
+            if ((sources & MarkerSource.Highlights) != 0)
             {
                 _highlightMarkers.Reset(reader, highlightCriteria, columns);
                 _markerHighlightContentRevision = -1;
                 _markerReportedHighlightError = null;
             }
 
-            if ((sources & 2) != 0)
+            if ((sources & MarkerSource.Search) != 0)
             {
                 _searchMarkers.Reset(reader, searchCriteria);
                 _markerSearchContentRevision = -1;
@@ -191,7 +187,8 @@ internal partial class LogWindow
         {
             // Initialization may read file headers. Run it on the discovery worker, never the UI thread.
             var clone = snapshot ?? ColumnizerPicker.CloneMemoryColumnizer(template, directory)
-                ?? throw new InvalidOperationException();
+                ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                    Resources.Columnizer_SnapshotUnavailable, template.GetName()));
             if (snapshot == null)
             {
                 (clone as IInitColumnizerMemory)?.Selected(callback);
@@ -266,9 +263,8 @@ internal partial class LogWindow
             ReportMarkerError(search, ref _markerReportedSearchError);
             var height = _markerBar.BucketHeight;
             var revision = Volatile.Read(ref _markerRevision);
-            if (_markerFrameGeneration == generation && _markerFrameRevision == revision
-                && _markerFrameLineCount == lineCount && _markerFrameHeight == height
-                && ReferenceEquals(highlights, _markerFrameHighlights) && ReferenceEquals(search, _markerFrameSearch))
+            var frame = new MarkerFrame(generation, revision, lineCount, height, highlights, search);
+            if (_markerFrame == frame)
             {
                 return;
             }
@@ -280,34 +276,29 @@ internal partial class LogWindow
             var buckets = await Task.Run(() =>
             {
                 int[] filterHits;
-                lock (_markerFilterLock)
+                lock (_filterHitLock)
                 {
                     filterHits = visibility.Filter ? _filterHitList.ToArray() : [];
                 }
 
-                return new[]
+                return new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>
                 {
-                    MarkerBucket.Aggregate(highlights.Matches, lineCount, height),
-                    MarkerBucket.Aggregate(bookmarks.Select(line => new MarkerLine(line, Color.OrangeRed.ToArgb())), lineCount, height),
-                    MarkerBucket.Aggregate(search.Matches, lineCount, height),
-                    MarkerBucket.Aggregate(filterHits.Order().Select(line => new MarkerLine(line, Color.MediumSeaGreen.ToArgb())), lineCount, height)
+                    [MarkerSource.Highlights] = MarkerBucket.Aggregate(highlights.Matches, lineCount, height),
+                    [MarkerSource.Bookmarks] = MarkerBucket.Aggregate(bookmarks.Select(line => new MarkerLine(line, Color.OrangeRed.ToArgb())), lineCount, height),
+                    [MarkerSource.Search] = MarkerBucket.Aggregate(search.Matches, lineCount, height),
+                    [MarkerSource.Filter] = MarkerBucket.Aggregate(filterHits.Order().Select(line => new MarkerLine(line, Color.MediumSeaGreen.ToArgb())), lineCount, height)
                 };
             }).ConfigureAwait(true);
             lock (_markerStateLock)
             {
                 if (_markersDisposed || _isClosing || IsDisposed || generation != _markerGeneration
-                    || Volatile.Read(ref _markerTailPending) != 0 || Volatile.Read(ref _markerRebuild) != 0
+                    || Volatile.Read(ref _markerTailPending) != 0 || _markerRebuild != MarkerSource.None
                     || revision != Volatile.Read(ref _markerRevision))
                 {
                     return;
                 }
 
-                _markerFrameGeneration = generation;
-                _markerFrameRevision = revision;
-                _markerFrameLineCount = lineCount;
-                _markerFrameHeight = height;
-                _markerFrameHighlights = highlights;
-                _markerFrameSearch = search;
+                _markerFrame = frame;
                 _markerBar.SetBuckets(buckets, height, discovering);
             }
         }
@@ -337,7 +328,7 @@ internal partial class LogWindow
 
     private void OnMarkerLineSelected (object? sender, SelectLineEventArgs eventArgs)
     {
-        if (_markerFrameGeneration == Volatile.Read(ref _markerGeneration)
+        if (_markerFrame?.Generation == Volatile.Read(ref _markerGeneration)
             && eventArgs.Line >= 0 && eventArgs.Line < dataGridView.RowCount)
         {
             RequestGotoLine(eventArgs.Line + 1);
@@ -356,8 +347,7 @@ internal partial class LogWindow
         _markerTimer.Dispose();
         _highlightMarkers.Dispose();
         _searchMarkers.Dispose();
-        _markerFrameHighlights = null;
-        _markerFrameSearch = null;
+        _markerFrame = null;
         _markerReportedHighlightError = null;
         _markerReportedSearchError = null;
         if (!_markerBar.IsDisposed)
@@ -365,6 +355,9 @@ internal partial class LogWindow
             _markerBar.ClearBuckets();
         }
     }
+
+    private sealed record MarkerFrame (int Generation, int Revision, int LineCount, int Height,
+        MarkerSnapshot Highlights, MarkerSnapshot Search);
 
     private sealed class MarkerLineSource (ILogfileReader reader, string fileName) : ILogLineSource
     {

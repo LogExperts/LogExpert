@@ -409,6 +409,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not create a parsing snapshot for columnizer &apos;{0}&apos;..
+        /// </summary>
+        public static string Columnizer_SnapshotUnavailable {
+            get {
+                return ResourceManager.GetString("Columnizer_SnapshotUnavailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Timestamp selector.
         /// </summary>
         public static string DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector {
@@ -4188,6 +4197,15 @@ namespace LogExpert {
         public static string MarkerBar_Highlights {
             get {
                 return ResourceManager.GetString("MarkerBar_Highlights", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Could not read log line {0} while discovering markers..
+        /// </summary>
+        public static string MarkerBar_LineUnavailable {
+            get {
+                return ResourceManager.GetString("MarkerBar_LineUnavailable", resourceCulture);
             }
         }
 

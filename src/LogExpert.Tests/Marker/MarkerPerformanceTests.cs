@@ -9,7 +9,9 @@ using LogExpert.Core.Entities;
 using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 
-namespace LogExpert.Persister.Tests.Marker;
+using NUnit.Framework;
+
+namespace LogExpert.Tests.Marker;
 
 [TestFixture]
 public class MarkerPerformanceTests

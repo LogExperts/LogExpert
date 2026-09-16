@@ -9,7 +9,9 @@ using LogExpert.Core.Interfaces;
 
 using Moq;
 
-namespace LogExpert.Persister.Tests.Marker;
+using NUnit.Framework;
+
+namespace LogExpert.Tests.Marker;
 
 [TestFixture]
 public class MarkerIndexTests

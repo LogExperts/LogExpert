@@ -26,10 +26,13 @@ public readonly record struct MarkerBucket (int Pixel, int FirstLine, int LastLi
 
             var pixel = lineCount == 1 ? 0 : (int)((long)line * (height - 1) / (lineCount - 1));
             var bucket = buckets[pixel];
+            // Invert the floor mapping above: a bucket starts at ceil(pixel * (lines - 1) / (height - 1))
+            // and ends immediately before the next bucket starts. The final pixel includes the last line.
             var first = height == 1 ? 0 : (int)(((long)pixel * (lineCount - 1) + height - 2) / (height - 1));
             var last = height == 1 || pixel == height - 1 || lineCount == 1 ? lineCount - 1
                 : (int)(((long)(pixel + 1) * (lineCount - 1) + height - 2) / (height - 1)) - 1;
             var target = bucket.Count == 0 ? line : bucket.TargetLine;
+            // Double distances to compare against the midpoint without rounding half-line ties.
             var distance = Math.Abs(2L * line - first - last);
             var targetDistance = Math.Abs(2L * target - first - last);
             if (distance < targetDistance || (distance == targetDistance && line < target))
