@@ -2,6 +2,7 @@ using ColumnizerLib;
 
 using CsvColumnizer;
 
+using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Entities;
 
 using Moq;
@@ -111,6 +112,29 @@ public class MarkerColumnizerSnapshotTests
         {
             Directory.Delete(directory, true);
         }
+    }
+
+    [Test]
+    public void SquareBracketClone_PreservesDetectedLayoutAndTimeOffsetAfterOriginalChanges ()
+    {
+        var line = new LogLine("2022-03-21 11:34:34.505[one][two][three][four][five][six]Message", 0);
+        var original = new SquareBracketColumnizer();
+        _ = original.GetPriority("square.log", new ILogLineMemory[] { line });
+        original.SetTimeOffset(123);
+        var clone = (SquareBracketColumnizer)((ICloneable)original).Clone();
+        _ = original.GetPriority("other.log", new ILogLineMemory[] { new LogLine("[Other]Changed", 0) });
+        original.SetTimeOffset(456);
+
+        var result = clone.SplitLine(null, line);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(clone.GetColumnNames(), Is.EqualTo(new[] { "Date", "Time", "Level", "Source", "Source1", "Source2", "Source3", "Source4", "Message" }));
+            Assert.That(result.ColumnValues, Has.Length.EqualTo(9));
+            Assert.That(result.ColumnValues[0].FullValue.ToString(), Is.EqualTo("2022-03-21"));
+            Assert.That(result.ColumnValues[1].FullValue.ToString(), Is.EqualTo("11:34:34.628"));
+            Assert.That(clone.GetTimeOffset(), Is.EqualTo(123));
+        });
     }
 
     private static string CreateTempDirectory ()

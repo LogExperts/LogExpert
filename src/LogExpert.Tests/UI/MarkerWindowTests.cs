@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.Versioning;
 
+using ColumnizerLib;
+
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Persister;
@@ -237,6 +239,26 @@ public sealed class MarkerWindowTests : IDisposable
         Assert.That(log.CurrentColumnizer.GetColumnNames(), Is.EqualTo(columnNames), "Overview parsing must not mutate the grid parser.");
         Click(bar, 0, 999, 1000);
         Assert.That(log.CurrentLineNum, Is.EqualTo(999));
+    }
+
+    [TestCase("2022-03-21 11:34:34.505[INFO][Worker]Message", "^11:34:34")]
+    [TestCase("[one][two][three][four][five][six]Message", @"^\[six\]$")]
+    public void SquareBracketColumns_DiscoveryPreservesDetectedLayout (string line, string expression)
+    {
+        File.WriteAllLines(_fileName, Enumerable.Repeat(line, 100));
+        _settings.Preferences.HighlightGroupList[0].HighlightEntryList = [new HighlightEntry
+        {
+            SearchText = expression, IsRegex = true, IsWordMatch = true, BackgroundColor = Color.Red
+        }];
+        var log = Open();
+        log.ForceColumnizer(new SquareBracketColumnizer());
+        _ = ((SquareBracketColumnizer)log.CurrentColumnizer).GetPriority(_fileName, new ILogLineMemory[] { new LogLine(line, 0) });
+        log.ColumnizerConfigChanged();
+        var bar = Find<MarkerBar>(log, "markerBar");
+
+        WaitForMarker(bar, 0, 20, 100, true);
+        Click(bar, 0, 20, 100);
+        Assert.That(log.CurrentLineNum, Is.EqualTo(20));
     }
 
     [Test]
