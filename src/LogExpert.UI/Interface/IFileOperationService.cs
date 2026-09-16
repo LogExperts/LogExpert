@@ -64,6 +64,9 @@ internal interface IFileOperationService
     /// </summary>
     MultiFileDecision LoadFilesWithOption (string[] fileNames, bool invertLogic);
 
+    /// <summary>Loads a completed drop selection, using the same files for either Ask outcome.</summary>
+    void LoadDroppedFiles (string[] selectedFiles, bool invertLogic, Func<MultiFileDecision> askUser);
+
     /// <summary>
     /// Iterates file names; routes .lxj files to a callback, adds all others via AddFileTab.
     /// </summary>

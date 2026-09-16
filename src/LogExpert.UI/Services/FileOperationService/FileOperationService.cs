@@ -209,10 +209,7 @@ internal sealed class FileOperationService (
         // a raw log line in the multi-file tab.
         if (fileNames.Any(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
         {
-            foreach (var sessionFile in fileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
-            {
-                _loadSessionCallback(sessionFile, false);
-            }
+            AddFileTabs(fileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray());
 
             var logs = fileNames.Where(f => !f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray();
             return logs.Length > 0 ? AddMultiFileTab(logs) : null;
@@ -246,9 +243,30 @@ internal sealed class FileOperationService (
         return logWindow;
     }
 
+    public void LoadDroppedFiles (string[] selectedFiles, bool invertLogic, Func<MultiFileDecision> askUser)
+    {
+        if (selectedFiles.Length == 0)
+        {
+            return;
+        }
+
+        var decision = LoadFilesWithOption(selectedFiles, invertLogic);
+        if (decision == MultiFileDecision.AskUser)
+        {
+            switch (askUser())
+            {
+                case MultiFileDecision.SingleFiles:
+                    AddFileTabs(selectedFiles);
+                    break;
+                case MultiFileDecision.MultiFile:
+                    _ = AddMultiFileTab(selectedFiles);
+                    break;
+            }
+        }
+    }
     public MultiFileDecision LoadFilesWithOption (string[] fileNames, bool invertLogic)
     {
-        Array.Sort(fileNames);
+        Array.Sort(fileNames, StringComparer.OrdinalIgnoreCase);
 
         if (fileNames.Length == 1)
         {
@@ -290,13 +308,20 @@ internal sealed class FileOperationService (
     {
         foreach (var fileName in fileNames.Where(filename => !string.IsNullOrEmpty(filename)))
         {
-            if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                _loadSessionCallback(fileName, false);
+                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+                {
+                    _loadSessionCallback(fileName, false);
+                }
+                else
+                {
+                    _ = AddFileTab(new FileTabRequest { FileName = fileName, TargetLine = targetLine });
+                }
             }
-            else
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or LogFileException)
             {
-                _ = AddFileTab(new FileTabRequest { FileName = fileName, TargetLine = targetLine });
+                _logger.Warn(ex, "Could not open selected file: {0}", fileName);
             }
         }
     }

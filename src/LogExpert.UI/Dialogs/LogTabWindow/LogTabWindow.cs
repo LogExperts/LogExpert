@@ -8,6 +8,7 @@ using System.Text;
 using ColumnizerLib;
 
 using LogExpert.Core.Classes;
+using LogExpert.Core.Classes.FileDrop;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -55,6 +56,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly FileOperationService _fileOperationService;
     private readonly SessionHandler _sessionHandler;
     private readonly ToolLaunchService _toolLaunchService;
+
+    private CancellationTokenSource? _dropCancellation;
+    private FolderDropDialog? _dropDialog;
 
     private bool _disposed;
 
@@ -747,6 +751,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (_disposed)
         {
             return;
+        }
+
+        if (disposing)
+        {
+            CancelPendingDrop();
         }
 
         if (disposing && (components != null))
@@ -1750,6 +1759,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
+        CancelPendingDrop();
         try
         {
             IList<LogWindow.LogWindow> deleteLogWindowList = [];
@@ -1913,46 +1923,92 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             : DragDropEffects.None;
     }
 
-    private void OnLogWindowDragDrop (object sender, DragEventArgs e)
+    private async void OnLogWindowDragDrop (object sender, DragEventArgs e)
     {
-#if DEBUG
-        var formats = e.Data.GetFormats();
-        var s = "Dropped formats: ";
-        foreach (var format in formats)
+        if (e.Data?.GetData(DataFormats.FileDrop) is not string[] names)
         {
-            s += format;
-            s += " , ";
+            return;
         }
 
-        s = s[..^3];
-        _logger.Debug(s);
-#endif
-
-        if (e.Data.GetDataPresent(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] names)
+        // Capture Shift at the drop, before discovery or the preview can yield to the UI.
+        var invertLogic = (e.KeyState & 4) == 4;
+        e.Effect = DragDropEffects.Copy;
+        CancelPendingDrop();
+        using var cancellation = new CancellationTokenSource();
+        _dropCancellation = cancellation;
+        try
         {
-            // (shift pressed) https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.drageventargs.keystate
-            var invertLogic = (e.KeyState & 4) == 4;
-            var decision = _fileOperationService.LoadFilesWithOption(names, invertLogic);
-
-            if (decision == MultiFileDecision.AskUser)
+            var discovery = new DroppedFileDiscovery().DiscoverAsync(names, cancellation.Token);
+            // Ordinary file drops need no preview. Only show progress if discovery takes time.
+            await Task.WhenAny(discovery, Task.Delay(150, cancellation.Token)).ConfigureAwait(true);
+            cancellation.Token.ThrowIfCancellationRequested();
+            if (IsDisposed || Disposing)
             {
-                MultiLoadRequestDialog dlg = new();
-                var res = dlg.ShowDialog();
-
-                if (res == DialogResult.Yes)
-                {
-                    _fileOperationService.AddFileTabs(names);
-                }
-                else if (res == DialogResult.No)
-                {
-                    _ = _fileOperationService.AddMultiFileTab(names);
-                }
+                return;
             }
 
-            e.Effect = DragDropEffects.Copy;
+            string[] selected;
+            if (discovery.IsCompletedSuccessfully && !discovery.Result.IncludesFolders && discovery.Result.Skipped.Length == 0)
+            {
+                selected = discovery.Result.Files;
+            }
+            else
+            {
+                using var dialog = new FolderDropDialog(discovery, cancellation.Token);
+                _dropDialog = dialog;
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                selected = dialog.SelectedFiles;
+                _dropDialog = null;
+            }
+
+            cancellation.Token.ThrowIfCancellationRequested();
+            if (!IsDisposed && !Disposing)
+            {
+                _fileOperationService.LoadDroppedFiles(selected, invertLogic, () =>
+                {
+                    using var dialog = new MultiLoadRequestDialog();
+                    return dialog.ShowDialog(this) switch
+                    {
+                        DialogResult.Yes => MultiFileDecision.SingleFiles,
+                        DialogResult.No => MultiFileDecision.MultiFile,
+                        _ => MultiFileDecision.Cancel
+                    };
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Closing/replacing the destination or cancelling the preview opens nothing.
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Could not open dropped files");
+            if (!IsDisposed && !Disposing && !cancellation.IsCancellationRequested)
+            {
+                MessageBox.Show(this, string.Format(CultureInfo.CurrentCulture, Resources.FolderDrop_Failed, ex.Message),
+                    Resources.FolderDrop_Title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        finally
+        {
+            cancellation.Cancel();
+            if (ReferenceEquals(_dropCancellation, cancellation))
+            {
+                _dropCancellation = null;
+                _dropDialog = null;
+            }
         }
     }
 
+    private void CancelPendingDrop ()
+    {
+        _dropCancellation?.Cancel();
+        _dropDialog?.Close();
+        _dropDialog = null;
+    }
     [SupportedOSPlatform("windows")]
     private void OnTimeShiftToolStripMenuItemCheckStateChanged (object sender, EventArgs e)
     {

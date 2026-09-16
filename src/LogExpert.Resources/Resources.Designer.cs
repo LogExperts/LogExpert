@@ -39,6 +39,78 @@ namespace LogExpert {
             get { return ResourceManager.GetString("HighlightDialog_UI_ResetSelectionColor", resourceCulture); }
         }
         
+        public static string FolderDrop_Title {
+            get { return ResourceManager.GetString("FolderDrop_Title", resourceCulture); }
+        }
+
+        public static string FolderDrop_Discovering {
+            get { return ResourceManager.GetString("FolderDrop_Discovering", resourceCulture); }
+        }
+
+        public static string FolderDrop_Instructions {
+            get { return ResourceManager.GetString("FolderDrop_Instructions", resourceCulture); }
+        }
+
+        public static string FolderDrop_Filter {
+            get { return ResourceManager.GetString("FolderDrop_Filter", resourceCulture); }
+        }
+
+        public static string FolderDrop_SelectAll {
+            get { return ResourceManager.GetString("FolderDrop_SelectAll", resourceCulture); }
+        }
+
+        public static string FolderDrop_SelectNone {
+            get { return ResourceManager.GetString("FolderDrop_SelectNone", resourceCulture); }
+        }
+
+        public static string FolderDrop_Open {
+            get { return ResourceManager.GetString("FolderDrop_Open", resourceCulture); }
+        }
+
+        public static string FolderDrop_Cancel {
+            get { return ResourceManager.GetString("FolderDrop_Cancel", resourceCulture); }
+        }
+
+        public static string FolderDrop_Path {
+            get { return ResourceManager.GetString("FolderDrop_Path", resourceCulture); }
+        }
+
+        public static string FolderDrop_Select {
+            get { return ResourceManager.GetString("FolderDrop_Select", resourceCulture); }
+        }
+
+        public static string FolderDrop_Summary {
+            get { return ResourceManager.GetString("FolderDrop_Summary", resourceCulture); }
+        }
+
+        public static string FolderDrop_Empty {
+            get { return ResourceManager.GetString("FolderDrop_Empty", resourceCulture); }
+        }
+
+        public static string FolderDrop_Skipped {
+            get { return ResourceManager.GetString("FolderDrop_Skipped", resourceCulture); }
+        }
+
+        public static string FolderDrop_DirectoryLink {
+            get { return ResourceManager.GetString("FolderDrop_DirectoryLink", resourceCulture); }
+        }
+
+        public static string FolderDrop_Failed {
+            get { return ResourceManager.GetString("FolderDrop_Failed", resourceCulture); }
+        }
+
+        public static string FolderDrop_Previous {
+            get { return ResourceManager.GetString("FolderDrop_Previous", resourceCulture); }
+        }
+
+        public static string FolderDrop_Next {
+            get { return ResourceManager.GetString("FolderDrop_Next", resourceCulture); }
+        }
+
+        public static string FolderDrop_Page {
+            get { return ResourceManager.GetString("FolderDrop_Page", resourceCulture); }
+        }
+
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;

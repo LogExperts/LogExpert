@@ -2243,4 +2243,58 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
     <value>Systemfarbe verwenden</value>
   </data>
+  <data name="FolderDrop_Title" xml:space="preserve">
+    <value>Dateien aus Ordnern öffnen</value>
+  </data>
+  <data name="FolderDrop_Discovering" xml:space="preserve">
+    <value>Dateien werden gesucht… Abbrechen öffnet keine Dateien.</value>
+  </data>
+  <data name="FolderDrop_Instructions" xml:space="preserve">
+    <value>Wählen Sie die zu öffnenden Dateien. Es wird nichts automatisch ausgewählt.</value>
+  </data>
+  <data name="FolderDrop_Filter" xml:space="preserve">
+    <value>Pfade filtern:</value>
+  </data>
+  <data name="FolderDrop_SelectAll" xml:space="preserve">
+    <value>Alle passenden auswählen</value>
+  </data>
+  <data name="FolderDrop_SelectNone" xml:space="preserve">
+    <value>Auswahl aufheben</value>
+  </data>
+  <data name="FolderDrop_Open" xml:space="preserve">
+    <value>Auswahl öffnen</value>
+  </data>
+  <data name="FolderDrop_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="FolderDrop_Path" xml:space="preserve">
+    <value>Vollständiger Pfad</value>
+  </data>
+  <data name="FolderDrop_Select" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="FolderDrop_Summary" xml:space="preserve">
+    <value>{0:N0} Dateien; {1:N0} passend; {2:N0} ausgewählt.</value>
+  </data>
+  <data name="FolderDrop_Empty" xml:space="preserve">
+    <value>Keine geeigneten Dateien gefunden. Automatisch gefundene .lxp- und .lxj-Dateien werden ausgeschlossen.</value>
+  </data>
+  <data name="FolderDrop_Skipped" xml:space="preserve">
+    <value>{0:N0} Speicherorte wurden übersprungen:</value>
+  </data>
+  <data name="FolderDrop_DirectoryLink" xml:space="preserve">
+    <value>Ordnerverknüpfung übersprungen (Junction oder symbolischer Link).</value>
+  </data>
+  <data name="FolderDrop_Failed" xml:space="preserve">
+    <value>Die abgelegten Dateien konnten nicht vorbereitet werden: {0}</value>
+  </data>
+  <data name="FolderDrop_Previous" xml:space="preserve">
+    <value>Zurück</value>
+  </data>
+  <data name="FolderDrop_Next" xml:space="preserve">
+    <value>Weiter</value>
+  </data>
+  <data name="FolderDrop_Page" xml:space="preserve">
+    <value>{0:N0}–{1:N0} von {2:N0} Treffern</value>
+  </data>
 </root>

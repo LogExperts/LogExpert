@@ -2,6 +2,9 @@ using System.Runtime.Versioning;
 using System.Text;
 
 using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.ProgressReporters;
+using LogExpert.Core.Enums;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
@@ -470,6 +473,102 @@ internal class FileOperationServiceTests : IDisposable
 
         // Assert — temp files must not be added to file history
         _configManagerMock.Verify(cm => cm.AddToFileHistory(It.IsAny<string>()), Times.Never);
+    }
+
+    [TestCase(MultiFileDecision.SingleFiles)]
+    [TestCase(MultiFileDecision.MultiFile)]
+    [TestCase(MultiFileDecision.Cancel)]
+    public void LoadDroppedFiles_Ask_UsesOnlyTheConfirmedSelection (MultiFileDecision choice)
+    {
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        string[] selected = [@"C:\logs\nested\b.log", @"C:\logs\a.log"];
+        string[]? combined = null;
+        _sut.FileOpened += (_, e) => combined = e.MultiFileNames;
+
+        _sut.LoadDroppedFiles(selected, invertLogic: true, () => choice);
+
+        string[] expected = [@"C:\logs\a.log", @"C:\logs\nested\b.log"];
+        if (choice == MultiFileDecision.SingleFiles)
+        {
+            Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(expected));
+        }
+        else if (choice == MultiFileDecision.MultiFile)
+        {
+            Assert.That(combined, Is.EqualTo(expected));
+        }
+        else
+        {
+            Assert.That(_factoryCalls, Is.Empty);
+        }
+    }
+
+    [TestCase(-1, false, 2)]
+    [TestCase(0, false, 1)]
+    [TestCase(1, false, 1)]
+    [TestCase(0, true, 1)]
+    [TestCase(1, true, 1)]
+    public void LoadDroppedFiles_CombinedChoice_ReadsAccessibleSelectedFiles (int unavailableIndex, bool lockFile, int expectedLines)
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "LogExpertDropRouting", Guid.NewGuid().ToString());
+        Directory.CreateDirectory(directory);
+        var first = Path.Combine(directory, "a.log");
+        var second = Path.Combine(directory, "b.txt");
+        File.WriteAllText(first, "first\n");
+        File.WriteAllText(second, "second\n");
+        _settings.Preferences.MultiFileOption = MultiFileOption.Ask;
+        var lineCount = -1;
+        FileStream? lockedFile = null;
+        _sut.FileOpened += (_, e) =>
+        {
+            if (e.MultiFileNames == null)
+            {
+                return;
+            }
+            // Exercise the same reader endpoint used by LogWindow.LoadFilesAsMulti.
+            using var reader = new LogfileReader(e.MultiFileNames,
+                new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
+                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance);
+            reader.ReadFiles();
+            lineCount = reader.GetLogLineMemories(0, 10).Length;
+        };
+        try
+        {
+            if (unavailableIndex >= 0)
+            {
+                var unavailableFile = unavailableIndex == 0 ? first : second;
+                if (lockFile)
+                {
+                    lockedFile = new FileStream(unavailableFile, FileMode.Open, FileAccess.Read, FileShare.None);
+                }
+                else
+                {
+                    File.Delete(unavailableFile);
+                }
+            }
+            _sut.LoadDroppedFiles([first, second], false, () => MultiFileDecision.MultiFile);
+            Assert.That(lineCount, Is.EqualTo(expectedLines));
+        }
+        finally
+        {
+            lockedFile?.Dispose();
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void LoadDroppedFiles_UnavailableFile_DoesNotBlockRemainingSelection (bool accessDenied)
+    {
+        _settings.Preferences.MultiFileOption = MultiFileOption.SingleFiles;
+        var service = new FileOperationService(_configManagerMock.Object, _tabControllerMock.Object,
+            _ledServiceMock.Object, _pluginRegistryMock.Object,
+            (request, encoding) => request.FileName == "a.log"
+                ? throw (accessDenied ? new UnauthorizedAccessException() : new IOException())
+                : _factory(request, encoding), () => null, (_, _) => { });
+
+        service.LoadDroppedFiles(["a.log", "b.log"], false, () => MultiFileDecision.Cancel);
+
+        Assert.That(_factoryCalls.Select(call => call.Request.FileName), Is.EqualTo(new[] { "b.log" }));
     }
 
     [Test]
