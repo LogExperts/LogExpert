@@ -1743,12 +1743,16 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Pattern syntax:
 
 * = any characters (wildcard)
-$D(&amp;lt;date&amp;gt;) = Date pattern
+$D(&lt;date&gt;) = Date pattern
 $I = File index number
 $J = File index number, hidden when zero
-$J(&amp;lt;prefix&amp;gt;) = Like $J, but adding &amp;lt;prefix&amp;gt; when non-zero
+$J(&lt;prefix&gt;) = Like $J, but adding &lt;prefix&gt; when non-zero
 
-&amp;lt;date&amp;gt;:
+Examples:
+*$J(.) → app.log, app.log.1, app.log.2
+*$J(.).log → app.log, app.1.log, app.2.log
+
+&lt;date&gt;:
 DD = day
 MM = month
 YY[YY] = year

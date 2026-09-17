@@ -1554,6 +1554,10 @@ $I = 文件索引编号
 $J = 文件索引编号，为零时隐藏
 $J(&lt;前缀&gt;) = 类似 $J，但在非零时添加 &lt;前缀&gt;
 
+示例：
+*$J(.) → app.log, app.log.1, app.log.2
+*$J(.).log → app.log, app.1.log, app.2.log
+
 &lt;日期&gt;：
 DD = 日
 MM = 月

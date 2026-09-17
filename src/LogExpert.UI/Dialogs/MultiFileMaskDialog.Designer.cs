@@ -121,7 +121,7 @@
         // 
         this.syntaxHelpLabel.Location = new System.Drawing.Point(15, 140);
         this.syntaxHelpLabel.Name = "syntaxHelpLabel";
-        this.syntaxHelpLabel.Size = new System.Drawing.Size(402, 194);
+        this.syntaxHelpLabel.Size = new System.Drawing.Size(402, 254);
         this.syntaxHelpLabel.TabIndex = 7;
         this.syntaxHelpLabel.Text = "Syntax Help Label";
         // 
@@ -129,7 +129,7 @@
         // 
         this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
         this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-        this.buttonOk.Location = new System.Drawing.Point(261, 347);
+        this.buttonOk.Location = new System.Drawing.Point(261, 407);
         this.buttonOk.Name = "buttonOk";
         this.buttonOk.Size = new System.Drawing.Size(75, 23);
         this.buttonOk.TabIndex = 8;
@@ -141,7 +141,7 @@
         // 
         this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
         this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-        this.buttonCancel.Location = new System.Drawing.Point(342, 347);
+        this.buttonCancel.Location = new System.Drawing.Point(342, 407);
         this.buttonCancel.Name = "buttonCancel";
         this.buttonCancel.Size = new System.Drawing.Size(75, 23);
         this.buttonCancel.TabIndex = 9;
@@ -152,7 +152,7 @@
         // 
         this.AcceptButton = this.buttonOk;
         this.CancelButton = this.buttonCancel;
-        this.ClientSize = new System.Drawing.Size(434, 386);
+        this.ClientSize = new System.Drawing.Size(434, 446);
         this.Controls.Add(this.buttonCancel);
         this.Controls.Add(this.buttonOk);
         this.Controls.Add(this.syntaxHelpLabel);
@@ -162,7 +162,7 @@
         this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
         this.MaximizeBox = false;
         this.MinimizeBox = false;
-        this.MinimumSize = new System.Drawing.Size(329, 420);
+        this.MinimumSize = new System.Drawing.Size(329, 480);
         this.Name = "MultiFileMaskDialog";
         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
         this.Text = "MultiFile settings";
