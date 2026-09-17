@@ -9,10 +9,11 @@ namespace LogExpert.UI.Controls.LogWindow;
 /// <summary>Renders prepared marker buckets. It has no reader, matching logic or scan lifecycle.</summary>
 internal sealed class MarkerBar : Control
 {
-    private static readonly MarkerSource[] _sourceOrder = [MarkerSource.Highlights, MarkerSource.Bookmarks, MarkerSource.Search, MarkerSource.Filter];
+    private static readonly MarkerCategory[] _categoryOrder = [MarkerCategory.Highlights, MarkerCategory.Bookmarks, MarkerCategory.Search, MarkerCategory.Filter];
+    private static readonly IReadOnlyDictionary<MarkerCategory, IReadOnlyList<MarkerBucket>> _emptyLanes = new Dictionary<MarkerCategory, IReadOnlyList<MarkerBucket>>();
     private readonly ToolTip _toolTip = new();
     private readonly ContextMenuStrip _menu = new();
-    private IReadOnlyDictionary<MarkerSource, IReadOnlyList<MarkerBucket>> _lanes = new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>();
+    private IReadOnlyDictionary<MarkerCategory, IReadOnlyList<MarkerBucket>> _lanes = _emptyLanes;
     private int _bucketHeight;
     private bool _discovering;
     private string _tooltipText = string.Empty;
@@ -37,7 +38,7 @@ internal sealed class MarkerBar : Control
     internal int BottomInset { get; set; }
     internal int BucketHeight => Math.Max(0, ClientSize.Height - TopInset - BottomInset);
 
-    internal void SetBuckets (IReadOnlyDictionary<MarkerSource, IReadOnlyList<MarkerBucket>> lanes, int height, bool discovering)
+    internal void SetBuckets (IReadOnlyDictionary<MarkerCategory, IReadOnlyList<MarkerBucket>> lanes, int height, bool discovering)
     {
         _lanes = lanes;
         _bucketHeight = height;
@@ -57,7 +58,7 @@ internal sealed class MarkerBar : Control
 
     internal void ClearBuckets ()
     {
-        _lanes = new Dictionary<MarkerSource, IReadOnlyList<MarkerBucket>>();
+        _lanes = _emptyLanes;
         _tooltipText = string.Empty;
         _toolTip.SetToolTip(this, null);
         Invalidate();
@@ -73,11 +74,11 @@ internal sealed class MarkerBar : Control
 
         using var brush = new SolidBrush(ForeColor);
         using var separator = new Pen(SystemColors.ControlDark);
-        for (var lane = 0; lane < _sourceOrder.Length; lane++)
+        for (var laneIndex = 0; laneIndex < _categoryOrder.Length; laneIndex++)
         {
-            var left = lane * ClientSize.Width / _sourceOrder.Length;
-            var right = (lane + 1) * ClientSize.Width / _sourceOrder.Length;
-            if (lane > 0)
+            var left = laneIndex * ClientSize.Width / _categoryOrder.Length;
+            var right = (laneIndex + 1) * ClientSize.Width / _categoryOrder.Length;
+            if (laneIndex > 0)
             {
                 e.Graphics.DrawLine(separator, left, TopInset, left, TopInset + BucketHeight);
             }
@@ -87,14 +88,9 @@ internal sealed class MarkerBar : Control
                 continue;
             }
 
-            foreach (var bucket in _lanes.GetValueOrDefault(_sourceOrder[lane]) ?? [])
+            foreach (var bucket in GetBuckets(_categoryOrder[laneIndex]))
             {
                 brush.Color = Color.FromArgb(bucket.ColorArgb);
-                // Bold-only rules inherit the current foreground when no color is specified.
-                if (brush.Color.A == 0)
-                {
-                    brush.Color = ForeColor;
-                }
                 var inset = right - left > 1 ? 1 : 0;
                 e.Graphics.FillRectangle(brush, left + inset, TopInset + bucket.Pixel, right - left - inset, 1);
             }
@@ -127,7 +123,7 @@ internal sealed class MarkerBar : Control
         base.OnMouseMove(e);
         var hit = HitTest(e.Location);
         var text = hit.HasValue
-            ? string.Format(CultureInfo.CurrentCulture, Resources.MarkerBar_ToolTip, CategoryName(hit.Value.Source),
+            ? string.Format(CultureInfo.CurrentCulture, Resources.MarkerBar_ToolTip, CategoryName(hit.Value.Category),
                 hit.Value.Bucket.FirstLine + 1, hit.Value.Bucket.LastLine + 1, hit.Value.Bucket.Count)
             : Resources.MarkerBar_Title;
         if (_discovering)
@@ -142,35 +138,41 @@ internal sealed class MarkerBar : Control
         }
     }
 
-    private (MarkerSource Source, MarkerBucket Bucket)? HitTest (Point point)
+    private (MarkerCategory Category, MarkerBucket Bucket)? HitTest (Point point)
     {
         if (ClientSize.Width <= 0 || point.X < 0 || point.X >= ClientSize.Width || _bucketHeight != BucketHeight)
         {
             return null;
         }
 
-        var lane = Math.Min(_sourceOrder.Length - 1, ((point.X + 1) * _sourceOrder.Length - 1) / ClientSize.Width);
-        var source = _sourceOrder[lane];
+        var laneIndex = Math.Min(_categoryOrder.Length - 1, ((point.X + 1) * _categoryOrder.Length - 1) / ClientSize.Width);
+        var category = _categoryOrder[laneIndex];
         var pixel = point.Y - TopInset;
-        foreach (var bucket in _lanes.GetValueOrDefault(source) ?? [])
+        foreach (var bucket in GetBuckets(category))
         {
             if (bucket.Pixel == pixel)
             {
-                return (source, bucket);
+                return (category, bucket);
             }
         }
 
         return null;
     }
 
-    private static string CategoryName (MarkerSource source)
+    private IReadOnlyList<MarkerBucket> GetBuckets (MarkerCategory category)
     {
-        return source switch
+        return _lanes.GetValueOrDefault(category) ?? [];
+    }
+
+    private static string CategoryName (MarkerCategory category)
+    {
+        return category switch
         {
-            MarkerSource.Highlights => Resources.MarkerBar_Highlights,
-            MarkerSource.Bookmarks => Resources.MarkerBar_Bookmarks,
-            MarkerSource.Search => Resources.MarkerBar_SearchHits,
-            _ => Resources.MarkerBar_FilterHits
+            MarkerCategory.Highlights => Resources.MarkerBar_Highlights,
+            MarkerCategory.Bookmarks => Resources.MarkerBar_Bookmarks,
+            MarkerCategory.Search => Resources.MarkerBar_SearchHits,
+            MarkerCategory.Filter => Resources.MarkerBar_FilterHits,
+            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
         };
     }
 

@@ -770,7 +770,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     protected void OnCurrentHighlightListChanged ()
     {
-        InvalidateMarkerCriteria(MarkerSource.Highlights);
+        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
         CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
     }
 
@@ -788,7 +788,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     protected void OnColumnizerChanged (ILogLineMemoryColumnizer columnizer)
     {
-        InvalidateMarkerCriteria(MarkerSource.Highlights);
+        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
         ColumnizerChanged?.Invoke(this, new ColumnizerEventArgs(columnizer));
     }
 
@@ -866,7 +866,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _ = Invoke(new MethodInvoker(RunHighlightBookmarkScan));
             Invoke(() =>
             {
-                InvalidateMarkerCriteria(MarkerSource.All);
+                InvalidateMarkerCriteria(MarkerScanSource.All);
                 _isReadyForLineNavigation = true;
                 ApplyPendingLineNavigation();
             });
@@ -921,7 +921,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (e.NewFile)
         {
-            InvalidateMarkerCriteria(MarkerSource.All);
+            InvalidateMarkerCriteria(MarkerScanSource.All);
             // File was new created (e.g. rollover)
             _isDeadFile = false;
             UnRegisterLogFileReaderEvents();
@@ -940,7 +940,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (e.IsRollover || e.LineCount < e.PrevLineCount)
         {
             Interlocked.Increment(ref _markerTailPending);
-            InvalidateMarkerCriteria(MarkerSource.All);
+            InvalidateMarkerCriteria(MarkerScanSource.All);
         }
 
         _tailFollowEngine.Post(e);
@@ -1055,7 +1055,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var newValue = (string)e.Value;
 
         CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
-        InvalidateMarkerCriteria(MarkerSource.Highlights);
+        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
         dataGridView.Refresh();
 
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
@@ -2779,7 +2779,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _isReadyForLineNavigation = false;
         _isLoading = true;
-        InvalidateMarkerCriteria(MarkerSource.All);
+        InvalidateMarkerCriteria(MarkerScanSource.All);
         _markerBar.ClearBuckets();
         FireCancelHandlers(); // reload cancels the jobs of the old content, not the window lifetime
         _searchCts?.Cancel();
@@ -2806,7 +2806,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void LogfileDead ()
     {
-        InvalidateMarkerCriteria(MarkerSource.All);
+        InvalidateMarkerCriteria(MarkerScanSource.All);
         _markerBar.ClearBuckets();
         CancelPendingLineNavigation();
         _isDeadFile = true;
@@ -7293,7 +7293,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     CurrentColumnizer.SetTimeOffset(0);
                 }
 
-                InvalidateMarkerCriteria(MarkerSource.Highlights);
+                InvalidateMarkerCriteria(MarkerScanSource.Highlights);
                 dataGridView.Refresh();
                 filterGridView.Refresh();
                 if (CurrentColumnizer.IsTimeshiftImplemented())
@@ -7758,7 +7758,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _guiStateArgs.HighlightGroupName = _currentHighlightGroup.GroupName;
         }
 
-        InvalidateMarkerCriteria(MarkerSource.Highlights);
+        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
 
         SendGuiStateUpdate();
 

@@ -3,8 +3,8 @@ namespace LogExpert.Core.Classes.Marker;
 /// <summary>A populated vertical pixel, including its logical range and navigation target.</summary>
 public readonly record struct MarkerBucket (int Pixel, int FirstLine, int LastLine, int Count, int TargetLine, int ColorArgb)
 {
-    /// <summary>Aggregates a line-ordered index without sampling; duplicate lines count only once.</summary>
-    public static IReadOnlyList<MarkerBucket> Aggregate (IEnumerable<MarkerLine> matches, int lineCount, int height)
+    /// <summary>Aggregates a line-ordered index without sampling and resolves inherited foregrounds; duplicate lines count only once.</summary>
+    public static IReadOnlyList<MarkerBucket> Aggregate (IEnumerable<MarkerLine> matches, int lineCount, int height, int defaultForegroundArgb)
     {
         ArgumentNullException.ThrowIfNull(matches);
         if (lineCount <= 0 || height <= 0)
@@ -44,7 +44,7 @@ public readonly record struct MarkerBucket (int Pixel, int FirstLine, int LastLi
             if (match.Priority < priorities[pixel])
             {
                 priorities[pixel] = match.Priority;
-                color = match.ColorArgb;
+                color = match.ColorArgb ?? defaultForegroundArgb;
             }
 
             buckets[pixel] = new MarkerBucket(pixel, first, last,

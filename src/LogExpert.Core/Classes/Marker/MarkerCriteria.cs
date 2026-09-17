@@ -81,7 +81,7 @@ public sealed class MarkerCriteria
             if (matched)
             {
                 var color = HasBackground(entry) ? entry.BackgroundColor : entry.ForegroundColor;
-                return new MarkerLine(lineNumber, color.ToArgb(), priority);
+                return new MarkerLine(lineNumber, color.A > 0 ? color.ToArgb() : null, priority);
             }
         }
 

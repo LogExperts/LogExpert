@@ -337,7 +337,7 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
     {
         BaseRegexColumnizer clone = Activator.CreateInstance(GetType()) as BaseRegexColumnizer
             ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
-                LogExpert.Resources.Columnizer_SnapshotUnavailable, GetName()));
+                Resources.RegexColumnizer_Error_Message_SnapshotUnavailable, GetName()));
 
         clone._config = new RegexColumnizerConfig
         {

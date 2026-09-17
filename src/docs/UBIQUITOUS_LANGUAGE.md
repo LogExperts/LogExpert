@@ -44,7 +44,9 @@
 |------|-----------|-----------------|
 | **Highlight Entry** | A rule that matches Log Lines by text or regex and applies visual formatting (colors, bold) | Hilight entry, highlight rule |
 | **Highlight Group** | A named collection of Highlight Entries that can be activated or deactivated together | Hilight group, color scheme |
-| **Bookmark** | A user- or auto-generated marker on a specific Log Line, carrying optional comment text and an overlay | Marker, pin, flag |
+| **Bookmark** | A user- or auto-generated annotation on a specific Log Line, carrying optional comment text and an overlay | Marker (reserved for the overview indicator), pin, flag |
+| **Marker** | An overview indicator in the Marker Bar representing highlights, Bookmarks, Log Search hits, or Window Filter hits on one or more Log Lines | Bookmark |
+| **Marker Bar** | The file-wide overview beside a Log Window, with separate marker categories | Bookmark bar |
 | **Bookmark Overlay** | A draggable visual annotation displayed on the data grid at a Bookmark's position | Tooltip, popup |
 | **Auto-Generated Bookmark** | A transient Bookmark created by scanning Highlight Entries with the "set bookmark" flag; not persisted | Scan bookmark |
 

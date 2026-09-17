@@ -23,6 +23,20 @@ meaning; do not redefine them locally.
   construction, since the bulk `HighlightBookmarkScanner` has no access to
   the side-effecting triggers.
 
+## Marker Bar
+
+- **Marker Bar** — A compact overview beside a Log Window that shows where
+  highlights, bookmarks, Log Search hits, and Window Filter hits occur across
+  the loaded file.
+- **Marker** — An indicator in the Marker Bar representing one or more matching
+  Log Lines. Markers are grouped by category; they do not create or replace
+  Bookmarks.
+- **Bookmark** — An annotation attached to a specific Log Line, with optional
+  comment text. A Bookmark can be represented by a Marker in the bookmark
+  category; the two terms are not synonyms.
+
+*Avoid*: "marker" when referring to the underlying Bookmark annotation.
+
 ## Audio alerts
 
 - **Audio Alert** — A sound played when a tail-only highlight match occurs.
