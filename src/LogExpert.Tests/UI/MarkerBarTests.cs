@@ -9,6 +9,8 @@ using LogExpert.UI.Controls.LogWindow;
 
 using NUnit.Framework;
 
+using Vanara.PInvoke;
+
 namespace LogExpert.Tests.UI;
 
 [TestFixture]
@@ -16,14 +18,20 @@ namespace LogExpert.Tests.UI;
 [System.Runtime.Versioning.SupportedOSPlatform("windows")]
 public class MarkerBarTests
 {
-    [Test]
-    public void Paint_DiscoveryIndicatorScalesToCurrentDeviceDpi ()
+    [TestCase(96, 10, 2)]
+    [TestCase(144, 15, 3)]
+    [TestCase(192, 20, 4)]
+    public void Paint_DiscoveryIndicatorScalesToDeviceDpi (int dpi, int expectedWidth, int expectedHeight)
     {
         using var bar = CreateBar(80, 40);
         bar.TopInset = 20;
         bar.BackColor = Color.White;
         bar.ForeColor = Color.Green;
         bar.SetBuckets(new Dictionary<MarkerCategory, IReadOnlyList<MarkerBucket>>(), bar.BucketHeight, true);
+        // WinForms accepts a nonzero wParam on BEFOREPARENT specifically for DPI tests.
+        _ = User32.SendMessage(bar.Handle, User32.WindowMessage.WM_DPICHANGED_BEFOREPARENT, (nint)dpi, nint.Zero);
+        _ = User32.SendMessage(bar.Handle, User32.WindowMessage.WM_DPICHANGED_AFTERPARENT, nint.Zero, nint.Zero);
+        Assert.That(bar.DeviceDpi, Is.EqualTo(dpi));
         using var image = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(image, bar.ClientRectangle);
 
@@ -42,14 +50,12 @@ public class MarkerBarTests
         Assert.That(indicatorPixels, Is.Not.Empty);
         var width = indicatorPixels.Max(point => point.X) - indicatorPixels.Min(point => point.X) + 1;
         var height = indicatorPixels.Max(point => point.Y) - indicatorPixels.Min(point => point.Y) + 1;
-        var expected = bar.LogicalToDeviceUnits(new Size(10, 2));
         Assert.Multiple(() =>
         {
             // GDI ellipse rasterization may differ by one edge pixel at fractional scaling.
-            Assert.That(width, Is.EqualTo(expected.Width).Within(1));
-            Assert.That(height, Is.EqualTo(expected.Height).Within(1));
+            Assert.That(width, Is.EqualTo(expectedWidth).Within(1));
+            Assert.That(height, Is.EqualTo(expectedHeight).Within(1));
         });
-        TestContext.Progress.WriteLine($"Marker discovery indicator: {width} x {height} pixels at {bar.DeviceDpi} DPI.");
     }
 
     [Test]

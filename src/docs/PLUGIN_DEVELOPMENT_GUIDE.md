@@ -444,25 +444,29 @@ Main interface for columnizer plugins.
 - `DateTime GetTimestamp(...)` - Extract timestamp
 - ... (see ColumnizerLib for complete reference)
 
-#### Optional marker snapshots (`ICloneable`)
+#### Optional marker snapshots (`IColumnizerSnapshotMemory`)
 
 A columnizer implementing `ILogLineMemoryColumnizer` can also implement
-`System.ICloneable` to preserve its current parsing state for the marker bar's
-background scan. This is optional; the columnizer interface has no new required
-members, and existing plugins do not need recompilation for this feature.
+`ColumnizerLib.IColumnizerSnapshotMemory` to preserve its current parsing state
+for the Marker Bar's background scan. This optional capability adds no required
+members to `ILogLineMemoryColumnizer`, and existing plugins do not need
+recompilation for this feature.
 
-`Clone()` must return an independent, initialized `ILogLineMemoryColumnizer` with
-its current configuration and detected layout. Do not share mutable parsing state
-with the original instance. The marker bar calls `Clone()` on the UI thread, so
-keep it quick and avoid file I/O. It parses using the copy on a worker thread and
-does not call `Selected()` on that copy.
+`ILogLineMemoryColumnizer CreateSnapshot()` must return an independent,
+initialized columnizer with its current configuration and detected layout.
+Do not share mutable parsing state with the original instance. The Marker Bar
+calls `CreateSnapshot()` on the UI thread, so keep it quick and perform no file
+I/O. It parses using the snapshot on a worker thread and does not call
+`Selected()` on that snapshot.
 
-Without a compatible clone, the marker bar constructs a fresh instance using the
+Without this capability, the Marker Bar constructs a fresh instance using the
 plugin's public parameterless constructor, calls optional `LoadConfig()` and
 `Selected()` on the worker, and applies the current time offset when supported.
-Runtime state that cannot be reconstructed this way requires the optional clone.
+Runtime state that cannot be reconstructed this way requires the optional
+snapshot capability.
 
-See [the marker columnizer capture](../LogExpert.UI/Controls/LogWindow/LogWindow.MarkerBar.cs)
+See [the snapshot contract](../ColumnizerLib/IColumnizerSnapshotMemory.cs),
+[the marker columnizer capture](../LogExpert.UI/Controls/LogWindow/LogWindow.MarkerBar.cs),
 and [the fallback factory](../LogExpert.Core/Classes/Columnizer/ColumnizerPicker.cs).
 
 #### ILogLine

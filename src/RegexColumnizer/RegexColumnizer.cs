@@ -21,7 +21,7 @@ namespace RegexColumnizer;
 /// columnizer implementations. The class ensures that columnized output always matches the expected column count, and
 /// provides mechanisms for both memory-efficient and string-based log line processing. Thread safety is not guaranteed;
 /// instances should not be shared across threads without external synchronization.</remarks>
-public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnizerConfiguratorMemory, ICloneable
+public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnizerConfiguratorMemory, IColumnizerSnapshotMemory
 {
     #region Fields
 
@@ -333,7 +333,7 @@ public abstract class BaseRegexColumnizer : ILogLineMemoryColumnizer, IColumnize
         return GetName();
     }
 
-    public object Clone ()
+    public ILogLineMemoryColumnizer CreateSnapshot ()
     {
         BaseRegexColumnizer clone = Activator.CreateInstance(GetType()) as BaseRegexColumnizer
             ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,

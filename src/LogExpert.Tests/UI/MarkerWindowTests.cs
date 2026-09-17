@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -393,7 +394,7 @@ public sealed class MarkerWindowTests : IDisposable
             MarkerCategory.Bookmarks => 1,
             MarkerCategory.Search => 2,
             MarkerCategory.Filter => 3,
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+            _ => throw new InvalidEnumArgumentException(nameof(category), (int)category, typeof(MarkerCategory))
         };
         return new Point((laneIndex * 2 + 1) * bar.Width / 8, bar.TopInset + (count == 1 ? 0 : (int)((long)line * (bar.BucketHeight - 1) / (count - 1))));
     }

@@ -172,7 +172,7 @@ internal sealed class MarkerBar : Control
             MarkerCategory.Bookmarks => Resources.MarkerBar_Bookmarks,
             MarkerCategory.Search => Resources.MarkerBar_SearchHits,
             MarkerCategory.Filter => Resources.MarkerBar_FilterHits,
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
+            _ => throw new InvalidEnumArgumentException(nameof(category), (int)category, typeof(MarkerCategory))
         };
     }
 

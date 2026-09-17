@@ -31,9 +31,9 @@ meaning; do not redefine them locally.
 - **Marker** — An indicator in the Marker Bar representing one or more matching
   Log Lines. Markers are grouped by category; they do not create or replace
   Bookmarks.
-- **Bookmark** — An annotation attached to a specific Log Line, with optional
-  comment text. A Bookmark can be represented by a Marker in the bookmark
-  category; the two terms are not synonyms.
+- **Bookmark** — A user- or auto-generated annotation attached to a specific
+  Log Line, carrying optional comment text and an overlay. A Bookmark can be
+  represented by a Marker in the bookmark category; the two terms are not synonyms.
 
 *Avoid*: "marker" when referring to the underlying Bookmark annotation.
 

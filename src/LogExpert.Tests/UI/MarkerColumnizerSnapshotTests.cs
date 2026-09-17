@@ -19,7 +19,7 @@ namespace LogExpert.Tests.UI;
 public class MarkerColumnizerSnapshotTests
 {
     [Test]
-    public void CsvClone_SplitLinePreservesInitializedParseAfterOriginalConfigChanges ()
+    public void CsvSnapshot_SplitLinePreservesInitializedParseAfterOriginalConfigChanges ()
     {
         var directory = CreateTempDirectory();
         try
@@ -38,7 +38,7 @@ public class MarkerColumnizerSnapshotTests
             _ = original.PreProcessLine("name,age".AsMemory(), 0, 0);
             original.Selected(new Mock<ILogLineMemoryColumnizerCallback>().Object);
 
-            var clone = (CsvColumnizer.CsvColumnizer)((ICloneable)original).Clone();
+            var snapshot = ((IColumnizerSnapshotMemory)original).CreateSnapshot();
             File.WriteAllText(Path.Join(directory, "csvcolumnizer.json"), JsonConvert.SerializeObject(new
             {
                 DelimiterChar = ";",
@@ -50,7 +50,7 @@ public class MarkerColumnizerSnapshotTests
             }));
             original.LoadConfig(directory);
 
-            var result = clone.SplitLine(null, new CsvLogLine("Alice,42", 1));
+            var result = snapshot.SplitLine(null, new CsvLogLine("Alice,42", 1));
 
             Assert.That(result.ColumnValues.Select(column => column.FullValue.ToString()), Is.EqualTo(["Alice", "42"]));
         }
@@ -61,7 +61,7 @@ public class MarkerColumnizerSnapshotTests
     }
 
     [Test]
-    public void RegexClone_SplitLinePreservesInitializedParseAfterOriginalConfigChanges ()
+    public void RegexSnapshot_SplitLinePreservesInitializedParseAfterOriginalConfigChanges ()
     {
         var directory = CreateTempDirectory();
         try
@@ -69,11 +69,11 @@ public class MarkerColumnizerSnapshotTests
             WriteRegexConfig(directory, "(?<name>[^:]+):(?<value>.+)");
             var original = new Regex1Columnizer();
             original.LoadConfig(directory);
-            var clone = (BaseRegexColumnizer)((ICloneable)original).Clone();
+            var snapshot = ((IColumnizerSnapshotMemory)original).CreateSnapshot();
             WriteRegexConfig(directory, "(?<other>.+)");
             original.LoadConfig(directory);
 
-            var result = clone.SplitLine(new Mock<ILogLineMemoryColumnizerCallback>().Object, new LogLine("Alice:42", 1));
+            var result = snapshot.SplitLine(new Mock<ILogLineMemoryColumnizerCallback>().Object, new LogLine("Alice:42", 1));
 
             Assert.That(result.ColumnValues.Select(column => column.FullValue.ToString()), Is.EqualTo(["Alice", "42"]));
         }
@@ -84,7 +84,7 @@ public class MarkerColumnizerSnapshotTests
     }
 
     [Test]
-    public void Log4jClone_SplitLinePreservesInitializedParseAndTimeOffsetAfterOriginalConfigChanges ()
+    public void Log4jSnapshot_SplitLinePreservesInitializedParseAndTimeOffsetAfterOriginalConfigChanges ()
     {
         var directory = CreateTempDirectory();
         try
@@ -93,19 +93,19 @@ public class MarkerColumnizerSnapshotTests
             var original = new Log4jXmlColumnizer.Log4jXmlColumnizer();
             original.LoadConfig(directory);
             original.SetTimeOffset(123);
-            var clone = (Log4jXmlColumnizer.Log4jXmlColumnizer)((ICloneable)original).Clone();
+            var snapshot = ((IColumnizerSnapshotMemory)original).CreateSnapshot();
             WriteLog4jConfig(directory, false);
             original.LoadConfig(directory);
 
             var line = new LogLine("1700000000000�INFO�Logger�Thread�Class�Method�File�12�Message", 1);
-            var result = clone.SplitLine(new Mock<ILogLineMemoryColumnizerCallback>().Object, line);
+            var result = snapshot.SplitLine(new Mock<ILogLineMemoryColumnizerCallback>().Object, line);
 
             Assert.Multiple(() =>
             {
                 Assert.That(result.ColumnValues, Has.Length.EqualTo(9));
                 Assert.That(result.ColumnValues[1].FullValue.ToString(), Is.EqualTo("INFO"));
                 Assert.That(result.ColumnValues[8].FullValue.ToString(), Is.EqualTo("Message"));
-                Assert.That(clone.GetTimeOffset(), Is.EqualTo(123));
+                Assert.That(snapshot.GetTimeOffset(), Is.EqualTo(123));
             });
         }
         finally
@@ -115,25 +115,25 @@ public class MarkerColumnizerSnapshotTests
     }
 
     [Test]
-    public void SquareBracketClone_PreservesDetectedLayoutAndTimeOffsetAfterOriginalChanges ()
+    public void SquareBracketSnapshot_PreservesDetectedLayoutAndTimeOffsetAfterOriginalChanges ()
     {
         var line = new LogLine("2022-03-21 11:34:34.505[one][two][three][four][five][six]Message", 0);
         var original = new SquareBracketColumnizer();
         _ = original.GetPriority("square.log", new ILogLineMemory[] { line });
         original.SetTimeOffset(123);
-        var clone = (SquareBracketColumnizer)((ICloneable)original).Clone();
+        var snapshot = ((IColumnizerSnapshotMemory)original).CreateSnapshot();
         _ = original.GetPriority("other.log", new ILogLineMemory[] { new LogLine("[Other]Changed", 0) });
         original.SetTimeOffset(456);
 
-        var result = clone.SplitLine(null, line);
+        var result = snapshot.SplitLine(null, line);
 
         Assert.Multiple(() =>
         {
-            Assert.That(clone.GetColumnNames(), Is.EqualTo(new[] { "Date", "Time", "Level", "Source", "Source1", "Source2", "Source3", "Source4", "Message" }));
+            Assert.That(snapshot.GetColumnNames(), Is.EqualTo(new[] { "Date", "Time", "Level", "Source", "Source1", "Source2", "Source3", "Source4", "Message" }));
             Assert.That(result.ColumnValues, Has.Length.EqualTo(9));
             Assert.That(result.ColumnValues[0].FullValue.ToString(), Is.EqualTo("2022-03-21"));
             Assert.That(result.ColumnValues[1].FullValue.ToString(), Is.EqualTo("11:34:34.628"));
-            Assert.That(clone.GetTimeOffset(), Is.EqualTo(123));
+            Assert.That(snapshot.GetTimeOffset(), Is.EqualTo(123));
         });
     }
 

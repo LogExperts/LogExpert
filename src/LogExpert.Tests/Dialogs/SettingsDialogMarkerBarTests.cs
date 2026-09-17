@@ -34,11 +34,6 @@ public class SettingsDialogMarkerBarTests
             Assert.That(tab.Controls.Find("checkBoxShowFilterMarkers", true).Single().Text, Is.EqualTo(UIStrings.SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers));
         });
 
-        foreach (var checkBox in tab.Controls.OfType<FlowLayoutPanel>().Single().Controls.OfType<CheckBox>())
-        {
-            TestContext.Progress.WriteLine($"{checkBox.Name}: {checkBox.Text}");
-        }
-
         ((CheckBox)tab.Controls.Find("checkBoxShowMarkerBar", true).Single()).Checked = true;
         ((CheckBox)tab.Controls.Find("checkBoxShowHighlightMarkers", true).Single()).Checked = false;
         ((CheckBox)tab.Controls.Find("checkBoxShowBookmarkMarkers", true).Single()).Checked = false;

@@ -80,8 +80,9 @@ public sealed class MarkerCriteria
 
             if (matched)
             {
-                var color = HasBackground(entry) ? entry.BackgroundColor : entry.ForegroundColor;
-                return new MarkerLine(lineNumber, color.A > 0 ? color.ToArgb() : null, priority);
+                int? color = HasBackground(entry) ? entry.BackgroundColor.ToArgb()
+                    : HasForeground(entry) ? entry.ForegroundColor.ToArgb() : null;
+                return new MarkerLine(lineNumber, color, priority);
             }
         }
 
@@ -91,12 +92,17 @@ public sealed class MarkerCriteria
     private static bool IsVisual (HighlightEntry entry)
     {
         return !entry.IsSearchHit && (HasBackground(entry)
-            || entry.ForegroundColor.A > 0 || entry.IsBold);
+            || HasForeground(entry) || entry.IsBold);
     }
 
     private static bool HasBackground (HighlightEntry entry)
     {
         return (!entry.IsWordMatch || !entry.NoBackground) && entry.BackgroundColor.A > 0;
+    }
+
+    private static bool HasForeground (HighlightEntry entry)
+    {
+        return entry.ForegroundColor.A > 0;
     }
 
     private static bool HasVisibleWordMatch (HighlightEntry entry, ITextValueMemory column)

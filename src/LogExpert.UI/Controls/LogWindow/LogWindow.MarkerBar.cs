@@ -179,7 +179,7 @@ internal partial class LogWindow
     private Func<int, ILogLineMemory, IReadOnlyList<ITextValueMemory>> CaptureMarkerColumns (ILogfileReader reader)
     {
         var template = CurrentColumnizer;
-        var snapshot = (template as ICloneable)?.Clone() as ILogLineMemoryColumnizer;
+        var snapshot = (template as IColumnizerSnapshotMemory)?.CreateSnapshot();
         var directory = ConfigManager.ActiveConfigDir;
         var offset = template.IsTimeshiftImplemented() ? template.GetTimeOffset() : 0;
         var callback = new ColumnizerCallback(new MarkerLineSource(reader, FileName));

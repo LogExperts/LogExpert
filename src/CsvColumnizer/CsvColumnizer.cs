@@ -17,7 +17,7 @@ namespace CsvColumnizer;
 /// The IPreProcessColumnizer is implemented to read field names from the very first line of the file. Then
 /// the line is dropped. So it's not seen by LogExpert. The field names will be used as column names.
 /// </summary>
-public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IColumnizerConfiguratorMemory, IPreProcessColumnizerMemory, IColumnizerPriorityMemory, ICloneable
+public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IColumnizerConfiguratorMemory, IPreProcessColumnizerMemory, IColumnizerPriorityMemory, IColumnizerSnapshotMemory
 {
     #region Fields
 
@@ -220,7 +220,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         // nothing to do
     }
 
-    public object Clone ()
+    public ILogLineMemoryColumnizer CreateSnapshot ()
     {
         CsvColumnizerConfig config = new()
         {

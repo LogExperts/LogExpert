@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 
 using ColumnizerLib;
@@ -43,7 +44,7 @@ public class MarkerPerformanceTests
 
         var initialSnapshot = index.Snapshot;
         var initialMatches = initialSnapshot.Matches.ToArray();
-        var initialBuckets = MarkerBucket.Aggregate(initialMatches, INITIAL_LINE_COUNT, 2_000, System.Drawing.Color.Black.ToArgb());
+        var initialBuckets = MarkerBucket.Aggregate(initialMatches, INITIAL_LINE_COUNT, 2_000, Color.Black.ToArgb());
 
         reader.Append(APPENDED_LINE_COUNT);
         var appendMemoryBefore = GC.GetTotalMemory(true);
@@ -56,7 +57,7 @@ public class MarkerPerformanceTests
 
         var appendedSnapshot = index.Snapshot;
         var appendedMatches = appendedSnapshot.Matches.ToArray();
-        var appendedBuckets = MarkerBucket.Aggregate(appendedMatches, reader.LineCount, 2_000, System.Drawing.Color.Black.ToArgb());
+        var appendedBuckets = MarkerBucket.Aggregate(appendedMatches, reader.LineCount, 2_000, Color.Black.ToArgb());
 
         Assert.Multiple(() =>
         {

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 [assembly: SupportedOSPlatform("windows")]
 namespace Log4jXmlColumnizer;
 
-public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfiguratorMemory, IColumnizerPriorityMemory, ICloneable
+public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfiguratorMemory, IColumnizerPriorityMemory, IColumnizerSnapshotMemory
 {
     #region Fields
 
@@ -278,7 +278,7 @@ public class Log4jXmlColumnizer : ILogLineMemoryXmlColumnizer, IColumnizerConfig
         }
     }
 
-    public object Clone ()
+    public ILogLineMemoryColumnizer CreateSnapshot ()
     {
         Log4jXmlColumnizer clone = new()
         {
