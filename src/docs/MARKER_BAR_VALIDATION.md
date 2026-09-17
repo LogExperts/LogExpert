@@ -1,4 +1,4 @@
-# Marker Bar implementation validation
+# Marker Bar Implementation Validation
 
 Issue #27 adds independent overview lanes for highlights, bookmarks, the latest Log Search, and Window Filter hits. The bar remains opt-in by explicit user choice. This report records measured performance and the limits of automated validation.
 
@@ -19,7 +19,7 @@ Measured on 2026-09-17 on Windows x64, .NET SDK 10.0.106, Debug, 96 DPI. Both ex
 | UI event pumps during discovery | Not applicable | 45 |
 | Maximum event-pump duration | Not applicable | 26.8 ms |
 
-The in-memory experiment checks all 502,000 final matches and their counts across 2,000 pixel buckets. Its file sizes model UTF-8 content with CRLF; it does not read disk. The real-file experiment verifies publication of the appended final-line marker and tooltip. Heap deltas use `GC.GetTotalMemory(true)` and allocations use `GC.GetTotalAllocatedBytes(true)`. These are individual-run diagnostics, not process working-set measurements or input-latency guarantees. The explicit tests report timings rather than imposing hardware-dependent CI thresholds.
+The in-memory experiment checks all 502,000 final matches and their counts across 2,000 pixel buckets. Its file sizes model UTF-8 content with CRLF; it does not read disk. The real-file experiment verifies publication of the appended final-line marker and tooltip. Heap deltas use `GC.GetTotalMemory(true)` and allocations use `GC.GetTotalAllocatedBytes(true)`. These are individual-run diagnostics, not process working-set measurements or input-latency guarantees. Both performance tests are marked [Explicit] and excluded from default and CI test runs; the recorded numbers are not continuously verified. They report timings rather than imposing hardware-dependent CI thresholds.
 
 Reproduce the measurements after building:
 
@@ -30,14 +30,14 @@ dotnet test src/LogExpert.UI.Tests/LogExpert.UI.Tests.csproj --no-build --filter
 
 ## UI coverage
 
-The WinForms fixtures formerly in `LogExpert.Tests` now run in `LogExpert.UI.Tests`, including dialog, control, navigation, menu, and window-service tests. Its setup selects PerMonitorV2 before creating handles, matching the application. Parsing-only fixtures remain in `LogExpert.Tests`; no process-wide DPI setup is added there.
+Twenty fixtures that exercise WinForms windows and controls moved from `LogExpert.Tests` to `LogExpert.UI.Tests`, including dialog, control, navigation, menu, and window-service tests. The UI assembly selects PerMonitorV2 before creating handles, matching the application. `LogExpert.Tests` retains parsing tests as well as the STA fixtures `LogWindowCoordinatorTests`, `ToolLaunchServiceTests`, and `ClipboardHelperTests`; it still enables `UseWindowsForms` and has no process-wide DPI setup.
 
 - DPI: discovery-indicator rendering and docked Marker Bar width at 96/144/192 DPI. The width expectations are 28/42/56 device pixels for a 28-logical-pixel bar. Tests deliver WinForms DPI messages to existing handles; physical monitor transitions were not exercised.
 - Themes: real Log Windows render inherited highlight colors as black in Classic mode and white in Dark mode; changing the grid foreground to yellow also updates markers. The nonparallel fixture checks that no windows are open before changing application color mode, closes its windows, and restores the original mode. Windows OS theme-setting changes were not exercised.
 - Layout and navigation: resizing, hidden/restored docked windows with appended content, simultaneous non-overlapping Time Spread, marker clicks, and stopping follow-tail.
-- Data updates: executed search and filter criteria, rule edits, source visibility, restored bookmarks, truncation, timeshift, and independent word-highlight columnizer state.
+- Data updates: executed search and filter criteria, rule edits, source visibility, restored bookmarks, truncation, timeshift, and independent Columnizer Snapshots for word highlights.
 
-All 17 marker-related host resource keys have German and Simplified Chinese translations, including settings labels, tooltips and scan errors. Exact key coverage and formatting placeholders were checked without allowing neutral-resource fallback.
+All 17 host resource keys added for this feature (16 Marker Bar and settings strings plus `Columnizer_SnapshotUnavailable`) have German and Simplified Chinese translations, including settings labels, tooltips and scan errors. Exact key coverage and formatting placeholders were checked without allowing neutral-resource fallback.
 
 ## Regression status
 
