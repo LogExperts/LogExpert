@@ -67,6 +67,9 @@
   <data name="RegexColumnizer_Description" xml:space="preserve">
     <value>Spalten werden durch reguläre Ausdrücke mit dem Namen Capture-Gruppen gefüllt</value>
   </data>
+  <data name="RegexColumnizer_Error_Message_SnapshotUnavailable" xml:space="preserve">
+    <value>Für den Columnizer „{0}“ konnte kein Snapshot des Parsing-Zustands erstellt werden.</value>
+  </data>
   <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
     <value>Das Konfigurationsverzeichnis darf nicht null oder leer sein</value>
   </data>

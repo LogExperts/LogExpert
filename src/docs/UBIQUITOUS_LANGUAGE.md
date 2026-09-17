@@ -40,11 +40,13 @@
 
 ## Highlighting & Bookmarks
 
+For **Bookmark**, **Marker**, and **Marker Bar**, use the definitions in
+[CONTEXT.md](../../CONTEXT.md#marker-bar).
+
 | Term | Definition | Aliases to avoid |
 |------|-----------|-----------------|
 | **Highlight Entry** | A rule that matches Log Lines by text or regex and applies visual formatting (colors, bold) | Hilight entry, highlight rule |
 | **Highlight Group** | A named collection of Highlight Entries that can be activated or deactivated together | Hilight group, color scheme |
-| **Bookmark** | A user- or auto-generated marker on a specific Log Line, carrying optional comment text and an overlay | Marker, pin, flag |
 | **Bookmark Overlay** | A draggable visual annotation displayed on the data grid at a Bookmark's position | Tooltip, popup |
 | **Auto-Generated Bookmark** | A transient Bookmark created by scanning Highlight Entries with the "set bookmark" flag; not persisted | Scan bookmark |
 

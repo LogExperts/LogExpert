@@ -2297,4 +2297,55 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="FolderDrop_Page" xml:space="preserve">
     <value>{0:N0}–{1:N0} von {2:N0} Treffern</value>
   </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
+    <value>Markierungsleiste</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar" xml:space="preserve">
+    <value>Markierungsleiste anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers" xml:space="preserve">
+    <value>Hervorhebungsmarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers" xml:space="preserve">
+    <value>Lesezeichenmarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers" xml:space="preserve">
+    <value>Suchtreffermarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
+    <value>Filtertreffermarkierungen anzeigen</value>
+  </data>
+  <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
+    <value>Für den Columnizer „{0}“ konnte kein Snapshot des Parsing-Zustands erstellt werden.</value>
+  </data>
+  <data name="MarkerBar_LineUnavailable" xml:space="preserve">
+    <value>Die Protokollzeile {0} konnte beim Ermitteln der Markierungen nicht gelesen werden.</value>
+  </data>
+  <data name="MarkerBar_Highlights" xml:space="preserve">
+    <value>Hervorhebungen</value>
+  </data>
+  <data name="MarkerBar_Bookmarks" xml:space="preserve">
+    <value>Lesezeichen</value>
+  </data>
+  <data name="MarkerBar_SearchHits" xml:space="preserve">
+    <value>Suchtreffer</value>
+  </data>
+  <data name="MarkerBar_FilterHits" xml:space="preserve">
+    <value>Filtertreffer</value>
+  </data>
+  <data name="MarkerBar_ClearSearch" xml:space="preserve">
+    <value>Suche löschen</value>
+  </data>
+  <data name="MarkerBar_Discovering" xml:space="preserve">
+    <value>Markierungen werden ermittelt…</value>
+  </data>
+  <data name="MarkerBar_ToolTip" xml:space="preserve">
+    <value>{0}: Zeilen {1}–{2}, {3} passende Zeilen</value>
+  </data>
+  <data name="MarkerBar_ScanFailed" xml:space="preserve">
+    <value>Die Ermittlung der Markierungen ist fehlgeschlagen: {0}</value>
+  </data>
+  <data name="MarkerBar_Title" xml:space="preserve">
+    <value>Markierungsleiste</value>
+  </data>
 </root>

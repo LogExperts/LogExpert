@@ -409,6 +409,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not create a parsing snapshot for columnizer &apos;{0}&apos;..
+        /// </summary>
+        public static string Columnizer_SnapshotUnavailable {
+            get {
+                return ResourceManager.GetString("Columnizer_SnapshotUnavailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Timestamp selector.
         /// </summary>
         public static string DateTimeDragControl_UI_ContextMenuStrip_TimestampSelector {
@@ -4147,6 +4156,96 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bookmarks.
+        /// </summary>
+        public static string MarkerBar_Bookmarks {
+            get {
+                return ResourceManager.GetString("MarkerBar_Bookmarks", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Clear search.
+        /// </summary>
+        public static string MarkerBar_ClearSearch {
+            get {
+                return ResourceManager.GetString("MarkerBar_ClearSearch", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Discovering markers….
+        /// </summary>
+        public static string MarkerBar_Discovering {
+            get {
+                return ResourceManager.GetString("MarkerBar_Discovering", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Filter hits.
+        /// </summary>
+        public static string MarkerBar_FilterHits {
+            get {
+                return ResourceManager.GetString("MarkerBar_FilterHits", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Highlights.
+        /// </summary>
+        public static string MarkerBar_Highlights {
+            get {
+                return ResourceManager.GetString("MarkerBar_Highlights", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Could not read log line {0} while discovering markers..
+        /// </summary>
+        public static string MarkerBar_LineUnavailable {
+            get {
+                return ResourceManager.GetString("MarkerBar_LineUnavailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker discovery failed: {0}.
+        /// </summary>
+        public static string MarkerBar_ScanFailed {
+            get {
+                return ResourceManager.GetString("MarkerBar_ScanFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Search hits.
+        /// </summary>
+        public static string MarkerBar_SearchHits {
+            get {
+                return ResourceManager.GetString("MarkerBar_SearchHits", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Marker bar.
+        /// </summary>
+        public static string MarkerBar_Title {
+            get {
+                return ResourceManager.GetString("MarkerBar_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to {0}: lines {1}–{2}, {3} matching lines.
+        /// </summary>
+        public static string MarkerBar_ToolTip {
+            get {
+                return ResourceManager.GetString("MarkerBar_ToolTip", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Close existing tabs.
         /// </summary>
         public static string MissingFilesDialog_UI_Button_CloseTabs {
@@ -5482,6 +5581,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show bookmark markers.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Show Error Message?.
         /// </summary>
         public static string SettingsDialog_UI_CheckBox_checkBoxShowErrorMessageOnlyOneInstance {
@@ -5490,6 +5598,42 @@ namespace LogExpert {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Show filter markers.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show highlight markers.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show marker bar.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Show search markers.
+        /// </summary>
+        public static string SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Allow only 1 Instance.
         /// </summary>
@@ -6400,6 +6544,15 @@ namespace LogExpert {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Marker bar.
+        /// </summary>
+        public static string SettingsDialog_UI_TabPage_tabPageMarkerBar {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_TabPage_tabPageMarkerBar", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Memory/CPU.
         /// </summary>

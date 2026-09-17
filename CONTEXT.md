@@ -23,6 +23,25 @@ meaning; do not redefine them locally.
   construction, since the bulk `HighlightBookmarkScanner` has no access to
   the side-effecting triggers.
 
+## Marker Bar
+
+- **Marker Bar** — A compact overview beside a Log Window that shows where
+  highlights, bookmarks, Log Search hits, and Window Filter hits occur across
+  the loaded file.
+- **Marker** — An indicator in the Marker Bar representing one or more matching
+  Log Lines. Markers are grouped by category; they do not create or replace
+  Bookmarks.
+- **Marker Snapshot** — An immutable collection of highlight or Log Search
+  matches discovered for the Marker Bar, together with how many Log Lines
+  have been scanned and any discovery failure.
+- **Bookmark** — A user- or auto-generated annotation attached to a specific
+  Log Line, carrying optional comment text and an overlay. A Bookmark can be
+  represented by a Marker in the bookmark category; the two terms are not synonyms.
+
+*Avoid*: "marker" when referring to the underlying Bookmark annotation;
+bare "snapshot" when the distinction between **Marker Snapshot**,
+**Columnizer Snapshot**, and **Session Snapshot** matters.
+
 ## Audio alerts
 
 - **Audio Alert** — A sound played when a tail-only highlight match occurs.
@@ -293,6 +312,9 @@ layer).
   line into columns. Each loaded log window has exactly one active
   columnizer at a time. The set of available columnizers is owned by
   `PluginRegistry`.
+- **Columnizer Snapshot** — An independent Columnizer with the active
+  Columnizer's configuration and detected column layout, ready for Marker Bar
+  discovery. Its parsing state is separate from the active Columnizer's.
 - **Columnizer Mask Entry** (`ColumnizerMaskEntry`) — One user-configured
   row on the Settings → Columnizers tab. Pairs a **Mask**, a **Mask Type**,
   and a **Columnizer Name**. Stored in `Preferences.ColumnizerMaskList`.

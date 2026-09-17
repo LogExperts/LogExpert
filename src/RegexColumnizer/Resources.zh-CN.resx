@@ -144,6 +144,9 @@
   <data name="RegexColumnizer_Description" xml:space="preserve">
     <value>列由具名捕获组的正则表达式填充</value>
   </data>
+  <data name="RegexColumnizer_Error_Message_SnapshotUnavailable" xml:space="preserve">
+    <value>无法为列分隔器 '{0}' 创建解析状态快照。</value>
+  </data>
   <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
     <value>配置目录不能为空</value>
   </data>

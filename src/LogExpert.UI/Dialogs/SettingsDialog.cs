@@ -76,6 +76,7 @@ internal partial class SettingsDialog : Form
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        InitializeMarkerBar();
 
         var darkMode = Application.IsDarkModeEnabled;
         PaintHelper.ApplyTabControlTheme(tabControlSettings, darkMode);
@@ -287,6 +288,7 @@ internal partial class SettingsDialog : Form
         FillLanguageList();
         FillReaderTypeList();
         FillControlCharsTab();
+        FillMarkerBarTab();
 
         comboBoxEncoding.SelectedItem = EncodingRegistry.GetEncoding(Preferences.DefaultEncoding, FallbackEncoding);
         comboBoxLanguage.SelectedItem = CultureInfo.GetCultureInfo(Preferences.DefaultLanguage).Name;
@@ -837,6 +839,7 @@ internal partial class SettingsDialog : Form
         GetToolListBoxData();
         SaveMultifileData();
         SaveControlCharsTab();
+        SaveMarkerBarTab();
     }
 
     private void OnBtnToolClick (object sender, EventArgs e)

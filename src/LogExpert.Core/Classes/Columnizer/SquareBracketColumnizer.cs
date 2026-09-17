@@ -13,7 +13,7 @@ namespace LogExpert.Core.Classes.Columnizer;
 /// memory-efficient log line processing and columnizer prioritization, making it suitable for integration with log
 /// viewers or analysis tools that require flexible column extraction.
 /// </remarks>
-public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory
+public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory, IColumnizerSnapshotMemory
 {
     #region ILogLineMemoryColumnizer implementation
 
@@ -39,6 +39,19 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
             // Time and date
             _columnCount += 2;
         }
+    }
+
+    /// <summary>
+    /// Creates an independent copy of the detected column layout and time offset.
+    /// </summary>
+    public ILogLineMemoryColumnizer CreateSnapshot ()
+    {
+        return new SquareBracketColumnizer
+        {
+            _columnCount = _columnCount,
+            _isTimeExists = _isTimeExists,
+            _timeOffset = _timeOffset
+        };
     }
 
     /// <summary>
