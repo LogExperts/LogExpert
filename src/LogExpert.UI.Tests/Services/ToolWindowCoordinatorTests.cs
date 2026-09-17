@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert.Tests.Services;
+namespace LogExpert.UI.Tests.Services;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

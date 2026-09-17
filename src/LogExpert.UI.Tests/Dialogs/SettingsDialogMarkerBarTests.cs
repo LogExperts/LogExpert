@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 using UIStrings = LogExpert.Resources;
 
-namespace LogExpert.Tests.Dialogs;
+namespace LogExpert.UI.Tests.Dialogs;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

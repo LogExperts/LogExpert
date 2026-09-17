@@ -2191,4 +2191,55 @@ YY[YY] = 年
   <data name="FolderDrop_Page" xml:space="preserve">
     <value>显示第 {0:N0}–{1:N0} 个，共 {2:N0} 个匹配文件</value>
   </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
+    <value>标记栏</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar" xml:space="preserve">
+    <value>显示标记栏</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers" xml:space="preserve">
+    <value>显示高亮标记</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers" xml:space="preserve">
+    <value>显示书签标记</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers" xml:space="preserve">
+    <value>显示搜索匹配标记</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
+    <value>显示过滤匹配标记</value>
+  </data>
+  <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
+    <value>无法为列分隔器 &apos;{0}&apos; 创建解析状态快照。</value>
+  </data>
+  <data name="MarkerBar_LineUnavailable" xml:space="preserve">
+    <value>查找标记时无法读取日志行 {0}。</value>
+  </data>
+  <data name="MarkerBar_Highlights" xml:space="preserve">
+    <value>高亮</value>
+  </data>
+  <data name="MarkerBar_Bookmarks" xml:space="preserve">
+    <value>书签</value>
+  </data>
+  <data name="MarkerBar_SearchHits" xml:space="preserve">
+    <value>搜索匹配</value>
+  </data>
+  <data name="MarkerBar_FilterHits" xml:space="preserve">
+    <value>过滤匹配</value>
+  </data>
+  <data name="MarkerBar_ClearSearch" xml:space="preserve">
+    <value>清除搜索</value>
+  </data>
+  <data name="MarkerBar_Discovering" xml:space="preserve">
+    <value>正在查找标记…</value>
+  </data>
+  <data name="MarkerBar_ToolTip" xml:space="preserve">
+    <value>{0}：第 {1}–{2} 行，{3} 个匹配行</value>
+  </data>
+  <data name="MarkerBar_ScanFailed" xml:space="preserve">
+    <value>标记查找失败：{0}</value>
+  </data>
+  <data name="MarkerBar_Title" xml:space="preserve">
+    <value>标记栏</value>
+  </data>
 </root>

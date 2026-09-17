@@ -6,7 +6,7 @@ using Moq;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.UI;
+namespace LogExpert.UI.Tests.UI;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

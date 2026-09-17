@@ -16,7 +16,7 @@ using Newtonsoft.Json;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.CommandLine;
+namespace LogExpert.UI.Tests.CommandLine;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

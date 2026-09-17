@@ -12,7 +12,7 @@ using LogExpert.UI.Services.MenuToolbarService;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Services;
+namespace LogExpert.UI.Tests.Services;
 
 [TestFixture]
 [SupportedOSPlatform("windows")]

@@ -4,7 +4,7 @@ using LogExpert.UI.Services.LedService;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Services;
+namespace LogExpert.UI.Tests.Services;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)] // Required for UI components

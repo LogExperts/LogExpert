@@ -6,7 +6,7 @@ using LogExpert.UI.Services.MenuToolbarService;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Encodings;
+namespace LogExpert.UI.Tests.Encodings;
 
 /// <summary>
 /// <see cref="EncodingRegistry.OfferedEncodings"/> is the one list of encodings a user can pick: the

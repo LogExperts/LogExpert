@@ -5,7 +5,7 @@ using LogExpert.UI.Dialogs;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Dialogs;
+namespace LogExpert.UI.Tests.Dialogs;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

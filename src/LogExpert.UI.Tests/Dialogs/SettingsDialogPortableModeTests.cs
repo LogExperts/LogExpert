@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 using UIStrings = LogExpert.Resources;
 
-namespace LogExpert.Tests.Dialogs;
+namespace LogExpert.UI.Tests.Dialogs;
 
 /// <summary>
 /// Regression tests for issue #658: populating the settings dialog from preferences set the

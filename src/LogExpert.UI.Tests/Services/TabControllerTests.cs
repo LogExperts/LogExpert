@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert.Tests.Services;
+namespace LogExpert.UI.Tests.Services;
 
 /// <summary>
 /// Unit tests for TabController.

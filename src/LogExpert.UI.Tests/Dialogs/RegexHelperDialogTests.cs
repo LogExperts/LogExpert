@@ -2,7 +2,7 @@ using LogExpert.UI.Dialogs;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Dialogs;
+namespace LogExpert.UI.Tests.Dialogs;
 
 /// <summary>
 /// Regression tests for the Regex Helper dialog's OK handler. Both combo boxes are

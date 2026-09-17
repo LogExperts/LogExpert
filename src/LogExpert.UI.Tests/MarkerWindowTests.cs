@@ -99,6 +99,7 @@ public sealed class MarkerWindowTests : IDisposable
         Directory.Delete(_directory, true);
     }
 
+    // The bar is 28 logical pixels wide: 100%, 150%, and 200% scaling have independent expected widths.
     [TestCase(96, 28)]
     [TestCase(144, 42)]
     [TestCase(192, 56)]
@@ -139,6 +140,7 @@ public sealed class MarkerWindowTests : IDisposable
     [TestCase(SystemColorMode.Dark)]
     public void Theme_BoldOnlyMarkersRenderTheLogWindowForeground (SystemColorMode colorMode)
     {
+        Assert.That(Application.OpenForms, Is.Empty, "Theme checks must start without live windows from another test.");
         Application.SetColorMode(colorMode);
         Assert.That(Application.IsDarkModeEnabled, Is.EqualTo(colorMode == SystemColorMode.Dark));
         _settings.Preferences.HighlightGroupList[0].HighlightEntryList =

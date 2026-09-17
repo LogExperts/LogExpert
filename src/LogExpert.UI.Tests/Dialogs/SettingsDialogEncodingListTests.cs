@@ -5,7 +5,7 @@ using LogExpert.Dialogs;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests.Dialogs;
+namespace LogExpert.UI.Tests.Dialogs;
 
 /// <summary>
 /// The Preferences encoding combo box, which is the only way to set <c>Preferences.DefaultEncoding</c>.
