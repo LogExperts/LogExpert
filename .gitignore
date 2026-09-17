@@ -621,7 +621,6 @@ temp.txt
 
 # roots docs folder should be empty
 /docs/*
-/src/docs/*
 
 # test project logs should be ignored, this is for rolling logfile tests
 /src/tools/LogRotator/logs/*
