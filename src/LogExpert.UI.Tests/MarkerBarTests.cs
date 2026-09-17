@@ -11,7 +11,7 @@ using NUnit.Framework;
 
 using Vanara.PInvoke;
 
-namespace LogExpert.Tests.UI;
+namespace LogExpert.UI.Tests;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]

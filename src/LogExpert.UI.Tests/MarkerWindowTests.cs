@@ -22,9 +22,11 @@ using Moq;
 
 using NUnit.Framework;
 
+using Vanara.PInvoke;
+
 using WeifenLuo.WinFormsUI.Docking;
 
-namespace LogExpert.Tests.UI;
+namespace LogExpert.UI.Tests;
 
 [TestFixture]
 [Apartment(ApartmentState.STA)]
@@ -38,10 +40,12 @@ public sealed class MarkerWindowTests : IDisposable
     private Mock<IConfigManager> _config = null!;
     private LogTabWindow? _window;
     private Exception? _uiException;
+    private SystemColorMode _originalColorMode;
 
     [SetUp]
     public void SetUp ()
     {
+        _originalColorMode = Application.ColorMode;
         _uiException = null;
         _directory = Path.Join(Path.GetTempPath(), "LogExpertMarkerTests", Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_directory);
@@ -86,9 +90,70 @@ public sealed class MarkerWindowTests : IDisposable
         finally
         {
             Application.ThreadException -= OnUiException;
+            if (Application.ColorMode != _originalColorMode)
+            {
+                Application.SetColorMode(_originalColorMode);
+            }
         }
 
         Directory.Delete(_directory, true);
+    }
+
+    [TestCase(96, 28)]
+    [TestCase(144, 42)]
+    [TestCase(192, 56)]
+    // Synthetic DPI notifications must not leave state on the STA used by subsequent docking tests.
+    [RequiresThread(ApartmentState.STA)]
+    public void DockedDpiChange_ScalesMarkerBarWidth (int dpi, int expectedWidth)
+    {
+        var log = Open();
+        var bar = Find<MarkerBar>(log, "markerBar");
+        var controls = new List<Control> { _window! };
+        for (var index = 0; index < controls.Count; index++)
+        {
+            controls.AddRange(controls[index].Controls.Cast<Control>().Where(control => control.IsHandleCreated));
+        }
+
+        // PMv2 delivers BEFOREPARENT bottom-up, changes the top-level form, then delivers AFTERPARENT top-down.
+        foreach (var control in controls.Skip(1).Reverse())
+        {
+            _ = User32.SendMessage(control.Handle, User32.WindowMessage.WM_DPICHANGED_BEFOREPARENT, (nint)dpi, nint.Zero);
+        }
+
+        var bounds = _window!.Bounds;
+        var suggestedBounds = new RECT(bounds.Left, bounds.Top, bounds.Right, bounds.Bottom);
+        _ = User32.SendMessage(_window.Handle, User32.WindowMessage.WM_DPICHANGED,
+            (nint)(dpi | (dpi << 16)), ref suggestedBounds);
+        foreach (var control in controls.Skip(1))
+        {
+            _ = User32.SendMessage(control.Handle, User32.WindowMessage.WM_DPICHANGED_AFTERPARENT, nint.Zero, nint.Zero);
+        }
+
+        Assert.That(log.DeviceDpi, Is.EqualTo(dpi));
+        Assert.That(bar.DeviceDpi, Is.EqualTo(dpi));
+        bar.Parent!.PerformLayout();
+        Assert.That(bar.Width, Is.EqualTo(expectedWidth));
+    }
+
+    [TestCase(SystemColorMode.Classic)]
+    [TestCase(SystemColorMode.Dark)]
+    public void Theme_BoldOnlyMarkersRenderTheLogWindowForeground (SystemColorMode colorMode)
+    {
+        Application.SetColorMode(colorMode);
+        Assert.That(Application.IsDarkModeEnabled, Is.EqualTo(colorMode == SystemColorMode.Dark));
+        _settings.Preferences.HighlightGroupList[0].HighlightEntryList =
+            [new HighlightEntry { SearchText = "ERROR", IsBold = true }];
+        var log = Open();
+        var bar = Find<MarkerBar>(log, "markerBar");
+        var grid = Find<DataGridView>(log, "dataGridView");
+        WaitForMarker(bar, MarkerCategory.Highlights, 20, 100, true);
+        var expected = colorMode == SystemColorMode.Dark ? Color.White : Color.Black;
+        Assert.That(grid.ForeColor.ToArgb(), Is.EqualTo(expected.ToArgb()));
+        Assert.That(MarkerColor(bar, MarkerCategory.Highlights, 20, 100), Is.EqualTo(expected.ToArgb()));
+
+        grid.ForeColor = Color.Yellow;
+        ApplyPreferences(log);
+        PumpUntil(() => MarkerColor(bar, MarkerCategory.Highlights, 20, 100) == Color.Yellow.ToArgb());
     }
 
     [Test]
@@ -406,10 +471,15 @@ public sealed class MarkerWindowTests : IDisposable
             return false;
         }
 
+        return MarkerColor(bar, category, line, count) != bar.BackColor.ToArgb();
+    }
+
+    private static int MarkerColor (MarkerBar bar, MarkerCategory category, int line, int count)
+    {
         using var bitmap = new Bitmap(bar.Width, bar.Height);
         bar.DrawToBitmap(bitmap, bar.ClientRectangle);
         var point = Position(bar, category, line, count);
-        return bitmap.GetPixel(point.X, point.Y).ToArgb() != bar.BackColor.ToArgb();
+        return bitmap.GetPixel(point.X, point.Y).ToArgb();
     }
 
     private static void Click (MarkerBar bar, MarkerCategory category, int line, int count)

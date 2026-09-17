@@ -2,7 +2,7 @@ using System.Runtime.Versioning;
 
 using NUnit.Framework;
 
-namespace LogExpert.Tests;
+namespace LogExpert.UI.Tests;
 
 [SetUpFixture]
 [SupportedOSPlatform("windows")]

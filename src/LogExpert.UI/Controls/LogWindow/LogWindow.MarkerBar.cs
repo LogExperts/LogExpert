@@ -43,9 +43,14 @@ internal partial class LogWindow
         _markerBar.LineSelected += OnMarkerLineSelected;
         _markerBar.ClearSearchRequested += OnClearSearchMarkers;
         _markerTimer.Tick += OnMarkerTimerTick;
-        DpiChanged += (_, _) => ApplyMarkerPreferences();
         ApplyMarkerPreferences();
         _markerTimer.Start();
+    }
+
+    protected override void OnDpiChangedAfterParent (EventArgs e)
+    {
+        base.OnDpiChangedAfterParent(e);
+        ApplyMarkerPreferences();
     }
 
     private void ApplyMarkerPreferences ()
@@ -186,20 +191,20 @@ internal partial class LogWindow
         var parser = new Lazy<ILogLineMemoryColumnizer>(() =>
         {
             // Initialization may read file headers. Run it on the discovery worker, never the UI thread.
-            var clone = snapshot ?? ColumnizerPicker.CloneMemoryColumnizer(template, directory)
+            var workerColumnizer = snapshot ?? ColumnizerPicker.CloneMemoryColumnizer(template, directory)
                 ?? throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
                     Resources.Columnizer_SnapshotUnavailable, template.GetName()));
             if (snapshot == null)
             {
-                (clone as IInitColumnizerMemory)?.Selected(callback);
+                (workerColumnizer as IInitColumnizerMemory)?.Selected(callback);
             }
 
-            if (clone.IsTimeshiftImplemented())
+            if (workerColumnizer.IsTimeshiftImplemented())
             {
-                clone.SetTimeOffset(offset);
+                workerColumnizer.SetTimeOffset(offset);
             }
 
-            return clone;
+            return workerColumnizer;
         });
         return (lineNumber, line) =>
         {

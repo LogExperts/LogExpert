@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <IsTestProject>true</IsTestProject>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AssemblyTitle>LogExpert.UI.Tests</AssemblyTitle>
+    <RootNamespace>LogExpert.UI.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
+    <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="Vanara.PInvoke.User32" />
+  </ItemGroup>
+
+</Project>
