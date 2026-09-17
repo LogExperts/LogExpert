@@ -103,7 +103,7 @@ internal sealed class MarkerBar : Control
             var diameter = 2 * scale;
             for (var dot = -1; dot <= 1; dot++)
             {
-                e.Graphics.FillEllipse(brush, Width / 2f + dot * 4 * scale - diameter / 2,
+                e.Graphics.FillEllipse(brush, Width / 2f + dot * 4f * scale - diameter / 2,
                     Math.Max(diameter, TopInset / 2f), diameter, diameter);
             }
         }
