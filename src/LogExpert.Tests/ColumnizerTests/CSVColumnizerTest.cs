@@ -62,6 +62,22 @@ public class CSVColumnizerTest
         field!.SetValue(columnizer, value);
     }
 
+    private const string HEADERLESS_LINE = "2026-09-01 07:09:58.1980; INFO; 2001:7c0:3006:3014::8602:1a1d; ; ; ; zrnsh01 logged in";
+
+    // Valid-CSV mode with "first line contains field names" unchecked
+    private static CsvColumnizer.CsvColumnizer CreateColumnizerWithoutFieldNames ()
+    {
+        CsvColumnizerConfig config = new();
+        config.InitDefaults();
+        config.HasFieldNames = false;
+        config.ConfigureReaderConfiguration();
+
+        CsvColumnizer.CsvColumnizer columnizer = new();
+        SetPrivateField(columnizer, "_config", config);
+        SetPrivateField(columnizer, "_isValidCsv", true);
+        return columnizer;
+    }
+
     [Test]
     public void Selected_HasFieldNames_FirstLineNull_FallsBackToCallback ()
     {
@@ -79,6 +95,55 @@ public class CSVColumnizerTest
         // Assert: columns detected from callback line
         Assert.That(columnizer.GetColumnCount(), Is.EqualTo(3));
         Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["name", "age", "city"]));
+    }
+
+    [Test]
+    public void Selected_NoFieldNames_ColumnCountFromFirstLine ()
+    {
+        var columnizer = CreateColumnizerWithoutFieldNames();
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(new CsvLogLine(HEADERLESS_LINE, 0));
+
+        columnizer.Selected(mockCallback.Object);
+
+        Assert.That(columnizer.GetColumnCount(), Is.EqualTo(7));
+    }
+
+    [Test]
+    public void Selected_NoFieldNames_GeneratesOneBasedColumnNames ()
+    {
+        var columnizer = CreateColumnizerWithoutFieldNames();
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(new CsvLogLine(HEADERLESS_LINE, 0));
+
+        columnizer.Selected(mockCallback.Object);
+
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["Column 1", "Column 2", "Column 3", "Column 4", "Column 5", "Column 6", "Column 7"]));
+    }
+
+    [Test]
+    public void SplitLine_NoFieldNames_SplitsIntoFields ()
+    {
+        var columnizer = CreateColumnizerWithoutFieldNames();
+        var line = new CsvLogLine(HEADERLESS_LINE, 0);
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(line);
+        columnizer.Selected(mockCallback.Object);
+
+        var result = columnizer.SplitLine(mockCallback.Object, line);
+
+        Assert.That(result.ColumnValues.Select(c => c.FullValue.ToString()), Is.EqualTo(["2026-09-01 07:09:58.1980", " INFO", " 2001:7c0:3006:3014::8602:1a1d", " ", " ", " ", " zrnsh01 logged in"]));
+    }
+
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void PreProcessLine_NoFieldNames_KeepsFirstLineVisible ()
+    {
+        var columnizer = CreateColumnizerWithoutFieldNames();
+
+        var result = columnizer.PreProcessLine(HEADERLESS_LINE.AsMemory(), 0, 0);
+
+        Assert.That(result.ToString(), Is.EqualTo(HEADERLESS_LINE));
     }
 
     [Test]

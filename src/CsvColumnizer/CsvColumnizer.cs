@@ -185,26 +185,21 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
             if (line != null)
             {
-                using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-                _ = csv.Read();
-                _ = csv.ReadHeader();
+                var fields = ReadFields(line.FullLine.ToString());
 
-                var fieldCount = csv.Parser.Count;
-
-                var headerRecord = csv.HeaderRecord;
-
-                if (_config.HasFieldNames && headerRecord != null)
+                if (_config.HasFieldNames && fields != null)
                 {
-                    foreach (var headerColumn in headerRecord)
+                    foreach (var headerColumn in fields)
                     {
                         _columnList.Add(new CsvColumn(headerColumn));
                     }
                 }
                 else
                 {
+                    var fieldCount = fields?.Length ?? 0;
                     for (var i = 0; i < fieldCount; ++i)
                     {
-                        _columnList.Add(new CsvColumn("Column " + i + 1));
+                        _columnList.Add(new CsvColumn(string.Format(CultureInfo.InvariantCulture, "Column {0}", i + 1)));
                     }
                 }
             }
@@ -360,6 +355,15 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         }
     }
 
+    /// <summary>
+    /// Parses one line into its fields; avoids ReadHeader(), which throws when HasHeaderRecord is false.
+    /// </summary>
+    private string[]? ReadFields (string line)
+    {
+        using CsvReader csv = new(new StringReader(line), _config.ReaderConfiguration);
+        return csv.Read() ? csv.Parser.Record : null;
+    }
+
     private ColumnizedLogLine SplitCsvLine (ILogLineMemory line)
     {
         if (line.FullLine.IsEmpty)
@@ -374,12 +378,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
         try
         {
-            using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-            _ = csv.Read();
-            _ = csv.ReadHeader();
-
-            //we only read line by line and not the whole file so it is always the header
-            var records = csv.HeaderRecord;
+            var records = ReadFields(line.FullLine.ToString());
 
             if (records != null)
             {
