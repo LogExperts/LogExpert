@@ -127,16 +127,4 @@ public class LineVisibilityMapTests
         Assert.That(shifted.HiddenCount, Is.EqualTo(2));
         Assert.That(shifted.IsAppendOf(map), Is.False);
     }
-
-    [Test]
-    public void Truncate_DropsTrailingLines ()
-    {
-        var map = Map(10, 1, 5, 8);
-
-        var truncated = map.Truncate(6);
-
-        Assert.That(truncated.LineCount, Is.EqualTo(6));
-        Assert.That(truncated.HiddenCount, Is.EqualTo(2));
-        Assert.That(truncated.VisibleCount, Is.EqualTo(4));
-    }
 }

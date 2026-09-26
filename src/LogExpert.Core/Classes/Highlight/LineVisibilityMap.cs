@@ -155,19 +155,6 @@ public sealed class LineVisibilityMap
         return new LineVisibilityMap(new HiddenLineStore(shifted, shifted.Length, lineCount), lineCount, shifted.Length);
     }
 
-    /// <summary>Keeps only the first <paramref name="lineCount"/> lines.</summary>
-    public LineVisibilityMap Truncate (int lineCount)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(lineCount);
-
-        lineCount = Math.Min(lineCount, LineCount);
-        var kept = Array.BinarySearch(_store.Items, 0, HiddenCount, lineCount);
-        kept = kept >= 0 ? kept : ~kept;
-
-        var items = _store.Items.AsSpan(0, kept).ToArray();
-        return new LineVisibilityMap(new HiddenLineStore(items, kept, lineCount), lineCount, kept);
-    }
-
     /// <summary>
     /// True when this map extends <paramref name="other"/> without changing any of its lines, so rows that
     /// <paramref name="other"/> displays keep their row index.

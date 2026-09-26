@@ -25,6 +25,7 @@ public sealed class LineVisibilityTracker : IDisposable
 
     private volatile LineVisibilityMap _map = LineVisibilityMap.Empty;
     private volatile HighlightEntry[]? _pendingRules;
+    private volatile bool _loadPending;
     private HighlightEntry[] _rules = [];
     private CancellationTokenSource? _scanCts;
     private Task _scanTask = Task.CompletedTask;
@@ -49,6 +50,9 @@ public sealed class LineVisibilityTracker : IDisposable
 
     public bool IsScanning => _pendingRules != null;
 
+    /// <summary>The scan started by <see cref="Load"/> has not finished: the map does not reflect the rules yet.</summary>
+    public bool IsLoadPending => _loadPending;
+
     /// <summary>New content was loaded: every line is visible until the scan with <paramref name="entries"/> completes.</summary>
     public void Load (int lineCount, IEnumerable<HighlightEntry> entries)
     {
@@ -62,6 +66,7 @@ public sealed class LineVisibilityTracker : IDisposable
 
             SetStateLocked(LineVisibilityMap.Identity(lineCount), []);
             StartOrStopScanLocked(rules);
+            _loadPending = rules.Length > 0;
         }
     }
 
@@ -94,40 +99,7 @@ public sealed class LineVisibilityTracker : IDisposable
     /// <summary>Tail path: evaluates lines appended up to <paramref name="lineCount"/> and returns the current map.</summary>
     public LineVisibilityMap Extend (int lineCount)
     {
-        while (true)
-        {
-            LineVisibilityMap from;
-            HighlightEntry[] rules;
-            int version;
-            lock (_lock)
-            {
-                if (_disposed || lineCount <= _map.LineCount)
-                {
-                    return _map;
-                }
-
-                (from, rules, version) = (_map, _rules, _version);
-            }
-
-            var (map, error) = TryEvaluate(from, rules, lineCount);
-            lock (_lock)
-            {
-                if (_disposed)
-                {
-                    return _map;
-                }
-
-                if (version != _version)
-                {
-                    continue;
-                }
-
-                SetStateLocked(map, error == null ? rules : []);
-            }
-
-            RaiseFailure(map, error);
-            return map;
-        }
+        return EvaluateAndCommit(lineCount, replace: false);
     }
 
     /// <summary>Tail path, rollover: the first <paramref name="offset"/> lines were dropped.</summary>
@@ -148,21 +120,31 @@ public sealed class LineVisibilityTracker : IDisposable
     /// <summary>Tail path, truncation: the content was replaced and is re-evaluated up to <paramref name="lineCount"/>.</summary>
     public LineVisibilityMap Replace (int lineCount)
     {
+        return EvaluateAndCommit(lineCount, replace: true);
+    }
+
+    /// <summary>
+    /// Evaluates against a snapshot outside the lock, then commits only if the state is unchanged, retrying otherwise.
+    /// <paramref name="replace"/> re-evaluates from the first line and restarts a pending scan on the new content.
+    /// </summary>
+    private LineVisibilityMap EvaluateAndCommit (int lineCount, bool replace)
+    {
         while (true)
         {
+            LineVisibilityMap from;
             HighlightEntry[] rules;
             int version;
             lock (_lock)
             {
-                if (_disposed)
+                if (_disposed || (!replace && lineCount <= _map.LineCount))
                 {
                     return _map;
                 }
 
-                (rules, version) = (_rules, _version);
+                (from, rules, version) = (replace ? LineVisibilityMap.Empty : _map, _rules, _version);
             }
 
-            var (map, error) = TryEvaluate(LineVisibilityMap.Empty, rules, lineCount);
+            var (map, error) = TryEvaluate(from, rules, lineCount);
             lock (_lock)
             {
                 if (_disposed)
@@ -176,10 +158,17 @@ public sealed class LineVisibilityTracker : IDisposable
                 }
 
                 SetStateLocked(map, error == null ? rules : []);
-                RestartPendingScanLocked();
+                if (replace)
+                {
+                    RestartPendingScanLocked();
+                }
             }
 
-            RaiseFailure(map, error);
+            if (error != null)
+            {
+                Changed?.Invoke(this, new LineVisibilityChangedEventArgs(map, error));
+            }
+
             return map;
         }
     }
@@ -220,6 +209,7 @@ public sealed class LineVisibilityTracker : IDisposable
             _generation++;
             _version++;
             _pendingRules = null;
+            _loadPending = false;
             _scanCts?.Cancel();
             _scanCts?.Dispose();
             _scanCts = null;
@@ -243,6 +233,7 @@ public sealed class LineVisibilityTracker : IDisposable
 
         if (rules.Length == 0)
         {
+            _loadPending = false;
             return;
         }
 
@@ -287,6 +278,7 @@ public sealed class LineVisibilityTracker : IDisposable
                     {
                         SetStateLocked(map, rules);
                         _pendingRules = null;
+                        _loadPending = false;
                         break;
                     }
                 }
@@ -310,6 +302,7 @@ public sealed class LineVisibilityTracker : IDisposable
                 map = LineVisibilityMap.Identity(_map.LineCount);
                 SetStateLocked(map, []);
                 _pendingRules = null;
+                _loadPending = false;
                 error = ex;
             }
         }
@@ -358,14 +351,6 @@ public sealed class LineVisibilityTracker : IDisposable
         // An unreadable line cannot be classified; it stays visible.
         var line = _getLine(lineNum);
         return line != null && HighlightEvaluator.IsHidden(rules, line);
-    }
-
-    private void RaiseFailure (LineVisibilityMap map, Exception? error)
-    {
-        if (error != null)
-        {
-            Changed?.Invoke(this, new LineVisibilityChangedEventArgs(map, error));
-        }
     }
 
     private static HighlightEntry[] Snapshot (IEnumerable<HighlightEntry> entries)

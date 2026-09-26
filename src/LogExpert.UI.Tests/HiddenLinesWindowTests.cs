@@ -4,7 +4,9 @@ using System.Runtime.Versioning;
 
 using ColumnizerLib;
 
+using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Highlight;
+using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
@@ -109,6 +111,67 @@ public sealed class HiddenLinesWindowTests : IDisposable
         Assert.That(log.HiddenLineCount, Is.EqualTo(LINE_COUNT / 2));
         Assert.That(Find<Label>(log, "hiddenLinesLabel").Text, Does.Contain("10"));
         Assert.That(Find<Panel>(log, "hiddenLinesBar").Visible, Is.True);
+    }
+
+    [Test]
+    public void Load_ShowsNoRowsUntilTheFirstScanHasFinished ()
+    {
+        File.WriteAllLines(_fileName, Enumerable.Range(0, 20_000).Select(Text));
+        _window = new LogTabWindow([_fileName], 1, false, _config.Object) { ShowInTaskbar = false, Opacity = 0 };
+        Find<WeifenLuo.WinFormsUI.Docking.DockPanel>(_window, "dockPanel").ShowDocumentIcon = false;
+        _window.Show();
+        PumpUntil(() => _window.CurrentLogWindow != null);
+        var log = _window.CurrentLogWindow;
+        var grid = Grid(log);
+        var largest = 0;
+        grid.RowsAdded += (_, _) => largest = Math.Max(largest, grid.RowCount);
+
+        PumpUntil(() => grid.RowCount == 10_000 && log.WhenLineVisibilityIdle().IsCompleted);
+
+        Assert.That(largest, Is.EqualTo(10_000), "hidden lines must never be shown while the first scan runs");
+    }
+
+    [TestCase(12, 12)]
+    [TestCase(13, 14)]
+    public void SavedPosition_IsRestoredOnceTheFirstScanHasFinished (int savedLine, int expectedLine)
+    {
+        _settings.Preferences.SaveSessions = true;
+        _ = Persister.SavePersistenceData(_fileName, new PersistenceData
+        {
+            FileName = _fileName,
+            CurrentLine = savedLine,
+            FirstDisplayedLine = savedLine,
+            FollowTail = false,
+            HighlightGroupName = "hide",
+            LineCount = LINE_COUNT
+        }, _settings.Preferences, _directory);
+
+        var log = Open();
+
+        Assert.That(log.CurrentLineNum, Is.EqualTo(expectedLine));
+        Assert.That(log.ShowHiddenLines, Is.False);
+    }
+
+    [Test]
+    public void TimeSync_FollowerOnHiddenLine_SelectsTheNearestVisibleLine ()
+    {
+        var log = OpenTimestamped();
+
+        _ = log.ScrollToTimestamp(new DateTime(2026, 1, 1, 10, 0, 5), false, false);
+
+        Assert.That(log.ShowHiddenLines, Is.False);
+        Assert.That(log.CurrentLineNum, Is.EqualTo(6));
+    }
+
+    [Test]
+    public void TimestampNavigation_InTheOriginWindow_RevealsTheHiddenLine ()
+    {
+        var log = OpenTimestamped();
+
+        _ = log.ScrollToTimestamp(new DateTime(2026, 1, 1, 10, 0, 5), false, true);
+
+        Assert.That(log.ShowHiddenLines, Is.True);
+        Assert.That(log.CurrentLineNum, Is.EqualTo(5));
     }
 
     [Test]
@@ -476,6 +539,15 @@ public sealed class HiddenLinesWindowTests : IDisposable
         PumpUntil(() => loaded.IsCompleted);
         loaded.GetAwaiter().GetResult();
         log.SetCurrentHighlightGroup("hide");
+        WaitForVisibility(log);
+        return log;
+    }
+
+    private LogWindow OpenTimestamped ()
+    {
+        File.WriteAllLines(_fileName, Enumerable.Range(0, LINE_COUNT).Select(i => $"2026-01-01 10:00:{i:D2}.000 {Text(i)}"));
+        var log = Open();
+        log.ForceColumnizer(new TimestampColumnizer());
         WaitForVisibility(log);
         return log;
     }

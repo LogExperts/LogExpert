@@ -81,10 +81,39 @@ public class LineVisibilityTrackerTests
     }
 
     [Test]
+    public void Load_IsPendingUntilItsScanCompletes_ButARuleRebuildIsNot ()
+    {
+        _gate.Reset();
+        _tracker.Load(_lines.Count, HideDebug);
+
+        Assert.That(_tracker.IsLoadPending, Is.True);
+        _gate.Set();
+        Idle();
+        Assert.That(_tracker.IsLoadPending, Is.False);
+
+        _gate.Reset();
+        _tracker.Rebuild([new HighlightEntry { SearchText = "INFO", IsHideLine = true }]);
+        Assert.That(_tracker.IsScanning, Is.True);
+        Assert.That(_tracker.IsLoadPending, Is.False, "a rule change keeps showing the previous map");
+    }
+
+    [Test]
+    public void Load_RulesRemovedWhilePending_IsNoLongerPending ()
+    {
+        _gate.Reset();
+        _tracker.Load(_lines.Count, HideDebug);
+
+        _tracker.Rebuild([]);
+
+        Assert.That(_tracker.IsLoadPending, Is.False);
+    }
+
+    [Test]
     public void Load_WithoutHideRules_IsImmediatelyComplete ()
     {
         _tracker.Load(_lines.Count, [new HighlightEntry { SearchText = "DEBUG" }]);
 
+        Assert.That(_tracker.IsLoadPending, Is.False);
         Assert.That(_tracker.IsScanning, Is.False);
         Assert.That(_tracker.Map.VisibleCount, Is.EqualTo(5));
     }

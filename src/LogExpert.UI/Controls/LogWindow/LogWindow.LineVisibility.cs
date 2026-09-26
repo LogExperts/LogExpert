@@ -6,7 +6,7 @@ using LogExpert.Core.Classes.Highlight;
 namespace LogExpert.UI.Controls.LogWindow;
 
 /// <summary>
-/// Hide-line highlight rules (#338). The main grid shows the rows of <see cref="_rowMap"/>; everything that talks
+/// Hide-line highlight rules. The main grid shows the rows of <see cref="_rowMap"/>; everything that talks
 /// to the reader, bookmarks, timestamps or sessions uses original logical lines, converted with
 /// <see cref="RowToLine"/> / <see cref="LineToRow"/>. The Window Filter grid is unaffected.
 /// </summary>
@@ -26,6 +26,9 @@ internal partial class LogWindow
     private LineVisibilityMap _appliedTrackedMap = LineVisibilityMap.Empty;
     private bool _showHiddenLines;
     private bool _isLoadComplete;
+
+    // A saved or reload position (original lines) waiting for the load's first scan.
+    private (int CurrentLine, int FirstDisplayedLine)? _pendingPosition;
 
     /// <summary>Number of lines the active hide rules remove, whether or not the override shows them.</summary>
     internal int HiddenLineCount => _lineVisibility.Map.HiddenCount;
@@ -76,6 +79,7 @@ internal partial class LogWindow
     private void ResetLineVisibility ()
     {
         _isLoadComplete = false;
+        _pendingPosition = null;
         _lineVisibility.Load(0, []);
         _rowMap = LineVisibilityMap.Empty;
         _appliedTrackedMap = _lineVisibility.Map;
@@ -97,7 +101,7 @@ internal partial class LogWindow
 
     private void UpdateHiddenLinesBar ()
     {
-        var hidden = _lineVisibility.Map.HiddenCount;
+        var hidden = HiddenLineCount;
         _hiddenLinesLabel.Text = string.Format(CultureInfo.CurrentCulture, Resources.LogWindow_UI_Label_HiddenLines, hidden);
         _showHiddenLinesCheckBox.Checked = _showHiddenLines;
 
@@ -125,7 +129,7 @@ internal partial class LogWindow
         }
     }
 
-    private void OnLineVisibilityChanged (object sender, LineVisibilityChangedEventArgs e)
+    private void OnLineVisibilityChanged (object? sender, LineVisibilityChangedEventArgs e)
     {
         if (_isClosing || IsDisposed || Disposing)
         {
@@ -162,17 +166,23 @@ internal partial class LogWindow
     }
 
     /// <summary>
-    /// The map the grid should display for <paramref name="tracked"/>: the tracked map itself, or, with the
-    /// override on, an identity map that keeps growing in place so tail appends stay appends.
+    /// The map the grid should display for <paramref name="tracked"/>: no rows while the load's first scan runs, the
+    /// tracked map itself, or, with the override on, an identity map that keeps growing in place so tail appends
+    /// stay appends.
     /// </summary>
     private LineVisibilityMap EffectiveMap (LineVisibilityMap tracked)
     {
+        var current = _rowMap;
         if (!_showHiddenLines)
         {
-            return tracked;
+            if (!_lineVisibility.IsLoadPending)
+            {
+                return tracked;
+            }
+
+            return current.LineCount == 0 ? current : LineVisibilityMap.Empty;
         }
 
-        var current = _rowMap;
         return current.HiddenCount == 0 && current.LineCount <= tracked.LineCount && tracked.IsAppendOf(_appliedTrackedMap)
             ? current.Append(tracked.LineCount, [])
             : LineVisibilityMap.Identity(tracked.LineCount);
@@ -190,24 +200,67 @@ internal partial class LogWindow
             return;
         }
 
+        if (PublishTrackedMap(0) && _guiStateArgs.FollowTail && dataGridView.RowCount > 0)
+        {
+            _columnCache.MarkPrefetchStale();
+            dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
+        }
+
+        dataGridView.Invalidate();
+        UpdateLineNavigationReadiness();
+    }
+
+    /// <summary>Switches the grid to the tracker's current map; returns whether the displayed map changed.</summary>
+    private bool PublishTrackedMap (int rolloverOffset)
+    {
         var tracked = _lineVisibility.Map;
         var newMap = EffectiveMap(tracked);
         _appliedTrackedMap = tracked;
 
-        if (!ReferenceEquals(newMap, _rowMap))
+        var changed = !ReferenceEquals(newMap, _rowMap);
+        if (changed)
         {
-            SetRowMap(newMap, 0);
-            if (_guiStateArgs.FollowTail && dataGridView.RowCount > 0)
-            {
-                _columnCache.MarkPrefetchStale();
-                dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
-            }
+            SetRowMap(newMap, rolloverOffset);
+        }
 
-            dataGridView.Invalidate();
+        if (_pendingPosition is { } position && !_lineVisibility.IsLoadPending)
+        {
+            _pendingPosition = null;
+            ApplyPosition(position.CurrentLine, position.FirstDisplayedLine);
         }
 
         UpdateHiddenLinesBar();
-        UpdateLineNavigationReadiness();
+        return changed;
+    }
+
+    /// <summary>
+    /// Restores a saved or reload position (original lines; a hidden one resolves to the nearest visible line),
+    /// deferred until the load's first scan has published the rows.
+    /// </summary>
+    private void RestorePosition (int currentLine, int firstDisplayedLine)
+    {
+        if (_lineVisibility.IsLoadPending && !_showHiddenLines)
+        {
+            _pendingPosition = (currentLine, firstDisplayedLine);
+            return;
+        }
+
+        ApplyPosition(currentLine, firstDisplayedLine);
+    }
+
+    private void ApplyPosition (int currentLine, int firstDisplayedLine)
+    {
+        var currentRow = currentLine >= 0 ? _rowMap.NearestRow(currentLine) : -1;
+        if (currentRow >= 0)
+        {
+            SelectRow(currentRow, false, true);
+        }
+
+        var firstRow = firstDisplayedLine >= 0 ? _rowMap.NearestRow(firstDisplayedLine) : -1;
+        if (firstRow >= 0)
+        {
+            dataGridView.FirstDisplayedScrollingRowIndex = firstRow;
+        }
     }
 
     /// <summary>
@@ -274,9 +327,6 @@ internal partial class LogWindow
     {
         return _rowMap.LineToRow(line);
     }
-
-    /// <summary>Original line of the current main-grid row, or -1.</summary>
-    private int CurrentLogicalLine => RowToLine(dataGridView.CurrentCellAddress.Y);
 
     /// <summary>
     /// Explicit navigation to an original line: a line beyond the end resolves to the last row; a hidden line turns
