@@ -183,11 +183,22 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                 ? _firstLine ?? callback.GetLogLineMemory(0)
                 : callback.GetLogLineMemory(0);
 
+            string[]? fields = null;
             if (line != null)
             {
-                var fields = ReadFields(line.FullLine.ToString());
+                try
+                {
+                    fields = ReadFields(line.FullLine.ToString());
+                }
+                catch (CsvHelperException)
+                {
+                    // first line doesn't parse with the current settings (e.g. wrong delimiter); same fallback as SplitCsvLine
+                }
+            }
 
-                if (_config.HasFieldNames && fields != null)
+            if (fields != null)
+            {
+                if (_config.HasFieldNames)
                 {
                     foreach (var headerColumn in fields)
                     {
@@ -196,8 +207,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                 }
                 else
                 {
-                    var fieldCount = fields?.Length ?? 0;
-                    for (var i = 0; i < fieldCount; ++i)
+                    for (var i = 0; i < fields.Length; ++i)
                     {
                         _columnList.Add(new CsvColumn(string.Format(CultureInfo.InvariantCulture, "Column {0}", i + 1)));
                     }

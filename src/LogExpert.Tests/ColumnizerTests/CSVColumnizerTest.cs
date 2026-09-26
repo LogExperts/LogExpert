@@ -135,6 +135,29 @@ public class CSVColumnizerTest
         Assert.That(result.ColumnValues.Select(c => c.FullValue.ToString()), Is.EqualTo(["2026-09-01 07:09:58.1980", " INFO", " 2001:7c0:3006:3014::8602:1a1d", " ", " ", " ", " zrnsh01 logged in"]));
     }
 
+    [TestCase(true)]
+    [TestCase(false)]
+    public void Selected_FirstLineIsBadDataForDelimiter_FallsBackToTextColumn (bool hasFieldNames)
+    {
+        // Quoted ';'-separated line parsed with a ',' delimiter (e.g. delimiter loaded from a saved config)
+        CsvColumnizerConfig config = new();
+        config.InitDefaults();
+        config.DelimiterChar = ",";
+        config.HasFieldNames = hasFieldNames;
+        config.ConfigureReaderConfiguration();
+
+        CsvColumnizer.CsvColumnizer columnizer = new();
+        SetPrivateField(columnizer, "_config", config);
+        SetPrivateField(columnizer, "_isValidCsv", true);
+
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(new CsvLogLine("\"2021-12-12\";\"TRACE\";\"semicolon file \"", 0));
+
+        columnizer.Selected(mockCallback.Object);
+
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["Text"]));
+    }
+
     [Test]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
     public void PreProcessLine_NoFieldNames_KeepsFirstLineVisible ()
