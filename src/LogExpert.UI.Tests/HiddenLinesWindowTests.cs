@@ -175,6 +175,28 @@ public sealed class HiddenLinesWindowTests : IDisposable
     }
 
     [Test]
+    public void NoticeBar_CentersTheCountBesideTheCheckBox ()
+    {
+        var log = Open();
+        var bar = Find<Panel>(log, "hiddenLinesBar");
+        var label = Find<Label>(log, "hiddenLinesLabel");
+        var checkBox = Find<CheckBox>(log, "showHiddenLinesCheckBox");
+        bar.PerformLayout();
+
+        Assert.That(label.Height, Is.EqualTo(bar.ClientSize.Height - bar.Padding.Vertical));
+        Assert.That(label.TextAlign, Is.EqualTo(ContentAlignment.MiddleLeft));
+        Assert.That(label.Top + (label.Height / 2), Is.EqualTo(checkBox.Top + (checkBox.Height / 2)).Within(1));
+        Assert.That(label.Right, Is.LessThanOrEqualTo(checkBox.Left));
+        Assert.That(label.PreferredWidth, Is.LessThan(label.Width), "the count must not run into the check box");
+
+        using var image = new Bitmap(bar.Width, bar.Height);
+        bar.DrawToBitmap(image, bar.ClientRectangle);
+        var path = Path.Join(TestContext.CurrentContext.WorkDirectory, "hidden-lines-bar.png");
+        image.Save(path);
+        TestContext.AddTestAttachment(path);
+    }
+
+    [Test]
     public void ShowHiddenLines_ShowsEveryLine_WithoutChangingTheRules ()
     {
         var log = Open();

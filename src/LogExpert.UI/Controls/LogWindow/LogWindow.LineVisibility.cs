@@ -16,7 +16,8 @@ internal partial class LogWindow
     private const int HIDDEN_LINES_BAR_HEIGHT = 24;
 
     private readonly Panel _hiddenLinesBar = new() { Name = "hiddenLinesBar", Dock = DockStyle.Top, Visible = false };
-    private readonly Label _hiddenLinesLabel = new() { Name = "hiddenLinesLabel", AutoSize = true, Dock = DockStyle.Left, TextAlign = ContentAlignment.MiddleLeft };
+    // Not AutoSize: an auto-sized label keeps its text height and sits at the top instead of centering beside the check box.
+    private readonly Label _hiddenLinesLabel = new() { Name = "hiddenLinesLabel", AutoSize = false, Dock = DockStyle.Left, TextAlign = ContentAlignment.MiddleLeft };
     private readonly CheckBox _showHiddenLinesCheckBox = new() { Name = "showHiddenLinesCheckBox", AutoSize = true, Dock = DockStyle.Left };
 
     private LineVisibilityTracker _lineVisibility;
@@ -103,6 +104,7 @@ internal partial class LogWindow
     {
         var hidden = HiddenLineCount;
         _hiddenLinesLabel.Text = string.Format(CultureInfo.CurrentCulture, Resources.LogWindow_UI_Label_HiddenLines, hidden);
+        _hiddenLinesLabel.Width = _hiddenLinesLabel.PreferredWidth + LogicalToDeviceUnits(12);
         _showHiddenLinesCheckBox.Checked = _showHiddenLines;
 
         var visible = hidden > 0 || _showHiddenLines;
