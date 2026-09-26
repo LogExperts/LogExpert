@@ -196,7 +196,7 @@ internal sealed class LogWindowCoordinator (
 
     public void IndicateTimeSyncActivity (LogWindow logWindow)
     {
-        _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
+        _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX, false);
     }
 
     public IList<WindowFileEntry> GetOpenFiles ()

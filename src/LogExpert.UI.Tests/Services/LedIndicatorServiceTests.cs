@@ -1,6 +1,12 @@
 using System.Runtime.Versioning;
 
+using LogExpert.Core.Config;
+using LogExpert.Core.Interfaces;
+using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Interface;
 using LogExpert.UI.Services.LedService;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -15,6 +21,13 @@ public class LedIndicatorServiceTests : IDisposable
     private ApplicationContext? _appContext;
     private WindowsFormsSynchronizationContext? _syncContext;
     private bool _disposed;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp ()
+    {
+        var dir = Path.GetDirectoryName(typeof(LedIndicatorServiceTests).Assembly.Location)!;
+        _ = PluginRegistry.PluginRegistry.Create(dir, 500);
+    }
 
     [SetUp]
     public void Setup ()
@@ -158,7 +171,7 @@ public class LedIndicatorServiceTests : IDisposable
         // We can't easily mock LogWindow since it has no parameterless constructor
         // and is internal, so we just test that registering null throws
         // Act & Assert
-        _ = Assert.Throws<ArgumentNullException>(() => _service.RegisterWindow(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _service.RegisterWindow(null!, new LedState()));
     }
 
     [Test]
@@ -169,7 +182,7 @@ public class LedIndicatorServiceTests : IDisposable
 
         // Act & Assert - Updating an unregistered window should not throw
         // (it just won't raise events)
-        Assert.DoesNotThrow(() => _service.UpdateWindowActivity(null, 10));
+        Assert.DoesNotThrow(() => _service.UpdateWindowActivity(null, 10, true));
     }
 
     [Test]
@@ -228,7 +241,7 @@ public class LedIndicatorServiceTests : IDisposable
         _service!.Initialize(Color.Blue);
 
         // Act & Assert
-        _ = Assert.Throws<ArgumentNullException>(() => _service.RegisterWindow(null!));
+        _ = Assert.Throws<ArgumentNullException>(() => _service.RegisterWindow(null!, new LedState()));
     }
 
     [Test]
@@ -316,6 +329,134 @@ public class LedIndicatorServiceTests : IDisposable
         Assert.That(iconNotSynced, Is.Not.Null);
         // The icons should be different (synced has blue indicator on left side)
         Assert.That(iconSynced, Is.Not.EqualTo(iconNotSynced));
+    }
+
+    [Test]
+    public void UpdateWindowActivity_WithMarkDirty_SetsDirtyAndRaisesDirtyIcon ()
+    {
+        // Arrange
+        _service!.Initialize(Color.Blue);
+        using var window = CreateLogWindow();
+        var state = new LedState();
+        _service.RegisterWindow(window, state);
+
+        Icon? raisedIcon = null;
+        _service.IconChanged += (_, e) => raisedIcon = e.NewIcon;
+
+        // Act
+        _service.UpdateWindowActivity(window, 50, true);
+
+        // Assert
+        Assert.That(state.IsDirty, Is.True);
+        Assert.That(raisedIcon, Is.SameAs(_service.GetIcon(50, new LedState { IsDirty = true })));
+    }
+
+    [Test]
+    public void UpdateWindowActivity_WithoutMarkDirty_DoesNotSetDirty ()
+    {
+        // Arrange
+        _service!.Initialize(Color.Blue);
+        using var window = CreateLogWindow();
+        var state = new LedState();
+        _service.RegisterWindow(window, state);
+
+        // Act
+        _service.UpdateWindowActivity(window, 50, false);
+
+        // Assert
+        Assert.That(state.IsDirty, Is.False);
+        Assert.That(state.DiffSum, Is.EqualTo(50));
+    }
+
+    [Test]
+    public void UpdateWindowActivity_PreservesTailAndSyncState ()
+    {
+        // Arrange
+        _service!.Initialize(Color.Blue);
+        using var window = CreateLogWindow();
+        var state = new LedState
+        {
+            TailState = TailFollowState.Off,
+            SyncState = TimeSyncState.Synced
+        };
+        _service.RegisterWindow(window, state);
+
+        Icon? raisedIcon = null;
+        _service.IconChanged += (_, e) => raisedIcon = e.NewIcon;
+
+        // Act
+        _service.UpdateWindowActivity(window, 50, false);
+
+        // Assert
+        var expected = _service.GetIcon(50, new LedState
+        {
+            TailState = TailFollowState.Off,
+            SyncState = TimeSyncState.Synced
+        });
+        Assert.That(raisedIcon, Is.SameAs(expected));
+    }
+
+    [Test]
+    public void AnimationTick_DirtyAndTailStateSurviveDecay ()
+    {
+        // Arrange
+        _service!.Initialize(Color.Blue);
+        using var window = CreateLogWindow();
+        var state = new LedState { TailState = TailFollowState.Paused };
+        _service.RegisterWindow(window, state);
+        _service.UpdateWindowActivity(window, 10, true);
+
+        Icon? raisedIcon = null;
+        _service.IconChanged += (_, e) => raisedIcon = e.NewIcon;
+
+        // Act
+        _service.StartService();
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (state.DiffSum > 0 && DateTime.UtcNow < deadline)
+        {
+            Application.DoEvents();
+            Thread.Sleep(20);
+        }
+
+        _service.StopService();
+
+        // Assert
+        Assert.That(state.DiffSum, Is.EqualTo(0));
+        Assert.That(state.IsDirty, Is.True);
+        Assert.That(raisedIcon, Is.SameAs(_service.GetIcon(0, new LedState
+        {
+            IsDirty = true,
+            TailState = TailFollowState.Paused
+        })));
+    }
+
+    [Test]
+    public void ClearDirty_ClearsStateAndRaisesCleanIcon ()
+    {
+        // Arrange
+        _service!.Initialize(Color.Blue);
+        using var window = CreateLogWindow();
+        var state = new LedState();
+        _service.RegisterWindow(window, state);
+        _service.UpdateWindowActivity(window, 50, true);
+
+        Icon? raisedIcon = null;
+        _service.IconChanged += (_, e) => raisedIcon = e.NewIcon;
+
+        // Act
+        _service.ClearDirty(window);
+
+        // Assert
+        Assert.That(state.IsDirty, Is.False);
+        Assert.That(raisedIcon, Is.SameAs(_service.GetIcon(50, new LedState())));
+    }
+
+    private static LogWindow CreateLogWindow ()
+    {
+        var configManagerMock = new Mock<IConfigManager>();
+        _ = configManagerMock.Setup(cm => cm.Settings).Returns(new Settings());
+
+        return new LogWindow(new Mock<ILogWindowCoordinator>().Object, "led.log", false, false, configManagerMock.Object, PluginRegistry.PluginRegistry.Instance);
     }
 
     public void Dispose ()
