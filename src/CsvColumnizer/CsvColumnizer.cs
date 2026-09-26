@@ -176,6 +176,25 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     {
         ArgumentNullException.ThrowIfNull(callback, nameof(callback));
 
+        DetectDelimiterFromFile(callback);
+        BuildColumns(callback);
+    }
+
+    /// <summary>
+    /// This instance may not have pre-processed the current file (e.g. a clone that loaded the saved config),
+    /// so re-detect the delimiter from the file's first line, like PreProcessLine() does on load.
+    /// </summary>
+    private void DetectDelimiterFromFile (ILogLineMemoryColumnizerCallback callback)
+    {
+        var line = _firstLine ?? callback.GetLogLineMemory(0);
+        if (line != null)
+        {
+            AutoDetectDelimiter(line.FullLine);
+        }
+    }
+
+    private void BuildColumns (ILogLineMemoryColumnizerCallback callback)
+    {
         if (_isValidCsv) // see PreProcessLine()
         {
             _columnList.Clear();
@@ -183,28 +202,33 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
                 ? _firstLine ?? callback.GetLogLineMemory(0)
                 : callback.GetLogLineMemory(0);
 
+            string[]? fields = null;
             if (line != null)
             {
-                using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-                _ = csv.Read();
-                _ = csv.ReadHeader();
-
-                var fieldCount = csv.Parser.Count;
-
-                var headerRecord = csv.HeaderRecord;
-
-                if (_config.HasFieldNames && headerRecord != null)
+                try
                 {
-                    foreach (var headerColumn in headerRecord)
+                    fields = ReadFields(line.FullLine.ToString());
+                }
+                catch (CsvHelperException)
+                {
+                    // first line doesn't parse with the current settings (e.g. wrong delimiter); same fallback as SplitCsvLine
+                }
+            }
+
+            if (fields != null)
+            {
+                if (_config.HasFieldNames)
+                {
+                    foreach (var headerColumn in fields)
                     {
                         _columnList.Add(new CsvColumn(headerColumn));
                     }
                 }
                 else
                 {
-                    for (var i = 0; i < fieldCount; ++i)
+                    for (var i = 0; i < fields.Length; ++i)
                     {
-                        _columnList.Add(new CsvColumn("Column " + i + 1));
+                        _columnList.Add(new CsvColumn(string.Format(CultureInfo.InvariantCulture, "Column {0}", i + 1)));
                     }
                 }
             }
@@ -254,6 +278,12 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         var configPath = configDir + "\\" + CONFIGFILENAME;
         FileInfo fileInfo = new(configPath);
 
+        // show the file's delimiter rather than the one from the saved config
+        if (callback != null)
+        {
+            DetectDelimiterFromFile(callback);
+        }
+
         CsvColumnizerConfigDlg dlg = new(_config);
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -268,7 +298,11 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
             _config.ConfigureReaderConfiguration();
 
-            Selected(callback);
+            // no re-detection here: keep the delimiter the user chose in the dialog
+            if (callback != null)
+            {
+                BuildColumns(callback);
+            }
         }
     }
 
@@ -360,6 +394,15 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         }
     }
 
+    /// <summary>
+    /// Parses one line into its fields; avoids ReadHeader(), which throws when HasHeaderRecord is false.
+    /// </summary>
+    private string[]? ReadFields (string line)
+    {
+        using CsvReader csv = new(new StringReader(line), _config.ReaderConfiguration);
+        return csv.Read() ? csv.Parser.Record : null;
+    }
+
     private ColumnizedLogLine SplitCsvLine (ILogLineMemory line)
     {
         if (line.FullLine.IsEmpty)
@@ -374,12 +417,7 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
         try
         {
-            using CsvReader csv = new(new StringReader(line.FullLine.ToString()), _config.ReaderConfiguration);
-            _ = csv.Read();
-            _ = csv.ReadHeader();
-
-            //we only read line by line and not the whole file so it is always the header
-            var records = csv.HeaderRecord;
+            var records = ReadFields(line.FullLine.ToString());
 
             if (records != null)
             {
