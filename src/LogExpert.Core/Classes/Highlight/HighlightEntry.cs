@@ -97,6 +97,12 @@ public class HighlightEntry () : ICloneable
 
     public bool NoBackground { get; set; }
 
+    /// <summary>
+    /// When true, lines matching this entry are removed from the Log Window's main grid. Display state only:
+    /// the lines stay in the reader and remain eligible for search, filtering and triggers.
+    /// </summary>
+    public bool IsHideLine { get; set; }
+
     public object Clone ()
     {
         var highLightEntry = new HighlightEntry
@@ -118,6 +124,7 @@ public class HighlightEntry () : ICloneable
             CooldownSeconds = CooldownSeconds,
             BookmarkComment = BookmarkComment,
             NoBackground = NoBackground,
+            IsHideLine = IsHideLine,
             IsSearchHit = IsSearchHit
         };
 
