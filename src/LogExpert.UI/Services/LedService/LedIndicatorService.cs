@@ -467,15 +467,16 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     /// <summary>
     /// Registers a window for tracking
     /// </summary>
-    public void RegisterWindow (LogWindow window)
+    public void RegisterWindow (LogWindow window, LedState state)
     {
         ArgumentNullException.ThrowIfNull(window);
+        ArgumentNullException.ThrowIfNull(state);
 
         lock (_stateLock)
         {
             if (!_windowStates.ContainsKey(window))
             {
-                _windowStates[window] = new LedState();
+                _windowStates[window] = state;
                 _logger.Debug("Registered window for LED tracking: {Window}", window.Text);
             }
         }
@@ -587,7 +588,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     /// <summary>
     /// Updates window activity level
     /// </summary>
-    public void UpdateWindowActivity (LogWindow window, int lineDiff)
+    public void UpdateWindowActivity (LogWindow window, int lineDiff, bool markDirty)
     {
         if (window == null || lineDiff < 0)
         {
@@ -606,6 +607,38 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
                     state.DiffSum = DIFF_MAX;
                 }
 
+                if (markDirty)
+                {
+                    state.IsDirty = true;
+                }
+
+                newIcon = GetIcon(state.DiffSum, state);
+            }
+        }
+
+        if (newIcon != null)
+        {
+            OnIconChanged(window, newIcon);
+        }
+    }
+
+    /// <summary>
+    /// Clears the dirty state of a window
+    /// </summary>
+    public void ClearDirty (LogWindow window)
+    {
+        if (window == null)
+        {
+            return;
+        }
+
+        Icon newIcon = null;
+
+        lock (_stateLock)
+        {
+            if (_windowStates.TryGetValue(window, out var state))
+            {
+                state.IsDirty = false;
                 newIcon = GetIcon(state.DiffSum, state);
             }
         }

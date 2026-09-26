@@ -598,16 +598,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // status-line, progress-bar and GUI-state updates into the subscriptions made here.
         CurrentLogWindow = newWindow;
 
-        // Clear dirty state for the newly activated window
-        if (newWindow?.Tag is LogWindowData data)
-        {
-            data.LedState.IsDirty = false;
-
-            // Update the tab icon to reflect cleared dirty state
-            var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(SetTabIcon, newWindow, icon);
-        }
-
         // Notify the window it has been activated
         newWindow?.LogWindowActivated();
     }
@@ -634,10 +624,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             logWindow.Tag = data;
         }
 
-        _ledService.RegisterWindow(logWindow);
-
         if (logWindow.Tag is LogWindowData ledData)
         {
+            _ledService.RegisterWindow(logWindow, ledData.LedState);
+
             var icon = GetLedIcon(ledData.LedState.DiffSum, ledData);
             _ = BeginInvoke(SetTabIcon, logWindow, icon);
         }
@@ -1136,6 +1126,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (logWindow != null)
         {
             ConnectToolWindows(logWindow);
+            _ledService.ClearDirty(logWindow);
         }
     }
 
@@ -2130,7 +2121,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        if (logWindow.Tag is not LogWindowData)
+        if (logWindow.Tag is not LogWindowData data)
         {
             return;
         }
@@ -2141,7 +2132,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        _ledService.UpdateWindowActivity(logWindow, diff);
+        var markDirty = (CurrentLogWindow != null && CurrentLogWindow != logWindow) || data.LedState.TailState != TailFollowState.On;
+        _ledService.UpdateWindowActivity(logWindow, diff, markDirty);
     }
 
     private void OnLogWindowFileNotFound (object sender, EventArgs e)
@@ -2185,10 +2177,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             if (dockPanel.ActiveContent == sender)
             {
-                var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
-                data.LedState.IsDirty = false;
-                var icon = GetLedIcon(data.LedState.DiffSum, data);
-                _ = BeginInvoke(SetTabIcon, (LogWindow.LogWindow)sender, icon);
+                _ledService.ClearDirty((LogWindow.LogWindow)sender);
             }
         }
     }
