@@ -12,6 +12,11 @@ namespace LogExpert.Core.Classes.Highlight;
 /// evaluated synchronously by the caller's thread. Evaluation uses <see cref="HighlightEvaluator.IsHidden"/> only,
 /// so it can never fire a trigger.
 /// </para>
+/// <para>
+/// Lines are never read while the lock is held: the UI thread takes the lock too, and a reader call may wait for the
+/// UI thread. Evaluations run against a state snapshot and commit only if the state (<see cref="_version"/>) is
+/// unchanged, retrying otherwise.
+/// </para>
 /// </summary>
 public sealed class LineVisibilityTracker : IDisposable
 {
@@ -19,11 +24,12 @@ public sealed class LineVisibilityTracker : IDisposable
     private readonly Lock _lock = new();
 
     private volatile LineVisibilityMap _map = LineVisibilityMap.Empty;
+    private volatile HighlightEntry[]? _pendingRules;
     private HighlightEntry[] _rules = [];
-    private HighlightEntry[]? _pendingRules;
     private CancellationTokenSource? _scanCts;
     private Task _scanTask = Task.CompletedTask;
     private int _generation;
+    private int _version;
     private bool _disposed;
 
     /// <param name="getLine">Reads an original line; read live, since the reader is replaced on reload.</param>
@@ -41,16 +47,7 @@ public sealed class LineVisibilityTracker : IDisposable
 
     public LineVisibilityMap Map => _map;
 
-    public bool IsScanning
-    {
-        get
-        {
-            lock (_lock)
-            {
-                return _pendingRules != null;
-            }
-        }
-    }
+    public bool IsScanning => _pendingRules != null;
 
     /// <summary>New content was loaded: every line is visible until the scan with <paramref name="entries"/> completes.</summary>
     public void Load (int lineCount, IEnumerable<HighlightEntry> entries)
@@ -63,8 +60,7 @@ public sealed class LineVisibilityTracker : IDisposable
                 return;
             }
 
-            _rules = [];
-            _map = LineVisibilityMap.Identity(lineCount);
+            SetStateLocked(LineVisibilityMap.Identity(lineCount), []);
             StartOrStopScanLocked(rules);
         }
     }
@@ -84,8 +80,8 @@ public sealed class LineVisibilityTracker : IDisposable
             StartOrStopScanLocked(rules);
             if (rules.Length == 0 && _map.HiddenCount > 0)
             {
-                _rules = [];
-                _map = cleared = LineVisibilityMap.Identity(_map.LineCount);
+                cleared = LineVisibilityMap.Identity(_map.LineCount);
+                SetStateLocked(cleared, []);
             }
         }
 
@@ -98,20 +94,40 @@ public sealed class LineVisibilityTracker : IDisposable
     /// <summary>Tail path: evaluates lines appended up to <paramref name="lineCount"/> and returns the current map.</summary>
     public LineVisibilityMap Extend (int lineCount)
     {
-        Exception? error;
-        LineVisibilityMap map;
-        lock (_lock)
+        while (true)
         {
-            if (_disposed || lineCount <= _map.LineCount)
+            LineVisibilityMap from;
+            HighlightEntry[] rules;
+            int version;
+            lock (_lock)
             {
-                return _map;
+                if (_disposed || lineCount <= _map.LineCount)
+                {
+                    return _map;
+                }
+
+                (from, rules, version) = (_map, _rules, _version);
             }
 
-            (map, error) = EvaluateLocked(_map, lineCount);
-        }
+            var (map, error) = TryEvaluate(from, rules, lineCount);
+            lock (_lock)
+            {
+                if (_disposed)
+                {
+                    return _map;
+                }
 
-        RaiseFailure(map, error);
-        return map;
+                if (version != _version)
+                {
+                    continue;
+                }
+
+                SetStateLocked(map, error == null ? rules : []);
+            }
+
+            RaiseFailure(map, error);
+            return map;
+        }
     }
 
     /// <summary>Tail path, rollover: the first <paramref name="offset"/> lines were dropped.</summary>
@@ -121,7 +137,7 @@ public sealed class LineVisibilityTracker : IDisposable
         {
             if (!_disposed)
             {
-                _map = _map.Shift(offset);
+                SetStateLocked(_map.Shift(offset), _rules);
                 RestartPendingScanLocked();
             }
 
@@ -132,21 +148,40 @@ public sealed class LineVisibilityTracker : IDisposable
     /// <summary>Tail path, truncation: the content was replaced and is re-evaluated up to <paramref name="lineCount"/>.</summary>
     public LineVisibilityMap Replace (int lineCount)
     {
-        Exception? error;
-        LineVisibilityMap map;
-        lock (_lock)
+        while (true)
         {
-            if (_disposed)
+            HighlightEntry[] rules;
+            int version;
+            lock (_lock)
             {
-                return _map;
+                if (_disposed)
+                {
+                    return _map;
+                }
+
+                (rules, version) = (_rules, _version);
             }
 
-            (map, error) = EvaluateLocked(LineVisibilityMap.Empty, lineCount);
-            RestartPendingScanLocked();
-        }
+            var (map, error) = TryEvaluate(LineVisibilityMap.Empty, rules, lineCount);
+            lock (_lock)
+            {
+                if (_disposed)
+                {
+                    return _map;
+                }
 
-        RaiseFailure(map, error);
-        return map;
+                if (version != _version)
+                {
+                    continue;
+                }
+
+                SetStateLocked(map, error == null ? rules : []);
+                RestartPendingScanLocked();
+            }
+
+            RaiseFailure(map, error);
+            return map;
+        }
     }
 
     /// <summary>Completes once no scan is running (including scans restarted meanwhile).</summary>
@@ -183,11 +218,19 @@ public sealed class LineVisibilityTracker : IDisposable
 
             _disposed = true;
             _generation++;
+            _version++;
             _pendingRules = null;
             _scanCts?.Cancel();
             _scanCts?.Dispose();
             _scanCts = null;
         }
+    }
+
+    private void SetStateLocked (LineVisibilityMap map, HighlightEntry[] rules)
+    {
+        _map = map;
+        _rules = rules;
+        _version++;
     }
 
     private void StartOrStopScanLocked (HighlightEntry[] rules)
@@ -219,34 +262,36 @@ public sealed class LineVisibilityTracker : IDisposable
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Any evaluation failure falls back to showing every line and is reported")]
     private void Scan (HighlightEntry[] rules, int lineCount, int generation, CancellationToken token)
     {
         LineVisibilityMap map;
         Exception? error = null;
         try
         {
-            List<int> hidden = [];
-            for (var i = 0; i < lineCount; i++)
-            {
-                token.ThrowIfCancellationRequested();
-                if (IsHiddenLine(rules, i))
-                {
-                    hidden.Add(i);
-                }
-            }
+            map = Evaluate(LineVisibilityMap.Empty, rules, lineCount, token);
 
-            lock (_lock)
+            // Catch up with lines the tail appended while the scan ran, outside the lock, until none are left.
+            while (true)
             {
-                if (generation != _generation)
+                int known;
+                lock (_lock)
                 {
-                    return;
+                    if (generation != _generation)
+                    {
+                        return;
+                    }
+
+                    known = _map.LineCount;
+                    if (known <= map.LineCount)
+                    {
+                        SetStateLocked(map, rules);
+                        _pendingRules = null;
+                        break;
+                    }
                 }
 
-                // Catch up with lines the tail appended while the scan ran.
-                map = Evaluate(LineVisibilityMap.Empty.Append(lineCount, hidden), rules, _map.LineCount);
-                _map = map;
-                _rules = rules;
-                _pendingRules = null;
+                map = Evaluate(map, rules, known, token);
             }
         }
         catch (OperationCanceledException)
@@ -262,8 +307,8 @@ public sealed class LineVisibilityTracker : IDisposable
                     return;
                 }
 
-                _map = map = LineVisibilityMap.Identity(_map.LineCount);
-                _rules = [];
+                map = LineVisibilityMap.Identity(_map.LineCount);
+                SetStateLocked(map, []);
                 _pendingRules = null;
                 error = ex;
             }
@@ -272,23 +317,20 @@ public sealed class LineVisibilityTracker : IDisposable
         Changed?.Invoke(this, new LineVisibilityChangedEventArgs(map, error));
     }
 
-    private (LineVisibilityMap Map, Exception? Error) EvaluateLocked (LineVisibilityMap from, int lineCount)
+    private (LineVisibilityMap Map, Exception? Error) TryEvaluate (LineVisibilityMap from, HighlightEntry[] rules, int lineCount)
     {
         try
         {
-            _map = Evaluate(from, _rules, lineCount);
-            return (_map, null);
+            return (Evaluate(from, rules, lineCount, CancellationToken.None), null);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             // Never publish a partial state: fall back to showing every line.
-            _rules = [];
-            _map = LineVisibilityMap.Identity(lineCount);
-            return (_map, ex);
+            return (LineVisibilityMap.Identity(lineCount), ex);
         }
     }
 
-    private LineVisibilityMap Evaluate (LineVisibilityMap from, HighlightEntry[] rules, int lineCount)
+    private LineVisibilityMap Evaluate (LineVisibilityMap from, HighlightEntry[] rules, int lineCount, CancellationToken token)
     {
         if (lineCount <= from.LineCount)
         {
@@ -300,6 +342,7 @@ public sealed class LineVisibilityTracker : IDisposable
         {
             for (var i = from.LineCount; i < lineCount; i++)
             {
+                token.ThrowIfCancellationRequested();
                 if (IsHiddenLine(rules, i))
                 {
                     hidden.Add(i);

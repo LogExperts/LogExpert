@@ -271,6 +271,32 @@ public class LineVisibilityTrackerTests
     }
 
     [Test]
+    public void ReaderCallInProgress_NeverBlocksTheOtherCallers ()
+    {
+        _tracker.Load(_lines.Count, HideDebug);
+        Idle();
+        _lines.Add("DEBUG f");
+        _gate.Reset();
+        var extend = Task.Run(() => _tracker.Extend(6));
+        Thread.Sleep(50);
+
+        // The UI thread calls these; a reader call may itself wait for the UI thread, so none may wait for it.
+        var others = Task.Run(() =>
+        {
+            _ = _tracker.IsScanning;
+            _tracker.Rebuild([new HighlightEntry { SearchText = "INFO", IsHideLine = true }]);
+            _ = _tracker.Shift(0);
+            _tracker.Load(_lines.Count, HideDebug);
+        });
+
+        Assert.That(others.Wait(TimeSpan.FromSeconds(2)), Is.True, "a caller waited for a blocked reader call");
+        _gate.Set();
+        Assert.That(extend.Wait(Timeout), Is.True);
+        Idle();
+        Assert.That(VisibleLines(_tracker.Map), Is.EqualTo(new[] { 0, 2, 4 }));
+    }
+
+    [Test]
     public void Dispose_CancelsAPendingScan_WithoutPublishing ()
     {
         _gate.Reset();

@@ -6028,6 +6028,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         CancelPendingLineNavigation();
 
         CancelHighlightBookmarkScan();
+        _lineVisibility.Dispose();
         StopTimespreadThread();
         StopTimestampSyncThread();
         _tailFollowEngine.Stop();

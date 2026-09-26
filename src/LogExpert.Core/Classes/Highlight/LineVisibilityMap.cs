@@ -119,11 +119,12 @@ public sealed class LineVisibilityMap
         ArgumentOutOfRangeException.ThrowIfLessThan(lineCount, LineCount);
 
         var previous = LineCount - 1;
+        // Hidden lines must be ascending and within the appended range.
         foreach (var line in hiddenLines)
         {
             if (line <= previous || line >= lineCount)
             {
-                throw new ArgumentOutOfRangeException(nameof(hiddenLines), line, "Hidden lines must be ascending and within the appended range.");
+                throw new ArgumentOutOfRangeException(nameof(hiddenLines), line, null);
             }
 
             previous = line;

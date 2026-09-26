@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 
 using LogExpert.Core.Classes.Highlight;
@@ -30,6 +31,7 @@ internal partial class LogWindow
     internal int HiddenLineCount => _lineVisibility.Map.HiddenCount;
 
     /// <summary>The per-window "Show hidden lines" override. Transient: not saved in the Session File.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal bool ShowHiddenLines
     {
         get => _showHiddenLines;

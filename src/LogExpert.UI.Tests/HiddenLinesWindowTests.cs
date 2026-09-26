@@ -254,6 +254,41 @@ public sealed class HiddenLinesWindowTests : IDisposable
     }
 
     [Test]
+    public void Reload_KeepsTheSelectedOriginalLine_AndHidesAgain ()
+    {
+        var log = Open();
+        log.GotoLine(14);
+        var finished = false;
+        log.ProgressBarUpdate += (_, progress) => finished |= !progress.Visible;
+
+        log.Reload();
+        PumpUntil(() => finished);
+        var loaded = Task.Run(log.WaitForLoadingFinished);
+        PumpUntil(() => loaded.IsCompleted);
+        WaitForVisibility(log);
+
+        Assert.That(Grid(log).RowCount, Is.EqualTo(LINE_COUNT / 2));
+        Assert.That(log.CurrentLineNum, Is.EqualTo(14));
+    }
+
+    [Test]
+    public void TailTriggers_StillFireOnHiddenLines_WithoutRevealingThem ()
+    {
+        _settings.Preferences.HighlightGroupList[0].HighlightEntryList.Add(new HighlightEntry { SearchText = "DEBUG 21", IsStopTail = true, IsSetBookmark = true });
+        var log = Open();
+        log.FollowTailChanged(true, false);
+
+        File.AppendAllLines(_fileName, [Text(20), Text(21), Text(22)]);
+        PumpUntil(() => log.GatherSessionSnapshot().LineCount == 23);
+        PumpUntil(() => log.BookmarkData.IsBookmarkAtLine(21));
+        PumpFor(TimeSpan.FromMilliseconds(100));
+
+        Assert.That(log.GatherSessionSnapshot().FollowTail, Is.False);
+        Assert.That(log.ShowHiddenLines, Is.False);
+        Assert.That(log.CurrentLineNum, Is.EqualTo(22), "stop-tail scrolls to the next visible line");
+    }
+
+    [Test]
     public void CopySelectedRows_CopiesOnlyTheSelectedVisibleLines ()
     {
         var log = Open();
@@ -341,6 +376,23 @@ public sealed class HiddenLinesWindowTests : IDisposable
     }
 
     [Test]
+    public void MarkerClick_OnHiddenLine_RevealsIt ()
+    {
+        _settings.Preferences.ShowMarkerBar = true;
+        var log = Open();
+        log.ToggleBookmark(11);
+        PumpFor(TimeSpan.FromMilliseconds(600));
+        var bar = Find<MarkerBar>(log, "markerBar");
+
+        // The bar raises LineSelected with the original line of the clicked marker; 11 is beyond the 10 visible rows.
+        _ = typeof(LogWindow).GetMethod("OnMarkerLineSelected", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(log, [bar, new Core.EventArguments.SelectLineEventArgs(11)]);
+
+        Assert.That(log.CurrentLineNum, Is.EqualTo(11));
+        Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
+    [Test]
     public void CommandLineTarget_OnHiddenLine_RevealsItAfterVisibilityInitialization ()
     {
         _window = new LogTabWindow([_fileName], 1, false, _config.Object, 8) { ShowInTaskbar = false, Opacity = 0 };
@@ -369,6 +421,48 @@ public sealed class HiddenLinesWindowTests : IDisposable
 
         Assert.That(log.ShowHiddenLines, Is.False);
         Assert.That(log.CurrentLineNum, Is.EqualTo(6));
+    }
+
+    [Test, Explicit("Real-file hide-line scan duration, memory and UI responsiveness experiment")]
+    public void LargeFile_ReportsScanDurationMemoryAndUiResponsiveness ()
+    {
+        const int LARGE_LINE_COUNT = 1_000_000;
+        File.WriteAllLines(_fileName, Enumerable.Range(0, LARGE_LINE_COUNT)
+            .Select(i => $"2026-09-26 12:34:56.{i % 1000:D3} {(i % 2 == 1 ? "DEBUG" : "INFO")} worker-{i % 16} message number {i}"));
+        HideRule.IsHideLine = false;
+        var log = Open();
+        var grid = Grid(log);
+        var memoryBefore = GC.GetTotalMemory(true);
+
+        HideRule.IsHideLine = true;
+        var elapsed = Stopwatch.StartNew();
+        log.SetCurrentHighlightGroup("hide");
+        var pump = Stopwatch.StartNew();
+        var maximumPump = TimeSpan.Zero;
+        while (grid.RowCount != LARGE_LINE_COUNT / 2 && elapsed.Elapsed < TimeSpan.FromSeconds(120))
+        {
+            pump.Restart();
+            PumpOnce();
+            maximumPump = maximumPump > pump.Elapsed ? maximumPump : pump.Elapsed;
+            Thread.Sleep(1);
+        }
+
+        var scan = elapsed.Elapsed;
+        Assert.That(grid.RowCount, Is.EqualTo(LARGE_LINE_COUNT / 2));
+        var memoryAfter = GC.GetTotalMemory(true);
+
+        elapsed.Restart();
+        log.GotoLine(LARGE_LINE_COUNT - 1);
+        var reveal = elapsed.Elapsed;
+        elapsed.Restart();
+        log.ShowHiddenLines = false;
+        grid.FirstDisplayedScrollingRowIndex = grid.RowCount / 2;
+        PumpOnce();
+        var scroll = elapsed.Elapsed;
+
+        TestContext.Progress.WriteLine($"Hide-line scan: {new FileInfo(_fileName).Length} bytes, {LARGE_LINE_COUNT} lines, {log.HiddenLineCount} hidden; " +
+            $"scan {scan.TotalMilliseconds:F0} ms; managed delta {memoryAfter - memoryBefore} bytes; maximum UI pump during scan {maximumPump.TotalMilliseconds:F1} ms; " +
+            $"reveal hidden last line {reveal.TotalMilliseconds:F0} ms; override off + mid-file scroll {scroll.TotalMilliseconds:F0} ms.");
     }
 
     private LogWindow Open ()

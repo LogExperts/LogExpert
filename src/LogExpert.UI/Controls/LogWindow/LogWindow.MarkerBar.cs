@@ -336,7 +336,7 @@ internal partial class LogWindow
     private void OnMarkerLineSelected (object? sender, SelectLineEventArgs eventArgs)
     {
         if (_markerFrame?.Generation == Volatile.Read(ref _markerGeneration)
-            && eventArgs.Line >= 0 && eventArgs.Line < dataGridView.RowCount)
+            && eventArgs.Line >= 0 && eventArgs.Line < _rowMap.LineCount)
         {
             RequestGotoLine(eventArgs.Line + 1);
         }
