@@ -78,6 +78,21 @@ public class CSVColumnizerTest
         return columnizer;
     }
 
+    // Valid-CSV mode with ',' as configured delimiter, as if loaded from a saved csvcolumnizer.json
+    private static CsvColumnizer.CsvColumnizer CreateColumnizerWithSavedCommaDelimiter (bool hasFieldNames)
+    {
+        CsvColumnizerConfig config = new();
+        config.InitDefaults();
+        config.DelimiterChar = ",";
+        config.HasFieldNames = hasFieldNames;
+        config.ConfigureReaderConfiguration();
+
+        CsvColumnizer.CsvColumnizer columnizer = new();
+        SetPrivateField(columnizer, "_config", config);
+        SetPrivateField(columnizer, "_isValidCsv", true);
+        return columnizer;
+    }
+
     [Test]
     public void Selected_HasFieldNames_FirstLineNull_FallsBackToCallback ()
     {
@@ -137,25 +152,43 @@ public class CSVColumnizerTest
 
     [TestCase(true)]
     [TestCase(false)]
-    public void Selected_FirstLineIsBadDataForDelimiter_FallsBackToTextColumn (bool hasFieldNames)
+    public void Selected_FirstLineIsBadData_FallsBackToTextColumn (bool hasFieldNames)
     {
-        // Quoted ';'-separated line parsed with a ',' delimiter (e.g. delimiter loaded from a saved config)
-        CsvColumnizerConfig config = new();
-        config.InitDefaults();
-        config.DelimiterChar = ",";
-        config.HasFieldNames = hasFieldNames;
-        config.ConfigureReaderConfiguration();
-
-        CsvColumnizer.CsvColumnizer columnizer = new();
-        SetPrivateField(columnizer, "_config", config);
-        SetPrivateField(columnizer, "_isValidCsv", true);
-
+        var columnizer = CreateColumnizerWithSavedCommaDelimiter(hasFieldNames);
         var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
-        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(new CsvLogLine("\"2021-12-12\";\"TRACE\";\"semicolon file \"", 0));
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(new CsvLogLine("\"2021-12-12\"x;\"TRACE\"y", 0));
 
         columnizer.Selected(mockCallback.Object);
 
         Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["Text"]));
+    }
+
+    [Test]
+    public void Selected_NoFieldNames_SavedDelimiterDiffersFromFile_DetectsFileDelimiter ()
+    {
+        // Instance that never pre-processed this file, e.g. a clone that loaded ',' from csvcolumnizer.json
+        var columnizer = CreateColumnizerWithSavedCommaDelimiter(false);
+        var line = new CsvLogLine("\"2021-12-12\";\"TRACE\";\"semicolon file \"", 0);
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+        _ = mockCallback.Setup(c => c.GetLogLineMemory(0)).Returns(line);
+
+        columnizer.Selected(mockCallback.Object);
+        var result = columnizer.SplitLine(mockCallback.Object, line);
+
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["Column 1", "Column 2", "Column 3"]));
+        Assert.That(result.ColumnValues.Select(c => c.FullValue.ToString()), Is.EqualTo(["2021-12-12", "TRACE", "semicolon file "]));
+    }
+
+    [Test]
+    public void Selected_HasFieldNames_SavedDelimiterDiffersFromFile_DetectsFileDelimiter ()
+    {
+        var columnizer = CreateColumnizerWithSavedCommaDelimiter(true);
+        SetPrivateField(columnizer, "_firstLine", new CsvLogLine("\"Date\";\"Level\";\"Message\"", 0));
+        var mockCallback = new Mock<ILogLineMemoryColumnizerCallback>();
+
+        columnizer.Selected(mockCallback.Object);
+
+        Assert.That(columnizer.GetColumnNames(), Is.EqualTo(["Date", "Level", "Message"]));
     }
 
     [Test]

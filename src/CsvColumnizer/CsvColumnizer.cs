@@ -176,6 +176,25 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
     {
         ArgumentNullException.ThrowIfNull(callback, nameof(callback));
 
+        DetectDelimiterFromFile(callback);
+        BuildColumns(callback);
+    }
+
+    /// <summary>
+    /// This instance may not have pre-processed the current file (e.g. a clone that loaded the saved config),
+    /// so re-detect the delimiter from the file's first line, like PreProcessLine() does on load.
+    /// </summary>
+    private void DetectDelimiterFromFile (ILogLineMemoryColumnizerCallback callback)
+    {
+        var line = _firstLine ?? callback.GetLogLineMemory(0);
+        if (line != null)
+        {
+            AutoDetectDelimiter(line.FullLine);
+        }
+    }
+
+    private void BuildColumns (ILogLineMemoryColumnizerCallback callback)
+    {
         if (_isValidCsv) // see PreProcessLine()
         {
             _columnList.Clear();
@@ -259,6 +278,12 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
         var configPath = configDir + "\\" + CONFIGFILENAME;
         FileInfo fileInfo = new(configPath);
 
+        // show the file's delimiter rather than the one from the saved config
+        if (callback != null)
+        {
+            DetectDelimiterFromFile(callback);
+        }
+
         CsvColumnizerConfigDlg dlg = new(_config);
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -273,7 +298,11 @@ public class CsvColumnizer : ILogLineMemoryColumnizer, IInitColumnizerMemory, IC
 
             _config.ConfigureReaderConfiguration();
 
-            Selected(callback);
+            // no re-detection here: keep the delimiter the user chose in the dialog
+            if (callback != null)
+            {
+                BuildColumns(callback);
+            }
         }
     }
 
