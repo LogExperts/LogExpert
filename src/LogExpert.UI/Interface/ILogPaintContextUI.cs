@@ -31,7 +31,7 @@ internal interface ILogPaintContextUI : ILogLineSource
 
     ILogLineMemory GetLogLineMemory (int lineNum);
 
-    IColumnMemory GetCellValue (int rowIndex, int columnIndex);
+    IColumnMemory GetCellValue (int lineNum, int columnIndex);
 
     Bookmark GetBookmarkForLine (int lineNum);
 

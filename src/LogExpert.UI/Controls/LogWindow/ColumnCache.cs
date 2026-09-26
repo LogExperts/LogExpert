@@ -20,6 +20,11 @@ internal class ColumnCache
     private int _prefetchCount;
     private PinHandle? _pinHandle;
 
+    // Sparse prefetch state (PrefetchLines)
+    private Dictionary<int, ILogLineMemory>? _sparseLines;
+    private int[] _sparseKey = [];
+    private List<PinHandle> _sparsePinHandles = [];
+
     #endregion
 
     #region Internals
@@ -48,14 +53,70 @@ internal class ColumnCache
         var newLines = logFileReader.GetLogLineMemories(startLine, count);
 
         //Atomic swap: old handle released AFTER new is in place
+        var oldHandles = _sparsePinHandles;
         var oldHandle = _pinHandle;
         _pinHandle = newHandle;
+        _sparsePinHandles = [];
+        _sparseLines = null;
         _prefetchedLines = newLines;
         _prefetchStartLine = startLine;
         _prefetchCount = newLines.Length;
 
         // Now safe to release old pins — new pins cover the new visible range
         oldHandle?.Dispose();
+        DisposeAll(oldHandles);
+    }
+
+    /// <summary>
+    /// Prefetch the given ascending, possibly non-contiguous lines (visible rows when hide-line rules skip lines).
+    /// Each contiguous run is pinned before it is read, like <see cref="Prefetch"/>, so only buffers holding
+    /// displayed lines are pinned.
+    /// </summary>
+    internal void PrefetchLines (ILogfileReader logFileReader, int[] lines)
+    {
+        if (_sparseLines != null && _prefetchStartLine == -1 && _sparseKey.AsSpan().SequenceEqual(lines))
+        {
+            return; // already prefetched these exact lines
+        }
+
+        List<PinHandle> newHandles = [];
+        Dictionary<int, ILogLineMemory> newLines = new(lines.Length);
+        var runStart = 0;
+        for (var i = 1; i <= lines.Length; i++)
+        {
+            if (i < lines.Length && lines[i] == lines[i - 1] + 1)
+            {
+                continue;
+            }
+
+            var first = lines[runStart];
+            var count = lines[i - 1] - first + 1;
+            if (logFileReader is IBufferPinning pinning)
+            {
+                newHandles.Add(pinning.PinRange(first, first + count - 1));
+            }
+
+            var runLines = logFileReader.GetLogLineMemories(first, count);
+            for (var j = 0; j < runLines.Length; j++)
+            {
+                newLines[first + j] = runLines[j];
+            }
+
+            runStart = i;
+        }
+
+        var oldHandle = _pinHandle;
+        var oldHandles = _sparsePinHandles;
+        _pinHandle = null;
+        _sparsePinHandles = newHandles;
+        _sparseLines = newLines;
+        _sparseKey = lines;
+        _prefetchedLines = null;
+        _prefetchStartLine = -1;
+        _prefetchCount = 0;
+
+        oldHandle?.Dispose();
+        DisposeAll(oldHandles);
     }
 
     /// <summary>
@@ -64,11 +125,24 @@ internal class ColumnCache
     /// </summary>
     internal ILogLineMemory? GetPrefetchedLine (int lineNumber)
     {
+        if (_sparseLines != null)
+        {
+            return _sparseLines.GetValueOrDefault(lineNumber);
+        }
+
         return _prefetchedLines != null
             && lineNumber >= _prefetchStartLine
             && lineNumber < _prefetchStartLine + _prefetchCount
                 ? _prefetchedLines[lineNumber - _prefetchStartLine]
                 : null;
+    }
+
+    private static void DisposeAll (List<PinHandle> handles)
+    {
+        foreach (var handle in handles)
+        {
+            handle.Dispose();
+        }
     }
 
     /// <summary>
@@ -78,6 +152,9 @@ internal class ColumnCache
     {
         _pinHandle?.Dispose();
         _pinHandle = null;
+        DisposeAll(_sparsePinHandles);
+        _sparsePinHandles = [];
+        _sparseLines = null;
 
         _prefetchedLines = null;
         _prefetchStartLine = -1;
@@ -92,6 +169,7 @@ internal class ColumnCache
     /// </summary>
     internal void MarkPrefetchStale ()
     {
+        _sparseLines = null;
         _prefetchStartLine = -1;
         _prefetchCount = 0;
         _lastLineNumber = -1;
@@ -117,14 +195,7 @@ internal class ColumnCache
             _lastColumnizer = columnizer;
             _lastLineNumber = lineNumber;
 
-            ILogLineMemory line = null;
-
-            if (_prefetchedLines != null
-                && lineNumber >= _prefetchStartLine
-                && lineNumber < _prefetchStartLine + _prefetchCount)
-            {
-                line = _prefetchedLines[lineNumber - _prefetchStartLine];
-            }
+            var line = GetPrefetchedLine(lineNumber);
 
             // Fallback: read directly. This is safe because the caller (CellValueNeeded)
             // has already called Prefetch/PrefetchFilterVisibleLines which pins the relevant

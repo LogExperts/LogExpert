@@ -219,6 +219,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         tableLayoutPanel1.ColumnStyles[0].SizeType = SizeType.Percent;
         tableLayoutPanel1.ColumnStyles[0].Width = 100;
         InitializeMarkerBar();
+        InitializeLineVisibility();
 
         _logWindowCoordinator.HighlightSettingsChanged += OnParentHighlightSettingsChanged;
         SetColumnizer(_pluginRegistry.RegisteredColumnizers[0]);
@@ -377,9 +378,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
+    /// <summary>Original logical line of the current row, or -1.</summary>
     public int CurrentLineNum => dataGridView.CurrentRow == null
             ? -1
-            : dataGridView.CurrentRow.Index;
+            : RowToLine(dataGridView.CurrentRow.Index);
 
     public string FileName { get; private set; }
 
@@ -653,7 +655,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _ = dataGridView.Focus();
         }
 
-        tableLayoutPanel1.RowStyles[0].Height = show ? 28 : 0;
+        UpdateTopRowHeight();
     }
 
     #endregion
@@ -703,8 +705,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     internal void DumpBufferInfo ()
     {
-        var currentLineNum = dataGridView.CurrentCellAddress.Y;
-        _logFileReader.LogBufferInfoForLine(currentLineNum);
+        _logFileReader.LogBufferInfoForLine(CurrentLogicalLine);
     }
 
     internal void DumpBufferDiagnostic ()
@@ -771,6 +772,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     protected void OnCurrentHighlightListChanged ()
     {
         InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        RebuildLineVisibility();
         CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
     }
 
@@ -821,6 +823,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
         DisposeMarkers();
+        _lineVisibility.Dispose();
         _waitingForClose = true;
         CancelPendingLineNavigation();
         _logWindowCoordinator.HighlightSettingsChanged -= OnParentHighlightSettingsChanged;
@@ -867,8 +870,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             Invoke(() =>
             {
                 InvalidateMarkerCriteria(MarkerScanSource.All);
-                _isReadyForLineNavigation = true;
-                ApplyPendingLineNavigation();
+                _isLoadComplete = true;
+                UpdateLineNavigationReadiness();
             });
             _ = _externaLoadingFinishedEvent.Set();
         }
@@ -958,7 +961,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         PrefetchVisibleLines();
 
         var startCount = CurrentColumnizer?.GetColumnCount() ?? 0;
-        e.Value = GetCellValue(e.RowIndex, e.ColumnIndex);
+        var lineNum = RowToLine(e.RowIndex);
+        e.Value = lineNum < 0
+            ? Column.EmptyColumn
+            : GetCellValue(lineNum, e.ColumnIndex);
 
         // The new column could be find dynamically.
         // Only support add new columns for now.
@@ -983,10 +989,27 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var firstVisible = dataGridView.FirstDisplayedScrollingRowIndex;
         var visibleCount = dataGridView.DisplayedRowCount(includePartialRow: true);
 
-        if (firstVisible >= 0 && visibleCount > 0)
+        if (firstVisible < 0 || visibleCount <= 0)
+        {
+            return;
+        }
+
+        var map = _rowMap;
+        if (map.HiddenCount == 0)
         {
             _columnCache.Prefetch(_logFileReader, firstVisible, visibleCount);
+            return;
         }
+
+        // Visible rows may be far apart in the file: pin only the lines they display.
+        var endRow = Math.Min(firstVisible + visibleCount, map.VisibleCount);
+        var lines = new int[Math.Max(0, endRow - firstVisible)];
+        for (var i = 0; i < lines.Length; i++)
+        {
+            lines[i] = map.RowToLine(firstVisible + i);
+        }
+
+        _columnCache.PrefetchLines(_logFileReader, lines);
     }
 
     private void PrefetchFilterVisibleLines ()
@@ -1040,10 +1063,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var line = _logFileReader.GetLogLineMemory(e.RowIndex);
+        var lineNum = RowToLine(e.RowIndex);
+        if (lineNum < 0)
+        {
+            return;
+        }
+
+        var line = _logFileReader.GetLogLineMemory(lineNum);
         var offset = CurrentColumnizer.GetTimeOffset();
         CurrentColumnizer.SetTimeOffset(0);
-        ColumnizerCallbackObject.SetLineNum(e.RowIndex);
+        ColumnizerCallbackObject.SetLineNum(lineNum);
         var cols = CurrentColumnizer.SplitLine(ColumnizerCallbackObject, line);
         CurrentColumnizer.SetTimeOffset(offset);
         if (cols.ColumnValues.Length <= e.ColumnIndex - 2)
@@ -1081,7 +1110,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.CurrentRow != null)
         {
-            _statusEventArgs.CurrentLineNum = dataGridView.CurrentRow.Index + 1;
+            _statusEventArgs.CurrentLineNum = RowToLine(dataGridView.CurrentRow.Index) + 1;
             SendStatusLineUpdate();
             if (syncFilterCheckBox.Checked)
             {
@@ -1469,7 +1498,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var lineNum = -1;
         if (dataGridView.CurrentRow != null)
         {
-            lineNum = dataGridView.CurrentRow.Index;
+            lineNum = RowToLine(dataGridView.CurrentRow.Index);
         }
 
         if (lineNum == -1)
@@ -1636,8 +1665,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (CurrentColumnizer.IsTimeshiftImplemented())
         {
-            var currentLine = dataGridView.CurrentCellAddress.Y;
-            if (currentLine > 0 && currentLine < dataGridView.RowCount)
+            var currentLine = CurrentLogicalLine;
+            if (currentLine > 0)
             {
                 var (timeStamp, _) = GetTimestampForLine(currentLine, false);
                 if (timeStamp.Equals(DateTime.MinValue)) // means: invalid
@@ -1655,7 +1684,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.CurrentRow != null && FilterPipe != null)
         {
-            var lineNum = FilterPipe.GetOriginalLineNum(dataGridView.CurrentRow.Index);
+            var lineNum = FilterPipe.GetOriginalLineNum(RowToLine(dataGridView.CurrentRow.Index));
             if (lineNum != -1)
             {
                 FilterPipe.OriginWindow.SelectLine(lineNum, false, true);
@@ -1725,7 +1754,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (e.RowIndex >= 0 && e.RowIndex < dataGridView.RowCount && !dataGridView.Rows[e.RowIndex].Selected)
         {
-            SelectLine(e.RowIndex, false, true);
+            SelectRow(e.RowIndex, false, true);
         }
         else if (e.RowIndex < 0)
         {
@@ -2642,23 +2671,25 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _rowHeightList = snapshot.RowHeightList;
             try
             {
-                if (snapshot.CurrentLine >= 0 && snapshot.CurrentLine < dataGridView.RowCount)
+                // Saved positions are original lines; a hidden one resolves to the nearest visible line.
+                if (snapshot.CurrentLine >= 0 && snapshot.CurrentLine < _logFileReader.LineCount)
                 {
-                    SelectLine(snapshot.CurrentLine, false, true);
+                    SelectNearestLine(snapshot.CurrentLine, false, true);
                 }
                 else
                 {
-                    if (_logFileReader.LineCount > 0)
+                    if (dataGridView.RowCount > 0)
                     {
-                        dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
-                        SelectLine(_logFileReader.LineCount - 1, false, true);
+                        dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
+                        SelectRow(dataGridView.RowCount - 1, false, true);
                     }
                 }
 
                 if (snapshot.FirstDisplayedLine >= 0 &&
-                    snapshot.FirstDisplayedLine < dataGridView.RowCount)
+                    snapshot.FirstDisplayedLine < _logFileReader.LineCount &&
+                    _rowMap.NearestRow(snapshot.FirstDisplayedLine) >= 0)
                 {
-                    dataGridView.FirstDisplayedScrollingRowIndex = snapshot.FirstDisplayedLine;
+                    dataGridView.FirstDisplayedScrollingRowIndex = _rowMap.NearestRow(snapshot.FirstDisplayedLine);
                 }
 
                 // Applied once, here (was double-applied: always pre-load, here only when true).
@@ -2787,19 +2818,27 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ClearBookmarkList();
         dataGridView.ClearSelection();
         dataGridView.RowCount = 0;
+        ResetLineVisibility();
     }
 
     [SupportedOSPlatform("windows")]
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
-        if (_reloadMemento.CurrentLine < dataGridView.RowCount && _reloadMemento.CurrentLine >= 0)
+        // The memento holds original lines; hidden ones resolve to the nearest visible row.
+        var currentRow = _reloadMemento.CurrentLine >= 0 && _reloadMemento.CurrentLine < _rowMap.LineCount
+            ? _rowMap.NearestRow(_reloadMemento.CurrentLine)
+            : -1;
+        if (currentRow >= 0)
         {
-            dataGridView.CurrentCell = dataGridView.Rows[_reloadMemento.CurrentLine].Cells[0];
+            dataGridView.CurrentCell = dataGridView.Rows[currentRow].Cells[0];
         }
 
-        if (_reloadMemento.FirstDisplayedLine < dataGridView.RowCount && _reloadMemento.FirstDisplayedLine >= 0)
+        var firstRow = _reloadMemento.FirstDisplayedLine >= 0 && _reloadMemento.FirstDisplayedLine < _rowMap.LineCount
+            ? _rowMap.NearestRow(_reloadMemento.FirstDisplayedLine)
+            : -1;
+        if (firstRow >= 0)
         {
-            dataGridView.FirstDisplayedScrollingRowIndex = _reloadMemento.FirstDisplayedLine;
+            dataGridView.FirstDisplayedScrollingRowIndex = firstRow;
         }
     }
 
@@ -2817,6 +2856,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         dataGridView.Enabled = false;
         dataGridView.RowCount = 0;
+        ResetLineVisibility();
         _progressEventArgs.Visible = false;
         _progressEventArgs.Value = _progressEventArgs.MaxValue;
         SendProgressBarUpdate();
@@ -3018,7 +3058,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _logFileReader.FileSizeChanged += OnFileSizeChanged;
         _isLoading = false;
         dataGridView.SuspendLayout();
-        dataGridView.RowCount = _logFileReader.LineCount;
+        _lineVisibility.Load(_logFileReader.LineCount, CurrentHighlightEntries());
+        ApplyLineVisibility();
         dataGridView.CurrentCellChanged += OnDataGridViewCurrentCellChanged;
         dataGridView.Enabled = true;
         dataGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
@@ -3054,12 +3095,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ShiftBookmarks(rolloverOffset);
         ShiftRowHeightList(rolloverOffset);
         ShiftFilterPipes(rolloverOffset);
+        _ = _lineVisibility.Shift(rolloverOffset);
     }
 
     void ITailFollowSink.OnTailLines (LogEventArgs e)
     {
         try
         {
+            // Evaluate hide rules for the new lines here, off the UI thread, before the grid shows them.
+            _ = !e.IsRollover && e.LineCount < e.PrevLineCount
+                ? _lineVisibility.Replace(e.LineCount)
+                : _lineVisibility.Extend(e.LineCount);
             _ = BeginInvoke(UpdateGrid, [e]);
             CheckFilterAndHighlight(e);
         }
@@ -3105,63 +3151,21 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void UpdateGrid (LogEventArgs logEventArgs)
     {
         var oldRowCount = dataGridView.RowCount;
-        var firstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex;
-
-        if (dataGridView.CurrentCellAddress.Y >= logEventArgs.LineCount)
-        {
-            //this.dataGridView.Rows[this.dataGridView.CurrentCellAddress.Y].Selected = false;
-            //this.dataGridView.CurrentCell = this.dataGridView.Rows[0].Cells[0];
-        }
 
         try
         {
-            if (dataGridView.RowCount > logEventArgs.LineCount)
+            // The engine thread already applied this event to the tracker (OnRolloverShift / OnTailLines). An append
+            // only grows the rows; a rollover or truncation rebuilds them and, without follow-tail, keeps the
+            // selected and first displayed original lines (moved up by the rollover offset).
+            var tracked = _lineVisibility.Map;
+            var newMap = EffectiveMap(tracked);
+            _appliedTrackedMap = tracked;
+            if (!ReferenceEquals(newMap, _rowMap))
             {
-                var currentLineNum = dataGridView.CurrentCellAddress.Y;
-                dataGridView.RowCount = 0;
-                dataGridView.RowCount = logEventArgs.LineCount;
-                if (!_guiStateArgs.FollowTail)
-                {
-                    if (currentLineNum >= dataGridView.RowCount)
-                    {
-                        currentLineNum = dataGridView.RowCount - 1;
-                    }
-
-                    dataGridView.CurrentCell = dataGridView.Rows[currentLineNum].Cells[0];
-                }
-            }
-            else
-            {
-                dataGridView.RowCount = logEventArgs.LineCount;
+                SetRowMap(newMap, logEventArgs.IsRollover ? logEventArgs.RolloverOffset : 0);
             }
 
-            //_logger.Debug($"UpdateGrid(): new RowCount={dataGridView.RowCount}");
-
-            if (logEventArgs.IsRollover)
-            {
-                // Multifile rollover
-                // keep selection and view range, if no follow tail mode
-                if (!_guiStateArgs.FollowTail)
-                {
-                    var currentLineNum = dataGridView.CurrentCellAddress.Y;
-                    currentLineNum -= logEventArgs.RolloverOffset;
-                    if (currentLineNum < 0)
-                    {
-                        currentLineNum = 0;
-                    }
-
-                    //_logger.Debug($"UpdateGrid(): Rollover=true, Rollover offset={logEventArgs.RolloverOffset}, currLineNum was {dataGridView.CurrentCellAddress.Y}, new currLineNum={currentLineNum}");
-                    firstDisplayedLine -= logEventArgs.RolloverOffset;
-                    if (firstDisplayedLine < 0)
-                    {
-                        firstDisplayedLine = 0;
-                    }
-
-                    dataGridView.FirstDisplayedScrollingRowIndex = firstDisplayedLine;
-                    dataGridView.CurrentCell = dataGridView.Rows[currentLineNum].Cells[0];
-                    dataGridView.Rows[currentLineNum].Selected = true;
-                }
-            }
+            UpdateHiddenLinesBar();
 
             _statusEventArgs.LineCount = logEventArgs.LineCount;
             StatusLineFileSize(logEventArgs.FileSize);
@@ -3263,7 +3267,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (firstStopTail)
                 {
                     var capturedLineNum = i;
-                    _ = BeginInvoke(() => SelectAndEnsureVisible(capturedLineNum, false));
+                    // Not explicit navigation: a hidden trigger line is not revealed.
+                    _ = BeginInvoke(() => SelectAndEnsureVisibleRow(_rowMap.NearestRow(capturedLineNum), false));
                     firstStopTail = false;
                 }
             }
@@ -3421,7 +3426,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (_logFileReader != null)
         {
-            dataGridView.RowCount = _logFileReader.LineCount;
+            dataGridView.RowCount = _rowMap.VisibleCount;
         }
 
         if (_filterResultList != null)
@@ -3917,7 +3922,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (dataGridView.CurrentRow != null)
             {
-                SyncTimestampDisplay(dataGridView.CurrentRow.Index);
+                SyncTimestampDisplay(RowToLine(dataGridView.CurrentRow.Index));
             }
         }
     }
@@ -3958,7 +3963,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             // timeout with no new Trigger -> update display
             var lineNum = _timeShiftSyncLine;
-            if (lineNum >= 0 && lineNum < dataGridView.RowCount)
+            if (lineNum >= 0 && lineNum < _rowMap.LineCount)
             {
                 var (timeStamp, lineNumber) = GetTimestampForLine(lineNum, true);
                 lineNum = lineNumber;
@@ -3978,8 +3983,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             // show time difference between 2 selected lines
             if (dataGridView.SelectedRows.Count == 2)
             {
-                var row1 = dataGridView.SelectedRows[0].Index;
-                var row2 = dataGridView.SelectedRows[1].Index;
+                var row1 = RowToLine(dataGridView.SelectedRows[0].Index);
+                var row2 = RowToLine(dataGridView.SelectedRows[1].Index);
                 if (row1 > row2)
                 {
                     (row2, row1) = (row1, row2);
@@ -4011,7 +4016,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (_filterResultList.Count > 0)
             {
-                var index = _filterResultList.BinarySearch(dataGridView.CurrentRow.Index);
+                var index = _filterResultList.BinarySearch(RowToLine(dataGridView.CurrentRow.Index));
                 if (index < 0)
                 {
                     index = ~index;
@@ -4084,29 +4089,48 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
     }
 
+    /// <summary>
+    /// Explicit navigation to an original line (Go to Line, bookmarks, Log Search, filter results, time sync, …).
+    /// A hidden target turns on "Show hidden lines" so that exact line is selected.
+    /// </summary>
     [SupportedOSPlatform("windows")]
     private void SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
+    {
+        _shouldCallTimeSync = triggerSyncCall;
+        SelectRow(RevealLine(lineNum), triggerSyncCall, shouldScroll);
+    }
+
+    /// <summary>Selects an original line, or the next (else previous) visible line when it is hidden.</summary>
+    [SupportedOSPlatform("windows")]
+    private void SelectNearestLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
+    {
+        _shouldCallTimeSync = triggerSyncCall;
+        SelectRow(lineNum < 0 ? -1 : _rowMap.NearestRow(lineNum), triggerSyncCall, shouldScroll);
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void SelectRow (int rowNum, bool triggerSyncCall, bool shouldScroll)
     {
         try
         {
             _shouldCallTimeSync = triggerSyncCall;
 
-            if (lineNum < 0)
+            if (rowNum < 0)
             {
                 return;
             }
 
             // Prevent ArgumentOutOfRangeException
-            if (lineNum >= dataGridView.Rows.GetRowCount(DataGridViewElementStates.None))
+            if (rowNum >= dataGridView.Rows.GetRowCount(DataGridViewElementStates.None))
             {
-                lineNum = dataGridView.Rows.GetRowCount(DataGridViewElementStates.None) - 1;
+                rowNum = dataGridView.Rows.GetRowCount(DataGridViewElementStates.None) - 1;
             }
 
-            dataGridView.Rows[lineNum].Selected = true;
+            dataGridView.Rows[rowNum].Selected = true;
 
             if (shouldScroll)
             {
-                dataGridView.CurrentCell = dataGridView.Rows[lineNum].Cells[0];
+                dataGridView.CurrentCell = dataGridView.Rows[rowNum].Cells[0];
                 _ = dataGridView.Focus();
             }
         }
@@ -4161,11 +4185,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void SelectPrevHighlightLine ()
     {
-        var lineNum = dataGridView.CurrentCellAddress.Y;
+        var lineNum = CurrentLogicalLine;
         while (lineNum > 0)
         {
             lineNum--;
-            var line = _logFileReader.GetLogLineMemory(lineNum);
+            var line = _rowMap.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -4181,11 +4205,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void SelectNextHighlightLine ()
     {
-        var lineNum = dataGridView.CurrentCellAddress.Y;
+        var lineNum = CurrentLogicalLine;
         while (lineNum < _logFileReader.LineCount)
         {
             lineNum++;
-            var line = _logFileReader.GetLogLineMemory(lineNum);
+            var line = _rowMap.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -4201,7 +4225,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private int FindNextBookmarkIndex (int lineNum)
     {
-        if (lineNum >= dataGridView.RowCount)
+        if (lineNum >= _rowMap.LineCount)
         {
             lineNum = 0;
         }
@@ -4218,7 +4242,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (lineNum <= 0)
         {
-            lineNum = dataGridView.RowCount - 1;
+            lineNum = _rowMap.LineCount - 1;
         }
         else
         {
@@ -4277,7 +4301,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (_filterPipeList.Count > 0)
         {
-            for (var i = 0; i < dataGridView.RowCount; ++i)
+            for (var i = 0; i < _logFileReader.LineCount; ++i)
             {
                 ProcessFilterPipes(i);
             }
@@ -4418,7 +4442,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ClearFilterList();
 
         _progressEventArgs.MinValue = 0;
-        _progressEventArgs.MaxValue = dataGridView.RowCount;
+        _progressEventArgs.MaxValue = _logFileReader.LineCount;
         _progressEventArgs.Value = 0;
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
@@ -4826,7 +4850,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index > -1)
                 {
-                    var fileName = _logFileReader.GetLogFileNameForLine(dataGridView.CurrentRow.Index);
+                    var fileName = _logFileReader.GetLogFileNameForLine(RowToLine(dataGridView.CurrentRow.Index));
                     if (fileName != null)
                     {
                         StatusLineText(Util.GetNameFromPath(fileName));
@@ -5181,7 +5205,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (row.Index != -1)
                 {
-                    lineNumList.Add(row.Index);
+                    lineNumList.Add(RowToLine(row.Index));
                 }
             }
 
@@ -5269,7 +5293,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (row.Index != -1)
                 {
-                    lineNumList.Add(row.Index);
+                    lineNumList.Add(RowToLine(row.Index));
                 }
             }
 
@@ -5293,7 +5317,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         (_guiStateArgs.MinTimestamp, _) = _timestampLocator.FindForward(0, _logFileReader.LineCount, true);
-        (_guiStateArgs.MaxTimestamp, _) = GetTimestampForLine(dataGridView.RowCount - 1, true);
+        (_guiStateArgs.MaxTimestamp, _) = GetTimestampForLine(_logFileReader.LineCount - 1, true);
         SendGuiStateUpdate();
     }
 
@@ -5398,9 +5422,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
+        var lineNum = RowToLine(rowNum);
+
         if (decrease)
         {
-            if (!_rowHeightList.TryGetValue(rowNum, out var entry))
+            if (!_rowHeightList.TryGetValue(lineNum, out var entry))
             {
                 return;
             }
@@ -5409,22 +5435,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 entry.Height -= _lineHeight;
                 if (entry.Height <= _lineHeight)
                 {
-                    _ = _rowHeightList.Remove(rowNum);
+                    _ = _rowHeightList.Remove(lineNum);
                 }
             }
         }
         else
         {
             RowHeightEntry entry;
-            if (!_rowHeightList.TryGetValue(rowNum, out var value))
+            if (!_rowHeightList.TryGetValue(lineNum, out var value))
             {
                 entry = new RowHeightEntry
                 {
-                    LineNum = rowNum,
+                    LineNum = lineNum,
                     Height = _lineHeight
                 };
 
-                _rowHeightList[rowNum] = entry;
+                _rowHeightList[lineNum] = entry;
             }
             else
             {
@@ -5445,7 +5471,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private int GetRowHeight (int rowNum)
     {
-        return _rowHeightList.TryGetValue(rowNum, out var value)
+        // _rowHeightList is keyed by original line (it is saved in the Session File).
+        return _rowHeightList.TryGetValue(RowToLine(rowNum), out var value)
             ? value.Height
             : _lineHeight;
     }
@@ -5461,7 +5488,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AddBookmarkAndEditComment ()
     {
-        var lineNum = dataGridView.CurrentCellAddress.Y;
+        var lineNum = CurrentLogicalLine;
         if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
         {
             ToggleBookmark();
@@ -5473,7 +5500,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void AddBookmarkComment (string text)
     {
-        var lineNum = dataGridView.CurrentCellAddress.Y;
+        var lineNum = CurrentLogicalLine;
         Bookmark bookmark;
 
         if (!_bookmarkProvider.IsBookmarkAtLine(lineNum))
@@ -5497,14 +5524,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _filterParams.RangeSearchText = filterRangeComboBox.Text;
         ColumnizerCallback callback = new(this);
         RangeFinder rangeFinder = new(_filterParams, callback);
-        var range = rangeFinder.FindRange(dataGridView.CurrentCellAddress.Y);
+        var range = rangeFinder.FindRange(CurrentLogicalLine);
         if (range != null)
         {
             SetCellSelectionMode(false);
             _noSelectionUpdates = true;
             for (var i = range.StartLine; i <= range.EndLine; ++i)
             {
-                dataGridView.Rows[i].Selected = true;
+                var row = LineToRow(i);
+                if (row >= 0)
+                {
+                    dataGridView.Rows[row].Selected = true;
+                }
             }
 
             _noSelectionUpdates = false;
@@ -5600,7 +5631,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     TimeSyncList = slave.TimeSyncList;
                 }
 
-                var currentLineNum = dataGridView.CurrentCellAddress.Y;
+                var currentLineNum = CurrentLogicalLine;
                 var (timeStamp, _) = GetTimestampForLine(currentLineNum, true);
                 if (!timeStamp.Equals(DateTime.MinValue) && !_shouldTimestampDisplaySyncingCancel)
                 {
@@ -5937,8 +5968,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             MultiFile = IsMultiFile,
             MultiFilePattern = _multiFileOptions.FormatPattern,
             MultiFileMaxDays = _multiFileOptions.MaxDayTry,
-            CurrentLine = dataGridView.CurrentCellAddress.Y,
-            FirstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex,
+            CurrentLine = CurrentLogicalLine,
+            FirstDisplayedLine = RowToLine(dataGridView.FirstDisplayedScrollingRowIndex),
             FilterVisible = !splitContainerLogWindow.Panel2Collapsed,
             FilterAdvanced = !advancedFilterSplitContainer.Panel1Collapsed,
             FilterPosition = splitContainerLogWindow.SplitterDistance,
@@ -6097,13 +6128,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ApplyFrozenState(gridView);
     }
 
-    public IColumnMemory GetCellValue (int rowIndex, int columnIndex)
+    public IColumnMemory GetCellValue (int lineNum, int columnIndex)
     {
         if (columnIndex == 1)
         {
             return new Column
             {
-                FullValue = $"{rowIndex + 1}".AsMemory() // line number
+                FullValue = $"{lineNum + 1}".AsMemory() // line number
             };
         }
 
@@ -6114,7 +6145,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            var cols = _columnCache.GetColumnsForLine(_logFileReader, rowIndex, CurrentColumnizer, ColumnizerCallbackObject);
+            var cols = _columnCache.GetColumnsForLine(_logFileReader, lineNum, CurrentColumnizer, ColumnizerCallbackObject);
             if (cols != null && cols.ColumnValues != null)
             {
                 if (columnIndex <= cols.ColumnValues.Length + 1)
@@ -6135,7 +6166,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         catch (IndexOutOfRangeException ex)
         {
 
-            _logger.Warn(ex, "Failed to get cell value due to index error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            _logger.Warn(ex, "Failed to get cell value due to index error. lineNum={LineNum}, columnIndex={ColumnIndex}", lineNum, columnIndex);
             return Column.EmptyColumn;
         }
 #else
@@ -6149,7 +6180,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         catch (ArgumentOutOfRangeException ex)
         {
 
-            _logger.Warn(ex, "Failed to get cell value due to argument range error. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            _logger.Warn(ex, "Failed to get cell value due to argument range error. lineNum={LineNum}, columnIndex={ColumnIndex}", lineNum, columnIndex);
             return Column.EmptyColumn;
         }
 #else
@@ -6162,7 +6193,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         catch (NullReferenceException ex)
         {
 
-            _logger.Warn(ex, "Failed to get cell value due to null state. rowIndex={RowIndex}, columnIndex={ColumnIndex}", rowIndex, columnIndex);
+            _logger.Warn(ex, "Failed to get cell value due to null state. lineNum={LineNum}, columnIndex={ColumnIndex}", lineNum, columnIndex);
             return Column.EmptyColumn;
         }
 #else
@@ -6262,9 +6293,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        if (isFilteredGridView)
+        rowIndex = isFilteredGridView
+            ? _filterResultList[rowIndex]
+            : RowToLine(rowIndex);
+
+        if (rowIndex < 0)
         {
-            rowIndex = _filterResultList[rowIndex];
+            e.Handled = false;
+            return;
         }
 
         // Ensure prefetch is current — CellPainting fires BEFORE CellValueNeeded on scroll jumps,
@@ -6442,12 +6478,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (_guiStateArgs.FollowTail && _logFileReader != null)
         {
-            if (dataGridView.RowCount >= _logFileReader.LineCount && _logFileReader.LineCount > 0)
+            // Follow the last visible row; hidden lines are never revealed by tailing.
+            if (_rowMap.LineCount >= _logFileReader.LineCount && dataGridView.RowCount > 0)
             {
                 // Mark stale instead of invalidating — keeps old buffers pinned until
                 // the next Prefetch atomically swaps in new pins.
                 _columnCache.MarkPrefetchStale();
-                dataGridView.FirstDisplayedScrollingRowIndex = _logFileReader.LineCount - 1;
+                dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
             }
         }
 
@@ -6507,7 +6544,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         FollowTailChanged(false, false);
-        if (dataGridView.RowCount > 0)
+        if (_rowMap.LineCount > 0)
         {
             dataGridView.ClearSelection();
             GotoLine(targetLine.Value - 1);
@@ -6526,14 +6563,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (line >= 0)
         {
-            if (line < dataGridView.RowCount)
-            {
-                SelectLine(line, false, true);
-            }
-            else
-            {
-                SelectLine(dataGridView.RowCount - 1, false, true);
-            }
+            // An original line; beyond the end selects the last line, a hidden one is revealed.
+            SelectLine(Math.Min(line, _rowMap.LineCount - 1), false, true);
 
             _ = dataGridView.Focus();
         }
@@ -6546,8 +6577,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var searchParams = _logWindowCoordinator.SearchParams;
 
         searchParams.CurrentLine = LogSearcher.ResolveDirection(searchParams) == SearchDirection.Forward
-            ? dataGridView.CurrentCellAddress.Y + 1
-            : dataGridView.CurrentCellAddress.Y - 1;
+            ? CurrentLogicalLine + 1
+            : CurrentLogicalLine - 1;
 
         _currentSearchParams = searchParams; // remember for async "not found" messages
         TrackMarkerSearch(searchParams);
@@ -6556,7 +6587,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         StatusLineText(Resources.LogWindow_UI_StatusLineText_SearchingPressESCToCancel);
 
         _progressEventArgs.MinValue = 0;
-        _progressEventArgs.MaxValue = dataGridView.RowCount;
+        _progressEventArgs.MaxValue = _logFileReader.LineCount;
         _progressEventArgs.Value = 0;
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
@@ -6625,28 +6656,34 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _ = Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), lineNumber, true);
     }
 
+    /// <summary>Explicit navigation to an original line; a hidden line is revealed (see <see cref="SelectLine"/>).</summary>
     public void SelectAndEnsureVisible (int line, bool triggerSyncCall)
+    {
+        SelectAndEnsureVisibleRow(RevealLine(line), triggerSyncCall);
+    }
+
+    private void SelectAndEnsureVisibleRow (int row, bool triggerSyncCall)
     {
         try
         {
-            SelectLine(line, triggerSyncCall, false);
+            SelectRow(row, triggerSyncCall, false);
 
             //if (!this.dataGridView.CurrentRow.Displayed)
-            if (line < dataGridView.FirstDisplayedScrollingRowIndex || line > dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
+            if (row < dataGridView.FirstDisplayedScrollingRowIndex || row > dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
             {
-                dataGridView.FirstDisplayedScrollingRowIndex = line;
-                for (var i = 0; i < 8 && dataGridView.FirstDisplayedScrollingRowIndex > 0 && line < dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false); ++i)
+                dataGridView.FirstDisplayedScrollingRowIndex = row;
+                for (var i = 0; i < 8 && dataGridView.FirstDisplayedScrollingRowIndex > 0 && row < dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false); ++i)
                 {
                     dataGridView.FirstDisplayedScrollingRowIndex -= 1;
                 }
 
-                if (line >= dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
+                if (row >= dataGridView.FirstDisplayedScrollingRowIndex + dataGridView.DisplayedRowCount(false))
                 {
                     dataGridView.FirstDisplayedScrollingRowIndex += 1;
                 }
             }
 
-            dataGridView.CurrentCell = dataGridView.Rows[line].Cells[0];
+            dataGridView.CurrentCell = dataGridView.Rows[row].Cells[0];
         }
         catch (Exception e)
         {
@@ -6699,11 +6736,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             case Keys.Down when e.Modifiers == Keys.Alt:
                 {
-                    var newLine = _logFileReader.GetNextMultiFileLine(dataGridView.CurrentCellAddress.Y);
+                    var newLine = _logFileReader.GetNextMultiFileLine(CurrentLogicalLine);
 
                     if (newLine != -1)
                     {
-                        SelectLine(newLine, false, true);
+                        SelectNearestLine(newLine, false, true);
                     }
 
                     e.Handled = true;
@@ -6712,11 +6749,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             case Keys.Up when e.Modifiers == Keys.Alt:
                 {
-                    var newLine = _logFileReader.GetPrevMultiFileLine(dataGridView.CurrentCellAddress.Y);
+                    var newLine = _logFileReader.GetPrevMultiFileLine(CurrentLogicalLine);
 
                     if (newLine != -1)
                     {
-                        SelectLine(newLine - 1, false, true);
+                        SelectNearestLine(newLine - 1, false, true);
                     }
 
                     e.Handled = true;
@@ -6785,9 +6822,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
             }
 
-            if (_bookmarkProvider.IsBookmarkAtLine(i))
+            var lineNum = RowToLine(i);
+            if (_bookmarkProvider.IsBookmarkAtLine(lineNum))
             {
-                var bookmark = _bookmarkProvider.GetBookmarkForLine(i);
+                var bookmark = _bookmarkProvider.GetBookmarkForLine(lineNum);
                 if (bookmark.Text.Length > 0)
                 {
                     //BookmarkOverlay overlay = new BookmarkOverlay();
@@ -6865,7 +6903,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 return;
             }
 
-            lineNum = dataGridView.CurrentCellAddress.Y;
+            lineNum = CurrentLogicalLine;
         }
 
         ToggleBookmark(lineNum);
@@ -7158,7 +7196,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             else
             {
-                var index = FindNextBookmarkIndex(dataGridView.CurrentCellAddress.Y);
+                var index = FindNextBookmarkIndex(CurrentLogicalLine);
                 if (index > _bookmarkProvider.Bookmarks.Count - 1)
                 {
                     index = 0;
@@ -7217,7 +7255,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
             else
             {
-                var index = FindPrevBookmarkIndex(dataGridView.CurrentCellAddress.Y);
+                var index = FindPrevBookmarkIndex(CurrentLogicalLine);
                 if (index < 0)
                 {
                     index = _bookmarkProvider.Bookmarks.Count - 1;
@@ -7373,7 +7411,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (row.Index != -1)
                 {
-                    lineNumList.Add(row.Index);
+                    lineNumList.Add(RowToLine(row.Index));
                 }
             }
 
@@ -7434,8 +7472,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _reloadMemento = new ReloadMemento
         {
-            CurrentLine = dataGridView.CurrentCellAddress.Y,
-            FirstDisplayedLine = dataGridView.FirstDisplayedScrollingRowIndex
+            CurrentLine = CurrentLogicalLine,
+            FirstDisplayedLine = RowToLine(dataGridView.FirstDisplayedScrollingRowIndex)
         };
 
         _forcedColumnizerForLoading = CurrentColumnizer;
@@ -7533,14 +7571,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public bool ScrollToTimestampWorker (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
     {
         var hasScrolled = false;
-        if (!CurrentColumnizer.IsTimeshiftImplemented() || dataGridView.RowCount == 0)
+        if (!CurrentColumnizer.IsTimeshiftImplemented() || _rowMap.LineCount == 0)
         {
             return false;
         }
 
         //this.Cursor = Cursors.WaitCursor;
-        var currentLine = dataGridView.CurrentCellAddress.Y;
-        if (currentLine < 0 || currentLine >= dataGridView.RowCount)
+        var currentLine = CurrentLogicalLine;
+        if (currentLine < 0)
         {
             currentLine = 0;
         }
@@ -7588,7 +7626,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogLineMemory GetCurrentLine ()
     {
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
-            ? _logFileReader.GetLogLineMemory(dataGridView.CurrentRow.Index)
+            ? _logFileReader.GetLogLineMemory(RowToLine(dataGridView.CurrentRow.Index))
             : null;
     }
 
@@ -7610,7 +7648,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogFileInfo GetCurrentFileInfo ()
     {
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
-            ? _logFileReader.GetLogFileInfoForLine(dataGridView.CurrentRow.Index)
+            ? _logFileReader.GetLogFileInfoForLine(RowToLine(dataGridView.CurrentRow.Index))
             : null;
     }
 
@@ -7759,6 +7797,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        RebuildLineVisibility();
 
         SendGuiStateUpdate();
 

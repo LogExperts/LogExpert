@@ -2352,4 +2352,16 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   <data name="MarkerBar_Title" xml:space="preserve">
     <value>Markierungsleiste</value>
   </data>
+  <data name="HighlightDialog_UI_CheckBox_HideLine" xml:space="preserve">
+    <value>Zeile ausblenden</value>
+  </data>
+  <data name="LogWindow_UI_Label_HiddenLines" xml:space="preserve">
+    <value>{0:N0} Zeilen durch Hervorhebungsregeln ausgeblendet</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ShowHiddenLines" xml:space="preserve">
+    <value>Ausgeblendete Zeilen anzeigen</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
+    <value>Ausblendregeln konnten nicht angewendet werden, alle Zeilen werden angezeigt: {0}</value>
+  </data>
 </root>
