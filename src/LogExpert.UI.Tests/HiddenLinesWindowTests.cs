@@ -131,6 +131,22 @@ public sealed class HiddenLinesWindowTests : IDisposable
         Assert.That(largest, Is.EqualTo(10_000), "hidden lines must never be shown while the first scan runs");
     }
 
+    [Test]
+    public void GotoLine_BeforeTheFirstScanHasFinished_IsAppliedOnceItHas ()
+    {
+        File.WriteAllLines(_fileName, Enumerable.Range(0, 20_000).Select(Text));
+        _window = new LogTabWindow([_fileName], 1, false, _config.Object) { ShowInTaskbar = false, Opacity = 0 };
+        Find<WeifenLuo.WinFormsUI.Docking.DockPanel>(_window, "dockPanel").ShowDocumentIcon = false;
+        _window.Show();
+        PumpUntil(() => _window.CurrentLogWindow != null);
+        var log = _window.CurrentLogWindow;
+
+        log.GotoLine(12_345);
+        PumpUntil(() => log.CurrentLineNum == 12_345);
+
+        Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
     [TestCase(12, 12)]
     [TestCase(13, 14)]
     public void SavedPosition_IsRestoredOnceTheFirstScanHasFinished (int savedLine, int expectedLine)
@@ -461,6 +477,102 @@ public sealed class HiddenLinesWindowTests : IDisposable
     }
 
     [Test]
+    public void FilterTab_HidesLinesThroughItsOwnGroup_AndLocateRevealsTheHiddenOriginalLine ()
+    {
+        _settings.Preferences.HighlightGroupList.Add(new HighlightGroup
+        {
+            GroupName = "hide-some",
+            HighlightEntryList = [new HighlightEntry { SearchText = "DEBUG (3|7|11|15|19)$", IsRegex = true, IsHideLine = true }]
+        });
+        var origin = Open();
+        if (!Find<Button>(origin, "filterSearchButton").Visible)
+        {
+            origin.ToggleFilterPanel();
+        }
+
+        PumpUntil(() => Find<Button>(origin, "filterSearchButton").Visible && Find<Button>(origin, "filterSearchButton").Enabled);
+        Find<ComboBox>(origin, "filterComboBox").Text = "DEBUG";
+        Find<Button>(origin, "filterSearchButton").PerformClick();
+        var filterGrid = Find<DataGridView>(origin, "filterGridView");
+        PumpUntil(() => filterGrid.RowCount == LINE_COUNT / 2 && Find<Button>(origin, "filterSearchButton").Enabled);
+
+        MenuItem(origin, "filterToTabToolStripMenuItem").PerformClick();
+        PumpUntil(() => _window!.CurrentLogWindow is { FilterPipe: not null });
+        var tab = _window!.CurrentLogWindow;
+        var loaded = Task.Run(tab.WaitForLoadingFinished);
+        PumpUntil(() => loaded.IsCompleted);
+        tab.SetCurrentHighlightGroup("hide-some");
+        WaitForVisibility(tab);
+
+        var tabGrid = Grid(tab);
+        Assert.That(tabGrid.RowCount, Is.EqualTo(5));
+        Assert.That(DisplayedLineNumber(tabGrid, 0), Is.EqualTo("1"));
+        Assert.That(DisplayedLineNumber(tabGrid, 1), Is.EqualTo("3"));
+        Assert.That(tab.HiddenLineCount, Is.EqualTo(5));
+
+        tab.GotoLine(2);
+        var locate = MenuItem(tab, "locateLineInOriginalFileToolStripMenuItem");
+        locate.Enabled = true;
+        locate.PerformClick();
+        PumpUntil(() => _window.CurrentLogWindow == origin);
+
+        Assert.That(origin.ShowHiddenLines, Is.True);
+        Assert.That(origin.CurrentLineNum, Is.EqualTo(5));
+    }
+
+    [Test]
+    public void Truncation_WhileTailing_RecomputesHiddenLinesForTheNewContent ()
+    {
+        var log = Open();
+        var grid = Grid(log);
+        log.GotoLine(14);
+
+        File.WriteAllLines(_fileName, ["DEBUG a", "INFO b", "INFO c", "DEBUG d", "INFO e", "DEBUG f", "DEBUG g"]);
+        PumpUntil(() => log.GatherSessionSnapshot().LineCount == 7);
+        WaitForVisibility(log);
+        PumpUntil(() => grid.RowCount == 3);
+
+        Assert.That(log.HiddenLineCount, Is.EqualTo(4));
+        Assert.That(DisplayedLineNumber(grid, 0), Is.EqualTo("2"));
+        Assert.That(DisplayedLineNumber(grid, 1), Is.EqualTo("3"));
+        Assert.That(DisplayedLineNumber(grid, 2), Is.EqualTo("5"));
+        Assert.That(log.ShowHiddenLines, Is.False);
+        Assert.That(log.CurrentLineNum, Is.AnyOf(1, 2, 4));
+        Assert.That(grid.CurrentCellAddress.Y, Is.LessThan(grid.RowCount));
+    }
+
+    [Test]
+    public void MultiFileRollover_ShiftsHiddenLinesWithTheDroppedFile ()
+    {
+        File.WriteAllLines(_fileName + ".1", Enumerable.Range(0, 9).Select(Text));
+        File.WriteAllLines(_fileName, Enumerable.Range(9, 10).Select(Text));
+        var log = Open();
+        var finished = false;
+        log.ProgressBarUpdate += (_, progress) => finished |= !progress.Visible;
+        log.SwitchMultiFile(true);
+        PumpUntil(() => finished);
+        var loaded = Task.Run(log.WaitForLoadingFinished);
+        PumpUntil(() => loaded.IsCompleted);
+        WaitForVisibility(log);
+        var grid = Grid(log);
+        PumpUntil(() => log.GatherSessionSnapshot().LineCount == 19 && grid.RowCount == 10);
+
+        var next = Path.Join(_directory, "next.tmp");
+        File.WriteAllLines(next, Enumerable.Range(19, 3).Select(Text));
+        File.Delete(_fileName + ".1");
+        File.Move(_fileName, _fileName + ".1");
+        File.Move(next, _fileName);
+        PumpUntil(() => log.GatherSessionSnapshot().LineCount == 13);
+        WaitForVisibility(log);
+        PumpUntil(() => grid.RowCount == 6);
+
+        Assert.That(log.HiddenLineCount, Is.EqualTo(7));
+        Assert.That(Enumerable.Range(0, 6).Select(row => DisplayedLineNumber(grid, row)), Is.EqualTo(new[] { "2", "4", "6", "8", "10", "12" }));
+        Assert.That(DisplayedText(grid, 0), Is.EqualTo("INFO 10"));
+        Assert.That(DisplayedText(grid, 5), Is.EqualTo("INFO 20"));
+    }
+
+    [Test]
     public void MarkerClick_OnHiddenLine_RevealsIt ()
     {
         _settings.Preferences.ShowMarkerBar = true;
@@ -586,6 +698,16 @@ public sealed class HiddenLinesWindowTests : IDisposable
     private static string DisplayedLineNumber (DataGridView grid, int row)
     {
         return ((IColumnMemory)grid.Rows[row].Cells[1].Value).FullValue.ToString();
+    }
+
+    private static ToolStripMenuItem MenuItem (LogWindow log, string name)
+    {
+        return (ToolStripMenuItem)typeof(LogWindow).GetField(name, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(log)!;
+    }
+
+    private static string DisplayedText (DataGridView grid, int row)
+    {
+        return ((IColumnMemory)grid.Rows[row].Cells[grid.ColumnCount - 1].Value).FullValue.ToString();
     }
 
     private static TControl Find<TControl> (Control parent, string name) where TControl : Control

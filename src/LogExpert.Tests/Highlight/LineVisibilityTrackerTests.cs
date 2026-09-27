@@ -126,11 +126,11 @@ public class LineVisibilityTrackerTests
         var before = _tracker.Map;
         _lines.AddRange(["DEBUG f", "INFO g"]);
 
-        var after = _tracker.Extend(7);
+        _tracker.Extend(7);
+        var after = _tracker.Map;
 
         Assert.That(VisibleLines(after), Is.EqualTo(new[] { 0, 2, 4, 6 }));
         Assert.That(after.IsAppendOf(before), Is.True);
-        Assert.That(_tracker.Map, Is.SameAs(after));
     }
 
     [Test]
@@ -140,7 +140,9 @@ public class LineVisibilityTrackerTests
         Idle();
         var before = _tracker.Map;
 
-        Assert.That(_tracker.Extend(3), Is.SameAs(before));
+        _tracker.Extend(3);
+
+        Assert.That(_tracker.Map, Is.SameAs(before));
     }
 
     [Test]
@@ -219,7 +221,8 @@ public class LineVisibilityTrackerTests
         _tracker.Load(_lines.Count, HideDebug);
         Idle();
 
-        var shifted = _tracker.Shift(2);
+        _tracker.Shift(2);
+        var shifted = _tracker.Map;
 
         Assert.That(shifted.LineCount, Is.EqualTo(3));
         Assert.That(VisibleLines(shifted), Is.EqualTo(new[] { 0, 2 }));
@@ -235,7 +238,7 @@ public class LineVisibilityTrackerTests
             _lines.RemoveRange(0, 2);
         }
 
-        _ = _tracker.Shift(2);
+        _tracker.Shift(2);
         _gate.Set();
         Idle();
 
@@ -254,9 +257,43 @@ public class LineVisibilityTrackerTests
             _lines.AddRange(["DEBUG x", "INFO y"]);
         }
 
-        var replaced = _tracker.Replace(2);
+        _tracker.Replace(2);
 
-        Assert.That(VisibleLines(replaced), Is.EqualTo(new[] { 1 }));
+        Assert.That(VisibleLines(_tracker.Map), Is.EqualTo(new[] { 1 }));
+    }
+
+    [Test]
+    public void EveryLine_IsReadWhileItsBufferIsPinned ()
+    {
+        var pinned = (First: -1, Last: -1);
+        var unpinnedReads = new List<int>();
+        using var tracker = new LineVisibilityTracker(
+            i =>
+            {
+                if (i < pinned.First || i > pinned.Last)
+                {
+                    unpinnedReads.Add(i);
+                }
+
+                return new LogLine(i % 2 == 0 ? "DEBUG" : "INFO", i);
+            },
+            (first, last) =>
+            {
+                pinned = (first, last);
+                return new ActionDisposable(() => pinned = (-1, -1));
+            });
+
+        tracker.Load(1000, HideDebug);
+        Assert.That(tracker.WhenIdle().Wait(Timeout), Is.True);
+        tracker.Extend(1100);
+
+        Assert.That(unpinnedReads, Is.Empty);
+        Assert.That(tracker.Map.HiddenCount, Is.EqualTo(550));
+    }
+
+    private sealed class ActionDisposable (Action dispose) : IDisposable
+    {
+        public void Dispose () => dispose();
     }
 
     [Test]
@@ -293,7 +330,8 @@ public class LineVisibilityTrackerTests
         Assert.That(tracker.WhenIdle().Wait(Timeout), Is.True);
         fail = true;
 
-        var map = tracker.Extend(6);
+        tracker.Extend(6);
+        var map = tracker.Map;
 
         Assert.That(map.LineCount, Is.EqualTo(6));
         Assert.That(map.HiddenCount, Is.Zero);
@@ -314,7 +352,7 @@ public class LineVisibilityTrackerTests
         {
             _ = _tracker.IsScanning;
             _tracker.Rebuild([new HighlightEntry { SearchText = "INFO", IsHideLine = true }]);
-            _ = _tracker.Shift(0);
+            _tracker.Shift(0);
             _tracker.Load(_lines.Count, HideDebug);
         });
 

@@ -61,14 +61,21 @@ public static class HighlightEvaluator
 
     /// <summary>
     /// Returns whether any hide-line entry matches the line. Other matching entries cannot cancel the decision,
-    /// whatever their order. Temporary search-hit entries never hide.
+    /// whatever their order.
     /// </summary>
     public static bool IsHidden (IEnumerable<HighlightEntry> entries, ITextValueMemory line)
     {
         ArgumentNullException.ThrowIfNull(entries);
         ArgumentNullException.ThrowIfNull(line);
 
-        return entries.Any(e => e.IsHideLine && !e.IsSearchHit && IsMatch(e, line));
+        return entries.Any(e => IsHideRule(e) && IsMatch(e, line));
+    }
+
+    /// <summary>Temporary search-hit entries never hide.</summary>
+    public static bool IsHideRule (HighlightEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        return entry.IsHideLine && !entry.IsSearchHit;
     }
 
     /// <summary>

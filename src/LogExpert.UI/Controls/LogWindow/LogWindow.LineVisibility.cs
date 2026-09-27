@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 
 using LogExpert.Core.Classes.Highlight;
+using LogExpert.Core.Interfaces;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -22,14 +23,17 @@ internal partial class LogWindow
 
     private LineVisibilityTracker _lineVisibility;
 
-    // Only touched on the UI thread; worker threads read it once into a local.
+    // Written only on the UI thread; other threads read it once into a local.
     private volatile LineVisibilityMap _rowMap = LineVisibilityMap.Empty;
     private LineVisibilityMap _appliedTrackedMap = LineVisibilityMap.Empty;
     private bool _showHiddenLines;
     private bool _isLoadComplete;
 
-    // A saved or reload position (original lines) waiting for the load's first scan.
-    private (int CurrentLine, int FirstDisplayedLine)? _pendingPosition;
+    // A saved or reload position waiting for the load's first scan.
+    private GridPosition? _pendingPosition;
+
+    /// <summary>The selected and first displayed original lines of the main grid; -1 when there is none.</summary>
+    private readonly record struct GridPosition (int CurrentLine, int FirstDisplayedLine);
 
     /// <summary>Number of lines the active hide rules remove, whether or not the override shows them.</summary>
     internal int HiddenLineCount => _lineVisibility.Map.HiddenCount;
@@ -58,7 +62,9 @@ internal partial class LogWindow
 
     private void InitializeLineVisibility ()
     {
-        _lineVisibility = new LineVisibilityTracker(line => _logFileReader?.GetLogLineMemory(line));
+        _lineVisibility = new LineVisibilityTracker(
+            line => _logFileReader?.GetLogLineMemory(line),
+            (first, last) => (_logFileReader as IBufferPinning)?.PinRange(first, last));
         _lineVisibility.Changed += OnLineVisibilityChanged;
 
         _showHiddenLinesCheckBox.Text = Resources.LogWindow_UI_CheckBox_ShowHiddenLines;
@@ -228,37 +234,41 @@ internal partial class LogWindow
         if (_pendingPosition is { } position && !_lineVisibility.IsLoadPending)
         {
             _pendingPosition = null;
-            ApplyPosition(position.CurrentLine, position.FirstDisplayedLine);
+            ApplyPosition(position, true);
         }
 
         UpdateHiddenLinesBar();
         return changed;
     }
 
-    /// <summary>
-    /// Restores a saved or reload position (original lines; a hidden one resolves to the nearest visible line),
-    /// deferred until the load's first scan has published the rows.
-    /// </summary>
-    private void RestorePosition (int currentLine, int firstDisplayedLine)
+    private GridPosition CurrentGridPosition ()
+    {
+        return new GridPosition(CurrentLineNum, RowToLine(dataGridView.FirstDisplayedScrollingRowIndex));
+    }
+
+    /// <summary>Restores a saved or reload position, deferred until the load's first scan has published the rows.</summary>
+    private void RestorePosition (GridPosition position)
     {
         if (_lineVisibility.IsLoadPending && !_showHiddenLines)
         {
-            _pendingPosition = (currentLine, firstDisplayedLine);
+            _pendingPosition = position;
             return;
         }
 
-        ApplyPosition(currentLine, firstDisplayedLine);
+        ApplyPosition(position, true);
     }
 
-    private void ApplyPosition (int currentLine, int firstDisplayedLine)
+    /// <summary>Scrolls to and optionally selects a position; a hidden line resolves to the nearest visible row.</summary>
+    private void ApplyPosition (GridPosition position, bool select)
     {
-        var currentRow = currentLine >= 0 ? _rowMap.NearestRow(currentLine) : -1;
-        if (currentRow >= 0)
+        var currentRow = position.CurrentLine >= 0 ? _rowMap.NearestRow(position.CurrentLine) : -1;
+        if (select && currentRow >= 0)
         {
-            SelectRow(currentRow, false, true);
+            dataGridView.CurrentCell = dataGridView.Rows[currentRow].Cells[0];
+            dataGridView.Rows[currentRow].Selected = true;
         }
 
-        var firstRow = firstDisplayedLine >= 0 ? _rowMap.NearestRow(firstDisplayedLine) : -1;
+        var firstRow = position.FirstDisplayedLine >= 0 ? _rowMap.NearestRow(position.FirstDisplayedLine) : -1;
         if (firstRow >= 0)
         {
             dataGridView.FirstDisplayedScrollingRowIndex = firstRow;
@@ -267,22 +277,18 @@ internal partial class LogWindow
 
     /// <summary>
     /// Switches the grid to <paramref name="newMap"/>. An append only grows the row count; any other change
-    /// rebuilds the rows and restores the selection and scroll position by original line, after moving those
-    /// lines up by <paramref name="rolloverOffset"/>.
+    /// rebuilds the rows and keeps the position by original line, moved up by <paramref name="rolloverOffset"/>.
     /// </summary>
     private void SetRowMap (LineVisibilityMap newMap, int rolloverOffset)
     {
-        var oldMap = _rowMap;
-        if (newMap.IsAppendOf(oldMap) && rolloverOffset == 0)
+        if (newMap.IsAppendOf(_rowMap) && rolloverOffset == 0)
         {
             _rowMap = newMap;
             dataGridView.RowCount = newMap.VisibleCount;
             return;
         }
 
-        var currentLine = oldMap.RowToLine(dataGridView.CurrentCellAddress.Y);
-        var firstLine = oldMap.RowToLine(dataGridView.FirstDisplayedScrollingRowIndex);
-        var hadCurrentLine = currentLine >= 0;
+        var position = CurrentGridPosition();
 
         dataGridView.RowCount = 0;
         _columnCache.MarkPrefetchStale();
@@ -293,29 +299,17 @@ internal partial class LogWindow
             dataGridView.UpdateRowHeightInfo(0, true);
         }
 
-        if (dataGridView.RowCount == 0)
+        if (dataGridView.RowCount > 0)
         {
-            return;
+            ApplyPosition(Shifted(position, rolloverOffset), !_guiStateArgs.FollowTail);
         }
+    }
 
-        if (firstLine >= 0)
-        {
-            var firstRow = newMap.NearestRow(Math.Max(0, firstLine - rolloverOffset));
-            if (firstRow >= 0)
-            {
-                dataGridView.FirstDisplayedScrollingRowIndex = firstRow;
-            }
-        }
-
-        if (hadCurrentLine && !_guiStateArgs.FollowTail)
-        {
-            var row = newMap.NearestRow(Math.Max(0, currentLine - rolloverOffset));
-            if (row >= 0)
-            {
-                dataGridView.CurrentCell = dataGridView.Rows[row].Cells[0];
-                dataGridView.Rows[row].Selected = true;
-            }
-        }
+    private static GridPosition Shifted (GridPosition position, int offset)
+    {
+        return new GridPosition(
+            position.CurrentLine < 0 ? -1 : Math.Max(0, position.CurrentLine - offset),
+            position.FirstDisplayedLine < 0 ? -1 : Math.Max(0, position.FirstDisplayedLine - offset));
     }
 
     /// <summary>Original line displayed in a main-grid row, or -1.</summary>
@@ -331,27 +325,29 @@ internal partial class LogWindow
     }
 
     /// <summary>
-    /// Explicit navigation to an original line: a line beyond the end resolves to the last row; a hidden line turns
-    /// on "Show hidden lines" so that exact line can be selected. Returns the row, or -1.
+    /// The row to select for an original line, or -1. A line beyond the end resolves to the last row. A hidden line
+    /// turns on "Show hidden lines" when <paramref name="reveal"/> (explicit navigation), else resolves to the nearest
+    /// visible row. Explicit navigation before the first scan is published waits for it, like <see cref="RequestGotoLine"/>.
     /// </summary>
-    private int RevealLine (int line)
+    private int NavigationRow (int line, bool reveal)
     {
         if (line < 0)
         {
             return -1;
         }
 
-        if (line >= _rowMap.LineCount)
+        if (reveal && !_isReadyForLineNavigation)
         {
-            return dataGridView.RowCount - 1;
+            RequestGotoLine(line + 1);
+            return -1;
         }
 
-        if (_rowMap.IsHidden(line))
+        if (reveal && _rowMap.IsHidden(line))
         {
             ShowHiddenLines = true;
         }
 
-        return LineToRow(line);
+        return _rowMap.NearestRow(line);
     }
 
     /// <summary>Line navigation may run once the file is loaded and the first visibility scan is published.</summary>

@@ -336,7 +336,7 @@ internal partial class LogWindow
     private void OnMarkerLineSelected (object? sender, SelectLineEventArgs eventArgs)
     {
         if (_markerFrame?.Generation == Volatile.Read(ref _markerGeneration)
-            && eventArgs.Line >= 0 && eventArgs.Line < _rowMap.LineCount)
+            && eventArgs.Line >= 0 && eventArgs.Line < _lineVisibility.Map.LineCount)
         {
             RequestGotoLine(eventArgs.Line + 1);
         }

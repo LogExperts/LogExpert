@@ -3,24 +3,15 @@ using ColumnizerLib;
 namespace LogExpert.Core.Classes.Highlight;
 
 /// <summary>
-/// Owns a Log Window's <see cref="LineVisibilityMap"/>: which original lines the hide-line Highlight Entries of the
-/// active Highlight Group remove from the main grid.
-/// <para>
-/// Full scans (new content, changed rules) run on a cancellable background task against a cloned rule snapshot; the
-/// previous map stays current until the scan's result replaces it in one step. Every structural change bumps a
-/// generation, so a scan that finishes against outdated content or rules is discarded. Appended tail lines are
-/// evaluated synchronously by the caller's thread. Evaluation uses <see cref="HighlightEvaluator.IsHidden"/> only,
-/// so it can never fire a trigger.
-/// </para>
-/// <para>
-/// Lines are never read while the lock is held: the UI thread takes the lock too, and a reader call may wait for the
-/// UI thread. Evaluations run against a state snapshot and commit only if the state (<see cref="_version"/>) is
-/// unchanged, retrying otherwise.
-/// </para>
+/// Keeps a Log Window's <see cref="LineVisibilityMap"/> up to date with the hide-line rules of its Highlight Group.
+/// Lines are never read while the lock is held: a reader call may wait for the UI thread, which takes the lock too.
 /// </summary>
 public sealed class LineVisibilityTracker : IDisposable
 {
+    private const int READ_BATCH_SIZE = 256;
+
     private readonly Func<int, ITextValueMemory?> _getLine;
+    private readonly Func<int, int, IDisposable?>? _pinRange;
     private readonly Lock _lock = new();
 
     private volatile LineVisibilityMap _map = LineVisibilityMap.Empty;
@@ -34,10 +25,12 @@ public sealed class LineVisibilityTracker : IDisposable
     private bool _disposed;
 
     /// <param name="getLine">Reads an original line; read live, since the reader is replaced on reload.</param>
-    public LineVisibilityTracker (Func<int, ITextValueMemory?> getLine)
+    /// <param name="pinRange">Pins the buffers of an inclusive line range before it is read, so they can't be evicted mid-read.</param>
+    public LineVisibilityTracker (Func<int, ITextValueMemory?> getLine, Func<int, int, IDisposable?>? pinRange = null)
     {
         ArgumentNullException.ThrowIfNull(getLine);
         _getLine = getLine;
+        _pinRange = pinRange;
     }
 
     /// <summary>
@@ -96,14 +89,14 @@ public sealed class LineVisibilityTracker : IDisposable
         }
     }
 
-    /// <summary>Tail path: evaluates lines appended up to <paramref name="lineCount"/> and returns the current map.</summary>
-    public LineVisibilityMap Extend (int lineCount)
+    /// <summary>Tail path: evaluates lines appended up to <paramref name="lineCount"/>.</summary>
+    public void Extend (int lineCount)
     {
-        return EvaluateAndCommit(lineCount, replace: false);
+        EvaluateAndCommit(lineCount, replace: false);
     }
 
     /// <summary>Tail path, rollover: the first <paramref name="offset"/> lines were dropped.</summary>
-    public LineVisibilityMap Shift (int offset)
+    public void Shift (int offset)
     {
         lock (_lock)
         {
@@ -112,22 +105,20 @@ public sealed class LineVisibilityTracker : IDisposable
                 SetStateLocked(_map.Shift(offset), _rules);
                 RestartPendingScanLocked();
             }
-
-            return _map;
         }
     }
 
     /// <summary>Tail path, truncation: the content was replaced and is re-evaluated up to <paramref name="lineCount"/>.</summary>
-    public LineVisibilityMap Replace (int lineCount)
+    public void Replace (int lineCount)
     {
-        return EvaluateAndCommit(lineCount, replace: true);
+        EvaluateAndCommit(lineCount, replace: true);
     }
 
     /// <summary>
     /// Evaluates against a snapshot outside the lock, then commits only if the state is unchanged, retrying otherwise.
     /// <paramref name="replace"/> re-evaluates from the first line and restarts a pending scan on the new content.
     /// </summary>
-    private LineVisibilityMap EvaluateAndCommit (int lineCount, bool replace)
+    private void EvaluateAndCommit (int lineCount, bool replace)
     {
         while (true)
         {
@@ -138,7 +129,7 @@ public sealed class LineVisibilityTracker : IDisposable
             {
                 if (_disposed || (!replace && lineCount <= _map.LineCount))
                 {
-                    return _map;
+                    return;
                 }
 
                 (from, rules, version) = (replace ? LineVisibilityMap.Empty : _map, _rules, _version);
@@ -149,7 +140,7 @@ public sealed class LineVisibilityTracker : IDisposable
             {
                 if (_disposed)
                 {
-                    return _map;
+                    return;
                 }
 
                 if (version != _version)
@@ -169,7 +160,7 @@ public sealed class LineVisibilityTracker : IDisposable
                 Changed?.Invoke(this, new LineVisibilityChangedEventArgs(map, error));
             }
 
-            return map;
+            return;
         }
     }
 
@@ -333,12 +324,17 @@ public sealed class LineVisibilityTracker : IDisposable
         List<int> hidden = [];
         if (rules.Length > 0)
         {
-            for (var i = from.LineCount; i < lineCount; i++)
+            for (var batchStart = from.LineCount; batchStart < lineCount; batchStart += READ_BATCH_SIZE)
             {
-                token.ThrowIfCancellationRequested();
-                if (IsHiddenLine(rules, i))
+                var batchEnd = Math.Min(batchStart + READ_BATCH_SIZE, lineCount);
+                using var pin = _pinRange?.Invoke(batchStart, batchEnd - 1);
+                for (var i = batchStart; i < batchEnd; i++)
                 {
-                    hidden.Add(i);
+                    token.ThrowIfCancellationRequested();
+                    if (IsHiddenLine(rules, i))
+                    {
+                        hidden.Add(i);
+                    }
                 }
             }
         }
@@ -356,7 +352,7 @@ public sealed class LineVisibilityTracker : IDisposable
     private static HighlightEntry[] Snapshot (IEnumerable<HighlightEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
-        return [.. entries.Where(e => e.IsHideLine && !e.IsSearchHit).Select(e => (HighlightEntry)e.Clone())];
+        return [.. entries.Where(HighlightEvaluator.IsHideRule).Select(e => (HighlightEntry)e.Clone())];
     }
 
     private static bool SameRules (HighlightEntry[] current, HighlightEntry[] next)

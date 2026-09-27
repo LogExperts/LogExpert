@@ -717,7 +717,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     void ILineSelectable.SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        SelectLine(lineNum, triggerSyncCall, shouldScroll);
+        RevealAndSelectLine(lineNum, triggerSyncCall, shouldScroll);
     }
 
     #region Event Handlers
@@ -1110,7 +1110,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.CurrentRow != null)
         {
-            _statusEventArgs.CurrentLineNum = RowToLine(dataGridView.CurrentRow.Index) + 1;
+            _statusEventArgs.CurrentLineNum = CurrentLineNum + 1;
             SendStatusLineUpdate();
             if (syncFilterCheckBox.Checked)
             {
@@ -1279,7 +1279,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     if (filterGridView.CurrentCellAddress.Y >= 0 && filterGridView.CurrentCellAddress.Y < _filterResultList.Count)
                     {
                         var lineNum = _filterResultList[filterGridView.CurrentCellAddress.Y];
-                        SelectLine(lineNum, false, true);
+                        RevealAndSelectLine(lineNum, false, true);
                         e.Handled = true;
                     }
 
@@ -1498,7 +1498,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var lineNum = -1;
         if (dataGridView.CurrentRow != null)
         {
-            lineNum = RowToLine(dataGridView.CurrentRow.Index);
+            lineNum = CurrentLineNum;
         }
 
         if (lineNum == -1)
@@ -1684,7 +1684,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (dataGridView.CurrentRow != null && FilterPipe != null)
         {
-            var lineNum = FilterPipe.GetOriginalLineNum(RowToLine(dataGridView.CurrentRow.Index));
+            var lineNum = FilterPipe.GetOriginalLineNum(CurrentLineNum);
             if (lineNum != -1)
             {
                 FilterPipe.OriginWindow.SelectLine(lineNum, false, true);
@@ -1934,7 +1934,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnTimeSpreadingControlLineSelected (object sender, SelectLineEventArgs e)
     {
-        SelectLine(e.Line, false, true);
+        RevealAndSelectLine(e.Line, false, true);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2671,7 +2671,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _rowHeightList = snapshot.RowHeightList;
             try
             {
-                // Saved positions are original lines; without a valid one, the last line is selected.
                 var lineCount = _logFileReader.LineCount;
                 var currentLine = snapshot.CurrentLine >= 0 && snapshot.CurrentLine < lineCount
                     ? snapshot.CurrentLine
@@ -2679,7 +2678,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var firstLine = snapshot.FirstDisplayedLine >= 0 && snapshot.FirstDisplayedLine < lineCount
                     ? snapshot.FirstDisplayedLine
                     : currentLine;
-                RestorePosition(currentLine, firstLine);
+                RestorePosition(new GridPosition(currentLine, firstLine));
 
                 // Applied once, here (was double-applied: always pre-load, here only when true).
                 // Applying true after positioning keeps the jump-to-tail semantics.
@@ -2813,11 +2812,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
-        // The memento holds original lines; ones beyond the reloaded content are ignored.
         var lineCount = _logFileReader.LineCount;
-        RestorePosition(
+        RestorePosition(new GridPosition(
             _reloadMemento.CurrentLine < lineCount ? _reloadMemento.CurrentLine : -1,
-            _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1);
+            _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1));
     }
 
     [SupportedOSPlatform("windows")]
@@ -3073,17 +3071,23 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         ShiftBookmarks(rolloverOffset);
         ShiftRowHeightList(rolloverOffset);
         ShiftFilterPipes(rolloverOffset);
-        _ = _lineVisibility.Shift(rolloverOffset);
+        _lineVisibility.Shift(rolloverOffset);
     }
 
     void ITailFollowSink.OnTailLines (LogEventArgs e)
     {
         try
         {
-            // Evaluate hide rules for the new lines here, off the UI thread, before the grid shows them.
-            _ = !e.IsRollover && e.LineCount < e.PrevLineCount
-                ? _lineVisibility.Replace(e.LineCount)
-                : _lineVisibility.Extend(e.LineCount);
+            // Off the UI thread, before the grid shows the new lines.
+            if (!e.IsRollover && e.LineCount < e.PrevLineCount)
+            {
+                _lineVisibility.Replace(e.LineCount);
+            }
+            else
+            {
+                _lineVisibility.Extend(e.LineCount);
+            }
+
             _ = BeginInvoke(UpdateGrid, [e]);
             CheckFilterAndHighlight(e);
         }
@@ -3132,9 +3136,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            // The engine thread already applied this event to the tracker (OnRolloverShift / OnTailLines). An append
-            // only grows the rows; a rollover or truncation rebuilds them and, without follow-tail, keeps the
-            // selected and first displayed original lines (moved up by the rollover offset).
+            // The tail thread already applied this event to the tracker.
             _ = PublishTrackedMap(logEventArgs.IsRollover ? logEventArgs.RolloverOffset : 0);
 
             _statusEventArgs.LineCount = logEventArgs.LineCount;
@@ -3237,8 +3239,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (firstStopTail)
                 {
                     var capturedLineNum = i;
-                    // Not explicit navigation: a hidden trigger line is not revealed.
-                    _ = BeginInvoke(() => SelectAndEnsureVisibleRow(_rowMap.NearestRow(capturedLineNum), false));
+                    _ = BeginInvoke(() => SelectAndEnsureVisibleRow(NavigationRow(capturedLineNum, reveal: false), false));
                     firstStopTail = false;
                 }
             }
@@ -3892,7 +3893,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (dataGridView.CurrentRow != null)
             {
-                SyncTimestampDisplay(RowToLine(dataGridView.CurrentRow.Index));
+                SyncTimestampDisplay(CurrentLineNum);
             }
         }
     }
@@ -3986,7 +3987,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (_filterResultList.Count > 0)
             {
-                var index = _filterResultList.BinarySearch(RowToLine(dataGridView.CurrentRow.Index));
+                var index = _filterResultList.BinarySearch(CurrentLineNum);
                 if (index < 0)
                 {
                     index = ~index;
@@ -4059,21 +4060,18 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         SendProgressBarUpdate();
     }
 
-    /// <summary>
-    /// Explicit navigation to an original line (Go to Line, bookmarks, Log Search, filter results, time sync, …).
-    /// A hidden target turns on "Show hidden lines" so that exact line is selected.
-    /// </summary>
+    /// <summary>Explicit navigation to an original line; a hidden line turns on "Show hidden lines".</summary>
     [SupportedOSPlatform("windows")]
-    private void SelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
+    private void RevealAndSelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        SelectRow(RevealLine(lineNum), triggerSyncCall, shouldScroll);
+        SelectRow(NavigationRow(lineNum, reveal: true), triggerSyncCall, shouldScroll);
     }
 
-    /// <summary>Selects an original line, or the next (else previous) visible line when it is hidden.</summary>
+    /// <summary>Selects an original line, or the nearest visible line when it is hidden.</summary>
     [SupportedOSPlatform("windows")]
     private void SelectNearestLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        SelectRow(lineNum < 0 ? -1 : _rowMap.NearestRow(lineNum), triggerSyncCall, shouldScroll);
+        SelectRow(NavigationRow(lineNum, reveal: false), triggerSyncCall, shouldScroll);
     }
 
     [SupportedOSPlatform("windows")]
@@ -4163,7 +4161,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var entry = FindHighlightEntry(line);
                 if (entry != null)
                 {
-                    SelectLine(lineNum, false, true);
+                    RevealAndSelectLine(lineNum, false, true);
                     break;
                 }
             }
@@ -4183,7 +4181,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var entry = FindHighlightEntry(line);
                 if (entry != null)
                 {
-                    SelectLine(lineNum, false, true);
+                    RevealAndSelectLine(lineNum, false, true);
                     break;
                 }
             }
@@ -4818,7 +4816,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 if (dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index > -1)
                 {
-                    var fileName = _logFileReader.GetLogFileNameForLine(RowToLine(dataGridView.CurrentRow.Index));
+                    var fileName = _logFileReader.GetLogFileNameForLine(CurrentLineNum);
                     if (fileName != null)
                     {
                         StatusLineText(Util.GetNameFromPath(fileName));
@@ -6533,8 +6531,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (line >= 0)
         {
-            // An original line; beyond the end selects the last line, a hidden one is revealed.
-            SelectLine(Math.Min(line, _rowMap.LineCount - 1), false, true);
+            RevealAndSelectLine(line, false, true);
 
             _ = dataGridView.Focus();
         }
@@ -6599,7 +6596,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             {
                 case SearchOutcome.Found:
                     StatusLineText(string.Empty);
-                    _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), result.LineNumber, true);
+                    _ = dataGridView.Invoke(new SelectLineFx((line1, triggerSyncCall) => RevealAndSelectLine(line1, triggerSyncCall, true)), result.LineNumber, true);
                     break;
 
                 case SearchOutcome.NotFound:
@@ -6623,17 +6620,22 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public void SelectLogLine (int lineNumber)
     {
-        _ = Invoke(new SelectLineFx((line1, triggerSyncCall) => SelectLine(line1, triggerSyncCall, true)), lineNumber, true);
+        _ = Invoke(new SelectLineFx((line1, triggerSyncCall) => RevealAndSelectLine(line1, triggerSyncCall, true)), lineNumber, true);
     }
 
-    /// <summary>Explicit navigation to an original line; a hidden line is revealed (see <see cref="SelectLine"/>).</summary>
+    /// <summary>Explicit navigation to an original line; a hidden line turns on "Show hidden lines".</summary>
     public void SelectAndEnsureVisible (int line, bool triggerSyncCall)
     {
-        SelectAndEnsureVisibleRow(RevealLine(line), triggerSyncCall);
+        SelectAndEnsureVisibleRow(NavigationRow(line, reveal: true), triggerSyncCall);
     }
 
     private void SelectAndEnsureVisibleRow (int row, bool triggerSyncCall)
     {
+        if (row < 0)
+        {
+            return;
+        }
+
         try
         {
             SelectRow(row, triggerSyncCall, false);
@@ -7173,7 +7175,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
 
                 var lineNum = _bookmarkProvider.Bookmarks[index].LineNum;
-                SelectLine(lineNum, true, true);
+                RevealAndSelectLine(lineNum, true, true);
             }
         }
     }
@@ -7232,7 +7234,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 }
 
                 var lineNum = _bookmarkProvider.Bookmarks[index].LineNum;
-                SelectLine(lineNum, false, true);
+                RevealAndSelectLine(lineNum, false, true);
             }
         }
     }
@@ -7556,9 +7558,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var foundLine = _timestampLocator.FindLine(timestamp, currentLine, _logFileReader.LineCount, roundToSeconds, _cts.Token);
         if (foundLine >= 0)
         {
-            // The window the user navigates in reveals a hidden line; windows following a time sync select the
-            // nearest visible line instead.
-            SelectAndEnsureVisibleRow(triggerSyncCall ? RevealLine(foundLine) : _rowMap.NearestRow(foundLine), triggerSyncCall);
+            // Windows following a time sync don't reveal hidden lines.
+            SelectAndEnsureVisibleRow(NavigationRow(foundLine, reveal: triggerSyncCall), triggerSyncCall);
             hasScrolled = true;
         }
 
@@ -7598,7 +7599,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogLineMemory GetCurrentLine ()
     {
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
-            ? _logFileReader.GetLogLineMemory(RowToLine(dataGridView.CurrentRow.Index))
+            ? _logFileReader.GetLogLineMemory(CurrentLineNum)
             : null;
     }
 
@@ -7620,7 +7621,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public ILogFileInfo GetCurrentFileInfo ()
     {
         return dataGridView.CurrentRow != null && dataGridView.CurrentRow.Index != -1
-            ? _logFileReader.GetLogFileInfoForLine(RowToLine(dataGridView.CurrentRow.Index))
+            ? _logFileReader.GetLogFileInfoForLine(CurrentLineNum)
             : null;
     }
 

@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 
@@ -1059,6 +1060,50 @@ public class ConfigManagerTest
         Assert.That(loadResult.Settings, Is.Not.Null);
         Assert.That(loadResult.Settings.Preferences.HighlightGroupList.Count, Is.EqualTo(1), "Should have exactly 1 group, not duplicates");
         Assert.That(loadResult.Settings.Preferences.HighlightGroupList[0].GroupName, Is.EqualTo("Group1"));
+    }
+
+    [Test]
+    [Category("BackwardCompatibility")]
+    public void HighlightExportImport_KeepsHideLineFlag ()
+    {
+        FileInfo exportFile = new(Path.Join(_testDir, "highlights.json"));
+        _configManager.Settings.Preferences.HighlightGroupList =
+        [
+            new HighlightGroup
+            {
+                GroupName = "HideGroup",
+                HighlightEntryList = [new HighlightEntry { SearchText = "DEBUG", IsHideLine = true }, new HighlightEntry { SearchText = "INFO" }]
+            }
+        ];
+
+        _configManager.Export(exportFile, SettingsFlags.HighlightSettings);
+        _configManager.Settings.Preferences.HighlightGroupList.Clear();
+        _configManager.ImportHighlightSettings(exportFile, ExportImportFlags.HighlightSettings);
+
+        var entries = _configManager.Settings.Preferences.HighlightGroupList.Single(group => group.GroupName == "HideGroup").HighlightEntryList;
+        Assert.That(entries.Select(entry => entry.IsHideLine), Is.EqualTo(new[] { true, false }));
+    }
+
+    [Test]
+    [Category("BackwardCompatibility")]
+    public void HighlightImport_LegacyFileWithoutHideLine_LoadsAsNotHidden ()
+    {
+        string legacyJson = @"[
+  {
+    ""GroupName"": ""LegacyGroup"",
+    ""HighlightEntryList"": [
+      { ""SearchText"": ""DEBUG"", ""IsRegex"": false, ""IsSetBookmark"": true }
+    ]
+  }
+]";
+        FileInfo importFile = new(Path.Join(_testDir, "legacy_highlights.json"));
+        File.WriteAllText(importFile.FullName, legacyJson);
+
+        _configManager.ImportHighlightSettings(importFile, ExportImportFlags.HighlightSettings);
+
+        var entry = _configManager.Settings.Preferences.HighlightGroupList.Single(group => group.GroupName == "LegacyGroup").HighlightEntryList.Single();
+        Assert.That(entry.IsSetBookmark, Is.True);
+        Assert.That(entry.IsHideLine, Is.False);
     }
 
     #endregion

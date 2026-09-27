@@ -30,7 +30,8 @@ meaning; do not redefine them locally.
   matches it (`HighlightEvaluator.IsHidden`); no other entry can cancel that,
   whatever the order. Display state only: hidden lines stay in the reader and
   remain eligible for Log Search, the Window Filter, Filter Pipes and triggers.
-  Temporary search-hit entries never hide.
+  Temporary search-hit entries never hide. Rules match the whole line, as for
+  triggers, even when word mode paints only matches inside columns.
 - **Original logical line** — A line index of the Logfile Reader, before hiding.
   Reader access, bookmarks, timestamps, row heights, sessions and markers use it.
 - **Visible row** — A row of the Log Window's main grid after hiding. Only grid
@@ -42,9 +43,11 @@ meaning; do not redefine them locally.
   triggers.
 - **Show hidden lines** — The per-window, transient override that displays
   hidden lines without changing any rule. Explicit navigation to a hidden line
-  (Go to Line, bookmarks, Log Search, filter results, time sync, markers, the
-  command-line target) turns it on; tailing and restoring saved positions never
-  do — they select the nearest visible line instead.
+  (Go to Line, bookmarks, Log Search, filter results, markers, the command-line
+  target, the window a time sync starts from) turns it on; tailing, Stop Tail,
+  windows following a time sync and restoring saved positions never do — they
+  select the nearest visible line instead. Explicit navigation made before the
+  load's first visibility scan finishes waits for it.
 
 *Avoid*: "filtered out" for hidden lines (filtering is the **Window Filter**),
 "row" when an original logical line is meant.

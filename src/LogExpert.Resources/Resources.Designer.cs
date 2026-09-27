@@ -416,7 +416,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("Columnizer_SnapshotUnavailable", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Timestamp selector.
         /// </summary>
@@ -4199,7 +4199,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_Bookmarks", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Clear search.
         /// </summary>
@@ -4208,7 +4208,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_ClearSearch", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Discovering markers….
         /// </summary>
@@ -4217,7 +4217,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_Discovering", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Filter hits.
         /// </summary>
@@ -4226,7 +4226,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_FilterHits", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Highlights.
         /// </summary>
@@ -4235,7 +4235,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_Highlights", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not read log line {0} while discovering markers..
         /// </summary>
@@ -4244,7 +4244,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_LineUnavailable", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Marker discovery failed: {0}.
         /// </summary>
@@ -4253,7 +4253,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_ScanFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Search hits.
         /// </summary>
@@ -4262,7 +4262,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_SearchHits", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Marker bar.
         /// </summary>
@@ -4271,7 +4271,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_Title", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0}: lines {1}–{2}, {3} matching lines.
         /// </summary>
@@ -4280,7 +4280,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("MarkerBar_ToolTip", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Close existing tabs.
         /// </summary>
@@ -4447,16 +4447,12 @@ namespace LogExpert {
         ///   Looks up a localized string similar to Pattern syntax:
         ///
         ///* = any characters (wildcard)
-        ///$D(&lt;date&gt;) = Date pattern
+        ///$D(&amp;lt;date&amp;gt;) = Date pattern
         ///$I = File index number
         ///$J = File index number, hidden when zero
-        ///$J(&lt;prefix&gt;) = Like $J, but adding &lt;prefix&gt; when non-zero
+        ///$J(&amp;lt;prefix&amp;gt;) = Like $J, but adding &amp;lt;prefix&amp;gt; when non-zero
         ///
-        ///Examples:
-        ///*$J(.) → app.log, app.log.1, app.log.2
-        ///*$J(.).log → app.log, app.1.log, app.2.log
-        ///
-        ///&lt;date&gt;:
+        ///&amp;lt;date&amp;gt;:
         ///DD = day
         ///MM = month
         ///YY[YY] = year
@@ -5628,7 +5624,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Show Error Message?.
         /// </summary>
@@ -5646,7 +5642,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Show highlight markers.
         /// </summary>
@@ -5655,7 +5651,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Show marker bar.
         /// </summary>
@@ -5664,7 +5660,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Show search markers.
         /// </summary>
@@ -5673,7 +5669,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Allow only 1 Instance.
         /// </summary>
@@ -6592,7 +6588,7 @@ namespace LogExpert {
                 return ResourceManager.GetString("SettingsDialog_UI_TabPage_tabPageMarkerBar", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Memory/CPU.
         /// </summary>
