@@ -138,8 +138,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly HiddenLinesBar _hiddenLinesBar = new();
     private LineVisibilityTracker _lineVisibility;
     private VisibleRows _visibleRows;
-    private bool _hasEnteredLoad;
-    private Action? _pendingNavigation;
+    private PendingNavigation? _pendingNavigation;
     private bool _isSearching;
 
     private List<int> _lastFilterLinesList = [];
@@ -2651,13 +2650,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    /// <summary>Restores a saved or reload position without firing a leftover time sync.</summary>
-    private void RestorePosition (GridPosition position)
-    {
-        _shouldCallTimeSync = false;
-        _visibleRows.RestorePosition(position);
-    }
-
     bool IVisibleRowsHost.IsFollowTail => _guiStateArgs.FollowTail;
 
     bool IVisibleRowsHost.HasRowHeights => _rowHeightList.Count > 0;
@@ -2896,7 +2888,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var firstLine = snapshot.FirstDisplayedLine >= 0 && snapshot.FirstDisplayedLine < lineCount
                     ? snapshot.FirstDisplayedLine
                     : currentLine;
-                RestorePosition(new GridPosition(currentLine, firstLine));
+                _shouldCallTimeSync = false;
+                _visibleRows.RestorePosition(new GridPosition(currentLine, firstLine));
                 _ = dataGridView.Focus();
 
                 // Applied once, here (was double-applied: always pre-load, here only when true).
@@ -3015,14 +3008,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        if (_hasEnteredLoad)
-        {
-            // A reload: navigation queued so far targets the content being replaced.
-            _pendingNavigation = null;
-        }
-
-        _hasEnteredLoad = true;
-
         _isReadyForLineNavigation = false;
         _isLoading = true;
         InvalidateMarkerCriteria(MarkerScanSource.All);
@@ -3040,7 +3025,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
         var lineCount = _logFileReader.LineCount;
-        RestorePosition(new GridPosition(
+        _shouldCallTimeSync = false;
+        _visibleRows.RestorePosition(new GridPosition(
             _reloadMemento.CurrentLine < lineCount ? _reloadMemento.CurrentLine : -1,
             _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1));
     }
@@ -3164,6 +3150,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ReloadNewFile ()
     {
+        CancelPendingLineNavigation();
         // prevent "overloads". May occur on very fast rollovers (next rollover before the file is reloaded)
         lock (_reloadLock)
         {
@@ -6722,10 +6709,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        RunWhenNavigable(() => GoToTargetLine(targetLine));
+        RunWhenNavigable(() => GotoRequestedLine(targetLine));
     }
 
-    private void GoToTargetLine (int targetLine)
+    private void GotoRequestedLine (int targetLine)
     {
         FollowTailChanged(false, false);
         if (_visibleRows.Map.LineCount > 0)
@@ -6737,10 +6724,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    /// <summary>
-    /// Runs line navigation now, or once the load and its first visibility scan are done. A newer request replaces
-    /// a pending one.
-    /// </summary>
+    /// <summary>Runs the user's line navigation now, or once the load and its first visibility scan are done.</summary>
     private void RunWhenNavigable (Action navigate)
     {
         if (_isReadyForLineNavigation)
@@ -6749,21 +6733,33 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
         else
         {
-            _pendingNavigation = navigate;
+            Queue(new PendingNavigation(navigate, IsTimeSyncFollow: false));
+        }
+    }
+
+    /// <summary>A newer request replaces a pending one, except that following a time sync never replaces the user's own.</summary>
+    private void Queue (PendingNavigation navigation)
+    {
+        if (!navigation.IsTimeSyncFollow || _pendingNavigation is not { IsTimeSyncFollow: false })
+        {
+            _pendingNavigation = navigation;
         }
     }
 
     private void ApplyPendingLineNavigation ()
     {
-        var navigate = _pendingNavigation;
+        var navigation = _pendingNavigation;
         _pendingNavigation = null;
         if (IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
         {
             return;
         }
 
-        navigate?.Invoke();
+        navigation?.Run();
     }
+
+    /// <summary>Line navigation waiting for the load's first visibility scan.</summary>
+    private readonly record struct PendingNavigation (Action Run, bool IsTimeSyncFollow);
 
     private void CancelPendingLineNavigation ()
     {
@@ -7784,11 +7780,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall);
     }
 
+    /// <returns>Whether it scrolled; false also when the navigation waits for the load's first scan.</returns>
     public bool ScrollToTimestampWorker (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
     {
         if (!_isReadyForLineNavigation)
         {
-            _pendingNavigation = () => ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall);
+            Queue(new PendingNavigation(() => ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall), IsTimeSyncFollow: !triggerSyncCall));
             return false;
         }
 

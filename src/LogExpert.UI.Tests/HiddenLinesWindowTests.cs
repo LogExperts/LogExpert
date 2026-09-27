@@ -635,6 +635,18 @@ public sealed class HiddenLinesWindowTests : IDisposable
     }
 
     [Test]
+    public void TimeSync_BeforeTheFirstScanHasFinished_DoesNotReplaceTheUsersQueuedNavigation ()
+    {
+        var log = OpenTimestampedBeforeTheFirstScan();
+
+        log.GotoLine(12_345);
+        _ = log.ScrollToTimestamp(SyncStart.AddSeconds(100), false, false);
+        PumpUntil(() => log.CurrentLineNum == 12_345);
+
+        Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
+    [Test]
     public void CommandLineTarget_OnVisibleLine_KeepsLinesHidden ()
     {
         _window = new LogTabWindow([_fileName], 1, false, _config.Object, 7) { ShowInTaskbar = false, Opacity = 0 };
