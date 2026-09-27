@@ -51,6 +51,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
+    private const int COLUMN_FINDER_HEIGHT = 28;
     private const int WORKER_SHUTDOWN_TIMEOUT = 2000; // ms to wait for a worker task to drain during teardown before giving up
     private const string FONT_COURIER_NEW = "Courier New";
     private const string FONT_VERDANA = "Verdana";
@@ -133,6 +134,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private bool _isLoadError;
     private bool _isLoading;
     private bool _isReadyForLineNavigation;
+    private bool _isLoadComplete;
+    private readonly HiddenLinesBar _hiddenLinesBar = new();
+    private LineVisibilityTracker _lineVisibility;
+    private VisibleRows _visibleRows;
     private int? _pendingTargetLine;
     private bool _isSearching;
 
@@ -994,7 +999,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        var map = _rowMap;
+        var map = _visibleRows.Map;
         if (map.HiddenCount == 0)
         {
             _columnCache.Prefetch(_logFileReader, firstVisible, visibleCount);
@@ -2451,6 +2456,210 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     #endregion
 
+    #region Line Visibility
+
+    /// <summary>Number of lines the active hide rules remove, whether or not the override shows them.</summary>
+    internal int HiddenLineCount => _lineVisibility.Map.HiddenCount;
+
+    /// <summary>The per-window "Show hidden lines" override. Transient: not saved in the Session File.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal bool ShowHiddenLines
+    {
+        get => _visibleRows.ShowHiddenLines;
+        set
+        {
+            if (_visibleRows.ShowHiddenLines == value)
+            {
+                return;
+            }
+
+            _visibleRows.ShowHiddenLines = value;
+            ApplyLineVisibility();
+        }
+    }
+
+    internal Task WhenLineVisibilityIdle ()
+    {
+        return _lineVisibility.WhenIdle();
+    }
+
+    private void InitializeLineVisibility ()
+    {
+        _lineVisibility = new LineVisibilityTracker(
+            line => _logFileReader?.GetLogLineMemory(line),
+            (first, last) => (_logFileReader as IBufferPinning)?.PinRange(first, last));
+        _lineVisibility.Changed += OnLineVisibilityChanged;
+        _visibleRows = new VisibleRows(dataGridView, _lineVisibility, () => _guiStateArgs.FollowTail, () => _columnCache.MarkPrefetchStale(), () => _rowHeightList.Count > 0);
+        _hiddenLinesBar.ShowHiddenLinesChanged += (_, _) => ShowHiddenLines = _hiddenLinesBar.ShowHiddenLines;
+
+        // Row 0 hosts the column finder; the notice bar stacks above it.
+        tableLayoutPanel1.Controls.Remove(columnFinderPanel);
+        var topRow = new Panel { Dock = DockStyle.Fill, Margin = new Padding(0) };
+        columnFinderPanel.Dock = DockStyle.Fill;
+        topRow.Controls.Add(columnFinderPanel);
+        topRow.Controls.Add(_hiddenLinesBar);
+        tableLayoutPanel1.Controls.Add(topRow, 0, 0);
+    }
+
+    /// <summary>The content is gone (loading, dead file): no rows, no scan, until the next load publishes.</summary>
+    private void ResetLineVisibility ()
+    {
+        _isLoadComplete = false;
+        _lineVisibility.Load(0, []);
+        _visibleRows.Reset();
+        UpdateHiddenLinesBar();
+    }
+
+    private void UpdateTopRowHeight ()
+    {
+        var height = _guiStateArgs.ColumnFinderVisible ? COLUMN_FINDER_HEIGHT : 0;
+        if (_hiddenLinesBar.Visible)
+        {
+            _hiddenLinesBar.Height = _hiddenLinesBar.BarHeight;
+            height += _hiddenLinesBar.Height;
+        }
+
+        columnFinderPanel.Visible = _guiStateArgs.ColumnFinderVisible;
+        tableLayoutPanel1.RowStyles[0].Height = height;
+    }
+
+    private void UpdateHiddenLinesBar ()
+    {
+        if (_hiddenLinesBar.SetState(HiddenLineCount, ShowHiddenLines))
+        {
+            UpdateTopRowHeight();
+        }
+    }
+
+    private List<HighlightEntry> CurrentHighlightEntries ()
+    {
+        lock (_currentHighlightGroupLock)
+        {
+            return [.. _currentHighlightGroup.HighlightEntryList];
+        }
+    }
+
+    private void RebuildLineVisibility ()
+    {
+        if (!_isLoading && _logFileReader != null)
+        {
+            _lineVisibility.Rebuild(CurrentHighlightEntries());
+        }
+    }
+
+    private void OnLineVisibilityChanged (object? sender, LineVisibilityChangedEventArgs e)
+    {
+        if (_isClosing || IsDisposed || Disposing)
+        {
+            return;
+        }
+
+        try
+        {
+            // Marshals through a parent's handle when this (background) tab has none yet.
+            _ = BeginInvoke(() =>
+            {
+                if (e.Error != null)
+                {
+                    _logger.Warn(e.Error, "Hide rules failed");
+                    StatusLineError(string.Format(CultureInfo.CurrentCulture, Resources.LogWindow_UI_StatusLineError_HideRulesFailed, e.Error.Message));
+                }
+
+                ApplyLineVisibility();
+            });
+        }
+        catch (InvalidOperationException)
+        {
+            // No handle anywhere up the chain yet: OnHandleCreated applies the current map.
+        }
+    }
+
+    protected override void OnHandleCreated (EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        if (_visibleRows != null && !_visibleRows.IsUpToDate)
+        {
+            _ = BeginInvoke(ApplyLineVisibility);
+        }
+    }
+
+    /// <summary>Publishes the tracker's current map to the grid (UI thread).</summary>
+    private void ApplyLineVisibility ()
+    {
+        if (_isLoading || _isClosing || _logFileReader == null || IsDisposed)
+        {
+            UpdateHiddenLinesBar();
+            return;
+        }
+
+        if (PublishTrackedMap(0) && _guiStateArgs.FollowTail && dataGridView.RowCount > 0)
+        {
+            _columnCache.MarkPrefetchStale();
+            dataGridView.FirstDisplayedScrollingRowIndex = dataGridView.RowCount - 1;
+        }
+
+        dataGridView.Invalidate();
+        UpdateLineNavigationReadiness();
+    }
+
+    /// <summary>Returns whether the displayed map changed.</summary>
+    private bool PublishTrackedMap (int rolloverOffset)
+    {
+        var changed = _visibleRows.Publish(rolloverOffset);
+        UpdateHiddenLinesBar();
+        return changed;
+    }
+
+    /// <summary>Original line displayed in a main-grid row, or -1.</summary>
+    private int RowToLine (int row)
+    {
+        return _visibleRows.Map.RowToLine(row);
+    }
+
+    /// <summary>Main-grid row of an original line, or -1 when it is hidden or out of range.</summary>
+    private int LineToRow (int line)
+    {
+        return _visibleRows.Map.LineToRow(line);
+    }
+
+    /// <summary>
+    /// The row to select for an original line, or -1. A line beyond the end resolves to the last row. A hidden line
+    /// turns on "Show hidden lines" when <paramref name="reveal"/> (explicit navigation), else resolves to the nearest
+    /// visible row. Explicit navigation before the first scan is published waits for it, like <see cref="RequestGotoLine"/>.
+    /// </summary>
+    private int NavigationRow (int line, bool reveal)
+    {
+        if (line < 0)
+        {
+            return -1;
+        }
+
+        if (reveal && !_isReadyForLineNavigation)
+        {
+            RequestGotoLine(line + 1);
+            return -1;
+        }
+
+        if (reveal && _visibleRows.Map.IsHidden(line))
+        {
+            ShowHiddenLines = true;
+        }
+
+        return _visibleRows.Map.NearestRow(line);
+    }
+
+    /// <summary>Line navigation may run once the file is loaded and the first visibility scan is published.</summary>
+    private void UpdateLineNavigationReadiness ()
+    {
+        if (_isLoadComplete && !_isReadyForLineNavigation && !_lineVisibility.IsScanning)
+        {
+            _isReadyForLineNavigation = true;
+            ApplyPendingLineNavigation();
+        }
+    }
+
+    #endregion
+
     #region Private Methods
 
     [SupportedOSPlatform("windows")]
@@ -2678,7 +2887,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var firstLine = snapshot.FirstDisplayedLine >= 0 && snapshot.FirstDisplayedLine < lineCount
                     ? snapshot.FirstDisplayedLine
                     : currentLine;
-                RestorePosition(new GridPosition(currentLine, firstLine));
+                _visibleRows.RestorePosition(new GridPosition(currentLine, firstLine));
 
                 // Applied once, here (was double-applied: always pre-load, here only when true).
                 // Applying true after positioning keeps the jump-to-tail semantics.
@@ -2813,7 +3022,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
         var lineCount = _logFileReader.LineCount;
-        RestorePosition(new GridPosition(
+        _visibleRows.RestorePosition(new GridPosition(
             _reloadMemento.CurrentLine < lineCount ? _reloadMemento.CurrentLine : -1,
             _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1));
     }
@@ -3397,7 +3606,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         if (_logFileReader != null)
         {
-            dataGridView.RowCount = _rowMap.VisibleCount;
+            dataGridView.RowCount = _visibleRows.Map.VisibleCount;
         }
 
         if (_filterResultList != null)
@@ -3934,7 +4143,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
             // timeout with no new Trigger -> update display
             var lineNum = _timeShiftSyncLine;
-            if (lineNum >= 0 && lineNum < _rowMap.LineCount)
+            if (lineNum >= 0 && lineNum < _visibleRows.Map.LineCount)
             {
                 var (timeStamp, lineNumber) = GetTimestampForLine(lineNum, true);
                 lineNum = lineNumber;
@@ -4155,7 +4364,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         while (lineNum > 0)
         {
             lineNum--;
-            var line = _rowMap.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
+            var line = _visibleRows.Map.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -4175,7 +4384,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         while (lineNum < _logFileReader.LineCount)
         {
             lineNum++;
-            var line = _rowMap.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
+            var line = _visibleRows.Map.IsHidden(lineNum) ? null : _logFileReader.GetLogLineMemory(lineNum);
             if (line != null)
             {
                 var entry = FindHighlightEntry(line);
@@ -4191,7 +4400,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private int FindNextBookmarkIndex (int lineNum)
     {
-        if (lineNum >= _rowMap.LineCount)
+        if (lineNum >= _visibleRows.Map.LineCount)
         {
             lineNum = 0;
         }
@@ -4208,7 +4417,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (lineNum <= 0)
         {
-            lineNum = _rowMap.LineCount - 1;
+            lineNum = _visibleRows.Map.LineCount - 1;
         }
         else
         {
@@ -6447,7 +6656,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (_guiStateArgs.FollowTail && _logFileReader != null)
         {
             // Follow the last visible row; hidden lines are never revealed by tailing.
-            if (_rowMap.LineCount >= _logFileReader.LineCount && dataGridView.RowCount > 0)
+            if (_visibleRows.Map.LineCount >= _logFileReader.LineCount && dataGridView.RowCount > 0)
             {
                 // Mark stale instead of invalidating — keeps old buffers pinned until
                 // the next Prefetch atomically swaps in new pins.
@@ -6512,7 +6721,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         FollowTailChanged(false, false);
-        if (_rowMap.LineCount > 0)
+        if (_visibleRows.Map.LineCount > 0)
         {
             dataGridView.ClearSelection();
             GotoLine(targetLine.Value - 1);
@@ -7543,7 +7752,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public bool ScrollToTimestampWorker (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
     {
         var hasScrolled = false;
-        if (!CurrentColumnizer.IsTimeshiftImplemented() || _rowMap.LineCount == 0)
+        if (!CurrentColumnizer.IsTimeshiftImplemented() || _visibleRows.Map.LineCount == 0)
         {
             return false;
         }
