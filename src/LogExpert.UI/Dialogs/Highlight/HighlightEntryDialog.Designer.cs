@@ -54,6 +54,7 @@ partial class HighlightEntryDialog
         _btnBookmarkComment = new Button();
         _checkBoxStopTail = new CheckBox();
         _checkBoxDontDirtyLed = new CheckBox();
+        _checkBoxHideLine = new CheckBox();
         _checkBoxPlugin = new CheckBox();
         _btnSelectPlugin = new Button();
         _checkBoxAlertOnHit = new CheckBox();
@@ -280,6 +281,7 @@ partial class HighlightEntryDialog
         _tabActions.Controls.Add(_labelCooldown);
         _tabActions.Controls.Add(_numericCooldownSeconds);
         _tabActions.Controls.Add(_labelCooldownSeconds);
+        _tabActions.Controls.Add(_checkBoxHideLine);
         _tabActions.Location = new Point(4, 24);
         _tabActions.Name = "_tabActions";
         _tabActions.Padding = new Padding(8);
@@ -328,6 +330,16 @@ partial class HighlightEntryDialog
         _checkBoxDontDirtyLed.TabIndex = 3;
         _checkBoxDontDirtyLed.Text = "Dont Dirty Led";
         _checkBoxDontDirtyLed.UseVisualStyleBackColor = true;
+        // 
+        // _checkBoxHideLine
+        // 
+        _checkBoxHideLine.AutoSize = true;
+        _checkBoxHideLine.Location = new Point(12, 250);
+        _checkBoxHideLine.Name = "_checkBoxHideLine";
+        _checkBoxHideLine.Size = new Size(74, 19);
+        _checkBoxHideLine.TabIndex = 13;
+        _checkBoxHideLine.Text = "Hide line";
+        _checkBoxHideLine.UseVisualStyleBackColor = true;
         // 
         // _checkBoxPlugin
         // 
@@ -485,6 +497,7 @@ partial class HighlightEntryDialog
     private System.Windows.Forms.Button _btnBookmarkComment;
     private System.Windows.Forms.CheckBox _checkBoxStopTail;
     private System.Windows.Forms.CheckBox _checkBoxDontDirtyLed;
+    private System.Windows.Forms.CheckBox _checkBoxHideLine;
     private System.Windows.Forms.CheckBox _checkBoxPlugin;
     private System.Windows.Forms.Button _btnSelectPlugin;
     private System.Windows.Forms.CheckBox _checkBoxAlertOnHit;

@@ -23,6 +23,35 @@ meaning; do not redefine them locally.
   construction, since the bulk `HighlightBookmarkScanner` has no access to
   the side-effecting triggers.
 
+## Line hiding
+
+- **Hide-line rule** — A Highlight Entry with `IsHideLine` set. A line is a
+  **Hidden Line** when any matching hide-line rule of the active Highlight Group
+  matches it (`HighlightEvaluator.IsHidden`); no other entry can cancel that,
+  whatever the order. Display state only: hidden lines stay in the reader and
+  remain eligible for Log Search, the Window Filter, Filter Pipes and triggers.
+  Temporary search-hit entries never hide. Rules match the whole line, as for
+  triggers, even when word mode paints only matches inside columns.
+- **Original logical line** — A line index of the Logfile Reader, before hiding.
+  Reader access, bookmarks, timestamps, row heights, sessions and markers use it.
+- **Visible row** — A row of the Log Window's main grid after hiding. Only grid
+  code deals in rows; convert with `RowToLine` / `LineToRow`.
+- **Line Visibility Map** (`LineVisibilityMap`) — The immutable mapping between
+  visible rows and original logical lines, owned by the **Line Visibility
+  Tracker** (`LineVisibilityTracker`), which rebuilds it on a cancellable
+  background scan and extends it on the tail path. Visibility scans never fire
+  triggers.
+- **Show hidden lines** — The per-window, transient override that displays
+  hidden lines without changing any rule. Explicit navigation to a hidden line
+  (Go to Line, bookmarks, Log Search, filter results, markers, the command-line
+  target, the window a time sync starts from) turns it on; tailing, Stop Tail,
+  windows following a time sync and restoring saved positions never do — they
+  select the nearest visible line instead. Explicit navigation made before the
+  load's first visibility scan finishes waits for it.
+
+*Avoid*: "filtered out" for hidden lines (filtering is the **Window Filter**),
+"row" when an original logical line is meant.
+
 ## Marker Bar
 
 - **Marker Bar** — A compact overview beside a Log Window that shows where

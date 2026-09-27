@@ -63,4 +63,26 @@ public class MarkerCriteriaTests
 
         Assert.That(match, Is.EqualTo(new MarkerLine(7, Color.Red.ToArgb(), 1)));
     }
+
+    [Test]
+    public void Highlights_HideRuleWithColors_StillProducesAMarker ()
+    {
+        var criteria = MarkerCriteria.ForHighlights([
+            new HighlightEntry { SearchText = "DEBUG", IsHideLine = true, BackgroundColor = Color.Orange }
+        ]);
+
+        Assert.That(criteria.IsEmpty, Is.False);
+        Assert.That(criteria.Match(4, new LogLine("DEBUG 4", 4)), Is.EqualTo(new MarkerLine(4, Color.Orange.ToArgb(), 0)));
+    }
+
+    [Test]
+    public void Highlights_HideRuleWithoutVisualAttributes_ProducesNoMarker ()
+    {
+        var criteria = MarkerCriteria.ForHighlights([
+            new HighlightEntry { SearchText = "DEBUG", IsHideLine = true }
+        ]);
+
+        Assert.That(criteria.IsEmpty, Is.True);
+        Assert.That(criteria.Match(4, new LogLine("DEBUG 4", 4)), Is.Null);
+    }
 }

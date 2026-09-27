@@ -1127,6 +1127,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hide line.
+        /// </summary>
+        public static string HighlightDialog_UI_CheckBox_HideLine {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_CheckBox_HideLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Background.
         /// </summary>
         public static string HighlightDialog_UI_CheckBox_NoBackground {
@@ -3268,6 +3277,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Show hidden lines.
+        /// </summary>
+        public static string LogWindow_UI_CheckBox_ShowHiddenLines {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_CheckBox_ShowHiddenLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hides the filter list after loading a filter.
         /// </summary>
         public static string LogWindow_UI_CheckBox_ToolTip_AutoHide {
@@ -3522,6 +3540,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0:N0} lines hidden by highlight rules.
+        /// </summary>
+        public static string LogWindow_UI_Label_HiddenLines {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_Label_HiddenLines", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Text &amp;filter:.
         /// </summary>
         public static string LogWindow_UI_Label_TextFilter {
@@ -3573,6 +3600,15 @@ namespace LogExpert {
         public static string LogWindow_UI_StatusLineError_FilterFailed {
             get {
                 return ResourceManager.GetString("LogWindow_UI_StatusLineError_FilterFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hide rules could not be applied, all lines are shown: {0}.
+        /// </summary>
+        public static string LogWindow_UI_StatusLineError_HideRulesFailed {
+            get {
+                return ResourceManager.GetString("LogWindow_UI_StatusLineError_HideRulesFailed", resourceCulture);
             }
         }
         

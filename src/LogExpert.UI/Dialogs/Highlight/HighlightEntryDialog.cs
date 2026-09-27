@@ -69,6 +69,7 @@ public partial class HighlightEntryDialog : Form
         _btnBookmarkComment.Text = Resources.HighlightDialog_UI_Button_BookmarkComment;
         _checkBoxStopTail.Text = Resources.HighlightDialog_UI_CheckBox_StopTail;
         _checkBoxDontDirtyLed.Text = Resources.HighlightDialog_UI_CheckBox_DontDirtyLed;
+        _checkBoxHideLine.Text = Resources.HighlightDialog_UI_CheckBox_HideLine;
         _checkBoxPlugin.Text = Resources.HighlightDialog_UI_CheckBox_Plugin;
         _btnSelectPlugin.Text = Resources.HighlightDialog_UI_Button_SelectPlugin;
         _checkBoxAlertOnHit.Text = Resources.HighlightDialog_UI_CheckBox_AlertOnHit;
@@ -97,6 +98,7 @@ public partial class HighlightEntryDialog : Form
         _checkBoxBookmark.Checked = _entry.IsSetBookmark;
         _checkBoxStopTail.Checked = _entry.IsStopTail;
         _checkBoxDontDirtyLed.Checked = _entry.IsLedSwitch;
+        _checkBoxHideLine.Checked = _entry.IsHideLine;
         _checkBoxPlugin.Checked = _entry.IsActionEntry;
 
         _checkBoxAlertOnHit.Checked = _entry.AlertOnHit;
@@ -145,6 +147,7 @@ public partial class HighlightEntryDialog : Form
         _entry.BookmarkComment = _bookmarkComment;
         _entry.IsStopTail = _checkBoxStopTail.Checked;
         _entry.IsLedSwitch = _checkBoxDontDirtyLed.Checked;
+        _entry.IsHideLine = _checkBoxHideLine.Checked;
         _entry.IsActionEntry = _checkBoxPlugin.Checked;
         _entry.ActionEntry = (ActionEntry)_currentActionEntry.Clone();
 

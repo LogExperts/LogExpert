@@ -2368,4 +2368,16 @@ Restart LogExpert to apply changes?</value>
   <data name="MarkerBar_ToolTip" xml:space="preserve"><value>{0}: lines {1}–{2}, {3} matching lines</value></data>
   <data name="MarkerBar_ScanFailed" xml:space="preserve"><value>Marker discovery failed: {0}</value></data>
   <data name="MarkerBar_Title" xml:space="preserve"><value>Marker bar</value></data>
+  <data name="HighlightDialog_UI_CheckBox_HideLine" xml:space="preserve">
+    <value>Hide line</value>
+  </data>
+  <data name="LogWindow_UI_Label_HiddenLines" xml:space="preserve">
+    <value>{0:N0} lines hidden by highlight rules</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ShowHiddenLines" xml:space="preserve">
+    <value>Show hidden lines</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
+    <value>Hide rules could not be applied, all lines are shown: {0}</value>
+  </data>
 </root>

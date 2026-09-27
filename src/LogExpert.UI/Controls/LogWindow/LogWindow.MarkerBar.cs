@@ -335,8 +335,9 @@ internal partial class LogWindow
 
     private void OnMarkerLineSelected (object? sender, SelectLineEventArgs eventArgs)
     {
+        // The tracker's map, not the displayed one: that is empty during the first scan, when clicks must be queued.
         if (_markerFrame?.Generation == Volatile.Read(ref _markerGeneration)
-            && eventArgs.Line >= 0 && eventArgs.Line < dataGridView.RowCount)
+            && eventArgs.Line >= 0 && eventArgs.Line < _lineVisibility.Map.LineCount)
         {
             RequestGotoLine(eventArgs.Line + 1);
         }

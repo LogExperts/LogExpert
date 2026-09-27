@@ -60,6 +60,25 @@ public static class HighlightEvaluator
     }
 
     /// <summary>
+    /// Returns whether any hide-line entry matches the line. Other matching entries cannot cancel the decision,
+    /// whatever their order.
+    /// </summary>
+    public static bool IsHidden (IEnumerable<HighlightEntry> entries, ITextValueMemory line)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+        ArgumentNullException.ThrowIfNull(line);
+
+        return entries.Any(e => IsHideRule(e) && IsMatch(e, line));
+    }
+
+    /// <summary>Returns whether the entry hides the lines it matches; temporary search-hit entries never do.</summary>
+    public static bool IsHideRule (HighlightEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        return entry.IsHideLine && !entry.IsSearchHit;
+    }
+
+    /// <summary>
     /// Classifies the non-plugin trigger actions implied by a set of matching entries: whether to
     /// suppress the dirty LED, stop tailing, set a bookmark, and the concatenated bookmark comment.
     /// Plugin and Audio Alert triggers are intentionally not handled here — they are fired by the
