@@ -5,11 +5,24 @@ namespace LogExpert.UI.Controls.LogWindow;
 /// <summary>The selected and first displayed original lines of the main grid; -1 when there is none.</summary>
 internal readonly record struct GridPosition (int CurrentLine, int FirstDisplayedLine);
 
+/// <summary>What <see cref="VisibleRows"/> needs from the Log Window that owns the grid.</summary>
+internal interface IVisibleRowsHost
+{
+    bool IsFollowTail { get; }
+
+    bool HasRowHeights { get; }
+
+    void MarkPrefetchStale ();
+
+    /// <summary>Selects the row of a restored saved or reload position, as explicit selection does.</summary>
+    void SelectRestoredRow (int row);
+}
+
 /// <summary>
 /// The rows of a Log Window's main grid after hiding: publishes a <see cref="LineVisibilityTracker"/>'s map to the grid
 /// and keeps the selection and scroll position by original line. UI thread only, except <see cref="Map"/>.
 /// </summary>
-internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker tracker, Func<bool> isFollowTail, Action markPrefetchStale, Func<bool> hasRowHeights)
+internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker tracker, IVisibleRowsHost host)
 {
     // Other threads read it once into a local.
     private volatile LineVisibilityMap _map = LineVisibilityMap.Empty;
@@ -23,6 +36,9 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
     public bool ShowHiddenLines { get; set; }
 
     public bool IsUpToDate => ReferenceEquals(_appliedTrackedMap, tracker.Map);
+
+    /// <summary>Original line of the current row, or -1.</summary>
+    public int CurrentLine => grid.CurrentRow == null ? -1 : _map.RowToLine(grid.CurrentRow.Index);
 
     /// <summary>The content is gone: no rows until the next load publishes.</summary>
     public void Reset ()
@@ -51,17 +67,10 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
         if (_pendingPosition is { } position && !tracker.IsLoadPending)
         {
             _pendingPosition = null;
-            ApplyPosition(position, true);
+            ApplyPosition(position, host.SelectRestoredRow);
         }
 
         return changed;
-    }
-
-    public GridPosition CurrentPosition ()
-    {
-        return new GridPosition(
-            grid.CurrentRow == null ? -1 : _map.RowToLine(grid.CurrentRow.Index),
-            _map.RowToLine(grid.FirstDisplayedScrollingRowIndex));
     }
 
     /// <summary>Restores a saved or reload position, deferred until the load's first scan has published the rows.</summary>
@@ -73,7 +82,7 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
             return;
         }
 
-        ApplyPosition(position, true);
+        ApplyPosition(position, host.SelectRestoredRow);
     }
 
     /// <summary>
@@ -108,10 +117,10 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
             return;
         }
 
-        var position = CurrentPosition();
+        var position = new GridPosition(CurrentLine, _map.RowToLine(grid.FirstDisplayedScrollingRowIndex));
 
         grid.RowCount = 0;
-        markPrefetchStale();
+        host.MarkPrefetchStale();
         _map = newMap;
         grid.RowCount = newMap.VisibleCount;
         if (grid.RowCount == 0)
@@ -119,22 +128,27 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
             return;
         }
 
-        if (hasRowHeights())
+        if (host.HasRowHeights)
         {
             grid.UpdateRowHeightInfo(0, true);
         }
 
-        ApplyPosition(Shifted(position, rolloverOffset), !isFollowTail());
+        ApplyPosition(Shifted(position, rolloverOffset), host.IsFollowTail ? null : SelectRow);
     }
 
-    /// <summary>Scrolls to and optionally selects a position; a hidden line resolves to the nearest visible row.</summary>
-    private void ApplyPosition (GridPosition position, bool select)
+    private void SelectRow (int row)
+    {
+        grid.CurrentCell = grid.Rows[row].Cells[0];
+        grid.Rows[row].Selected = true;
+    }
+
+    /// <summary>Selects (unless <paramref name="select"/> is null) and scrolls to a position; a hidden line resolves to the nearest visible row.</summary>
+    private void ApplyPosition (GridPosition position, Action<int>? select)
     {
         var currentRow = position.CurrentLine >= 0 ? _map.NearestRow(position.CurrentLine) : -1;
-        if (select && currentRow >= 0)
+        if (select != null && currentRow >= 0)
         {
-            grid.CurrentCell = grid.Rows[currentRow].Cells[0];
-            grid.Rows[currentRow].Selected = true;
+            select(currentRow);
         }
 
         var firstRow = position.FirstDisplayedLine >= 0 ? _map.NearestRow(position.FirstDisplayedLine) : -1;

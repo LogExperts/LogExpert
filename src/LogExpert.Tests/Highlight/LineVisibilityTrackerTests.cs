@@ -24,7 +24,7 @@ public class LineVisibilityTrackerTests
         _lines = ["INFO a", "DEBUG b", "INFO c", "DEBUG d", "INFO e"];
         _gate = new ManualResetEventSlim(true);
         _changedCount = 0;
-        _tracker = new LineVisibilityTracker(GetLine);
+        _tracker = new LineVisibilityTracker(GetLine, NoPin);
         _tracker.Changed += (_, _) => Interlocked.Increment(ref _changedCount);
     }
 
@@ -35,6 +35,8 @@ public class LineVisibilityTrackerTests
         _tracker.Dispose();
         _gate.Dispose();
     }
+
+    private static IDisposable? NoPin (int first, int last) => null;
 
     private ITextValueMemory? GetLine (int lineNum)
     {
@@ -310,7 +312,7 @@ public class LineVisibilityTrackerTests
     public void ScanFailure_PublishesAllVisible_AndReportsTheError ()
     {
         LineVisibilityChangedEventArgs? reported = null;
-        using var tracker = new LineVisibilityTracker(i => i == 3 ? throw new InvalidOperationException("boom") : new LogLine("DEBUG", i));
+        using var tracker = new LineVisibilityTracker(i => i == 3 ? throw new InvalidOperationException("boom") : new LogLine("DEBUG", i), NoPin);
         tracker.Changed += (_, e) => reported = e;
 
         tracker.Load(5, HideDebug);
@@ -325,7 +327,7 @@ public class LineVisibilityTrackerTests
     public void TailFailure_FallsBackToAllVisible ()
     {
         var fail = false;
-        using var tracker = new LineVisibilityTracker(i => fail ? throw new InvalidOperationException("boom") : new LogLine(i % 2 == 0 ? "DEBUG" : "INFO", i));
+        using var tracker = new LineVisibilityTracker(i => fail ? throw new InvalidOperationException("boom") : new LogLine(i % 2 == 0 ? "DEBUG" : "INFO", i), NoPin);
         tracker.Load(4, HideDebug);
         Assert.That(tracker.WhenIdle().Wait(Timeout), Is.True);
         fail = true;

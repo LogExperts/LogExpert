@@ -71,7 +71,7 @@ public static class HighlightEvaluator
         return entries.Any(e => IsHideRule(e) && IsMatch(e, line));
     }
 
-    /// <summary>Temporary search-hit entries never hide.</summary>
+    /// <summary>Returns whether the entry hides the lines it matches; temporary search-hit entries never do.</summary>
     public static bool IsHideRule (HighlightEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);

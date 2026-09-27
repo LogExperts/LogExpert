@@ -42,7 +42,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace LogExpert.UI.Controls.LogWindow;
 
 [SupportedOSPlatform("windows")]
-internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink
+internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink, IVisibleRowsHost
 {
     #region Fields
 
@@ -139,6 +139,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private LineVisibilityTracker _lineVisibility;
     private VisibleRows _visibleRows;
     private int? _pendingTargetLine;
+    private Action? _pendingNavigation;
     private bool _isSearching;
 
     private List<int> _lastFilterLinesList = [];
@@ -384,9 +385,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     }
 
     /// <summary>Original logical line of the current row, or -1.</summary>
-    public int CurrentLineNum => dataGridView.CurrentRow == null
-            ? -1
-            : RowToLine(dataGridView.CurrentRow.Index);
+    public int CurrentLineNum => _visibleRows.CurrentLine;
 
     public string FileName { get; private set; }
 
@@ -2489,7 +2488,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             line => _logFileReader?.GetLogLineMemory(line),
             (first, last) => (_logFileReader as IBufferPinning)?.PinRange(first, last));
         _lineVisibility.Changed += OnLineVisibilityChanged;
-        _visibleRows = new VisibleRows(dataGridView, _lineVisibility, () => _guiStateArgs.FollowTail, () => _columnCache.MarkPrefetchStale(), () => _rowHeightList.Count > 0);
+        _visibleRows = new VisibleRows(dataGridView, _lineVisibility, this);
         _hiddenLinesBar.ShowHiddenLinesChanged += (_, _) => ShowHiddenLines = _hiddenLinesBar.ShowHiddenLines;
 
         // Row 0 hosts the column finder; the notice bar stacks above it.
@@ -2625,18 +2624,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>
     /// The row to select for an original line, or -1. A line beyond the end resolves to the last row. A hidden line
     /// turns on "Show hidden lines" when <paramref name="reveal"/> (explicit navigation), else resolves to the nearest
-    /// visible row. Explicit navigation before the first scan is published waits for it, like <see cref="RequestGotoLine"/>.
+    /// visible row.
     /// </summary>
-    private int NavigationRow (int line, bool reveal)
+    private int RevealOrNearestRow (int line, bool reveal)
     {
         if (line < 0)
         {
-            return -1;
-        }
-
-        if (reveal && !_isReadyForLineNavigation)
-        {
-            RequestGotoLine(line + 1);
             return -1;
         }
 
@@ -2656,6 +2649,36 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _isReadyForLineNavigation = true;
             ApplyPendingLineNavigation();
         }
+    }
+
+    /// <summary>
+    /// Explicit navigation before the load's first visibility scan is published waits for it, then runs as requested.
+    /// A newer request replaces a pending one. Returns whether <paramref name="navigate"/> was deferred.
+    /// </summary>
+    private bool DeferNavigation (Action navigate)
+    {
+        if (_isReadyForLineNavigation)
+        {
+            return false;
+        }
+
+        _pendingTargetLine = null;
+        _pendingNavigation = navigate;
+        return true;
+    }
+
+    bool IVisibleRowsHost.IsFollowTail => _guiStateArgs.FollowTail;
+
+    bool IVisibleRowsHost.HasRowHeights => _rowHeightList.Count > 0;
+
+    void IVisibleRowsHost.MarkPrefetchStale ()
+    {
+        _columnCache.MarkPrefetchStale();
+    }
+
+    void IVisibleRowsHost.SelectRestoredRow (int row)
+    {
+        SelectRow(row, false, true);
     }
 
     #endregion
@@ -3005,6 +3028,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
+        if (_isLoadComplete)
+        {
+            // Navigation queued against content that is now being replaced.
+            _pendingNavigation = null;
+        }
+
         _isReadyForLineNavigation = false;
         _isLoading = true;
         InvalidateMarkerCriteria(MarkerScanSource.All);
@@ -3345,7 +3374,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         try
         {
-            // The tail thread already applied this event to the tracker.
+            // The engine's worker thread already applied this event to the tracker.
             _ = PublishTrackedMap(logEventArgs.IsRollover ? logEventArgs.RolloverOffset : 0);
 
             _statusEventArgs.LineCount = logEventArgs.LineCount;
@@ -3448,7 +3477,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 if (firstStopTail)
                 {
                     var capturedLineNum = i;
-                    _ = BeginInvoke(() => SelectAndEnsureVisibleRow(NavigationRow(capturedLineNum, reveal: false), false));
+                    _ = BeginInvoke(() => SelectAndEnsureVisibleRow(RevealOrNearestRow(capturedLineNum, reveal: false), false));
                     firstStopTail = false;
                 }
             }
@@ -4273,14 +4302,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void RevealAndSelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        SelectRow(NavigationRow(lineNum, reveal: true), triggerSyncCall, shouldScroll);
+        if (!DeferNavigation(() => RevealAndSelectLine(lineNum, triggerSyncCall, shouldScroll)))
+        {
+            SelectRow(RevealOrNearestRow(lineNum, reveal: true), triggerSyncCall, shouldScroll);
+        }
     }
 
     /// <summary>Selects an original line, or the nearest visible line when it is hidden.</summary>
     [SupportedOSPlatform("windows")]
     private void SelectNearestLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        SelectRow(NavigationRow(lineNum, reveal: false), triggerSyncCall, shouldScroll);
+        SelectRow(RevealOrNearestRow(lineNum, reveal: false), triggerSyncCall, shouldScroll);
     }
 
     [SupportedOSPlatform("windows")]
@@ -6705,6 +6737,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         _pendingTargetLine = targetLine;
+        _pendingNavigation = null;
         if (_isReadyForLineNavigation)
         {
             ApplyPendingLineNavigation();
@@ -6714,8 +6747,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void ApplyPendingLineNavigation ()
     {
         var targetLine = _pendingTargetLine;
+        var navigate = _pendingNavigation;
         _pendingTargetLine = null;
-        if (!targetLine.HasValue || IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
+        _pendingNavigation = null;
+        if (IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
+        {
+            return;
+        }
+
+        navigate?.Invoke();
+        if (!targetLine.HasValue)
         {
             return;
         }
@@ -6733,6 +6774,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void CancelPendingLineNavigation ()
     {
         _pendingTargetLine = null;
+        _pendingNavigation = null;
         _isReadyForLineNavigation = false;
     }
 
@@ -6835,7 +6877,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>Explicit navigation to an original line; a hidden line turns on "Show hidden lines".</summary>
     public void SelectAndEnsureVisible (int line, bool triggerSyncCall)
     {
-        SelectAndEnsureVisibleRow(NavigationRow(line, reveal: true), triggerSyncCall);
+        if (!DeferNavigation(() => SelectAndEnsureVisible(line, triggerSyncCall)))
+        {
+            SelectAndEnsureVisibleRow(RevealOrNearestRow(line, reveal: true), triggerSyncCall);
+        }
     }
 
     private void SelectAndEnsureVisibleRow (int row, bool triggerSyncCall)
@@ -7752,7 +7797,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public bool ScrollToTimestampWorker (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
     {
         var hasScrolled = false;
-        if (!CurrentColumnizer.IsTimeshiftImplemented() || _visibleRows.Map.LineCount == 0)
+        if ((triggerSyncCall && DeferNavigation(() => ScrollToTimestampWorker(timestamp, roundToSeconds, true)))
+            || !CurrentColumnizer.IsTimeshiftImplemented()
+            || _visibleRows.Map.LineCount == 0)
         {
             return false;
         }
@@ -7768,7 +7815,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         if (foundLine >= 0)
         {
             // Windows following a time sync don't reveal hidden lines.
-            SelectAndEnsureVisibleRow(NavigationRow(foundLine, reveal: triggerSyncCall), triggerSyncCall);
+            SelectAndEnsureVisibleRow(RevealOrNearestRow(foundLine, reveal: triggerSyncCall), triggerSyncCall);
             hasScrolled = true;
         }
 

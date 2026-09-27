@@ -11,7 +11,7 @@ public sealed class LineVisibilityTracker : IDisposable
     private const int READ_BATCH_SIZE = 256;
 
     private readonly Func<int, ITextValueMemory?> _getLine;
-    private readonly Func<int, int, IDisposable?>? _pinRange;
+    private readonly Func<int, int, IDisposable?> _pinRange;
     private readonly Lock _lock = new();
 
     private volatile LineVisibilityMap _map = LineVisibilityMap.Empty;
@@ -26,9 +26,10 @@ public sealed class LineVisibilityTracker : IDisposable
 
     /// <param name="getLine">Reads an original line; read live, since the reader is replaced on reload.</param>
     /// <param name="pinRange">Pins the buffers of an inclusive line range before it is read, so they can't be evicted mid-read.</param>
-    public LineVisibilityTracker (Func<int, ITextValueMemory?> getLine, Func<int, int, IDisposable?>? pinRange = null)
+    public LineVisibilityTracker (Func<int, ITextValueMemory?> getLine, Func<int, int, IDisposable?> pinRange)
     {
         ArgumentNullException.ThrowIfNull(getLine);
+        ArgumentNullException.ThrowIfNull(pinRange);
         _getLine = getLine;
         _pinRange = pinRange;
     }
@@ -327,7 +328,7 @@ public sealed class LineVisibilityTracker : IDisposable
             for (var batchStart = from.LineCount; batchStart < lineCount; batchStart += READ_BATCH_SIZE)
             {
                 var batchEnd = Math.Min(batchStart + READ_BATCH_SIZE, lineCount);
-                using var pin = _pinRange?.Invoke(batchStart, batchEnd - 1);
+                using var pin = _pinRange(batchStart, batchEnd - 1);
                 for (var i = batchStart; i < batchEnd; i++)
                 {
                     token.ThrowIfCancellationRequested();

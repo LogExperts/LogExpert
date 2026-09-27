@@ -134,16 +134,36 @@ public sealed class HiddenLinesWindowTests : IDisposable
     [Test]
     public void GotoLine_BeforeTheFirstScanHasFinished_IsAppliedOnceItHas ()
     {
-        File.WriteAllLines(_fileName, Enumerable.Range(0, 20_000).Select(Text));
-        _window = new LogTabWindow([_fileName], 1, false, _config.Object) { ShowInTaskbar = false, Opacity = 0 };
-        Find<WeifenLuo.WinFormsUI.Docking.DockPanel>(_window, "dockPanel").ShowDocumentIcon = false;
-        _window.Show();
-        PumpUntil(() => _window.CurrentLogWindow != null);
-        var log = _window.CurrentLogWindow;
+        var log = OpenBeforeTheFirstScan(Text);
 
         log.GotoLine(12_345);
         PumpUntil(() => log.CurrentLineNum == 12_345);
 
+        Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
+    [Test]
+    public void BookmarkWindowNavigation_BeforeTheFirstScanHasFinished_IsAppliedOnceItHas ()
+    {
+        var log = OpenBeforeTheFirstScan(Text);
+
+        log.SelectAndEnsureVisible(12_345, false);
+        PumpUntil(() => log.CurrentLineNum == 12_345);
+
+        Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
+    [Test]
+    public void TimestampNavigation_BeforeTheFirstScanHasFinished_IsAppliedOnceItHas ()
+    {
+        var start = new DateTime(2026, 1, 1, 10, 0, 0);
+        _settings.Preferences.ColumnizerMaskList = [new ColumnizerMaskEntry { Mask = "hidden.log", ColumnizerName = new TimestampColumnizer().GetName() }];
+        var log = OpenBeforeTheFirstScan(i => $"{start.AddSeconds(i):yyyy-MM-dd HH:mm:ss}.000 {Text(i)}");
+
+        var scrolled = log.ScrollToTimestamp(start.AddSeconds(12_345), false, true);
+        PumpUntil(() => log.CurrentLineNum == 12_345);
+
+        Assert.That(scrolled, Is.False, "the navigation was only queued");
         Assert.That(log.ShowHiddenLines, Is.True);
     }
 
@@ -675,6 +695,17 @@ public sealed class HiddenLinesWindowTests : IDisposable
         log.SetCurrentHighlightGroup("hide");
         WaitForVisibility(log);
         return log;
+    }
+
+    /// <summary>Opens a 20,000-line file and returns as soon as the Log Window exists, while it still loads and scans.</summary>
+    private LogWindow OpenBeforeTheFirstScan (Func<int, string> text)
+    {
+        File.WriteAllLines(_fileName, Enumerable.Range(0, 20_000).Select(text));
+        _window = new LogTabWindow([_fileName], 1, false, _config.Object) { ShowInTaskbar = false, Opacity = 0 };
+        Find<WeifenLuo.WinFormsUI.Docking.DockPanel>(_window, "dockPanel").ShowDocumentIcon = false;
+        _window.Show();
+        PumpUntil(() => _window.CurrentLogWindow != null);
+        return _window.CurrentLogWindow;
     }
 
     private LogWindow OpenTimestamped ()
