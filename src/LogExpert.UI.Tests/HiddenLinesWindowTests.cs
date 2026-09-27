@@ -27,6 +27,7 @@ namespace LogExpert.UI.Tests;
 public sealed class HiddenLinesWindowTests : IDisposable
 {
     private const int LINE_COUNT = 20;
+    private static readonly DateTime SyncStart = new(2026, 1, 1, 10, 0, 0);
 
     private string _directory = null!;
     private string _fileName = null!;
@@ -156,15 +157,24 @@ public sealed class HiddenLinesWindowTests : IDisposable
     [Test]
     public void TimestampNavigation_BeforeTheFirstScanHasFinished_IsAppliedOnceItHas ()
     {
-        var start = new DateTime(2026, 1, 1, 10, 0, 0);
-        _settings.Preferences.ColumnizerMaskList = [new ColumnizerMaskEntry { Mask = "hidden.log", ColumnizerName = new TimestampColumnizer().GetName() }];
-        var log = OpenBeforeTheFirstScan(i => $"{start.AddSeconds(i):yyyy-MM-dd HH:mm:ss}.000 {Text(i)}");
+        var log = OpenTimestampedBeforeTheFirstScan();
 
-        var scrolled = log.ScrollToTimestamp(start.AddSeconds(12_345), false, true);
+        var scrolled = log.ScrollToTimestamp(SyncStart.AddSeconds(12_345), false, true);
         PumpUntil(() => log.CurrentLineNum == 12_345);
 
         Assert.That(scrolled, Is.False, "the navigation was only queued");
         Assert.That(log.ShowHiddenLines, Is.True);
+    }
+
+    [Test]
+    public void TimeSyncFollower_BeforeTheFirstScanHasFinished_SelectsTheNearestVisibleLineOnceItHas ()
+    {
+        var log = OpenTimestampedBeforeTheFirstScan();
+
+        _ = log.ScrollToTimestamp(SyncStart.AddSeconds(12_345), false, false);
+        PumpUntil(() => log.CurrentLineNum == 12_346);
+
+        Assert.That(log.ShowHiddenLines, Is.False);
     }
 
     [TestCase(12, 12)]
@@ -706,6 +716,15 @@ public sealed class HiddenLinesWindowTests : IDisposable
         _window.Show();
         PumpUntil(() => _window.CurrentLogWindow != null);
         return _window.CurrentLogWindow;
+    }
+
+    private LogWindow OpenTimestampedBeforeTheFirstScan ()
+    {
+        _settings.Preferences.ColumnizerMaskList = [new ColumnizerMaskEntry { Mask = "hidden.log", ColumnizerName = new TimestampColumnizer().GetName() }];
+        var log = OpenBeforeTheFirstScan(i => $"{SyncStart.AddSeconds(i):yyyy-MM-dd HH:mm:ss}.000 {Text(i)}");
+        // Nothing is hidden until the first scan has published, so the window can't be navigable yet.
+        Assume.That(log.HiddenLineCount, Is.Zero, "the first scan finished before the test could navigate");
+        return log;
     }
 
     private LogWindow OpenTimestamped ()

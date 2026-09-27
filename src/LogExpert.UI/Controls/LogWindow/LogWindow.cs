@@ -138,7 +138,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly HiddenLinesBar _hiddenLinesBar = new();
     private LineVisibilityTracker _lineVisibility;
     private VisibleRows _visibleRows;
-    private int? _pendingTargetLine;
+    private bool _hasEnteredLoad;
     private Action? _pendingNavigation;
     private bool _isSearching;
 
@@ -2651,20 +2651,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
     }
 
-    /// <summary>
-    /// Explicit navigation before the load's first visibility scan is published waits for it, then runs as requested.
-    /// A newer request replaces a pending one. Returns whether <paramref name="navigate"/> was deferred.
-    /// </summary>
-    private bool DeferNavigation (Action navigate)
+    /// <summary>Restores a saved or reload position without firing a leftover time sync.</summary>
+    private void RestorePosition (GridPosition position)
     {
-        if (_isReadyForLineNavigation)
-        {
-            return false;
-        }
-
-        _pendingTargetLine = null;
-        _pendingNavigation = navigate;
-        return true;
+        _shouldCallTimeSync = false;
+        _visibleRows.RestorePosition(position);
     }
 
     bool IVisibleRowsHost.IsFollowTail => _guiStateArgs.FollowTail;
@@ -2674,11 +2665,6 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     void IVisibleRowsHost.MarkPrefetchStale ()
     {
         _columnCache.MarkPrefetchStale();
-    }
-
-    void IVisibleRowsHost.SelectRestoredRow (int row)
-    {
-        SelectRow(row, false, true);
     }
 
     #endregion
@@ -2910,7 +2896,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 var firstLine = snapshot.FirstDisplayedLine >= 0 && snapshot.FirstDisplayedLine < lineCount
                     ? snapshot.FirstDisplayedLine
                     : currentLine;
-                _visibleRows.RestorePosition(new GridPosition(currentLine, firstLine));
+                RestorePosition(new GridPosition(currentLine, firstLine));
+                _ = dataGridView.Focus();
 
                 // Applied once, here (was double-applied: always pre-load, here only when true).
                 // Applying true after positioning keeps the jump-to-tail semantics.
@@ -3028,11 +3015,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _progressEventArgs.Visible = true;
         SendProgressBarUpdate();
 
-        if (_isLoadComplete)
+        if (_hasEnteredLoad)
         {
-            // Navigation queued against content that is now being replaced.
+            // A reload: navigation queued so far targets the content being replaced.
             _pendingNavigation = null;
         }
+
+        _hasEnteredLoad = true;
 
         _isReadyForLineNavigation = false;
         _isLoading = true;
@@ -3051,7 +3040,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
         var lineCount = _logFileReader.LineCount;
-        _visibleRows.RestorePosition(new GridPosition(
+        RestorePosition(new GridPosition(
             _reloadMemento.CurrentLine < lineCount ? _reloadMemento.CurrentLine : -1,
             _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1));
     }
@@ -4302,10 +4291,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void RevealAndSelectLine (int lineNum, bool triggerSyncCall, bool shouldScroll)
     {
-        if (!DeferNavigation(() => RevealAndSelectLine(lineNum, triggerSyncCall, shouldScroll)))
-        {
-            SelectRow(RevealOrNearestRow(lineNum, reveal: true), triggerSyncCall, shouldScroll);
-        }
+        RunWhenNavigable(() => SelectRow(RevealOrNearestRow(lineNum, reveal: true), triggerSyncCall, shouldScroll));
     }
 
     /// <summary>Selects an original line, or the nearest visible line when it is hidden.</summary>
@@ -6736,19 +6722,40 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             return;
         }
 
-        _pendingTargetLine = targetLine;
-        _pendingNavigation = null;
+        RunWhenNavigable(() => GoToTargetLine(targetLine));
+    }
+
+    private void GoToTargetLine (int targetLine)
+    {
+        FollowTailChanged(false, false);
+        if (_visibleRows.Map.LineCount > 0)
+        {
+            dataGridView.ClearSelection();
+            GotoLine(targetLine - 1);
+            // Scrolling to the last row can automatically turn follow-tail back on.
+            FollowTailChanged(false, false);
+        }
+    }
+
+    /// <summary>
+    /// Runs line navigation now, or once the load and its first visibility scan are done. A newer request replaces
+    /// a pending one.
+    /// </summary>
+    private void RunWhenNavigable (Action navigate)
+    {
         if (_isReadyForLineNavigation)
         {
-            ApplyPendingLineNavigation();
+            navigate();
+        }
+        else
+        {
+            _pendingNavigation = navigate;
         }
     }
 
     private void ApplyPendingLineNavigation ()
     {
-        var targetLine = _pendingTargetLine;
         var navigate = _pendingNavigation;
-        _pendingTargetLine = null;
         _pendingNavigation = null;
         if (IsDisposed || Disposing || _waitingForClose || _isClosing || _isDeadFile || _isLoadError)
         {
@@ -6756,24 +6763,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         navigate?.Invoke();
-        if (!targetLine.HasValue)
-        {
-            return;
-        }
-
-        FollowTailChanged(false, false);
-        if (_visibleRows.Map.LineCount > 0)
-        {
-            dataGridView.ClearSelection();
-            GotoLine(targetLine.Value - 1);
-            // Scrolling to the last row can automatically turn follow-tail back on.
-            FollowTailChanged(false, false);
-        }
     }
 
     private void CancelPendingLineNavigation ()
     {
-        _pendingTargetLine = null;
         _pendingNavigation = null;
         _isReadyForLineNavigation = false;
     }
@@ -6877,10 +6870,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     /// <summary>Explicit navigation to an original line; a hidden line turns on "Show hidden lines".</summary>
     public void SelectAndEnsureVisible (int line, bool triggerSyncCall)
     {
-        if (!DeferNavigation(() => SelectAndEnsureVisible(line, triggerSyncCall)))
-        {
-            SelectAndEnsureVisibleRow(RevealOrNearestRow(line, reveal: true), triggerSyncCall);
-        }
+        RunWhenNavigable(() => SelectAndEnsureVisibleRow(RevealOrNearestRow(line, reveal: true), triggerSyncCall));
     }
 
     private void SelectAndEnsureVisibleRow (int row, bool triggerSyncCall)
@@ -7796,10 +7786,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     public bool ScrollToTimestampWorker (DateTime timestamp, bool roundToSeconds, bool triggerSyncCall)
     {
+        if (!_isReadyForLineNavigation)
+        {
+            _pendingNavigation = () => ScrollToTimestampWorker(timestamp, roundToSeconds, triggerSyncCall);
+            return false;
+        }
+
         var hasScrolled = false;
-        if ((triggerSyncCall && DeferNavigation(() => ScrollToTimestampWorker(timestamp, roundToSeconds, true)))
-            || !CurrentColumnizer.IsTimeshiftImplemented()
-            || _visibleRows.Map.LineCount == 0)
+        if (!CurrentColumnizer.IsTimeshiftImplemented() || _visibleRows.Map.LineCount == 0)
         {
             return false;
         }

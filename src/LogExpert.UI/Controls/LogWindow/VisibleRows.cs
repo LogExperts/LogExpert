@@ -13,9 +13,6 @@ internal interface IVisibleRowsHost
     bool HasRowHeights { get; }
 
     void MarkPrefetchStale ();
-
-    /// <summary>Selects the row of a restored saved or reload position, as explicit selection does.</summary>
-    void SelectRestoredRow (int row);
 }
 
 /// <summary>
@@ -67,7 +64,7 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
         if (_pendingPosition is { } position && !tracker.IsLoadPending)
         {
             _pendingPosition = null;
-            ApplyPosition(position, host.SelectRestoredRow);
+            SelectAndScrollTo(position);
         }
 
         return changed;
@@ -82,7 +79,7 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
             return;
         }
 
-        ApplyPosition(position, host.SelectRestoredRow);
+        SelectAndScrollTo(position);
     }
 
     /// <summary>
@@ -133,29 +130,42 @@ internal sealed class VisibleRows (DataGridView grid, LineVisibilityTracker trac
             grid.UpdateRowHeightInfo(0, true);
         }
 
-        ApplyPosition(Shifted(position, rolloverOffset), host.IsFollowTail ? null : SelectRow);
+        var shifted = Shifted(position, rolloverOffset);
+        if (host.IsFollowTail)
+        {
+            ScrollTo(shifted);
+        }
+        else
+        {
+            SelectAndScrollTo(shifted);
+        }
     }
 
-    private void SelectRow (int row)
+    /// <summary>Selects and scrolls to a position; a hidden line resolves to the nearest visible row.</summary>
+    private void SelectAndScrollTo (GridPosition position)
     {
-        grid.CurrentCell = grid.Rows[row].Cells[0];
-        grid.Rows[row].Selected = true;
+        var row = NearestRow(position.CurrentLine);
+        if (row >= 0)
+        {
+            grid.CurrentCell = grid.Rows[row].Cells[0];
+            grid.Rows[row].Selected = true;
+        }
+
+        ScrollTo(position);
     }
 
-    /// <summary>Selects (unless <paramref name="select"/> is null) and scrolls to a position; a hidden line resolves to the nearest visible row.</summary>
-    private void ApplyPosition (GridPosition position, Action<int>? select)
+    private void ScrollTo (GridPosition position)
     {
-        var currentRow = position.CurrentLine >= 0 ? _map.NearestRow(position.CurrentLine) : -1;
-        if (select != null && currentRow >= 0)
+        var row = NearestRow(position.FirstDisplayedLine);
+        if (row >= 0)
         {
-            select(currentRow);
+            grid.FirstDisplayedScrollingRowIndex = row;
         }
+    }
 
-        var firstRow = position.FirstDisplayedLine >= 0 ? _map.NearestRow(position.FirstDisplayedLine) : -1;
-        if (firstRow >= 0)
-        {
-            grid.FirstDisplayedScrollingRowIndex = firstRow;
-        }
+    private int NearestRow (int line)
+    {
+        return line >= 0 ? _map.NearestRow(line) : -1;
     }
 
     private static GridPosition Shifted (GridPosition position, int offset)

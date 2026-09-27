@@ -356,6 +356,7 @@ public sealed class LineVisibilityTracker : IDisposable
         return [.. entries.Where(HighlightEvaluator.IsHideRule).Select(e => (HighlightEntry)e.Clone())];
     }
 
+    // Matching depends only on these fields (see HighlightEvaluator.IsMatch and HighlightEntry.Regex).
     private static bool SameRules (HighlightEntry[] current, HighlightEntry[] next)
     {
         return current.Length == next.Length
