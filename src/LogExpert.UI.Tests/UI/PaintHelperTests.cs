@@ -138,6 +138,21 @@ public class PaintHelperTests
     }
 
     [Test]
+    public void GetDataGridDefaultRowStyle_AsRowsDefaultCellStyle_CellInheritsGridFont ()
+    {
+        // The cell editing control (double-click / Ctrl+E) takes its font from the inherited cell style (#720).
+        using DataGridView gridView = new();
+        using Font configuredFont = new("Consolas", 10f);
+        _ = gridView.Columns.Add("text", "text");
+        _ = gridView.Rows.Add("line");
+        gridView.DefaultCellStyle.Font = configuredFont;
+
+        gridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle(darkMode: false);
+
+        Assert.That(gridView.Rows[0].Cells[0].InheritedStyle.Font, Is.EqualTo(configuredFont));
+    }
+
+    [Test]
     public void GetBrushForFocusedControl_UnfocusedDarkMode_UsesDarkGray ()
     {
         using var brush = (SolidBrush)PaintHelper.GetBrushForFocusedControl(focused: false, SystemColors.Highlight, darkMode: true);
