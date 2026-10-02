@@ -1529,6 +1529,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
 		<value>Kopieren</value>
 	</data>
+  <data name="HighlightDialog_UI_Button_CopyEntry" xml:space="preserve">
+		<value>Ko&amp;pieren</value>
+	</data>
   <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
 		<value>Gruppe löschen</value>
 	</data>

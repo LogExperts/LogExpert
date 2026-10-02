@@ -933,6 +933,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             FillHighlightComboBox();
             ConfigManager.Settings.Preferences.HighlightGroupList = HighlightGroupList;
             ConfigManager.Settings.Preferences.SelectionHighlight = dlg.SelectionHighlight;
+            ConfigManager.Settings.Preferences.HighlightCustomColors = dlg.CustomColors;
             ConfigManager.Save(SettingsFlags.HighlightSettings);
             OnHighlightSettingsChanged();
         }

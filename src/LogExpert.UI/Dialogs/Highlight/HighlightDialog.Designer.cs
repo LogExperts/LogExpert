@@ -34,6 +34,7 @@ partial class HighlightDialog
         var resources = new System.ComponentModel.ComponentResourceManager(typeof(HighlightDialog));
         listBoxHighlight = new ListBox();
         btnAdd = new Button();
+        btnCopy = new Button();
         btnEdit = new Button();
         btnDelete = new Button();
         btnMoveUp = new Button();
@@ -64,20 +65,20 @@ partial class HighlightDialog
         // 
         // listBoxHighlight
         // 
-        listBoxHighlight.Anchor = AnchorStyles.Top;
+        listBoxHighlight.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         listBoxHighlight.DrawMode = DrawMode.OwnerDrawFixed;
         listBoxHighlight.FormattingEnabled = true;
         listBoxHighlight.Location = new Point(12, 145);
         listBoxHighlight.Margin = new Padding(4, 5, 4, 5);
         listBoxHighlight.Name = "listBoxHighlight";
-        listBoxHighlight.Size = new Size(460, 212);
+        listBoxHighlight.Size = new Size(460, 252);
         listBoxHighlight.TabIndex = 0;
         listBoxHighlight.SelectedIndexChanged += OnListBoxHighlightSelectedIndexChanged;
         listBoxHighlight.DoubleClick += OnBtnEditClick;
         // 
         // btnAdd
         // 
-        btnAdd.Anchor = AnchorStyles.Top;
+        btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Right;
         btnAdd.Location = new Point(478, 142);
         btnAdd.Margin = new Padding(4, 5, 4, 5);
         btnAdd.Name = "btnAdd";
@@ -88,14 +89,27 @@ partial class HighlightDialog
         btnAdd.UseVisualStyleBackColor = true;
         btnAdd.Click += OnAddButtonClick;
         // 
+        // btnCopy
+        // 
+        btnCopy.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnCopy.Location = new Point(478, 184);
+        btnCopy.Margin = new Padding(4, 5, 4, 5);
+        btnCopy.Name = "btnCopy";
+        btnCopy.Size = new Size(85, 35);
+        btnCopy.TabIndex = 2;
+        btnCopy.Text = "Co&py";
+        toolTip.SetToolTip(btnCopy, "Copy the selected highlight into a new one (opens the editor dialog)");
+        btnCopy.UseVisualStyleBackColor = true;
+        btnCopy.Click += OnBtnCopyClick;
+        // 
         // btnEdit
         // 
-        btnEdit.Anchor = AnchorStyles.Top;
-        btnEdit.Location = new Point(478, 187);
+        btnEdit.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnEdit.Location = new Point(478, 226);
         btnEdit.Margin = new Padding(4, 5, 4, 5);
         btnEdit.Name = "btnEdit";
         btnEdit.Size = new Size(85, 35);
-        btnEdit.TabIndex = 2;
+        btnEdit.TabIndex = 3;
         btnEdit.Text = "&Edit";
         toolTip.SetToolTip(btnEdit, "Edit the selected highlight in the editor dialog");
         btnEdit.UseVisualStyleBackColor = true;
@@ -103,12 +117,12 @@ partial class HighlightDialog
         // 
         // btnDelete
         // 
-        btnDelete.Anchor = AnchorStyles.Top;
-        btnDelete.Location = new Point(478, 232);
+        btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnDelete.Location = new Point(478, 268);
         btnDelete.Margin = new Padding(4, 5, 4, 5);
         btnDelete.Name = "btnDelete";
         btnDelete.Size = new Size(85, 35);
-        btnDelete.TabIndex = 3;
+        btnDelete.TabIndex = 4;
         btnDelete.Text = "D&elete";
         toolTip.SetToolTip(btnDelete, "Delete the current highlight");
         btnDelete.UseVisualStyleBackColor = true;
@@ -116,12 +130,12 @@ partial class HighlightDialog
         // 
         // btnMoveUp
         // 
-        btnMoveUp.Anchor = AnchorStyles.Top;
-        btnMoveUp.Location = new Point(478, 277);
+        btnMoveUp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnMoveUp.Location = new Point(478, 310);
         btnMoveUp.Margin = new Padding(4, 5, 4, 5);
         btnMoveUp.Name = "btnMoveUp";
         btnMoveUp.Size = new Size(85, 35);
-        btnMoveUp.TabIndex = 4;
+        btnMoveUp.TabIndex = 5;
         btnMoveUp.Text = "&Up";
         toolTip.SetToolTip(btnMoveUp, "Move the current highlight one position up");
         btnMoveUp.UseVisualStyleBackColor = true;
@@ -129,12 +143,12 @@ partial class HighlightDialog
         // 
         // btnMoveDown
         // 
-        btnMoveDown.Anchor = AnchorStyles.Top;
-        btnMoveDown.Location = new Point(478, 319);
+        btnMoveDown.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        btnMoveDown.Location = new Point(478, 352);
         btnMoveDown.Margin = new Padding(4, 5, 4, 5);
         btnMoveDown.Name = "btnMoveDown";
         btnMoveDown.Size = new Size(85, 35);
-        btnMoveDown.TabIndex = 5;
+        btnMoveDown.TabIndex = 6;
         btnMoveDown.Text = "&Down";
         toolTip.SetToolTip(btnMoveDown, "Move the current highlight one position down");
         btnMoveDown.UseVisualStyleBackColor = true;
@@ -142,9 +156,9 @@ partial class HighlightDialog
         // 
         // btnOk
         // 
-        btnOk.Anchor = AnchorStyles.Top;
+        btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
         btnOk.DialogResult = DialogResult.OK;
-        btnOk.Location = new Point(387, 480);
+        btnOk.Location = new Point(387, 520);
         btnOk.Margin = new Padding(4, 5, 4, 5);
         btnOk.Name = "btnOk";
         btnOk.Size = new Size(85, 35);
@@ -155,9 +169,9 @@ partial class HighlightDialog
         // 
         // btnCancel
         // 
-        btnCancel.Anchor = AnchorStyles.Top;
+        btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
         btnCancel.DialogResult = DialogResult.Cancel;
-        btnCancel.Location = new Point(478, 480);
+        btnCancel.Location = new Point(478, 520);
         btnCancel.Margin = new Padding(4, 5, 4, 5);
         btnCancel.Name = "btnCancel";
         btnCancel.Size = new Size(85, 35);
@@ -172,8 +186,8 @@ partial class HighlightDialog
         // 
         // btnExportGroup
         // 
-        btnExportGroup.Anchor = AnchorStyles.Top;
-        btnExportGroup.Location = new Point(108, 480);
+        btnExportGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+        btnExportGroup.Location = new Point(108, 520);
         btnExportGroup.Margin = new Padding(4, 5, 4, 5);
         btnExportGroup.Name = "btnExportGroup";
         btnExportGroup.Size = new Size(85, 35);
@@ -185,8 +199,8 @@ partial class HighlightDialog
         // 
         // btnImportGroup
         // 
-        btnImportGroup.Anchor = AnchorStyles.Top;
-        btnImportGroup.Location = new Point(12, 480);
+        btnImportGroup.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+        btnImportGroup.Location = new Point(12, 520);
         btnImportGroup.Margin = new Padding(4, 5, 4, 5);
         btnImportGroup.Name = "btnImportGroup";
         btnImportGroup.Size = new Size(85, 35);
@@ -198,7 +212,7 @@ partial class HighlightDialog
         // 
         // btnMoveGroupDown
         // 
-        btnMoveGroupDown.Anchor = AnchorStyles.None;
+        btnMoveGroupDown.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         btnMoveGroupDown.Location = new Point(383, 53);
         btnMoveGroupDown.Margin = new Padding(4, 5, 4, 5);
         btnMoveGroupDown.Name = "btnMoveGroupDown";
@@ -211,7 +225,7 @@ partial class HighlightDialog
         // 
         // btnMoveGroupUp
         // 
-        btnMoveGroupUp.Anchor = AnchorStyles.None;
+        btnMoveGroupUp.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         btnMoveGroupUp.Location = new Point(290, 53);
         btnMoveGroupUp.Margin = new Padding(4, 5, 4, 5);
         btnMoveGroupUp.Name = "btnMoveGroupUp";
@@ -224,7 +238,7 @@ partial class HighlightDialog
         // 
         // labelAssignNamesToGroups
         // 
-        labelAssignNamesToGroups.Anchor = AnchorStyles.None;
+        labelAssignNamesToGroups.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         labelAssignNamesToGroups.AutoSize = true;
         labelAssignNamesToGroups.Location = new Point(8, 93);
         labelAssignNamesToGroups.Margin = new Padding(4, 0, 4, 0);
@@ -235,7 +249,7 @@ partial class HighlightDialog
         // 
         // btnCopyGroup
         // 
-        btnCopyGroup.Anchor = AnchorStyles.None;
+        btnCopyGroup.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         btnCopyGroup.Location = new Point(104, 53);
         btnCopyGroup.Margin = new Padding(4, 5, 4, 5);
         btnCopyGroup.Name = "btnCopyGroup";
@@ -248,7 +262,7 @@ partial class HighlightDialog
         // 
         // btnDeleteGroup
         // 
-        btnDeleteGroup.Anchor = AnchorStyles.None;
+        btnDeleteGroup.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         btnDeleteGroup.Location = new Point(197, 53);
         btnDeleteGroup.Margin = new Padding(4, 5, 4, 5);
         btnDeleteGroup.Name = "btnDeleteGroup";
@@ -261,7 +275,7 @@ partial class HighlightDialog
         // 
         // btnNewGroup
         // 
-        btnNewGroup.Anchor = AnchorStyles.None;
+        btnNewGroup.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         btnNewGroup.Location = new Point(8, 53);
         btnNewGroup.Margin = new Padding(4, 5, 4, 5);
         btnNewGroup.Name = "btnNewGroup";
@@ -274,7 +288,7 @@ partial class HighlightDialog
         // 
         // comboBoxGroups
         // 
-        comboBoxGroups.Anchor = AnchorStyles.None;
+        comboBoxGroups.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         comboBoxGroups.DisplayMember = "GroupName";
         comboBoxGroups.DrawMode = DrawMode.OwnerDrawFixed;
         comboBoxGroups.Location = new Point(8, 19);
@@ -289,12 +303,13 @@ partial class HighlightDialog
         // 
         // pnlBackground
         // 
-        pnlBackground.Anchor = AnchorStyles.Top;
+        pnlBackground.Dock = DockStyle.Fill;
         pnlBackground.AutoScroll = true;
         pnlBackground.Controls.Add(btnExportGroup);
         pnlBackground.Controls.Add(listBoxHighlight);
         pnlBackground.Controls.Add(btnImportGroup);
         pnlBackground.Controls.Add(btnAdd);
+        pnlBackground.Controls.Add(btnCopy);
         pnlBackground.Controls.Add(btnEdit);
         pnlBackground.Controls.Add(btnDelete);
         pnlBackground.Controls.Add(btnMoveUp);
@@ -305,12 +320,12 @@ partial class HighlightDialog
         pnlBackground.Controls.Add(groupBoxSelection);
         pnlBackground.Location = new Point(0, 0);
         pnlBackground.Name = "pnlBackground";
-        pnlBackground.Size = new Size(576, 528);
+        pnlBackground.Size = new Size(576, 568);
         pnlBackground.TabIndex = 23;
         // 
         // groupBoxGroups
         // 
-        groupBoxGroups.Anchor = AnchorStyles.Top;
+        groupBoxGroups.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         groupBoxGroups.Controls.Add(btnMoveGroupDown);
         groupBoxGroups.Controls.Add(btnMoveGroupUp);
         groupBoxGroups.Controls.Add(labelAssignNamesToGroups);
@@ -327,7 +342,8 @@ partial class HighlightDialog
         groupBoxGroups.TabStop = false;
         groupBoxGroups.Text = "Groups";
         // Selection appearance is application-wide, separate from the group editor.
-        groupBoxSelection.Location = new Point(12, 364);
+        groupBoxSelection.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        groupBoxSelection.Location = new Point(12, 404);
         groupBoxSelection.Size = new Size(552, 108);
         groupBoxSelection.TabIndex = 8;
         groupBoxSelection.Controls.Add(selectionControls);
@@ -357,7 +373,7 @@ partial class HighlightDialog
         // 
         AcceptButton = btnOk;
         CancelButton = btnCancel;
-        ClientSize = new Size(576, 528);
+        ClientSize = new Size(576, 568);
         Controls.Add(pnlBackground);
         DoubleBuffered = true;
         helpProvider.SetHelpKeyword(this, "Highlighting.htm");
@@ -367,7 +383,7 @@ partial class HighlightDialog
         Margin = new Padding(4, 5, 4, 5);
         MaximizeBox = false;
         MinimizeBox = false;
-        MinimumSize = new Size(592, 567);
+        MinimumSize = new Size(592, 607);
         Name = "HighlightDialog";
         helpProvider.SetShowHelp(this, true);
         StartPosition = FormStartPosition.CenterParent;
@@ -388,6 +404,7 @@ partial class HighlightDialog
 
     private System.Windows.Forms.ListBox listBoxHighlight;
     private System.Windows.Forms.Button btnAdd;
+    private System.Windows.Forms.Button btnCopy;
     private System.Windows.Forms.Button btnEdit;
     private System.Windows.Forms.Button btnDelete;
     private System.Windows.Forms.Button btnMoveUp;

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -45,7 +46,15 @@ public partial class HighlightEntryDialog : Form
         UpdateNoBackgroundEnabled();
         UpdateBackgroundColorEnabled();
         UpdatePreview();
+        ShowColorDialog = dialog => dialog.ShowDialog(this);
     }
+
+    /// <summary>Custom-color palette shared by the foreground and background pickers; updated only when a picker is accepted.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int[] CustomColors { get; set; } = [];
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<ColorDialog, DialogResult> ShowColorDialog { get; set; }
 
     private void ApplyResources ()
     {
@@ -431,12 +440,15 @@ public partial class HighlightEntryDialog : Form
         using ColorDialog colorDialog = new()
         {
             AllowFullOpen = true,
+            FullOpen = true,
             ShowHelp = false,
             Color = comboBox.CustomColor,
+            CustomColors = CustomColors,
         };
 
-        if (colorDialog.ShowDialog() == DialogResult.OK)
+        if (ShowColorDialog(colorDialog) == DialogResult.OK)
         {
+            CustomColors = colorDialog.CustomColors;
             comboBox.CustomColor = colorDialog.Color;
             comboBox.SelectedIndex = 0;
             UpdatePreview();

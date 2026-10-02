@@ -11,11 +11,19 @@ namespace LogExpert.Core.Config;
 public class Preferences
 {
     private SelectionHighlightSettings _selectionHighlight = new();
+    private int[] _highlightCustomColors = [];
 
     public SelectionHighlightSettings SelectionHighlight
     {
         get => _selectionHighlight;
         set => _selectionHighlight = value ?? new();
+    }
+
+    /// <summary>Custom-color palette shared by the Highlight Entry color pickers, as ColorDialog.CustomColors values.</summary>
+    public int[] HighlightCustomColors
+    {
+        get => _highlightCustomColors;
+        set => _highlightCustomColors = value ?? [];
     }
 
     /// <summary>

@@ -1010,6 +1010,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Co&amp;py.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_CopyEntry {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_CopyEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Background color.
         /// </summary>
         public static string HighlightDialog_UI_Button_CustomBackColor {

@@ -1434,6 +1434,9 @@
   <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
     <value>复制(&amp;C)</value>
   </data>
+  <data name="HighlightDialog_UI_Button_CopyEntry" xml:space="preserve">
+    <value>复制(&amp;P)</value>
+  </data>
   <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
     <value>删除分组</value>
   </data>

@@ -1610,6 +1610,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
         <value>&amp;Copy</value>
     </data>
+  <data name="HighlightDialog_UI_Button_CopyEntry" xml:space="preserve">
+        <value>Co&amp;py</value>
+    </data>
   <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
         <value>Delete group</value>
     </data>
