@@ -612,8 +612,9 @@ public sealed class HiddenLinesWindowTests : IDisposable
         var bar = Find<MarkerBar>(log, "markerBar");
 
         // The bar raises LineSelected with the original line of the clicked marker; 11 is beyond the 10 visible rows.
-        _ = typeof(LogWindow).GetMethod("OnMarkerLineSelected", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
-            .Invoke(log, [bar, new Core.EventArguments.SelectLineEventArgs(11)]);
+        var markers = typeof(LogWindow).GetField("_markerController", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(log)!;
+        _ = typeof(MarkerBarController).GetMethod("OnLineSelected", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .Invoke(markers, [bar, new Core.EventArguments.SelectLineEventArgs(11)]);
 
         Assert.That(log.CurrentLineNum, Is.EqualTo(11));
         Assert.That(log.ShowHiddenLines, Is.True);

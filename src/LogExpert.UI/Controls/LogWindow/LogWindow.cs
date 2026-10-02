@@ -16,6 +16,7 @@ using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Marker;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Classes.Search;
 using LogExpert.Core.Classes.Tail;
@@ -42,7 +43,7 @@ using WeifenLuo.WinFormsUI.Docking;
 namespace LogExpert.UI.Controls.LogWindow;
 
 [SupportedOSPlatform("windows")]
-internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink, IVisibleRowsHost
+internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, ILogWindow, ITimestampSource, ITailFollowSink, IVisibleRowsHost, IMarkerBarHost
 {
     #region Fields
 
@@ -138,6 +139,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private readonly HiddenLinesBar _hiddenLinesBar = new();
     private LineVisibilityTracker _lineVisibility;
     private VisibleRows _visibleRows;
+    private readonly MarkerBarController _markerController;
     private PendingNavigation? _pendingNavigation;
     private bool _isSearching;
 
@@ -179,6 +181,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     public LogWindow (ILogWindowCoordinator logWindowCoordinator, string fileName, bool isTempFile, bool forcePersistenceLoading, IConfigManager configManager, IPluginRegistry pluginRegistry)
     {
+        _markerController = new MarkerBarController(this);
         SuspendLayout();
 
         //HighDPI Functionality must be called before all UI Elements are initialized, to make sure they work as intended
@@ -419,6 +422,45 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     ILogLineMemoryColumnizer ITimestampSource.Columnizer => CurrentColumnizer;
     IPositionedColumnizerCallback ITimestampSource.Callback => ColumnizerCallbackObject;
     Lock ITimestampSource.ColumnizerLock => _currentColumnizerLock;
+
+    #endregion
+
+    #region IMarkerBarHost
+
+    ILogfileReader IMarkerBarHost.Reader => _logFileReader;
+    string IMarkerBarHost.FileName => FileName;
+    ILogLineMemoryColumnizer IMarkerBarHost.Columnizer => CurrentColumnizer;
+    string IMarkerBarHost.ConfigDir => ConfigManager.ActiveConfigDir;
+    bool IMarkerBarHost.IsContentUnavailable => _isLoading || _isDeadFile;
+    bool IMarkerBarHost.IsClosed => _isClosing || IsDisposed;
+    int IMarkerBarHost.ColumnHeaderHeight => dataGridView.ColumnHeadersVisible ? dataGridView.ColumnHeadersHeight : 0;
+    int IMarkerBarHost.NavigableLineCount => _lineVisibility.Map.LineCount;
+
+    MarkerCriteria IMarkerBarHost.GetHighlightCriteria ()
+    {
+        lock (_currentHighlightGroupLock)
+        {
+            return MarkerCriteria.ForHighlights(_currentHighlightGroup.HighlightEntryList);
+        }
+    }
+
+    int[] IMarkerBarHost.GetBookmarkLineNumbers ()
+    {
+        return _bookmarkProvider.GetBookmarkLineNumbers();
+    }
+
+    int[] IMarkerBarHost.GetFilterHits ()
+    {
+        lock (_filterHitLock)
+        {
+            return _filterHitList.ToArray();
+        }
+    }
+
+    void IMarkerBarHost.StatusLineError (string text)
+    {
+        StatusLineError(text);
+    }
 
     #endregion
 
@@ -670,6 +712,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         return "LogWindow#" + FileName;
     }
 
+    protected override void OnDpiChangedAfterParent (EventArgs e)
+    {
+        base.OnDpiChangedAfterParent(e);
+        ApplyMarkerPreferences();
+    }
+
     #endregion
 
     [SupportedOSPlatform("windows")]
@@ -774,7 +822,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     protected void OnCurrentHighlightListChanged ()
     {
-        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        _markerController.InvalidateCriteria(MarkerScanSource.Highlights);
         RebuildLineVisibility();
         CurrentHighlightGroupChanged?.Invoke(this, new CurrentHighlightGroupChangedEventArgs(this, _currentHighlightGroup));
     }
@@ -782,7 +830,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     //TODO Double Check why the bookmark Providers have the Event and the LogWindow, and if it still necessary
     protected void OnBookmarksChanged ()
     {
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
         BookmarksChanged?.Invoke(this, EventArgs.Empty);
     }
 
@@ -793,7 +841,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     protected void OnColumnizerChanged (ILogLineMemoryColumnizer columnizer)
     {
-        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        _markerController.InvalidateCriteria(MarkerScanSource.Highlights);
         ColumnizerChanged?.Invoke(this, new ColumnizerEventArgs(columnizer));
     }
 
@@ -825,7 +873,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnLogWindowDisposed (object sender, EventArgs e)
     {
-        DisposeMarkers();
+        _markerController.Dispose();
         _lineVisibility.Dispose();
         _waitingForClose = true;
         CancelPendingLineNavigation();
@@ -872,7 +920,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _ = Invoke(new MethodInvoker(RunHighlightBookmarkScan));
             Invoke(() =>
             {
-                InvalidateMarkerCriteria(MarkerScanSource.All);
+                _markerController.InvalidateCriteria(MarkerScanSource.All);
                 _isLoadComplete = true;
                 UpdateLineNavigationReadiness();
             });
@@ -927,7 +975,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (e.NewFile)
         {
-            InvalidateMarkerCriteria(MarkerScanSource.All);
+            _markerController.InvalidateCriteria(MarkerScanSource.All);
             // File was new created (e.g. rollover)
             _isDeadFile = false;
             UnRegisterLogFileReaderEvents();
@@ -945,8 +993,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         if (e.IsRollover || e.LineCount < e.PrevLineCount)
         {
-            Interlocked.Increment(ref _markerTailPending);
-            InvalidateMarkerCriteria(MarkerScanSource.All);
+            _markerController.BeginRollover();
         }
 
         _tailFollowEngine.Post(e);
@@ -1087,7 +1134,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var newValue = (string)e.Value;
 
         CurrentColumnizer.PushValue(ColumnizerCallbackObject, e.ColumnIndex - 2, newValue, oldValue);
-        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        _markerController.InvalidateCriteria(MarkerScanSource.Highlights);
         dataGridView.Refresh();
 
         TimeSpan timeSpan = new(CurrentColumnizer.GetTimeOffset() * TimeSpan.TicksPerMillisecond);
@@ -2397,7 +2444,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnBookmarkProviderBookmarkRemoved (object sender, EventArgs e)
     {
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
         if (!_isLoading)
         {
             dataGridView.Refresh();
@@ -2408,7 +2455,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnBookmarkProviderBookmarkAdded (object sender, EventArgs e)
     {
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
         if (!_isLoading)
         {
             dataGridView.Refresh();
@@ -2418,7 +2465,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void OnBookmarkProviderAllBookmarksRemoved (object sender, EventArgs e)
     {
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
     }
 
     private void OnLogWindowLeave (object sender, EventArgs e)
@@ -2479,6 +2526,21 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     internal Task WhenLineVisibilityIdle ()
     {
         return _lineVisibility.WhenIdle();
+    }
+
+    private void InitializeMarkerBar ()
+    {
+        tableLayoutPanel1.ColumnCount = 3;
+        _ = tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 0));
+        tableLayoutPanel1.Controls.Add(_markerController.Bar, 2, 1);
+        ApplyMarkerPreferences();
+        _markerController.Start();
+    }
+
+    private void ApplyMarkerPreferences ()
+    {
+        _markerController.ApplyPreferences(Preferences, dataGridView.BackgroundColor, dataGridView.ForeColor);
+        tableLayoutPanel1.ColumnStyles[2].Width = Preferences.ShowMarkerBar ? (int)Math.Round(28d * DeviceDpi / 96d) : 0;
     }
 
     private void InitializeLineVisibility ()
@@ -3015,8 +3077,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         _isReadyForLineNavigation = false;
         _isLoading = true;
-        InvalidateMarkerCriteria(MarkerScanSource.All);
-        _markerBar.ClearBuckets();
+        _markerController.Clear();
         FireCancelHandlers(); // reload cancels the jobs of the old content, not the window lifetime
         _searchCts?.Cancel();
         ClearFilterList();
@@ -3038,8 +3099,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void LogfileDead ()
     {
-        InvalidateMarkerCriteria(MarkerScanSource.All);
-        _markerBar.ClearBuckets();
+        _markerController.Clear();
         CancelPendingLineNavigation();
         _isDeadFile = true;
 
@@ -3313,15 +3373,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             if (e.IsRollover || e.LineCount < e.PrevLineCount)
             {
-                Interlocked.Decrement(ref _markerTailPending);
+                _markerController.EndRollover();
             }
         }
     }
 
     void ITailFollowSink.OnLineCountChanged (int lineCount)
     {
-        Interlocked.Increment(ref _markerContentRevision);
-        MarkMarkerDataChanged();
+        _markerController.MarkContentChanged();
         _timeSpreadCalc.SetLineCount(lineCount);
     }
 
@@ -4667,7 +4726,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             FilterSpread.TrimHistory(_lastFilterLinesList);
         }
 
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
 
         // Closing the window cancels the run (linked token), so this continuation also fires
         // mid-close — with the handle already destroyed, narration and BeginInvoke would throw.
@@ -4717,7 +4776,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             }
         }
 
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
 
         if (immediate)
         {
@@ -4889,7 +4948,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                 {
                     _filterHitList = [];
                 }
-                MarkMarkerDataChanged();
+                _markerController.MarkDataChanged();
                 //this.filterGridView.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.DisplayedCells);
                 filterGridView.ResumeLayout();
             }
@@ -4922,7 +4981,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         {
             _filterHitList = FilterSpread.ShiftLines(_filterHitList, offset);
         }
-        MarkMarkerDataChanged();
+        _markerController.MarkDataChanged();
         _lastFilterLinesList = FilterSpread.RebuildHistory(_filterResultList);
 
         TriggerFilterLineGuiUpdate();
@@ -6208,7 +6267,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     public void CloseLogWindow ()
     {
         _isClosing = true;
-        DisposeMarkers();
+        _markerController.Dispose();
         CancelPendingLineNavigation();
 
         CancelHighlightBookmarkScan();
@@ -6789,7 +6848,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             : CurrentLineNum - 1;
 
         _currentSearchParams = searchParams; // remember for async "not found" messages
-        TrackMarkerSearch(searchParams);
+        _markerController.TrackSearch(searchParams);
 
         _isSearching = true;
         StatusLineText(Resources.LogWindow_UI_StatusLineText_SearchingPressESCToCancel);
@@ -7544,7 +7603,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                     CurrentColumnizer.SetTimeOffset(0);
                 }
 
-                InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+                _markerController.InvalidateCriteria(MarkerScanSource.Highlights);
                 dataGridView.Refresh();
                 filterGridView.Refresh();
                 if (CurrentColumnizer.IsTimeshiftImplemented())
@@ -8019,7 +8078,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _guiStateArgs.HighlightGroupName = _currentHighlightGroup.GroupName;
         }
 
-        InvalidateMarkerCriteria(MarkerScanSource.Highlights);
+        _markerController.InvalidateCriteria(MarkerScanSource.Highlights);
         RebuildLineVisibility();
 
         SendGuiStateUpdate();
