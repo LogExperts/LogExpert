@@ -265,7 +265,6 @@ internal static class PaintHelper
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
-            Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
             ForeColor = darkMode ? Color.White : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
