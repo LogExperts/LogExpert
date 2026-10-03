@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using LogExpert.PluginRegistry;
+
 using NUnit.Framework;
 
 namespace LogExpert.UI.Tests;
@@ -8,6 +10,8 @@ namespace LogExpert.UI.Tests;
 [SupportedOSPlatform("windows")]
 public class UiTestSetup
 {
+    private readonly string _pluginTrustDir = Path.Join(Path.GetTempPath(), "LogExpert_UiTestPluginTrust_" + Guid.NewGuid().ToString("N"));
+
     [OneTimeSetUp]
     public void EnableApplicationDpiMode ()
     {
@@ -18,5 +22,15 @@ public class UiTestSetup
         // On by default only under a debugger; off, a control touched from a worker thread can create its
         // window there and later deadlock the UI thread instead of failing the test.
         Control.CheckForIllegalCrossThreadCalls = true;
+
+        // Until initialized, PluginValidator reads and writes trusted-plugins.json in the developer's %APPDATA%\LogExpert.
+        _ = Directory.CreateDirectory(_pluginTrustDir);
+        PluginValidator.Initialize(_pluginTrustDir);
+    }
+
+    [OneTimeTearDown]
+    public void RemovePluginTrustDir ()
+    {
+        Directory.Delete(_pluginTrustDir, recursive: true);
     }
 }

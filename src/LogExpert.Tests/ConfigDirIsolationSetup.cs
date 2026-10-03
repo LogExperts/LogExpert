@@ -1,4 +1,5 @@
 using LogExpert.Configuration;
+using LogExpert.PluginRegistry;
 
 using NUnit.Framework;
 
@@ -12,7 +13,9 @@ public class ConfigDirIsolationSetup
     public void RedirectConfigDir ()
     {
         _configDir = Path.Join(Path.GetTempPath(), "LogExpert_TestConfig_" + Guid.NewGuid().ToString("N"));
+        _ = Directory.CreateDirectory(_configDir);
         ConfigManager.Instance.ConfigDir = _configDir;
+        PluginValidator.Initialize(_configDir);
     }
 
     [OneTimeTearDown]
