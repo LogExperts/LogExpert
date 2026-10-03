@@ -344,6 +344,7 @@ partial class HighlightDialog
         // Selection appearance is application-wide, separate from the group editor.
         groupBoxSelection.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         groupBoxSelection.Location = new Point(12, 404);
+        groupBoxSelection.Name = "groupBoxSelection";
         groupBoxSelection.Size = new Size(552, 108);
         groupBoxSelection.TabIndex = 8;
         groupBoxSelection.Controls.Add(selectionControls);

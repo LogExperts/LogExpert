@@ -37,6 +37,9 @@ public class HighlightDialogLayoutTests
         dialog.Show();
         dialog.Size = dialog.MinimumSize;
 
+        // Windows caps a form at the screen size; small CI screens can't host the scaled minimum.
+        Assume.That(dialog.Size, Is.EqualTo(dialog.MinimumSize), "screen too small for the scaled minimum size");
+
         foreach (var name in new[] { "pnlBackground", "groupBoxGroups" })
         {
             var container = dialog.Controls.Find(name, true).Single();

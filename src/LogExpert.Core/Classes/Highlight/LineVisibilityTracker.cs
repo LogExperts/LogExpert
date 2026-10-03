@@ -230,11 +230,13 @@ public sealed class LineVisibilityTracker : IDisposable
         }
 
         var cts = new CancellationTokenSource();
+        // Read now: the source may be disposed before the task starts.
+        var token = cts.Token;
         var generation = _generation;
         var lineCount = _map.LineCount;
         _scanCts = cts;
         _pendingRules = rules;
-        _scanTask = Task.Run(() => Scan(rules, lineCount, generation, cts.Token), CancellationToken.None);
+        _scanTask = Task.Run(() => Scan(rules, lineCount, generation, token), CancellationToken.None);
     }
 
     private void RestartPendingScanLocked ()
