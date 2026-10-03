@@ -103,7 +103,8 @@ public class ConfigManager : IConfigManager
     /// </summary>
     public string PortableSessionDir => Path.Join(PortableConfigDir, "sessions");
 
-    public string ConfigDir => Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
+    /// <summary>%APPDATA%/LogExpert/; tests redirect it so they never touch the user's real configuration.</summary>
+    public string ConfigDir { get; internal set; } = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "LogExpert");
 
     /// <summary>
     /// Application.StartUpPath + portable
