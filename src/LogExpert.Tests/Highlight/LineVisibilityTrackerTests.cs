@@ -377,4 +377,17 @@ public class LineVisibilityTrackerTests
         Assert.That(_tracker.WhenIdle().Wait(Timeout), Is.True);
         Assert.That(_changedCount, Is.Zero);
     }
+
+    [Test]
+    public void Dispose_BeforeTheScanTaskStarts_LeavesNoFaultedScan ()
+    {
+        for (var i = 0; i < 200; i++)
+        {
+            using var tracker = new LineVisibilityTracker(GetLine, NoPin);
+            tracker.Load(_lines.Count, HideDebug);
+            tracker.Dispose();
+
+            Assert.DoesNotThrow(() => tracker.WhenIdle().Wait(Timeout), $"iteration {i}");
+        }
+    }
 }
