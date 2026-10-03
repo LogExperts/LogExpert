@@ -197,6 +197,44 @@ public class HighlightDialogEntryTests
         Assert.That(_dialog.CustomColors, Is.EqualTo(new[] { 0x00102030 }));
     }
 
+    [Test]
+    public void SelectionColorPickerOk_SharesThePaletteWithTheEntryEditors ()
+    {
+        int[] shown = null;
+        int[] received = null;
+        _dialog.ShowColorDialog = picker =>
+        {
+            shown = picker.CustomColors;
+            picker.CustomColors = [0x00ABCDEF];
+            return DialogResult.OK;
+        };
+        Find<Button>("btnSelectionColor").PerformClick();
+
+        _dialog.ShowEntryDialog = editor =>
+        {
+            received = editor.CustomColors;
+            return DialogResult.Cancel;
+        };
+        Find<Button>("btnAdd").PerformClick();
+
+        Assert.That(shown[0], Is.EqualTo(0x00102030));
+        Assert.That(received[0], Is.EqualTo(0x00ABCDEF));
+    }
+
+    [Test]
+    public void SelectionColorPickerCancel_KeepsThePalette ()
+    {
+        _dialog.ShowColorDialog = picker =>
+        {
+            picker.CustomColors = [0x00ABCDEF];
+            return DialogResult.Cancel;
+        };
+
+        Find<Button>("btnSelectionColor").PerformClick();
+
+        Assert.That(_dialog.CustomColors, Is.EqualTo(new[] { 0x00102030 }));
+    }
+
     private static HighlightEntry EditedEntry (HighlightEntryDialog editor)
     {
         return (HighlightEntry)typeof(HighlightEntryDialog).GetField("_entry", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(editor);
