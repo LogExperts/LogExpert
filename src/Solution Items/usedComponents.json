@@ -12,7 +12,7 @@
   },
   {
     "PackageId": "chocolatey",
-    "PackageVersion": "2.7.1",
+    "PackageVersion": "2.7.4",
     "PackageProjectUrl": "https://github.com/chocolatey/choco",
     "Copyright": "Copyright \u00A9 2017 - 2026 Chocolatey Software, Inc. Copyright \u00A9 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved.",
     "Authors": "Chocolatey Software, Inc",
@@ -46,7 +46,7 @@
   },
   {
     "PackageId": "GitVersion.Core",
-    "PackageVersion": "6.7.0",
+    "PackageVersion": "6.8.2",
     "PackageProjectUrl": "https://github.com/GitTools/GitVersion",
     "Copyright": "Copyright GitTools 2026.",
     "Authors": "GitTools and Contributors",
@@ -57,7 +57,7 @@
   },
   {
     "PackageId": "Microsoft.Build",
-    "PackageVersion": "18.6.3",
+    "PackageVersion": "18.9.6",
     "PackageProjectUrl": "http://go.microsoft.com/fwlink/?LinkId=624683",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -68,7 +68,7 @@
   },
   {
     "PackageId": "Microsoft.Build.Tasks.Core",
-    "PackageVersion": "18.6.3",
+    "PackageVersion": "18.9.6",
     "PackageProjectUrl": "http://go.microsoft.com/fwlink/?LinkId=624683",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -79,7 +79,7 @@
   },
   {
     "PackageId": "Microsoft.NET.Test.Sdk",
-    "PackageVersion": "18.6.0",
+    "PackageVersion": "18.9.0",
     "PackageProjectUrl": "https://github.com/microsoft/vstest",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -101,11 +101,11 @@
   },
   {
     "PackageId": "NAudio",
-    "PackageVersion": "2.3.0",
-    "PackageProjectUrl": "https://github.com/naudio/NAudio",
+    "PackageVersion": "3.0.1",
+    "PackageProjectUrl": "https://naudio.github.io/NAudio/",
     "Copyright": "\u00A9 Mark Heath 2026",
     "Authors": "Mark Heath \u0026 Contributors",
-    "Description": "NAudio, an audio library for .NET",
+    "Description": "NAudio is an open source .NET audio library \u2014 playback and recording, file readers and writers, MIDI, DSP and effects, with platform-specific backends auto-selected by target framework.",
     "License": "MIT",
     "LicenseUrl": "https://licenses.nuget.org/MIT",
     "LicenseInformationOrigin": 0
@@ -123,7 +123,7 @@
   },
   {
     "PackageId": "NLog",
-    "PackageVersion": "6.1.3",
+    "PackageVersion": "6.2.0",
     "PackageProjectUrl": "https://nlog-project.org/",
     "Copyright": "Copyright (c) 2004-2026 NLog Project - https://nlog-project.org/",
     "Authors": "Jarek Kowalski,Kim Christensen,Julian Verdurmen",
@@ -134,7 +134,7 @@
   },
   {
     "PackageId": "NuGet.CommandLine",
-    "PackageVersion": "7.6.0",
+    "PackageVersion": "7.9.0",
     "PackageProjectUrl": "https://aka.ms/nugetprj",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -145,7 +145,7 @@
   },
   {
     "PackageId": "NuGet.Packaging",
-    "PackageVersion": "7.6.0",
+    "PackageVersion": "7.9.0",
     "PackageProjectUrl": "https://aka.ms/nugetprj",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -156,7 +156,7 @@
   },
   {
     "PackageId": "NuGet.Versioning",
-    "PackageVersion": "7.6.0",
+    "PackageVersion": "7.9.0",
     "PackageProjectUrl": "https://aka.ms/nugetprj",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -213,7 +213,7 @@
   },
   {
     "PackageId": "NUnit3TestAdapter",
-    "PackageVersion": "6.2.0",
+    "PackageVersion": "6.3.0",
     "PackageProjectUrl": "https://docs.nunit.org/articles/vs-test-adapter/Index.html",
     "Copyright": "Copyright (c) 2011-2021 Charlie Poole, 2014-2026 Terje Sandstrom",
     "Authors": "Charlie Poole, Terje Sandstrom",
@@ -225,8 +225,8 @@
   },
   {
     "PackageId": "SSH.NET",
-    "PackageVersion": "2025.1.0",
-    "Copyright": "Copyright \u00A9 Renci 2010-2025",
+    "PackageVersion": "2026.0.0",
+    "Copyright": "Copyright \u00A9 Renci 2010-2026",
     "Authors": "Renci",
     "Description": "SSH.NET is a Secure Shell (SSH) library for .NET, optimized for parallelism.",
     "License": "MIT",
@@ -235,7 +235,7 @@
   },
   {
     "PackageId": "System.CommandLine",
-    "PackageVersion": "2.0.8",
+    "PackageVersion": "2.0.11",
     "PackageProjectUrl": "https://github.com/dotnet/command-line-api",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -246,7 +246,7 @@
   },
   {
     "PackageId": "System.Drawing.Common",
-    "PackageVersion": "10.0.8",
+    "PackageVersion": "10.0.11",
     "PackageProjectUrl": "https://github.com/dotnet/winforms",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -257,7 +257,7 @@
   },
   {
     "PackageId": "System.Resources.Extensions",
-    "PackageVersion": "10.0.8",
+    "PackageVersion": "10.0.11",
     "PackageProjectUrl": "https://dot.net/",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -268,7 +268,7 @@
   },
   {
     "PackageId": "System.Security.Cryptography.Xml",
-    "PackageVersion": "10.0.10",
+    "PackageVersion": "10.0.11",
     "PackageProjectUrl": "https://dot.net/",
     "Copyright": "\u00A9 Microsoft Corporation. All rights reserved.",
     "Authors": "Microsoft",
@@ -279,7 +279,7 @@
   },
   {
     "PackageId": "Vanara.PInvoke.RstrtMgr",
-    "PackageVersion": "5.0.5",
+    "PackageVersion": "5.0.7",
     "PackageProjectUrl": "https://github.com/dahall/vanara",
     "Copyright": "Copyright \u00A9 2017-2026",
     "Authors": "David Hall",
@@ -290,7 +290,7 @@
   },
   {
     "PackageId": "Vanara.PInvoke.Shell32",
-    "PackageVersion": "5.0.5",
+    "PackageVersion": "5.0.7",
     "PackageProjectUrl": "https://github.com/dahall/vanara",
     "Copyright": "Copyright \u00A9 2017-2026",
     "Authors": "David Hall",
@@ -301,7 +301,7 @@
   },
   {
     "PackageId": "Vanara.PInvoke.User32",
-    "PackageVersion": "5.0.5",
+    "PackageVersion": "5.0.7",
     "PackageProjectUrl": "https://github.com/dahall/vanara",
     "Copyright": "Copyright \u00A9 2017-2026",
     "Authors": "David Hall",
