@@ -41,6 +41,8 @@ internal partial class HighlightDialog : Form
         ConfigManager = configManager;
         _selectionColor = configManager.Settings.Preferences.SelectionHighlight.CustomColor;
         checkBoxSelectionOutline.Checked = configManager.Settings.Preferences.SelectionHighlight.Outline;
+        CustomColors = [.. configManager.Settings.Preferences.HighlightCustomColors];
+        ShowEntryDialog = dialog => dialog.ShowDialog(this);
         UpdateSelectionColorPreview();
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
@@ -57,6 +59,7 @@ internal partial class HighlightDialog : Form
         btnCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
         btnAdd.Text = Resources.LogExpert_Common_UI_Button_Add;
         btnEdit.Text = Resources.LogExpert_Common_UI_Button_Edit;
+        btnCopy.Text = Resources.HighlightDialog_UI_Button_CopyEntry;
         btnDelete.Text = Resources.LogExpert_Common_UI_Button_Delete;
         btnMoveUp.Text = Resources.LogExpert_Common_UI_Button_MoveUp;
         btnMoveDown.Text = Resources.LogExpert_Common_UI_Button_MoveDown;
@@ -110,6 +113,13 @@ internal partial class HighlightDialog : Form
         CustomColor = _selectionColor
     };
 
+    /// <summary>Pending Highlight Entry color-picker palette; the caller persists it when the dialog is accepted.</summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int[] CustomColors { get; private set; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<HighlightEntryDialog, DialogResult> ShowEntryDialog { get; set; }
+
     #endregion
 
     #region Event handling Methods
@@ -144,14 +154,32 @@ internal partial class HighlightDialog : Form
             return;
         }
 
-        var entry = new HighlightEntry
+        AddEntry(new HighlightEntry
         {
             ForegroundColor = Color.White,
             BackgroundColor = Color.Gray,
-        };
+        });
+    }
 
-        using var dlg = new HighlightEntryDialog(entry, KeywordActionList, isNew: true);
-        if (dlg.ShowDialog(this) == DialogResult.OK)
+    private void OnBtnCopyClick (object sender, EventArgs e)
+    {
+        if (_currentGroup != null && listBoxHighlight.SelectedItem is HighlightEntry entry)
+        {
+            AddEntry((HighlightEntry)entry.Clone());
+        }
+    }
+
+    private void OnBtnEditClick (object sender, EventArgs e)
+    {
+        if (listBoxHighlight.SelectedItem is HighlightEntry entry && TryEditEntry(entry, isNew: false))
+        {
+            listBoxHighlight.Refresh();
+        }
+    }
+
+    private void AddEntry (HighlightEntry entry)
+    {
+        if (TryEditEntry(entry, isNew: true))
         {
             _currentGroup.HighlightEntryList.Add(entry);
             _ = listBoxHighlight.Items.Add(entry);
@@ -160,18 +188,16 @@ internal partial class HighlightDialog : Form
         }
     }
 
-    private void OnBtnEditClick (object sender, EventArgs e)
+    private bool TryEditEntry (HighlightEntry entry, bool isNew)
     {
-        if (listBoxHighlight.SelectedItem is not HighlightEntry entry)
+        using var dlg = new HighlightEntryDialog(entry, KeywordActionList, isNew) { CustomColors = CustomColors };
+        if (ShowEntryDialog(dlg) != DialogResult.OK)
         {
-            return;
+            return false;
         }
 
-        using var dlg = new HighlightEntryDialog(entry, KeywordActionList, isNew: false);
-        if (dlg.ShowDialog(this) == DialogResult.OK)
-        {
-            listBoxHighlight.Refresh();
-        }
+        CustomColors = dlg.CustomColors;
+        return true;
     }
 
     private void OnBtnCopyGroupClick (object sender, EventArgs e)
@@ -549,6 +575,7 @@ internal partial class HighlightDialog : Form
         var lastSelected = atLeastOneSelected && listBoxHighlight.SelectedIndex == listBoxHighlight.Items.Count - 1;
 
         btnEdit.Enabled = atLeastOneSelected;
+        btnCopy.Enabled = atLeastOneSelected;
         btnDelete.Enabled = atLeastOneSelected;
         btnMoveUp.Enabled = atLeastOneSelected && moreThanOne && !firstSelected;
         btnMoveDown.Enabled = atLeastOneSelected && moreThanOne && !lastSelected;

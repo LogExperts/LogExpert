@@ -194,6 +194,7 @@ partial class HighlightEntryDialog
         // 
         // _btnCustomForeColor
         // 
+        _btnCustomForeColor.AutoSize = true;
         _btnCustomForeColor.Location = new Point(200, 33);
         _btnCustomForeColor.Name = "_btnCustomForeColor";
         _btnCustomForeColor.Size = new Size(95, 30);
@@ -225,6 +226,7 @@ partial class HighlightEntryDialog
         // 
         // _btnCustomBackColor
         // 
+        _btnCustomBackColor.AutoSize = true;
         _btnCustomBackColor.Location = new Point(200, 97);
         _btnCustomBackColor.Name = "_btnCustomBackColor";
         _btnCustomBackColor.Size = new Size(95, 30);
@@ -303,6 +305,7 @@ partial class HighlightEntryDialog
         // 
         // _btnBookmarkComment
         // 
+        _btnBookmarkComment.AutoSize = true;
         _btnBookmarkComment.Location = new Point(200, 12);
         _btnBookmarkComment.Name = "_btnBookmarkComment";
         _btnBookmarkComment.Size = new Size(120, 28);
@@ -354,6 +357,7 @@ partial class HighlightEntryDialog
         // 
         // _btnSelectPlugin
         // 
+        _btnSelectPlugin.AutoSize = true;
         _btnSelectPlugin.Location = new Point(200, 104);
         _btnSelectPlugin.Name = "_btnSelectPlugin";
         _btnSelectPlugin.Size = new Size(120, 28);
@@ -390,6 +394,7 @@ partial class HighlightEntryDialog
         // 
         // _btnBrowseSoundFile
         // 
+        _btnBrowseSoundFile.AutoSize = true;
         _btnBrowseSoundFile.Location = new Point(326, 174);
         _btnBrowseSoundFile.Name = "_btnBrowseSoundFile";
         _btnBrowseSoundFile.Size = new Size(90, 28);
@@ -458,6 +463,7 @@ partial class HighlightEntryDialog
         Controls.Add(_btnCancel);
         MaximizeBox = false;
         MinimizeBox = false;
+        MinimumSize = new Size(600, 466);
         Name = "HighlightEntryDialog";
         ShowInTaskbar = false;
         StartPosition = FormStartPosition.CenterParent;
