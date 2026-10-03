@@ -19,7 +19,7 @@ public class Preferences
         set => _selectionHighlight = value ?? new();
     }
 
-    /// <summary>Custom-color palette shared by the Highlight Entry color pickers, as ColorDialog.CustomColors values.</summary>
+    /// <summary>Custom-color palette shared by the Highlight dialog's color pickers, as ColorDialog.CustomColors values.</summary>
     public int[] HighlightCustomColors
     {
         get => _highlightCustomColors;
