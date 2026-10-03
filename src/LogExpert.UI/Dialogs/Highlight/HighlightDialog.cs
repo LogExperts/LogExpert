@@ -43,6 +43,7 @@ internal partial class HighlightDialog : Form
         checkBoxSelectionOutline.Checked = configManager.Settings.Preferences.SelectionHighlight.Outline;
         CustomColors = [.. configManager.Settings.Preferences.HighlightCustomColors];
         ShowEntryDialog = dialog => dialog.ShowDialog(this);
+        ShowColorDialog = dialog => dialog.ShowDialog(this);
         UpdateSelectionColorPreview();
         Load += OnHighlightDialogLoad;
         listBoxHighlight.DrawItem += OnHighlightListBoxDrawItem;
@@ -113,12 +114,15 @@ internal partial class HighlightDialog : Form
         CustomColor = _selectionColor
     };
 
-    /// <summary>Pending Highlight Entry color-picker palette; the caller persists it when the dialog is accepted.</summary>
+    /// <summary>Pending color-picker palette shared by the entry and selection pickers; the caller persists it when the dialog is accepted.</summary>
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int[] CustomColors { get; private set; }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal Func<HighlightEntryDialog, DialogResult> ShowEntryDialog { get; set; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal Func<ColorDialog, DialogResult> ShowColorDialog { get; set; }
 
     #endregion
 
@@ -126,9 +130,10 @@ internal partial class HighlightDialog : Form
 
     private void OnSelectionColorClick (object sender, EventArgs e)
     {
-        using var dialog = new ColorDialog { Color = _selectionColor ?? SystemColors.Highlight, FullOpen = true };
-        if (dialog.ShowDialog(this) == DialogResult.OK)
+        using var dialog = new ColorDialog { Color = _selectionColor ?? SystemColors.Highlight, FullOpen = true, CustomColors = CustomColors };
+        if (ShowColorDialog(dialog) == DialogResult.OK)
         {
+            CustomColors = dialog.CustomColors;
             _selectionColor = dialog.Color;
             UpdateSelectionColorPreview();
         }
