@@ -37,6 +37,8 @@
     <LogExpertDocsDirectory>$(LogExpertBinRoot)Docs\</LogExpertDocsDirectory>
 
     <SignAssembly>true</SignAssembly>
+    <!-- Hang timeout for every test run (dotnet test, Nuke, CI); see tests.runsettings. -->
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests.runsettings</RunSettingsFilePath>
     <PackageProjectUrl>https://github.com/LogExperts/LogExpert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LogExperts/LogExpert</RepositoryUrl>
     <PackageTags>LogExpert, Columnizer, Logging, Windows, Winforms</PackageTags>

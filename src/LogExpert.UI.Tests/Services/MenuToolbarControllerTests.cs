@@ -102,6 +102,25 @@ internal class MenuToolbarControllerTests : IDisposable
     }
 
     [Test]
+    public void UpdateGuiState_OnTheUiThreadUnderAnotherContext_AppliesImmediately ()
+    {
+        // Deciding by context instance re-posted on the UI thread itself, looping forever and freezing it.
+        var previous = SynchronizationContext.Current;
+        try
+        {
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
+            _controller.UpdateGuiState(new GuiStateEventArgs { FollowTail = true, MenuEnabled = true }, false);
+
+            Assert.That(_followTailCheckBox.Checked, Is.True);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+    }
+
+    [Test]
     public void UpdateGuiState_SetsFollowTailChecked ()
     {
         var state = new GuiStateEventArgs { FollowTail = true, MenuEnabled = true };

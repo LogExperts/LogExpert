@@ -44,6 +44,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     // Animation
     private System.Windows.Forms.Timer _animationTimer;
     private readonly SynchronizationContext _uiContext;
+    private readonly int _uiThreadId = Environment.CurrentManagedThreadId;
     private bool _isInitialized;
     private bool _disposed;
 
@@ -664,7 +665,7 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
         var args = new IconChangedEventArgs(window, icon);
 
         // Marshal to UI thread if needed
-        if (SynchronizationContext.Current != _uiContext)
+        if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
             _uiContext.Post(_ => IconChanged?.Invoke(this, args), null);
         }

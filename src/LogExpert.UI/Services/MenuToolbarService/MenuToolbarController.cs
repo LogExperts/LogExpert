@@ -50,6 +50,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     private ToolStripMenuItem _lastUsedMenuItem;
 
     private readonly SynchronizationContext _uiContext;
+    private readonly int _uiThreadId = Environment.CurrentManagedThreadId;
     private bool _disposed;
     private bool _suppressEvents;
 
@@ -111,7 +112,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     {
         ArgumentNullException.ThrowIfNull(state);
 
-        if (_uiContext != SynchronizationContext.Current)
+        if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
             _uiContext.Post(_ => UpdateGuiState(state, timestampControlEnabled), null);
             return;
@@ -185,7 +186,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     public void UpdateEncodingMenu (Encoding currentEncoding)
     {
-        if (_uiContext != SynchronizationContext.Current)
+        if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
             _uiContext.Post(_ => UpdateEncodingMenu(currentEncoding), null);
             return;
@@ -220,7 +221,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             return;
         }
 
-        if (_uiContext != SynchronizationContext.Current)
+        if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
             _uiContext.Post(_ => UpdateHighlightGroups(groups, selectedGroup), null);
             return;
@@ -254,7 +255,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             return;
         }
 
-        if (_uiContext != SynchronizationContext.Current)
+        if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
             _uiContext.Post(_ => PopulateFileHistory(fileHistory), null);
             return;
