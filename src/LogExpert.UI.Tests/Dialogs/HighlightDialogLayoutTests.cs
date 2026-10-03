@@ -33,12 +33,15 @@ public class HighlightDialogLayoutTests
     public void AtTheMinimumSize_ControlsNeitherOverlapNorLeaveTheirContainer (float scale)
     {
         using var dialog = CreateDialog();
+
+        // WinForms clips MinimumSize to the working area, so small (CI) screens can't host the scaled minimum.
+        var workingArea = Screen.PrimaryScreen!.WorkingArea.Size;
+        Assume.That(dialog.MinimumSize.Width * scale <= workingArea.Width && dialog.MinimumSize.Height * scale <= workingArea.Height, Is.True,
+            $"working area {workingArea} too small for the minimum size at {scale}x");
+
         dialog.Scale(new SizeF(scale, scale));
         dialog.Show();
         dialog.Size = dialog.MinimumSize;
-
-        // Windows caps a form at the screen size; small CI screens can't host the scaled minimum.
-        Assume.That(dialog.Size, Is.EqualTo(dialog.MinimumSize), "screen too small for the scaled minimum size");
 
         foreach (var name in new[] { "pnlBackground", "groupBoxGroups" })
         {
