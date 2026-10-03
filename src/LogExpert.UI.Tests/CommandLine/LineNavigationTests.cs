@@ -29,10 +29,12 @@ internal sealed class LineNavigationTests : IDisposable
     private Mock<IConfigManager> _config;
     private Settings _settings;
     private LogTabWindow? _window;
+    private WinFormsSynchronizationScope? _synchronization;
 
     [SetUp]
     public void SetUp ()
     {
+        _synchronization = new WinFormsSynchronizationScope();
         _directory = Path.Join(Path.GetTempPath(), "LogExpertLineTests", Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_directory);
         _fileName = Path.Join(_directory, "application.log");
@@ -63,6 +65,7 @@ internal sealed class LineNavigationTests : IDisposable
         _window?.Close();
         _window?.Dispose();
         _window = null;
+        _synchronization?.Dispose();
         Directory.Delete(_directory, true);
     }
 

@@ -41,10 +41,12 @@ public sealed class MarkerWindowTests : IDisposable
     private LogTabWindow? _window;
     private Exception? _uiException;
     private SystemColorMode _originalColorMode;
+    private WinFormsSynchronizationScope? _synchronization;
 
     [SetUp]
     public void SetUp ()
     {
+        _synchronization = new WinFormsSynchronizationScope();
         _originalColorMode = Application.ColorMode;
         _uiException = null;
         _directory = Path.Join(Path.GetTempPath(), "LogExpertMarkerTests", Guid.NewGuid().ToString("N"));
@@ -94,6 +96,8 @@ public sealed class MarkerWindowTests : IDisposable
             {
                 Application.SetColorMode(_originalColorMode);
             }
+
+            _synchronization?.Dispose();
         }
 
         Directory.Delete(_directory, true);

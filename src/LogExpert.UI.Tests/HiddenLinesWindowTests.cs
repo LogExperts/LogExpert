@@ -35,12 +35,14 @@ public sealed class HiddenLinesWindowTests : IDisposable
     private Mock<IConfigManager> _config = null!;
     private LogTabWindow? _window;
     private Exception? _uiException;
+    private WinFormsSynchronizationScope? _synchronization;
 
     private HighlightEntry HideRule => _settings.Preferences.HighlightGroupList[0].HighlightEntryList[0];
 
     [SetUp]
     public void SetUp ()
     {
+        _synchronization = new WinFormsSynchronizationScope();
         _uiException = null;
         _directory = Path.Join(Path.GetTempPath(), "LogExpertHiddenLinesTests", Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_directory);
@@ -88,6 +90,7 @@ public sealed class HiddenLinesWindowTests : IDisposable
         finally
         {
             Application.ThreadException -= OnUiException;
+            _synchronization?.Dispose();
         }
 
         Directory.Delete(_directory, true);
