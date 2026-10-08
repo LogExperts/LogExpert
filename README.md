@@ -39,6 +39,19 @@ Requirements
 * <https://dotnet.microsoft.com/en-us/download>
 * .NET 10 (<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-10.0.0-windows-x64-installer>)
 
+## Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
+
+Only LogExpert's own binaries are signed. Third-party libraries shipped with LogExpert are not signed by this project.
+
+Team roles:
+
+* Committers and reviewers: [Hirogen](https://github.com/Hirogen)
+* Approvers: [Hirogen](https://github.com/Hirogen)
+
+Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it. For example, the SFTP plugin only connects to the servers the user opens files from.
+
 ## Command line
 
 Open a log at a specific line:
