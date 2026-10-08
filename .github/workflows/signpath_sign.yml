@@ -1,0 +1,127 @@
+name: Code Signing (SignPath)
+
+# Manually started for now: builds Release, signs our own binaries, packages them, then signs the
+# installer. Once the test certificate works end to end, these steps move into release.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      signing-policy:
+        description: SignPath signing policy
+        type: choice
+        options: [test-signing, release-signing]
+        default: test-signing
+
+permissions:
+  actions: read   # the SignPath action downloads the uploaded artifact through the GitHub API
+  contents: read
+
+jobs:
+  sign:
+    runs-on: windows-latest  # SignPath requires GitHub-hosted runners for open source projects
+    name: Build, sign and package (${{ inputs.signing-policy }})
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for GitVersion to compute version from tags
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install InnoSetup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build
+        run: ./build.ps1 --target Clean Compile --configuration Release
+
+      # The binaries are signed before packaging so the zip, the Chocolatey package and the
+      # installer all ship the signed files.
+      - name: Upload unsigned binaries
+        id: upload-unsigned-app
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-app
+          path: bin/Release
+          retention-days: 1
+
+      - name: Sign binaries
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ inputs.signing-policy }}
+          artifact-configuration-slug: app-files
+          github-artifact-id: ${{ steps.upload-unsigned-app.outputs.artifact-id }}
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600  # release-signing waits for manual approval
+          output-artifact-directory: bin/Release-signed
+
+      - name: Replace unsigned binaries with signed ones
+        shell: pwsh
+        run: |
+          Remove-Item bin/Release -Recurse -Force
+          Move-Item bin/Release-signed bin/Release
+
+      - name: Check binary signatures
+        shell: pwsh
+        run: |
+          # Status is not 'Valid' with the test certificate (its root is not trusted), so only
+          # check that a signature is present.
+          $files = Get-ChildItem bin/Release -File | Where-Object { $_.Name -like 'LogExpert*.exe' -or $_.Name -like 'LogExpert*.dll' -or $_.Name -eq 'ColumnizerLib.dll' }
+          $signatures = $files | Get-AuthenticodeSignature
+          $signatures | Format-Table @{ n = 'File'; e = { Split-Path $_.Path -Leaf } }, Status, @{ n = 'Signer'; e = { $_.SignerCertificate.Subject } } -AutoSize
+          $unsigned = $signatures | Where-Object { $_.Status -eq 'NotSigned' }
+          if ($unsigned) {
+            Write-Host "::error::Unsigned: $($unsigned.Path -join ', ')"
+            exit 1
+          }
+
+      # Compile and Test are skipped so packaging uses the signed binaries instead of rebuilding.
+      - name: Package
+        run: ./build.ps1 --target Pack --configuration Release --skip Restore Compile Test
+
+      - name: Upload unsigned installer
+        id: upload-unsigned-setup
+        uses: actions/upload-artifact@v7
+        with:
+          path: bin/LogExpert-Setup-*.exe
+          archive: false
+          retention-days: 1
+
+      - name: Sign installer
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ inputs.signing-policy }}
+          artifact-configuration-slug: initial
+          github-artifact-id: ${{ steps.upload-unsigned-setup.outputs.artifact-id }}
+          skip-decompress: true
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 3600
+          output-artifact-directory: bin/setup-signed
+
+      - name: Replace unsigned installer with signed one
+        shell: pwsh
+        run: |
+          Get-ChildItem bin/setup-signed -Filter *.exe | Copy-Item -Destination bin -Force
+          Get-AuthenticodeSignature bin/LogExpert-Setup-*.exe | Format-Table Path, Status, @{ n = 'Signer'; e = { $_.SignerCertificate.Subject } } -AutoSize
+
+      - name: Upload signed packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: signed-packages-${{ inputs.signing-policy }}
+          path: |
+            bin/LogExpert-Setup-*.exe
+            bin/LogExpert.*.zip
+            bin/LogExpert.ColumnizerLib.*.nupkg
+            bin/SftpFileSystem.x64.*.zip
+            bin/SftpFileSystem.x86.*.zip
+            bin/chocolatey/logexpert.*.nupkg
+          retention-days: 7
