@@ -269,7 +269,9 @@ partial class Build : NukeBuild
                 .SetProject(columnizerFolder / "ColumnizerLib.csproj")
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(BinDirectory)
-                .SetVersion(VersionString));
+                .SetVersion(VersionString)
+                // Directory.Build.props pins PackageVersion, which would otherwise win over Version.
+                .SetProperty("PackageVersion", VersionString));
         });
 
     Target Pack => _ => _

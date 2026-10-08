@@ -104,7 +104,8 @@ logs.
 3. The run should:
    - print a table of signed binaries in *Check binary signatures*. With the test certificate the
      status is `UnknownError` (untrusted root), not `Valid`. That is expected.
-   - finish with a `signed-packages-test-signing` artifact.
+   - finish with a `signed-packages-test-signing` artifact. The two unsigned artifacts are deleted
+     at the end of a successful run, and kept when a step fails, so they can be inspected.
 4. Download the artifact, right-click `LogExpert-Setup-*.exe` → *Properties* → *Digital Signatures*.
    A signature from the SignPath test certificate should be listed.
 5. Install it and make sure LogExpert starts **and the built-in columnizers load**. This confirms

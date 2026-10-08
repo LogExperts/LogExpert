@@ -13,7 +13,7 @@ on:
         default: test-signing
 
 permissions:
-  actions: read   # the SignPath action downloads the uploaded artifact through the GitHub API
+  actions: write  # SignPath downloads the unsigned artifacts through the API; the last step deletes them
   contents: read
 
 jobs:
@@ -125,3 +125,15 @@ jobs:
             bin/SftpFileSystem.x86.*.zip
             bin/chocolatey/logexpert.*.nupkg
           retention-days: 7
+
+      # Leaves only the signed artifact, so the unsigned installer cannot be downloaded by mistake.
+      # Skipped when an earlier step failed, so the unsigned files stay available for debugging.
+      - name: Delete unsigned artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          foreach ($id in '${{ steps.upload-unsigned-app.outputs.artifact-id }}', '${{ steps.upload-unsigned-setup.outputs.artifact-id }}') {
+            gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
