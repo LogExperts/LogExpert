@@ -152,6 +152,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private bool _noSelectionUpdates;
 
     private ReloadMemento _reloadMemento;
+    private int? _lineCountBeforeAutomaticReload;
     private int _reloadOverloadCounter;
     private SortedList<int, RowHeightEntry> _rowHeightList = [];
     private int _selectedCol; // set by context menu event for column headers only
@@ -928,6 +929,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         _reloadMemento = null;
+        _lineCountBeforeAutomaticReload = null;
     }
 
     [SupportedOSPlatform("windows")]
@@ -3091,9 +3093,20 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void PositionAfterReload (ReloadMemento reloadMemento)
     {
         var lineCount = _logFileReader.LineCount;
+        if (_lineCountBeforeAutomaticReload is int previousLineCount)
+        {
+            // A tail edit can lose at most one line; a rotation to a short new file should reset the view.
+            if (lineCount < previousLineCount - 1 || reloadMemento.FirstDisplayedLine >= lineCount)
+            {
+                return;
+            }
+
+            FollowTailChanged(false, false);
+        }
+
         RestorePositionWithoutTimeSync(new GridPosition(
-            _reloadMemento.CurrentLine < lineCount ? _reloadMemento.CurrentLine : -1,
-            _reloadMemento.FirstDisplayedLine < lineCount ? _reloadMemento.FirstDisplayedLine : -1));
+            reloadMemento.CurrentLine < lineCount ? reloadMemento.CurrentLine : -1,
+            reloadMemento.FirstDisplayedLine < lineCount ? reloadMemento.FirstDisplayedLine : -1));
     }
 
     [SupportedOSPlatform("windows")]
@@ -3222,6 +3235,17 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             if (_reloadOverloadCounter <= 1)
             {
                 CancelPendingLineNavigation();
+                var firstDisplayedLine = RowToLine(dataGridView.FirstDisplayedScrollingRowIndex);
+                if (!_guiStateArgs.FollowTail && firstDisplayedLine >= 0)
+                {
+                    _lineCountBeforeAutomaticReload = _visibleRows.Map.LineCount;
+                    _reloadMemento = new ReloadMemento
+                    {
+                        CurrentLine = CurrentLineNum,
+                        FirstDisplayedLine = firstDisplayedLine
+                    };
+                }
+
                 SavePersistenceData(false);
                 _ = _loadingFinishedEvent.Reset();
                 _ = _externaLoadingFinishedEvent.Reset();
@@ -7741,6 +7765,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         CancelPendingLineNavigation();
         SavePersistenceData(false);
+
+        _lineCountBeforeAutomaticReload = null;
 
         _reloadMemento = new ReloadMemento
         {
