@@ -23,6 +23,7 @@ public class SftpLogFileInfo : ILogFileInfo
     private readonly SftpClient _sftp;
     private readonly object _sshKeyMonitor = new();
     private DateTime _lastChange = DateTime.Now;
+    private DateTime? _lastWriteTimeUtc;
     private long _lastLength;
 
     #endregion
@@ -206,20 +207,13 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            try
+            if (!TryGetFile(out var file))
             {
-                var file = (SftpFile)_sftp.Get(_remoteFileName);
-                var len = file.Attributes.Size;
-                return len != -1;
-            }
-            catch (Exception e) when (e is SshException or
-                                           SftpPathNotFoundException or
-                                           SftpPermissionDeniedException or
-                                           ArgumentNullException)
-            {
-                _logger.LogError(e.Message);
                 return false;
             }
+
+            _lastWriteTimeUtc = file.Attributes.LastWriteTimeUtc;
+            return file.Attributes.Size != -1;
         }
     }
 
@@ -239,19 +233,17 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            try
+            if (_lastWriteTimeUtc is not null)
             {
-                var file = (SftpFile)_sftp.Get(_remoteFileName);
-                return file.Attributes.LastWriteTimeUtc;
+                return _lastWriteTimeUtc;
             }
-            catch (Exception e) when (e is SshException or
-                                           SftpPathNotFoundException or
-                                           SftpPermissionDeniedException or
-                                           ArgumentNullException)
+
+            if (TryGetFile(out var file))
             {
-                _logger.LogError(e.Message);
-                return null;
+                _lastWriteTimeUtc = file.Attributes.LastWriteTimeUtc;
             }
+
+            return _lastWriteTimeUtc;
         }
     }
 
@@ -259,17 +251,7 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            try
-            {
-                var file = (SftpFile)_sftp.Get(_remoteFileName);
-                return file.Attributes.Size;
-            }
-            catch (Exception e) when (e is SftpPathNotFoundException or
-                                           SftpPermissionDeniedException)
-            {
-                _logger.LogError(e.Message);
-                return -1;
-            }
+            return TryGetFile(out var file) ? file.Attributes.Size : -1;
         }
     }
 
@@ -321,6 +303,23 @@ public class SftpLogFileInfo : ILogFileInfo
 
                 Thread.Sleep(RETRY_SLEEP);
             }
+        }
+    }
+
+    private bool TryGetFile (out SftpFile file)
+    {
+        try
+        {
+            file = (SftpFile)_sftp.Get(_remoteFileName);
+            return true;
+        }
+        catch (Exception e) when (e is SshException or
+                                       SftpPathNotFoundException or
+                                       SftpPermissionDeniedException)
+        {
+            _logger.LogError(e.Message);
+            file = null!;
+            return false;
         }
     }
 

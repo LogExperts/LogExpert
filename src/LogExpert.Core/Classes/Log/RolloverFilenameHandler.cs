@@ -21,6 +21,7 @@ public class RolloverFilenameHandler
     private readonly RolloverFilenameBuilder _filenameBuilder;
     private readonly ILogFileInfo _logFileInfo;
     private readonly MultiFileOptions _options;
+    private readonly TimeProvider _timeProvider;
 
     #endregion
 
@@ -31,10 +32,12 @@ public class RolloverFilenameHandler
     /// </summary>
     /// <param name="logFileInfo">The complete path of the logfile</param>
     /// <param name="options">Multifile option (e.g. format pattern)</param>
-    public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultiFileOptions options)
+    /// <param name="timeProvider">Time source used to calculate the file-age cutoff.</param>
+    public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultiFileOptions options, TimeProvider timeProvider = null)
     {
         _options = options;
         _logFileInfo = logFileInfo;
+        _timeProvider = timeProvider ?? TimeProvider.System;
         _filenameBuilder = new RolloverFilenameBuilder(_options.FormatPattern);
         _filenameBuilder.SetFileName(logFileInfo.FileName);
     }
@@ -69,11 +72,17 @@ public class RolloverFilenameHandler
                 _filenameBuilder.Index += 1;
                 fileName = _filenameBuilder.BuildFileName();
                 filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
-                if (FileExistsWithinAgeLimit(filePath, pluginRegistry))
+                var result = GetCandidateResult(filePath, pluginRegistry);
+                if (result == CandidateResult.Include)
                 {
                     _ = fileList.AddFirst(filePath);
                     found = true;
                     continue;
+                }
+
+                if (result == CandidateResult.TooOld)
+                {
+                    return fileList;
                 }
             }
 
@@ -87,11 +96,17 @@ public class RolloverFilenameHandler
                     _filenameBuilder.DecrementDate();
                     fileName = _filenameBuilder.BuildFileName();
                     filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
-                    if (FileExistsWithinAgeLimit(filePath, pluginRegistry))
+                    var result = GetCandidateResult(filePath, pluginRegistry);
+                    if (result == CandidateResult.Include)
                     {
                         _ = fileList.AddFirst(filePath);
                         found = true;
                         break;
+                    }
+
+                    if (result == CandidateResult.TooOld)
+                    {
+                        return fileList;
                     }
 
                     tryCounter++;
@@ -106,25 +121,35 @@ public class RolloverFilenameHandler
 
     #region Private Methods
 
-    private bool FileExistsWithinAgeLimit(string filePath, IPluginRegistry pluginRegistry)
+    private CandidateResult GetCandidateResult(string filePath, IPluginRegistry pluginRegistry)
     {
         var fs = pluginRegistry.FindFileSystemForUri(filePath);
 
         if(fs == null)
         {
-            return false; 
+            return CandidateResult.Missing;
         }
 
         var info = fs.GetLogfileInfo(filePath);
         if (info is null || !info.FileExists)
         {
-            return false;
+            return CandidateResult.Missing;
         }
 
-        // Zero keeps the historical unlimited behavior. Files without timestamp support are retained.
-        return _options.MaxDayTry <= 0
-            || info.LastWriteTimeUtc is not { } lastWriteTimeUtc
-            || lastWriteTimeUtc >= DateTime.UtcNow.AddDays(-_options.MaxDayTry);
+        if (_options.MaxFileAgeDays <= 0 || info.LastWriteTimeUtc is not { } lastWriteTimeUtc)
+        {
+            return CandidateResult.Include;
+        }
+
+        var cutoffUtc = _timeProvider.GetUtcNow().UtcDateTime.AddDays(-_options.MaxFileAgeDays);
+        return lastWriteTimeUtc >= cutoffUtc ? CandidateResult.Include : CandidateResult.TooOld;
+    }
+
+    private enum CandidateResult
+    {
+        Missing,
+        Include,
+        TooOld
     }
 
     #endregion

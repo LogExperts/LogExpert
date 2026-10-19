@@ -616,8 +616,20 @@
   <data name="SettingsDialog_UI_Label_labelArguments" xml:space="preserve">
     <value>参数：</value>
   </data>
-  <data name="SettingsDialog_UI_Label_labelMaxDays" xml:space="preserve">
-    <value>最大天数：</value>
+  <data name="SettingsDialog_UI_Label_labelMaxDayGap" xml:space="preserve">
+    <value>最大日期间隔：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaxFileAgeDays" xml:space="preserve">
+    <value>最大文件年龄（天）：</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaxFileAgeDaysHint" xml:space="preserve">
+    <value>0 = 关闭</value>
+  </data>
+  <data name="SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays" xml:space="preserve">
+    <value>对于 $D 模式：放弃搜索前可跳过的连续无日志文件天数。</value>
+  </data>
+  <data name="SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays" xml:space="preserve">
+    <value>要加载的滚动日志文件的最大天数。设置为 0 可关闭文件期限限制。</value>
   </data>
   <data name="SettingsDialog_UI_Label_labelPattern" xml:space="preserve">
     <value>模式：</value>
@@ -1545,11 +1557,14 @@
   <data name="MultiFileMaskDialog_UI_Label_FileNamePattern" xml:space="preserve">
     <value>文件名模式：</value>
   </data>
-  <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
-    <value>最大天数：</value>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDayGap" xml:space="preserve">
+    <value>最大日期间隔：</value>
   </data>
-  <data name="MultiFileMaskDialog_UI_Label_MaxDaysHint" xml:space="preserve">
-    <value>0 = 天数不受限制</value>
+  <data name="MultiFileMaskDialog_UI_Label_MaxFileAgeDays" xml:space="preserve">
+    <value>最大文件年龄（天）：</value>
+  </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint" xml:space="preserve">
+    <value>0 = 关闭</value>
   </data>
   <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
     <value>模式语法：
@@ -1568,7 +1583,11 @@ $J(&lt;前缀&gt;) = 类似 $J，但在非零时添加 &lt;前缀&gt;
 DD = 日
 MM = 月
 YY[YY] = 年
-其它字符将按原样使用</value>
+其它字符将按原样使用
+
+多文件限制：
+最大日期间隔 = 对于 $D 模式，放弃搜索前可跳过的连续无日志文件天数
+最大文件年龄（天） = 要加载的最旧滚动日志文件天数；0 表示关闭期限限制</value>
   </data>
   <data name="FilterColumnChooser_UI_Title" xml:space="preserve">
     <value>列</value>

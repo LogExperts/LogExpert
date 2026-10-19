@@ -8,6 +8,7 @@
     <RootNamespace>ColumnizerLib</RootNamespace>
 
     <PackageId>LogExpert.ColumnizerLib</PackageId>
+    <PackageVersion>1.22.0</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
