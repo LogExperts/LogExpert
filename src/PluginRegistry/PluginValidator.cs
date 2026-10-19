@@ -185,7 +185,7 @@ public static partial class PluginValidator
 
         foreach (var (name, hash) in GetBuiltInPluginHashes())
         {
-            if (!config.PluginHashes.TryGetValue(name, out var persistedHash) || persistedHash != hash)
+            if (!config.PluginHashes.TryGetValue(name, out var persistedHash) || !string.Equals(persistedHash, hash, StringComparison.OrdinalIgnoreCase))
             {
                 config.PluginHashes[name] = hash;
                 changed = true;

@@ -18,6 +18,9 @@ namespace LogExpert.PluginRegistry.Tests;
 /// the type is already loaded by the time any in-process test runs, and an eager load
 /// targets the real %APPDATA% path. Keep PluginValidator free of a static constructor and
 /// of I/O in field initializers.
+///
+/// Also covers issue #733: loading the configuration refreshes built-in plugin hashes
+/// persisted by an older build, keeping user-trusted entries.
 /// </summary>
 [TestFixture]
 public class PluginValidatorConfigPersistenceTests
@@ -28,7 +31,7 @@ public class PluginValidatorConfigPersistenceTests
     private string _originalConfigDirectory = null!;
     private string _originalConfigPath = null!;
     private object? _originalConfig;
-    private bool _originalBypass;
+    private bool _originalBypassSetting;
 
     private const string STALE_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -49,7 +52,7 @@ public class PluginValidatorConfigPersistenceTests
         _originalConfigDirectory = (string)GetStaticField("_configDirectory").GetValue(null)!;
         _originalConfigPath = (string)GetStaticField("_configPath").GetValue(null)!;
         _originalConfig = GetStaticField("_trustedPluginConfig").GetValue(null);
-        _originalBypass = PluginHashCalculator.BypassHashVerification;
+        _originalBypassSetting = PluginHashCalculator.BypassHashVerification;
     }
 
     [TearDown]
@@ -59,7 +62,7 @@ public class PluginValidatorConfigPersistenceTests
         GetStaticField("_configDirectory").SetValue(null, _originalConfigDirectory);
         GetStaticField("_configPath").SetValue(null, _originalConfigPath);
         GetStaticField("_trustedPluginConfig").SetValue(null, _originalConfig);
-        PluginHashCalculator.BypassHashVerification = _originalBypass;
+        PluginHashCalculator.BypassHashVerification = _originalBypassSetting;
 
         if (Directory.Exists(_testDataPath))
         {
