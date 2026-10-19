@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using Newtonsoft.Json;
+
 using NUnit.Framework;
 
 namespace LogExpert.PluginRegistry.Tests;
@@ -26,6 +28,9 @@ public class PluginValidatorConfigPersistenceTests
     private string _originalConfigDirectory = null!;
     private string _originalConfigPath = null!;
     private object? _originalConfig;
+    private bool _originalBypass;
+
+    private const string STALE_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
     private static FieldInfo GetStaticField (string name)
     {
@@ -44,6 +49,7 @@ public class PluginValidatorConfigPersistenceTests
         _originalConfigDirectory = (string)GetStaticField("_configDirectory").GetValue(null)!;
         _originalConfigPath = (string)GetStaticField("_configPath").GetValue(null)!;
         _originalConfig = GetStaticField("_trustedPluginConfig").GetValue(null);
+        _originalBypass = PluginHashCalculator.BypassHashVerification;
     }
 
     [TearDown]
@@ -53,6 +59,7 @@ public class PluginValidatorConfigPersistenceTests
         GetStaticField("_configDirectory").SetValue(null, _originalConfigDirectory);
         GetStaticField("_configPath").SetValue(null, _originalConfigPath);
         GetStaticField("_trustedPluginConfig").SetValue(null, _originalConfig);
+        PluginHashCalculator.BypassHashVerification = _originalBypass;
 
         if (Directory.Exists(_testDataPath))
         {
@@ -76,6 +83,40 @@ public class PluginValidatorConfigPersistenceTests
         GetStaticField("_configDirectory").SetValue(null, _configDir);
         GetStaticField("_configPath").SetValue(null, Path.Join(_configDir, "trusted-plugins.json"));
         GetStaticField("_trustedPluginConfig").SetValue(null, null);
+    }
+
+    private static string BuiltCsvColumnizerPath ()
+    {
+        // Test output is src/PluginRegistry.Tests/bin/<Configuration>; plugins are built to bin/<Configuration>/plugins.
+        var binDirectory = Path.GetDirectoryName(typeof(PluginValidatorConfigPersistenceTests).Assembly.Location)!;
+        var path = Path.GetFullPath(Path.Join(binDirectory, "..", "..", "..", "..", "bin", Path.GetFileName(binDirectory), "plugins", "CsvColumnizer.dll"));
+        Assert.That(File.Exists(path), Is.True, $"Built plugin not found: {path}");
+        return path;
+    }
+
+    private void SeedConfig (TrustedPluginConfig config)
+    {
+        File.WriteAllText(Path.Join(_configDir, "trusted-plugins.json"), JsonConvert.SerializeObject(config));
+    }
+
+    private TrustedPluginConfig ReadPersistedConfig ()
+    {
+        return JsonConvert.DeserializeObject<TrustedPluginConfig>(File.ReadAllText(Path.Join(_configDir, "trusted-plugins.json")))!;
+    }
+
+    private static TrustedPluginConfig StaleConfig ()
+    {
+        return new TrustedPluginConfig
+        {
+            PluginNames = ["CsvColumnizer.dll", "UserPlugin.dll"],
+            PluginHashes = new Dictionary<string, string>
+            {
+                ["CsvColumnizer.dll"] = STALE_HASH,
+                ["CsvColumnizer.dll (x86)"] = STALE_HASH,
+                ["UserPlugin.dll"] = "ABCDEF"
+            },
+            AllowUserTrustedPlugins = false
+        };
     }
 
     [Test]
@@ -130,6 +171,63 @@ public class PluginValidatorConfigPersistenceTests
                 "Initialize should create the default configuration in its directory");
             Assert.That(File.Exists(Path.Join(_configDir, "trusted-plugins.json")), Is.False,
                 "Nothing may be written to the pre-Initialize default directory");
+        });
+    }
+
+    [Test]
+    [Description("Issue #733: a stale persisted hash for a built-in plugin must not reject the plugin after an upgrade")]
+    public void Initialize_WithStaleBuiltInHash_ValidatesBuiltInPlugin ()
+    {
+        PluginHashCalculator.BypassHashVerification = false;
+        SeedConfig(StaleConfig());
+
+        PluginValidator.Initialize(_configDir);
+
+        var result = PluginValidator.ValidatePlugin(BuiltCsvColumnizerPath(), out _, out var errorMessage);
+        Assert.That(result, Is.True, $"Built-in plugin should validate, but failed with: {errorMessage}");
+    }
+
+    [Test]
+    [Description("Issue #733: the refreshed built-in hashes are persisted; user entries and settings survive")]
+    public void Initialize_WithStaleBuiltInHash_PersistsRunningBuildHashesAndKeepsUserEntries ()
+    {
+        SeedConfig(StaleConfig());
+
+        PluginValidator.Initialize(_configDir);
+
+        var persisted = ReadPersistedConfig();
+        var builtIn = PluginValidator.GetBuiltInPluginHashes();
+        Assert.Multiple(() =>
+        {
+            Assert.That(persisted.PluginHashes["CsvColumnizer.dll"], Is.EqualTo(builtIn["CsvColumnizer.dll"]));
+            Assert.That(persisted.PluginHashes["CsvColumnizer.dll (x86)"], Is.EqualTo(builtIn["CsvColumnizer.dll (x86)"]));
+            Assert.That(persisted.PluginNames, Does.Contain("JsonColumnizer.dll"), "Missing built-in names must be added");
+            Assert.That(persisted.PluginNames, Does.Contain("UserPlugin.dll"));
+            Assert.That(persisted.PluginHashes["UserPlugin.dll"], Is.EqualTo("ABCDEF"));
+            Assert.That(persisted.AllowUserTrustedPlugins, Is.False);
+        });
+    }
+
+    [Test]
+    [Description("Issue #733: a built-in plugin whose bytes differ from the running build's table is still rejected")]
+    public void ValidatePlugin_TamperedBuiltInPlugin_IsRejectedWithHashMismatch ()
+    {
+        PluginHashCalculator.BypassHashVerification = false;
+        SeedConfig(StaleConfig());
+        PluginValidator.Initialize(_configDir);
+
+        var tamperedPath = Path.Join(_testDataPath, "CsvColumnizer.dll");
+        File.Copy(BuiltCsvColumnizerPath(), tamperedPath);
+        using (var stream = File.Open(tamperedPath, FileMode.Append))
+        {
+            stream.WriteByte(0);
+        }
+
+        var result = PluginValidator.ValidatePlugin(tamperedPath, out _, out var errorMessage);
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.False);
+            Assert.That(errorMessage, Does.Contain("has been modified"));
         });
     }
 }
