@@ -59,9 +59,10 @@ The generated file does not exist yet on a fresh clone. Build once and it appear
 
 ### "Plugin hash mismatch" on a user's machine after an update
 
-`trusted-plugins.json` in the user profile is seeded from `GetBuiltInPluginHashes()` on first launch
-and is not rewritten by an upgrade, so hashes from the previous version linger. Re-trust the plugin
-via Settings > Plugin Management, or delete `%APPDATA%\LogExpert\trusted-plugins.json` when testing.
+Every load of `trusted-plugins.json` reconciles the built-in names and hashes with the running build's
+`GetBuiltInPluginHashes()` (user-trusted entries are kept), so an upgrade does not cause this for
+built-in plugins. A mismatch on a built-in plugin therefore means its bytes differ from the build
+that is running: a partial or mixed install, or a modified file. Reinstall.
 
 ## Adding a plugin
 
