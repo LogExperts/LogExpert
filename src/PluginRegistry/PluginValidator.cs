@@ -174,22 +174,16 @@ public static partial class PluginValidator
     {
         var changed = false;
 
-        foreach (var name in _trustedPluginNames)
+        foreach (var name in _trustedPluginNames.Where(n => !config.PluginNames.Contains(n, StringComparer.OrdinalIgnoreCase)))
         {
-            if (!config.PluginNames.Contains(name, StringComparer.OrdinalIgnoreCase))
-            {
-                config.PluginNames.Add(name);
-                changed = true;
-            }
+            config.PluginNames.Add(name);
+            changed = true;
         }
 
-        foreach (var (name, hash) in GetBuiltInPluginHashes())
+        foreach (var (name, hash) in GetBuiltInPluginHashes().Where(e => !config.PluginHashes.TryGetValue(e.Key, out var persistedHash) || !string.Equals(persistedHash, e.Value, StringComparison.OrdinalIgnoreCase)))
         {
-            if (!config.PluginHashes.TryGetValue(name, out var persistedHash) || !string.Equals(persistedHash, hash, StringComparison.OrdinalIgnoreCase))
-            {
-                config.PluginHashes[name] = hash;
-                changed = true;
-            }
+            config.PluginHashes[name] = hash;
+            changed = true;
         }
 
         if (changed)
