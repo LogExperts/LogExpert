@@ -1742,6 +1742,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
         <value>Max days:</value>
     </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDaysHint" xml:space="preserve">
+        <value>0 = Unlimited number of days</value>
+    </data>
   <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
         <value>Pattern syntax:
 

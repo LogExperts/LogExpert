@@ -34,6 +34,7 @@ internal partial class MultiFileMaskDialog : Form
         labelMultiSettingsFor.Text = Resources.MultiFileMaskDialog_UI_Label_SettingsFor;
         labelFileNamePattern.Text = Resources.MultiFileMaskDialog_UI_Label_FileNamePattern;
         labelMaxDays.Text = Resources.MultiFileMaskDialog_UI_Label_MaxDays;
+        labelMaxDaysHint.Text = Resources.MultiFileMaskDialog_UI_Label_MaxDaysHint;
         syntaxHelpLabel.Text = Resources.MultiFileMaskDialog_UI_Label_SyntaxHelp;
         buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
         buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;

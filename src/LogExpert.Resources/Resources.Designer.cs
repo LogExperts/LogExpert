@@ -4442,6 +4442,15 @@ namespace LogExpert {
                 return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDays", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 0 = Unlimited number of days.
+        /// </summary>
+        public static string MultiFileMaskDialog_UI_Label_MaxDaysHint {
+            get {
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDaysHint", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to MultiFile settings for:.

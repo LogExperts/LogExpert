@@ -1679,6 +1679,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
 		<value>Max Tage:</value>
 	</data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDaysHint" xml:space="preserve">
+		<value>0 = Unbegrenzte Tage</value>
+	</data>
   <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
 		<value>Muster syntax:
 

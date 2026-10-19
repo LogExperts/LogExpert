@@ -1548,6 +1548,9 @@
   <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
     <value>最大天数：</value>
   </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDaysHint" xml:space="preserve">
+    <value>0 = 天数不受限制</value>
+  </data>
   <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
     <value>模式语法：
 

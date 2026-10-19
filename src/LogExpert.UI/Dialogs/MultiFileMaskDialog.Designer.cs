@@ -33,6 +33,7 @@
         this.labelFileName = new System.Windows.Forms.Label();
         this.labelFileNamePattern = new System.Windows.Forms.Label();
         this.upDownMaxDays = new System.Windows.Forms.NumericUpDown();
+        this.labelMaxDaysHint = new System.Windows.Forms.Label();
         this.fileNamePatternTextBox = new System.Windows.Forms.TextBox();
         this.labelMaxDays = new System.Windows.Forms.Label();
         this.Settings = new System.Windows.Forms.GroupBox();
@@ -86,7 +87,16 @@
         0,
         0,
         0});
-        // 
+        //
+        // labelMaxDaysHint
+        //
+        this.labelMaxDaysHint.AutoSize = true;
+        this.labelMaxDaysHint.Location = new System.Drawing.Point(146, 57);
+        this.labelMaxDaysHint.Name = "labelMaxDaysHint";
+        this.labelMaxDaysHint.Size = new System.Drawing.Size(202, 20);
+        this.labelMaxDaysHint.TabIndex = 6;
+        this.labelMaxDaysHint.Text = "0 = Unlimited number of days";
+        //
         // fileNamePatternTextBox
         // 
         this.fileNamePatternTextBox.Location = new System.Drawing.Point(149, 25);
@@ -110,6 +120,7 @@
         this.Settings.Controls.Add(this.labelFileNamePattern);
         this.Settings.Controls.Add(this.labelMaxDays);
         this.Settings.Controls.Add(this.upDownMaxDays);
+        this.Settings.Controls.Add(this.labelMaxDaysHint);
         this.Settings.Controls.Add(this.fileNamePatternTextBox);
         this.Settings.Location = new System.Drawing.Point(15, 39);
         this.Settings.Name = "Settings";
@@ -182,6 +193,7 @@
 		private System.Windows.Forms.Label labelFileName;
 		private System.Windows.Forms.Label labelFileNamePattern;
 		private System.Windows.Forms.NumericUpDown upDownMaxDays;
+		private System.Windows.Forms.Label labelMaxDaysHint;
 		private System.Windows.Forms.TextBox fileNamePatternTextBox;
 		private System.Windows.Forms.Label labelMaxDays;
 		private System.Windows.Forms.GroupBox Settings;
