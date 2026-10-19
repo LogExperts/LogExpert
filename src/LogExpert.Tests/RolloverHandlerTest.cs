@@ -91,4 +91,58 @@ internal class RolloverHandlerTest : RolloverHandlerTestBase
 
         Cleanup();
     }
+
+    [Test]
+    [TestCase("*$J(.)", "app.log.1", "app.log.2")]
+    [TestCase("*$J(.).log", "app.1.log", "app.2.log")]
+    public void GetNameList_ExcludesIndexedFilesOlderThanMaxDays (
+        string formatPattern,
+        string recentFileName,
+        string oldFileName)
+    {
+        var directory = Directory.CreateDirectory(TEST_DIR_NAME);
+        TestDirectory = directory;
+        var activeFile = CreateFile(directory, "app.log");
+        var recentFile = CreateFile(directory, recentFileName);
+        var oldFile = CreateFile(directory, oldFileName);
+        File.SetLastWriteTimeUtc(activeFile, DateTime.UtcNow);
+        File.SetLastWriteTimeUtc(recentFile, DateTime.UtcNow.AddDays(-2));
+        File.SetLastWriteTimeUtc(oldFile, DateTime.UtcNow.AddDays(-4));
+
+        MultiFileOptions options = new()
+        {
+            FormatPattern = formatPattern,
+            MaxDayTry = 3
+        };
+        ILogFileInfo info = new LogFileInfo(new Uri(activeFile));
+        RolloverFilenameHandler handler = new(info, options);
+
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
+
+        Assert.That(fileList, Is.EqualTo(new[] { recentFile, activeFile }));
+        Cleanup();
+    }
+
+    [Test]
+    public void GetNameList_WithZeroMaxDays_DoesNotFilterByAge ()
+    {
+        var directory = Directory.CreateDirectory(TEST_DIR_NAME);
+        TestDirectory = directory;
+        var activeFile = CreateFile(directory, "app.log");
+        var oldFile = CreateFile(directory, "app.log.1");
+        File.SetLastWriteTimeUtc(oldFile, DateTime.UtcNow.AddYears(-1));
+
+        MultiFileOptions options = new()
+        {
+            FormatPattern = "*$J(.)",
+            MaxDayTry = 0
+        };
+        ILogFileInfo info = new LogFileInfo(new Uri(activeFile));
+        RolloverFilenameHandler handler = new(info, options);
+
+        var fileList = handler.GetNameList(PluginRegistry.PluginRegistry.Instance);
+
+        Assert.That(fileList, Is.EqualTo(new[] { oldFile, activeFile }));
+        Cleanup();
+    }
 }

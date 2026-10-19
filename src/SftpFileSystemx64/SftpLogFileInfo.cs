@@ -235,6 +235,26 @@ public class SftpLogFileInfo : ILogFileInfo
 
     public string FullName => Uri.ToString();
 
+    public DateTime? LastWriteTimeUtc
+    {
+        get
+        {
+            try
+            {
+                var file = (SftpFile)_sftp.Get(_remoteFileName);
+                return file.Attributes.LastWriteTimeUtc;
+            }
+            catch (Exception e) when (e is SshException or
+                                           SftpPathNotFoundException or
+                                           SftpPermissionDeniedException or
+                                           ArgumentNullException)
+            {
+                _logger.LogError(e.Message);
+                return null;
+            }
+        }
+    }
+
     public long Length
     {
         get

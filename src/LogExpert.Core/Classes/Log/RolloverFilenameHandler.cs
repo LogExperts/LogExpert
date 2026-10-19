@@ -69,7 +69,7 @@ public class RolloverFilenameHandler
                 _filenameBuilder.Index += 1;
                 fileName = _filenameBuilder.BuildFileName();
                 filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
-                if (FileExists(filePath, pluginRegistry))
+                if (FileExistsWithinAgeLimit(filePath, pluginRegistry))
                 {
                     _ = fileList.AddFirst(filePath);
                     found = true;
@@ -87,7 +87,7 @@ public class RolloverFilenameHandler
                     _filenameBuilder.DecrementDate();
                     fileName = _filenameBuilder.BuildFileName();
                     filePath = _logFileInfo.DirectoryName + _logFileInfo.DirectorySeparatorChar + fileName;//TODO: Change to Directory.Combine
-                    if (FileExists(filePath, pluginRegistry))
+                    if (FileExistsWithinAgeLimit(filePath, pluginRegistry))
                     {
                         _ = fileList.AddFirst(filePath);
                         found = true;
@@ -106,7 +106,7 @@ public class RolloverFilenameHandler
 
     #region Private Methods
 
-    private bool FileExists(string filePath, IPluginRegistry pluginRegistry)
+    private bool FileExistsWithinAgeLimit(string filePath, IPluginRegistry pluginRegistry)
     {
         var fs = pluginRegistry.FindFileSystemForUri(filePath);
 
@@ -116,7 +116,15 @@ public class RolloverFilenameHandler
         }
 
         var info = fs.GetLogfileInfo(filePath);
-        return info is not null && info.FileExists;
+        if (info is null || !info.FileExists)
+        {
+            return false;
+        }
+
+        // Zero keeps the historical unlimited behavior. Files without timestamp support are retained.
+        return _options.MaxDayTry <= 0
+            || info.LastWriteTimeUtc is not { } lastWriteTimeUtc
+            || lastWriteTimeUtc >= DateTime.UtcNow.AddDays(-_options.MaxDayTry);
     }
 
     #endregion
