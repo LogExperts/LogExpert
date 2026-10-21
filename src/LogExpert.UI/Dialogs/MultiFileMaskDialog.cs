@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.Versioning;
 
+using LogExpert.Core.Entities;
+
 namespace LogExpert.UI.Dialogs;
 
 [SupportedOSPlatform("windows")]
@@ -69,7 +71,7 @@ internal partial class MultiFileMaskDialog : Form
     {
         fileNamePatternTextBox.Text = FileNamePattern;
         upDownMaxDayGap.Value = MaxDayGap;
-        upDownMaxFileAgeDays.Value = MaxFileAgeDays;
+        upDownMaxFileAgeDays.Value = Math.Clamp(MaxFileAgeDays, 0, MultiFileOptions.MAX_FILE_AGE_DAYS);
     }
 
     #endregion

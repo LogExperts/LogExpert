@@ -95,7 +95,7 @@
         // 
         this.upDownMaxFileAgeDays.Location = new System.Drawing.Point(170, 85);
         this.upDownMaxFileAgeDays.Maximum = new decimal(new int[] {
-        2147483647,
+        3650,
         0,
         0,
         0});

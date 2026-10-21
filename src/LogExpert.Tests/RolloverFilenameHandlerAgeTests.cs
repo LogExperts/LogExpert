@@ -49,6 +49,19 @@ internal sealed class RolloverFilenameHandlerAgeTests
     }
 
     [Test]
+    public void GetNameList_FileAgeAboveMaximum_IsClampedWithoutOverflow ()
+    {
+        var context = CreateContext(
+            "app.log",
+            new MultiFileOptions { FormatPattern = "*$J(.)", MaxFileAgeDays = int.MaxValue },
+            ("app.log.1", _now.AddDays(-10).UtcDateTime));
+
+        var result = context.Handler.GetNameList(context.Registry);
+
+        Assert.That(result, Is.EqualTo(new[] { GetPath("app.log.1"), GetPath("app.log") }));
+    }
+
+    [Test]
     public void GetNameList_FirstRolloverIsOld_StopsBeforeNewerHigherIndex ()
     {
         var context = CreateContext(

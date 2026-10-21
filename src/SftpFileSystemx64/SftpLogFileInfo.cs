@@ -1,5 +1,7 @@
 using ColumnizerLib;
 
+using System.Diagnostics.CodeAnalysis;
+
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using Renci.SshNet.Sftp;
@@ -207,7 +209,7 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            if (!TryGetFile(out var file))
+            if (!TryGetFile(out var file, catchSshException: true, catchArgumentNullException: true))
             {
                 return false;
             }
@@ -238,7 +240,7 @@ public class SftpLogFileInfo : ILogFileInfo
                 return _lastWriteTimeUtc;
             }
 
-            if (TryGetFile(out var file))
+            if (TryGetFile(out var file, catchSshException: true, catchArgumentNullException: true))
             {
                 _lastWriteTimeUtc = file.Attributes.LastWriteTimeUtc;
             }
@@ -251,7 +253,9 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            return TryGetFile(out var file) ? file.Attributes.Size : -1;
+            return TryGetFile(out var file, catchSshException: false, catchArgumentNullException: false)
+                ? file.Attributes.Size
+                : -1;
         }
     }
 
@@ -306,19 +310,24 @@ public class SftpLogFileInfo : ILogFileInfo
         }
     }
 
-    private bool TryGetFile (out SftpFile file)
+    private bool TryGetFile (
+        [NotNullWhen(true)] out SftpFile? file,
+        bool catchSshException,
+        bool catchArgumentNullException)
     {
         try
         {
             file = (SftpFile)_sftp.Get(_remoteFileName);
             return true;
         }
-        catch (Exception e) when (e is SshException or
-                                       SftpPathNotFoundException or
-                                       SftpPermissionDeniedException)
+        catch (Exception e) when ((catchSshException && e is SshException) ||
+                                   e is SftpPathNotFoundException ||
+                                   e is SftpPermissionDeniedException ||
+                                   (catchArgumentNullException && e is ArgumentNullException))
         {
             _logger.LogError(e.Message);
-            file = null!;
+            _lastWriteTimeUtc = null;
+            file = null;
             return false;
         }
     }

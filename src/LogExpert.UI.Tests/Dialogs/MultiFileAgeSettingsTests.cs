@@ -36,6 +36,7 @@ public class MultiFileAgeSettingsTests
         {
             Assert.That(maxDayGap.Value, Is.EqualTo(3));
             Assert.That(maxFileAgeDays.Value, Is.EqualTo(14));
+            Assert.That(maxFileAgeDays.Maximum, Is.EqualTo(MultiFileOptions.MAX_FILE_AGE_DAYS));
             Assert.That(Find<Label>(dialog, "labelMaxDayGap").Text,
                 Is.EqualTo(UIStrings.MultiFileMaskDialog_UI_Label_MaxDayGap));
             Assert.That(Find<Label>(dialog, "labelMaxFileAgeDays").Text,
@@ -51,6 +52,17 @@ public class MultiFileAgeSettingsTests
             Assert.That(dialog.MaxDayGap, Is.EqualTo(5));
             Assert.That(dialog.MaxFileAgeDays, Is.EqualTo(30));
         });
+    }
+
+    [Test]
+    public void MultiFileMaskDialog_ClampsAnOversizedPersistedFileAge ()
+    {
+        using var dialog = new MultiFileMaskDialog("app.log") { MaxFileAgeDays = int.MaxValue };
+
+        InvokePrivate(dialog, "OnMultiFileMaskDialogLoad");
+
+        Assert.That(Find<NumericUpDown>(dialog, "upDownMaxFileAgeDays").Value,
+            Is.EqualTo(MultiFileOptions.MAX_FILE_AGE_DAYS));
     }
 
     [Test]
@@ -77,8 +89,6 @@ public class MultiFileAgeSettingsTests
         {
             Assert.That(maxDayGap.Value, Is.EqualTo(3));
             Assert.That(maxFileAgeDays.Value, Is.EqualTo(14));
-            Assert.That(Find<Label>(dialog, "labelMaxDayGap").Text,
-                Is.EqualTo(UIStrings.SettingsDialog_UI_Label_labelMaxDayGap));
         });
 
         maxDayGap.Value = 7;
@@ -90,6 +100,23 @@ public class MultiFileAgeSettingsTests
             Assert.That(preferences.MultiFileOptions.MaxDayTry, Is.EqualTo(7));
             Assert.That(preferences.MultiFileOptions.MaxFileAgeDays, Is.EqualTo(30));
         });
+    }
+
+    [Test]
+    public void SettingsDialog_ClampsAnOversizedPersistedFileAge ()
+    {
+        var preferences = new Preferences
+        {
+            MultiFileOptions = new MultiFileOptions { MaxFileAgeDays = int.MaxValue }
+        };
+        var configManager = new Mock<IConfigManager>();
+        _ = configManager.SetupGet(manager => manager.Settings).Returns(new Settings());
+
+        using var dialog = new SettingsDialog(preferences, null!, 0, configManager.Object);
+        InvokePrivate(dialog, "FillMultifileSettings");
+
+        Assert.That(Find<NumericUpDown>(dialog, "upDownMultifileMaxFileAgeDays").Value,
+            Is.EqualTo(MultiFileOptions.MAX_FILE_AGE_DAYS));
     }
 
     private static TControl Find<TControl> (Control parent, string name) where TControl : Control

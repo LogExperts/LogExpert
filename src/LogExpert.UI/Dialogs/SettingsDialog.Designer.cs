@@ -1609,7 +1609,7 @@ partial class SettingsDialog
         // 
         upDownMultifileMaxFileAgeDays.Location = new Point(170, 112);
         upDownMultifileMaxFileAgeDays.Margin = new Padding(4, 5, 4, 5);
-        upDownMultifileMaxFileAgeDays.Maximum = new decimal(new int[] { 2147483647, 0, 0, 0 });
+        upDownMultifileMaxFileAgeDays.Maximum = new decimal(new int[] { 3650, 0, 0, 0 });
         upDownMultifileMaxFileAgeDays.Name = "upDownMultifileMaxFileAgeDays";
         helpProvider.SetShowHelp(upDownMultifileMaxFileAgeDays, false);
         upDownMultifileMaxFileAgeDays.Size = new Size(92, 23);

@@ -521,18 +521,6 @@ public static class PersisterXML
             persistenceData.MultiFileMaxDays = 0;
         }
 
-        value = GetOptionsAttribute(optionsNode, "multifile", "maxFileAgeDays");
-        try
-        {
-            persistenceData.MultiFileMaxFileAgeDays = value != null ? int.Parse(value, CultureInfo.InvariantCulture) : 0;
-        }
-        catch (Exception ex) when (ex is ArgumentNullException or
-                                        FormatException or
-                                        OverflowException)
-        {
-            persistenceData.MultiFileMaxFileAgeDays = 0;
-        }
-
         XmlNode multiFileNode = optionsNode.SelectSingleNode("multifile");
         if (multiFileNode != null)
         {

@@ -33,7 +33,7 @@ public class RolloverFilenameHandler
     /// <param name="logFileInfo">The complete path of the logfile</param>
     /// <param name="options">Multifile option (e.g. format pattern)</param>
     /// <param name="timeProvider">Time source used to calculate the file-age cutoff.</param>
-    public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultiFileOptions options, TimeProvider timeProvider = null)
+    public RolloverFilenameHandler(ILogFileInfo logFileInfo, MultiFileOptions options, TimeProvider? timeProvider = null)
     {
         _options = options;
         _logFileInfo = logFileInfo;
@@ -136,12 +136,15 @@ public class RolloverFilenameHandler
             return CandidateResult.Missing;
         }
 
-        if (_options.MaxFileAgeDays <= 0 || info.LastWriteTimeUtc is not { } lastWriteTimeUtc)
+        var maxFileAgeDays = Math.Clamp(_options.MaxFileAgeDays, 0, MultiFileOptions.MAX_FILE_AGE_DAYS);
+        if (maxFileAgeDays == 0 || info.LastWriteTimeUtc is not { } lastWriteTimeUtc)
         {
             return CandidateResult.Include;
         }
 
-        var cutoffUtc = _timeProvider.GetUtcNow().UtcDateTime.AddDays(-_options.MaxFileAgeDays);
+        var nowUtc = _timeProvider.GetUtcNow().UtcDateTime;
+        var maximumAge = TimeSpan.FromDays(maxFileAgeDays);
+        var cutoffUtc = nowUtc - DateTime.MinValue < maximumAge ? DateTime.MinValue : nowUtc - maximumAge;
         return lastWriteTimeUtc >= cutoffUtc ? CandidateResult.Include : CandidateResult.TooOld;
     }
 
