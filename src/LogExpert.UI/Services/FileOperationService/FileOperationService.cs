@@ -68,7 +68,11 @@ internal sealed class FileOperationService (
 
     public LogWindow AddFileTab (FileTabRequest request)
     {
-        var logFileName = PersisterHelpers.FindFilenameForSettings(request.FileName, _pluginRegistry);
+        // A shortcut names a file the user did not open: resolve it before anything else, so the tab,
+        // the reader and the Session File all deal with the target. The request keeps the original
+        // path, so what the user picked is still what is shown and remembered.
+        var requestedFile = ShellLinkResolver.Resolve(request.FileName);
+        var logFileName = PersisterHelpers.FindFilenameForSettings(requestedFile, _pluginRegistry);
         var normalizedPath = Path.GetFullPath(logFileName);
 
         var existingWindow = FindWindowForFile(normalizedPath);
@@ -102,9 +106,9 @@ internal sealed class FileOperationService (
             AddToFileHistory(request.FileName);
         }
 
-        if (request.FileName.EndsWith(".lxp", StringComparison.Ordinal))
+        if (requestedFile.EndsWith(".lxp", StringComparison.Ordinal))
         {
-            logWindow.ForcedPersistenceFileName = request.FileName;
+            logWindow.ForcedPersistenceFileName = requestedFile;
         }
 
         // Register before starting the asynchronous load, including very small files.
@@ -204,14 +208,18 @@ internal sealed class FileOperationService (
             return null;
         }
 
+        // Shortcuts are resolved for the same reason as in AddFileTab: only the reader needs the
+        // targets, while the request keeps the path the user dropped.
+        var resolvedFileNames = fileNames.Select(ShellLinkResolver.Resolve).ToArray();
+
         // Session files (.lxj) aren't logs — dispatch them to the project loader and
         // continue with only the log files. Without this, the .lxj would be treated as
         // a raw log line in the multi-file tab.
-        if (fileNames.Any(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
+        if (resolvedFileNames.Any(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)))
         {
-            AddFileTabs(fileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray());
+            AddFileTabs(resolvedFileNames.Where(f => f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray());
 
-            var logs = fileNames.Where(f => !f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray();
+            var logs = resolvedFileNames.Where(f => !f.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase)).ToArray();
             return logs.Length > 0 ? AddMultiFileTab(logs) : null;
         }
 
@@ -235,9 +243,9 @@ internal sealed class FileOperationService (
         {
             LogWindow = logWindow,
             Request = request,
-            ResolvedFileName = fileNames[^1],
+            ResolvedFileName = resolvedFileNames[^1],
             EncodingOptions = encodingOptions,
-            MultiFileNames = fileNames
+            MultiFileNames = resolvedFileNames
         });
 
         return logWindow;

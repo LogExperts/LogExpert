@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 
+using LogExpert.Core.Helpers;
 using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Classes.Persister;
@@ -10,8 +11,9 @@ public static class PersisterHelpers
     private const string LOCAL_FILE_SYSTEM_NAME = "LocalFileSystem";
 
     /// <summary>
-    /// Checks if the file name is a settings file (.lxp). If so, the contained logfile name
-    /// is returned. If not, the given file name is returned unchanged.
+    /// Resolves a shortcut to the file it points at, then checks if that file is a settings file
+    /// (.lxp). If so, the contained logfile name is returned. If not, the given file name is
+    /// returned unchanged.
     /// </summary>
     /// <param name="fileName">The file name to resolve</param>
     /// <param name="pluginRegistry">Plugin registry for file system resolution (optional)</param>
@@ -19,6 +21,11 @@ public static class PersisterHelpers
     public static string FindFilenameForSettings (string fileName, IPluginRegistry pluginRegistry)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
+
+        // A shortcut is not a log file: resolve it first, so the rest of this method — the .lxp
+        // lookup included — sees the file the user actually meant. Anything unresolvable comes back
+        // unchanged and keeps the previous behaviour.
+        fileName = ShellLinkResolver.Resolve(fileName);
 
         if (fileName.EndsWith(".lxp", StringComparison.OrdinalIgnoreCase))
         {
