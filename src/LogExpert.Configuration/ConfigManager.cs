@@ -329,6 +329,13 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
+    public void ClearFileHistory ()
+    {
+        Instance.Settings.FileHistoryList.Clear();
+
+        Save(SettingsFlags.FileHistory);
+    }
+
     public void ClearLastOpenFilesList ()
     {
         lock (_loadSaveLock)

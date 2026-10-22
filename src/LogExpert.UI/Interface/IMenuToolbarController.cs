@@ -53,5 +53,6 @@ internal interface IMenuToolbarController : IDisposable
     // Events
     event EventHandler<HistoryItemClickedEventArgs> HistoryItemClicked;
     event EventHandler<HistoryItemClickedEventArgs> HistoryItemRemoveRequested;
+    event EventHandler HistoryClearRequested;
     event EventHandler<HighlightGroupSelectedEventArgs> HighlightGroupSelected;
 }

@@ -268,8 +268,45 @@ internal class MenuToolbarControllerTests : IDisposable
         _controller.PopulateFileHistory(history);
 
         var lastUsed = FindMenuItem("lastUsedToolStripMenuItem");
-        Assert.That(lastUsed.DropDownItems, Has.Count.EqualTo(2));
+        Assert.That(lastUsed.DropDownItems, Has.Count.EqualTo(4), "2 files + separator + clear item");
         Assert.That(lastUsed.DropDownItems[0].Text, Is.EqualTo(@"C:\log1.txt"));
+        Assert.That(lastUsed.DropDownItems[2], Is.TypeOf<ToolStripSeparator>());
+        Assert.That(lastUsed.DropDownItems[3].Name, Is.EqualTo("clearFileHistoryToolStripMenuItem"));
+        Assert.That(lastUsed.DropDownItems[3].Enabled, Is.True);
+    }
+
+    [Test]
+    public void PopulateFileHistory_DisablesClearItem_WhenHistoryIsEmpty ()
+    {
+        _controller.PopulateFileHistory([]);
+
+        var lastUsed = FindMenuItem("lastUsedToolStripMenuItem");
+        Assert.That(lastUsed.DropDownItems, Has.Count.EqualTo(1), "clear item only, no separator");
+        Assert.That(lastUsed.DropDownItems[0].Name, Is.EqualTo("clearFileHistoryToolStripMenuItem"));
+        Assert.That(lastUsed.DropDownItems[0].Enabled, Is.False);
+    }
+
+    [Test]
+    public void ClearHistoryItem_RaisesHistoryClearRequested_AndNotFileClicked ()
+    {
+        var clearRequested = 0;
+        string clickedFile = null;
+        _controller.HistoryClearRequested += (_, _) => clearRequested++;
+        _controller.HistoryItemClicked += (_, e) => clickedFile = e.FileName;
+
+        _controller.PopulateFileHistory(["test.log"]);
+        var lastUsed = FindMenuItem("lastUsedToolStripMenuItem");
+        var clearItem = lastUsed.DropDownItems[^1];
+
+        var args = new ToolStripItemClickedEventArgs(clearItem);
+        var onItemClicked = typeof(ToolStrip).GetMethod("OnItemClicked", BindingFlags.Instance | BindingFlags.NonPublic);
+        _ = onItemClicked.Invoke(lastUsed.DropDown, [args]);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(clearRequested, Is.EqualTo(1));
+            Assert.That(clickedFile, Is.Null, "the clear item must not be treated as a file entry");
+        });
     }
 
     [Test]

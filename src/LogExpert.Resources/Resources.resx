@@ -1173,6 +1173,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem" xml:space="preserve">
         <value>Last used</value>
     </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem" xml:space="preserve">
+        <value>Clear recently used</value>
+    </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem" xml:space="preserve">
         <value>Exit</value>
     </data>

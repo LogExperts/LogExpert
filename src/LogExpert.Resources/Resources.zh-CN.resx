@@ -1031,6 +1031,9 @@
   <data name="LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem" xml:space="preserve">
     <value>最近使用</value>
   </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem" xml:space="preserve">
+    <value>清除最近使用</value>
+  </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem" xml:space="preserve">
     <value>退出</value>
   </data>
