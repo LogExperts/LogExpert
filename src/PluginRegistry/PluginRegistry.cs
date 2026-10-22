@@ -1277,7 +1277,17 @@ public class PluginRegistry : IPluginRegistry
 
     private static Assembly ColumnizerResolveEventHandler (object? sender, ResolveEventArgs args)
     {
-        var fileName = new AssemblyName(args.Name).Name + ".dll";
+        var assemblyName = new AssemblyName(args.Name).Name;
+
+        // Type names come from settings and .lxp files; a name like "../x" must not reach outside our directories.
+        if (string.IsNullOrEmpty(assemblyName) ||
+            assemblyName != Path.GetFileName(assemblyName) ||
+            assemblyName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            return null;
+        }
+
+        var fileName = assemblyName + ".dll";
 
         var mainDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
         var pluginDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "plugins", fileName);

@@ -105,9 +105,39 @@ public class MockColumnizerWithCustomName : ILogLineMemoryColumnizer
 
 }
 
+public sealed class NotAColumnizer
+{
+    public static int ConstructorCalls { get; set; }
+
+    public NotAColumnizer ()
+    {
+        ConstructorCalls++;
+    }
+}
+
 [TestFixture]
 public class ColumnizerJsonConverterTests
 {
+    [Test]
+    public void Deserialize_TypeNameIsNotAColumnizer_ThrowsWithoutCreatingInstance ()
+    {
+        NotAColumnizer.ConstructorCalls = 0;
+        var json = JsonConvert.SerializeObject(new
+        {
+            TypeName = typeof(NotAColumnizer).AssemblyQualifiedName,
+            State = new { }
+        });
+
+        var settings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.None,
+            Converters = { new ColumnizerJsonConverter() }
+        };
+
+        _ = Assert.Throws<JsonSerializationException>(() => JsonConvert.DeserializeObject<ILogLineMemoryColumnizer>(json, settings));
+        Assert.That(NotAColumnizer.ConstructorCalls, Is.Zero);
+    }
+
     [Test]
     public void SerializeDeserialize_MockColumnizer_RoundTripPreservesStateAndType ()
     {
