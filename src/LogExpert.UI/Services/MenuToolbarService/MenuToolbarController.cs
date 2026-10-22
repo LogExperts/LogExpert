@@ -14,6 +14,8 @@ namespace LogExpert.UI.Services.MenuToolbarService;
 [SupportedOSPlatform("windows")]
 internal sealed class MenuToolbarController : IMenuToolbarController
 {
+    private const string CLEAR_HISTORY_ITEM_NAME = "clearFileHistoryToolStripMenuItem";
+
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private MenuStrip _mainMenu;
@@ -56,6 +58,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     public event EventHandler<HistoryItemClickedEventArgs> HistoryItemClicked;
     public event EventHandler<HistoryItemClickedEventArgs> HistoryItemRemoveRequested;
+    public event EventHandler HistoryClearRequested;
     public event EventHandler<HighlightGroupSelectedEventArgs> HighlightGroupSelected;
 
     public MenuToolbarController ()
@@ -270,10 +273,23 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
         var strip = new ToolStripDropDownMenu();
 
-        foreach (var file in fileHistory)
+        var history = fileHistory as IList<string> ?? [.. fileHistory];
+
+        foreach (var file in history)
         {
             _ = strip.Items.Add(new ToolStripMenuItem(file));
         }
+
+        if (history.Count > 0)
+        {
+            _ = strip.Items.Add(new ToolStripSeparator());
+        }
+
+        _ = strip.Items.Add(new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
+        {
+            Name = CLEAR_HISTORY_ITEM_NAME,
+            Enabled = history.Count > 0
+        });
 
         strip.ItemClicked += OnHistoryMenuItemClicked;
         strip.MouseUp += OnHistoryStripMouseUp;
@@ -302,6 +318,12 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     private void OnHistoryMenuItemClicked (object sender, ToolStripItemClickedEventArgs e)
     {
+        if (e.ClickedItem?.Name == CLEAR_HISTORY_ITEM_NAME)
+        {
+            HistoryClearRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         var fileName = e.ClickedItem?.Text;
         if (!string.IsNullOrEmpty(fileName))
         {
@@ -320,7 +342,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         if (sender is ToolStripDropDownMenu strip)
         {
             var item = strip.GetItemAt(e.Location);
-            if (item != null && !string.IsNullOrEmpty(item.Text))
+            if (item != null && item.Name != CLEAR_HISTORY_ITEM_NAME && !string.IsNullOrEmpty(item.Text))
             {
                 HistoryItemRemoveRequested?.Invoke(this, new HistoryItemClickedEventArgs(item.Text));
             }

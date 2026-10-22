@@ -183,6 +183,12 @@ public interface IConfigManager
     void RemoveFromFileHistory (string fileName);
 
     /// <summary>
+    /// Removes all entries from the file history list.
+    /// </summary>
+    /// <remarks>The settings are saved immediately after the list has been cleared.</remarks>
+    void ClearFileHistory ();
+
+    /// <summary>
     /// Clears the list of recently opened files.
     /// </summary>
     /// <remarks>Call this method to remove all entries from the recent files list, typically to reset user
