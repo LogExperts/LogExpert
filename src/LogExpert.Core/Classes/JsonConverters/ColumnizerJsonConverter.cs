@@ -96,8 +96,11 @@ public class ColumnizerJsonConverter : JsonConverter
             columnizerType = Type.GetType(typeName, throwOnError: false);
             //FindColumnizerTypeByAssemblyQualifiedName(typeName);
 
-            // If Type.GetType fails, try finding it manually
-            if (columnizerType == null)
+            // If Type.GetType fails or finds something that is not a columnizer, try finding it manually
+            if (columnizerType == null ||
+                !typeof(ILogLineMemoryColumnizer).IsAssignableFrom(columnizerType) ||
+                columnizerType.IsInterface ||
+                columnizerType.IsAbstract)
             {
                 columnizerType = FindColumnizerTypeByAssemblyQualifiedName(typeName);
             }
