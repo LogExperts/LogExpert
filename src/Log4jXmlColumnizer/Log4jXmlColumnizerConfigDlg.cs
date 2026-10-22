@@ -24,12 +24,27 @@ public partial class Log4jXmlColumnizerConfigDlg : Form
 
         _config = config;
         InitializeComponent();
+
+        ApplyResources();
+
         FillListBox();
         localTimeCheckBox.Checked = _config.LocalTimestamps;
         ResumeLayout();
     }
 
     #endregion
+
+    private void ApplyResources ()
+    {
+        Text = Resources.Log4jXmlColumnizerConfigDlg_UI_Title;
+        label1.Text = Resources.Log4jXmlColumnizerConfigDlg_UI_Label_ChooseColumns;
+        localTimeCheckBox.Text = Resources.Log4jXmlColumnizerConfigDlg_UI_CheckBox_LocalTime;
+        Column.HeaderText = Resources.Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_Column;
+        maxWidth.HeaderText = Resources.Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_MaxLen;
+        maxWidth.ToolTipText = Resources.Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_ToolTipMaxLen;
+        okButton.Text = Resources.Log4jXmlColumnizerConfigDlg_UI_Button_OK;
+        cancelButton.Text = Resources.Log4jXmlColumnizerConfigDlg_UI_Button_Cancel;
+    }
 
     #region Private Methods
 

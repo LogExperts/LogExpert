@@ -152,6 +152,21 @@
   <data name="Bookmark_added" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority" xml:space="preserve">
+		<value>Priorität der Columnizer-Auswahl</value>
+	</data>
+  <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
+		<value>Maximale Anzeigelänge (Neustart nötig)</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask" xml:space="preserve">
+		<value>Zuerst Verlauf, dann Maske (Standard)</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence" xml:space="preserve">
+		<value>Maske verwenden, per-Date-Persistenz überschreiben</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory" xml:space="preserve">
+		<value>Zuerst Maske, dann Verlauf</value>
+	</data>
   <data name="bookmark_bubbles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\bookmark_bubbles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -2366,5 +2381,50 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
   <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
     <value>Ausblendregeln konnten nicht angewendet werden, alle Zeilen werden angezeigt: {0}</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameterNamed" xml:space="preserve">
+    <value>&amp;Wert für "{0}":</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnAdd" xml:space="preserve">
+    <value>Neues Highlight-Element erstellen (öffnet den Editor-Dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopy" xml:space="preserve">
+    <value>Das ausgewählte Highlight in ein neues kopieren (öffnet den Editor-Dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnEdit" xml:space="preserve">
+    <value>Das ausgewählte Highlight im Editor-Dialog bearbeiten</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDelete" xml:space="preserve">
+    <value>Das aktuelle Highlight löschen</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveUp" xml:space="preserve">
+    <value>Das aktuelle Highlight um eine Position nach oben verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveDown" xml:space="preserve">
+    <value>Das aktuelle Highlight um eine Position nach unten verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnExportGroup" xml:space="preserve">
+    <value>Highlight-Gruppen exportieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnImportGroup" xml:space="preserve">
+    <value>Highlight-Gruppen importieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe um eine Position nach unten verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe um eine Position nach oben verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopyGroup" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe in eine neue kopieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDeleteGroup" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe löschen</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnNewGroup" xml:space="preserve">
+    <value>Neue leere Highlight-Gruppe erstellen</value>
+  </data>
+  <data name="HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups" xml:space="preserve">
+    <value>Wählen Sie eine Gruppe, um unterschiedliche Highlight-Einstellungen zu erstellen. Geben Sie einen Namen ein, um den Namen der Gruppe zu ändern.</value>
   </data>
 </root>

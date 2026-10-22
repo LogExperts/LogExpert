@@ -139,7 +139,7 @@
     <value>最小列数</value>
   </data>
   <data name="CsvColumnizerConfigDlg_UI_Label_MinColumnsInfo" xml:space="preserve">
-    <value>(0 = 不检查最小值)</value>
+    <value>（0 = 不检查最小列数）</value>
   </data>
   <data name="CsvColumnizerConfigDlg_UI_CheckBox_FirstLineFieldNames" xml:space="preserve">
     <value>首行包含字段名</value>
@@ -157,6 +157,9 @@
     <value>反序列化配置数据时出错：{0}</value>
   </data>
   <data name="CsvColumnizer_Description" xml:space="preserve">
-    <value>将 CSV 文件拆分为列。</value>
+    <value>将 CSV 文件拆分为列。
+
+致谢：
+本列分隔器使用 CsvHelper。https://github.com/JoshClose/CsvHelper.</value>
   </data>
 </root>

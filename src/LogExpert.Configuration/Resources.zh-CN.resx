@@ -127,6 +127,6 @@
     <value>反序列化返回 null</value>
   </data>
   <data name="ConfigManager_Error_Messages_InvalidOperation_SettingsValidationFailed" xml:space="preserve">
-    <value>设置验证失败 - 拒绝保存可能已损坏的数据</value>
+    <value>设置验证失败——拒绝保存可能已损坏的数据</value>
   </data>
 </root>
