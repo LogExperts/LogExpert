@@ -204,7 +204,7 @@ internal partial class TimeSpreadingControl : UserControl
             }
         }
 
-        _ = BeginInvoke(new MethodInvoker(Refresh));
+        RefreshOnUiThread();
     }
 
     private void OnTimeSpreadCalcStartCalc (object sender, EventArgs e)
@@ -238,7 +238,30 @@ internal partial class TimeSpreadingControl : UserControl
             gfx.DrawString(Resources.TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView, Font, fgBrush, rectf, format);
         }
 
-        _ = BeginInvoke(new MethodInvoker(Refresh));
+        RefreshOnUiThread();
+    }
+
+    /// <summary>
+    /// The calculator raises its events from a thread-pool worker; the control may not have a
+    /// window handle yet (a loaded but never displayed window, e.g. a background tab of a
+    /// restored session) or may be tearing down. BeginInvoke throws on both — skip the refresh,
+    /// the control paints when it first becomes visible anyway.
+    /// </summary>
+    private void RefreshOnUiThread ()
+    {
+        if (!IsHandleCreated || IsDisposed)
+        {
+            return;
+        }
+
+        try
+        {
+            _ = BeginInvoke(new MethodInvoker(Refresh));
+        }
+        catch (InvalidOperationException)
+        {
+            // Handle destroyed between the check and the call — the window is closing.
+        }
     }
 
     private void OnTimeSpreadingControlSizeChanged (object sender, EventArgs e)

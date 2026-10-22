@@ -9,8 +9,6 @@ using LogExpert.Dialogs;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
 
-using NLog;
-
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.UI.Services.ToolWindowCoordinatorService;
@@ -18,8 +16,6 @@ namespace LogExpert.UI.Services.ToolWindowCoordinatorService;
 [SupportedOSPlatform("windows")]
 internal sealed class ToolWindowCoordinator (IConfigManager configManager) : IToolWindowCoordinator
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
     private readonly IConfigManager _configManager = configManager;
 
     private BookmarkWindow? _bookmarkWindow;
@@ -36,7 +32,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         };
 
         var prefs = _configManager.Settings.Preferences;
-        _bookmarkWindow.PreferencesChanged(prefs.FontName, prefs.FontSize, prefs.SetLastColumnWidth, prefs.LastColumnWidth, SettingsFlags.All);
+        _bookmarkWindow.PreferencesChanged(prefs.Font, prefs.SetLastColumnWidth, prefs.LastColumnWidth, SettingsFlags.All);
         _bookmarkWindow.VisibleChanged += OnBookmarkWindowVisibleChanged;
         _firstBookmarkWindowShow = true;
     }
@@ -61,8 +57,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         _connectedLogWindow = logWindow;
 
         // Subscribe to bookmark events for relay
-        logWindow.BookmarkAdded += OnBookmarkAdded;
-        logWindow.BookmarkRemoved += OnBookmarkRemoved;
+        logWindow.BookmarksChanged += OnBookmarksChanged;
         logWindow.BookmarkTextChanged += OnBookmarkTextChanged;
         logWindow.ColumnizerChanged += OnColumnizerChanged;
 
@@ -76,8 +71,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
     {
         if (_connectedLogWindow != null)
         {
-            _connectedLogWindow.BookmarkAdded -= OnBookmarkAdded;
-            _connectedLogWindow.BookmarkRemoved -= OnBookmarkRemoved;
+            _connectedLogWindow.BookmarksChanged -= OnBookmarksChanged;
             _connectedLogWindow.BookmarkTextChanged -= OnBookmarkTextChanged;
             _connectedLogWindow.ColumnizerChanged -= OnColumnizerChanged;
             _connectedLogWindow = null;
@@ -119,9 +113,9 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
             : (IDockContent?)null;
     }
 
-    public void ApplyPreferences (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)
+    public void ApplyPreferences (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)
     {
-        _bookmarkWindow?.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _bookmarkWindow?.PreferencesChanged(font, setLastColumnWidth, lastColumnWidth, flags);
     }
 
     public void SetLineColumnVisible (bool visible)
@@ -141,12 +135,7 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
 
     // Event relay handlers
 
-    private void OnBookmarkAdded (object? sender, EventArgs e)
-    {
-        _bookmarkWindow?.UpdateView();
-    }
-
-    private void OnBookmarkRemoved (object? sender, EventArgs e)
+    private void OnBookmarksChanged (object? sender, EventArgs e)
     {
         _bookmarkWindow?.UpdateView();
     }

@@ -152,6 +152,9 @@
   <data name="Bookmark_added" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
+        <value>Maximum Display Length (restart required)</value>
+    </data>
   <data name="bookmark_bubbles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\bookmark_bubbles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -187,6 +190,9 @@
   </data>
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LogExpert_Common_UI_Message_ClipboardInUse" xml:space="preserve">
+    <value>Could not copy to the clipboard. It is in use by another application. Please try again.</value>
   </data>
   <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
         <value>LogExpert</value>
@@ -236,7 +242,7 @@
         <value>Export Settings to file</value>
     </data>
   <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
-        <value>Settings (*.json)|*.json|All files (*.*)</value>
+        <value>Settings (*.json)|*.json|All files (*.*)|*.*</value>
     </data>
   <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
         <value>Copy of</value>
@@ -289,6 +295,9 @@
     </data>
   <data name="LogWindow_UI_Text_FreezeLeftColumnsUntilHereGridViewColumns_selectedColHeaderText" xml:space="preserve">
         <value>Freeze left columns until here ({0})</value>
+    </data>
+  <data name="LogWindow_UI_StatusLineError_FilterFailed" xml:space="preserve">
+        <value>Filter failed: {0}</value>
     </data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
         <value>Invalid regular expression</value>
@@ -415,6 +424,11 @@
     </data>
   <data name="LogWindow_UI_ToolStripMenuItem_ToolTip_ScrollAllTabsToCurrentTimestamp" xml:space="preserve">
         <value>Scolls all open tabs to the selected timestamp, if possible</value>
+    </data>
+  <data name="LogWindow_UI_TimeSync_TimestampControlHint" xml:space="preserve">
+        <value>Files are now time synced.
+
+To sync the other windows while you select lines (mouse click or arrow keys), enable "Show timestamp control" under Settings &gt; Timestamp features. Without it, only "Scroll all tabs to current timestamp" moves the other windows.</value>
     </data>
   <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
         <value>Time synced files</value>
@@ -648,7 +662,7 @@
         <value>Insufficient rights {0}: {1}</value>
     </data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
-        <value>Error during {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
+        <value>Error during value {0}, min {1}, max {2}, visible {3}: {4}</value>
     </data>
   <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
         <value>lines</value>
@@ -665,7 +679,7 @@
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
         <value>This is a test exception thrown by a background thread</value>
     </data>
-  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+  <data name="LogTabWindow_UI_Session_Default_Filter" xml:space="preserve">
         <value>LogExpert session {0}</value>
     </data>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
@@ -852,8 +866,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
         <value>Ask before closing tabs</value>
     </data>
-  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
-        <value>Dark Mode (restart required)</value>
+  <data name="SettingsDialog_UI_Label_labelColorMode" xml:space="preserve">
+        <value>Color mode (restart required)</value>
     </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
         <value>Follow tail enabled</value>
@@ -884,6 +898,27 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxMaskPrio" xml:space="preserve">
         <value>Mask has priority before history</value>
+    </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority" xml:space="preserve">
+        <value>Columnizer selection priority</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask" xml:space="preserve">
+        <value>Use history then mask (default)</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory" xml:space="preserve">
+        <value>Use mask, then history</value>
+    </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence" xml:space="preserve">
+        <value>Use mask, override per-file persistence</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType" xml:space="preserve">
+        <value>Type</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType" xml:space="preserve">
+        <value>Glob uses * and ? wildcards. Regex uses .NET regular expression syntax.</value>
+    </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale" xml:space="preserve">
+        <value>Columnizer '{0}' is not installed — this entry will be skipped.</value>
     </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxPortableMode" xml:space="preserve">
         <value>Activate Portable Mode</value>
@@ -1315,21 +1350,6 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem" xml:space="preserve">
         <value>Encoding</value>
     </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
-        <value>ASCII</value>
-    </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
-        <value>ANSI</value>
-    </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
-        <value>ISO-8859-1</value>
-    </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
-        <value>UTF8</value>
-    </data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
-        <value>Unicode</value>
-    </data>
   <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
         <value>+00:00:00.000</value>
     </data>
@@ -1491,7 +1511,8 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="SearchDialog_UI_Label_SearchFor" xml:space="preserve">
         <value>&amp;Search for:</value>
-    </data>
+      <comment>@MutedRule(PunctuationTail)</comment>
+  </data>
   <data name="SearchDialog_UI_CheckBox_CaseSensitive" xml:space="preserve">
         <value>&amp;Case sensitive</value>
     </data>
@@ -1535,8 +1556,29 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="HighlightDialog_UI_Title" xml:space="preserve">
         <value>Highlighting and action triggers</value>
     </data>
+  <data name="HighlightEntryEditDialog_UI_Title_Add" xml:space="preserve">
+        <value>Add Highlight</value>
+    </data>
+  <data name="HighlightEntryEditDialog_UI_Title_EditFormat" xml:space="preserve">
+        <value>Edit Highlight — "{0}"</value>
+    </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_LineMatchCriteria" xml:space="preserve">
+        <value>Line Match Criteria</value>
+    </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Coloring" xml:space="preserve">
+        <value>Coloring</value>
+    </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Actions" xml:space="preserve">
+        <value>Actions</value>
+    </data>
+  <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
+        <value>(preview)</value>
+    </data>
   <data name="LogExpert_Common_UI_Button_Add" xml:space="preserve">
         <value>&amp;Add</value>
+    </data>
+  <data name="LogExpert_Common_UI_Button_Edit" xml:space="preserve">
+        <value>&amp;Edit</value>
     </data>
   <data name="LogExpert_Common_UI_Button_Delete" xml:space="preserve">
         <value>&amp;Delete</value>
@@ -1570,6 +1612,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
         <value>&amp;Copy</value>
+    </data>
+  <data name="HighlightDialog_UI_Button_CopyEntry" xml:space="preserve">
+        <value>Co&amp;py</value>
     </data>
   <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
         <value>Delete group</value>
@@ -1606,6 +1651,24 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="HighlightDialog_UI_CheckBox_Plugin" xml:space="preserve">
         <value>Plugin</value>
+    </data>
+  <data name="HighlightDialog_UI_CheckBox_AlertOnHit" xml:space="preserve">
+        <value>Alert on hit</value>
+    </data>
+  <data name="HighlightDialog_UI_Label_SoundFile" xml:space="preserve">
+        <value>Sound file:</value>
+    </data>
+  <data name="HighlightDialog_UI_Button_BrowseSoundFile" xml:space="preserve">
+        <value>Browse...</value>
+    </data>
+  <data name="HighlightDialog_UI_Label_Cooldown" xml:space="preserve">
+        <value>Cooldown:</value>
+    </data>
+  <data name="HighlightDialog_UI_Label_Seconds" xml:space="preserve">
+        <value>seconds</value>
+    </data>
+  <data name="HighlightDialog_UI_OpenFileFilter_Audio" xml:space="preserve">
+        <value>Audio files (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|All files (*.*)|*.*</value>
     </data>
   <data name="HighlightDialog_UI_CheckBox_WordMatch" xml:space="preserve">
         <value>Word mode</value>
@@ -1652,45 +1715,6 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="ExceptionWindow_UI_Button_CopyToClipboard" xml:space="preserve">
         <value>Copy to clipboard</value>
     </data>
-  <data name="PatternWindow_UI_Title" xml:space="preserve">
-        <value>Patterns</value>
-    </data>
-  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
-        <value>Number of blocks (pattern variants):</value>
-    </data>
-  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
-        <value>Block lines:</value>
-    </data>
-  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-        <value>This feature is pre-beta and does not work :)
-		Usage: Select a range in the log window and press "Recalc". 
-		This will search for text ranges similar to the selected one.</value>
-    </data>
-  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
-        <value>Fuzzy</value>
-    </data>
-  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
-        <value>Max diff</value>
-    </data>
-  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
-        <value>Max misses</value>
-    </data>
-  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
-        <value>Weigth</value>
-    </data>
-  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
-        <value>(no range set)</value>
-    </data>
-  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
-        <value>Recalc</value>
-    </data>
-  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
-        <value>Set range</value>
-    </data>
-  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-        <value>Start: {0}
-		End: {1}</value>
-    </data>
   <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
         <value>Loading Session</value>
     </data>
@@ -1725,12 +1749,16 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Pattern syntax:
 
 * = any characters (wildcard)
-$D(&amp;lt;date&amp;gt;) = Date pattern
+$D(&lt;date&gt;) = Date pattern
 $I = File index number
 $J = File index number, hidden when zero
-$J(&amp;lt;prefix&amp;gt;) = Like $J, but adding &amp;lt;prefix&amp;gt; when non-zero
+$J(&lt;prefix&gt;) = Like $J, but adding &lt;prefix&gt; when non-zero
 
-&amp;lt;date&amp;gt;:
+Examples:
+*$J(.) → app.log, app.log.1, app.log.2
+*$J(.).log → app.log, app.1.log, app.2.log
+
+&lt;date&gt;:
 DD = day
 MM = month
 YY[YY] = year
@@ -1941,12 +1969,14 @@ Regex search/replace on current selected line</value>
   </data>
   <data name="PluginTrustDialog_UI_Button_AddPlugin" xml:space="preserve">
     <value>&amp;Add Plugin...</value>
+    <comment>@MutedRule(PunctuationTail)</comment>
   </data>
   <data name="PluginTrustDialog_UI_Button_Remove" xml:space="preserve">
     <value>&amp;Remove</value>
   </data>
   <data name="PluginTrustDialog_UI_Button_ViewHash" xml:space="preserve">
     <value>&amp;View Hash...</value>
+    <comment>@MutedRule(PunctuationTail)</comment>
   </data>
   <data name="PluginTrustDialog_UI_Column_PluginName" xml:space="preserve">
     <value>Plugin Name</value>
@@ -2052,6 +2082,7 @@ Continue?</value>
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_Text_PluginTrustManagement" xml:space="preserve">
     <value>Plugin &amp;Trust Management...</value>
+    <comment>@MutedRule(PunctuationTail)</comment>
   </data>
   <data name="SearchDialog_UI_Error_InvalidRegexPattern" xml:space="preserve">
     <value>Invalid regex pattern: {0}</value>
@@ -2073,28 +2104,25 @@ Restart LogExpert to apply changes?</value>
   <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
     <value>Default (single line)</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
-    <value>Error loading project file. The file may be corrupted or inaccessible.</value>
+  <data name="LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>Error loading session. The file may be corrupted or inaccessible.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
-    <value>Project Load Failed</value>
-  </data>
-  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
     <value>None of the files in this session could be found. The session cannot be loaded.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
     <value>Session Load Failed</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
     <value>Session file has been updated with the new file paths.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
     <value>Session Updated</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Failed to update session file: {0}</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Session Update Failed</value>
   </data>
   <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
@@ -2174,5 +2202,233 @@ Restart LogExpert to apply changes?</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
     <value>Scanning bookmarks finished / canceled!</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageControlCharacters" xml:space="preserve">
+    <value>Control characters</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable" xml:space="preserve">
+    <value>Substitute control characters in display</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsWarning" xml:space="preserve">
+    <value>Display only — does not modify file contents or affect search, filter, or copy-to-clipboard (unless the option below is enabled). Enabling this can make some log files look unusual.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsHint" xml:space="preserve">
+    <value>Enable substitution above to apply.</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle" xml:space="preserve">
+    <value>Display style</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures" xml:space="preserve">
+    <value>Unicode Control Pictures (default)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret" xml:space="preserve">
+    <value>Caret notation (^X)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape" xml:space="preserve">
+    <value>C escape sequence (\x01)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation" xml:space="preserve">
+    <value>Abbreviation (&lt;SOH&gt;)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047" xml:space="preserve">
+    <value>ISO 2047 graphics</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetAll" xml:space="preserve">
+    <value>Enable all</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNone" xml:space="preserve">
+    <value>Disable all</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace" xml:space="preserve">
+    <value>Non-whitespace defaults</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsForeColor" xml:space="preserve">
+    <value>Foreground colour:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsBackColor" xml:space="preserve">
+    <value>Background colour:</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsForeColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColorClear" xml:space="preserve">
+    <value>(no color)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsBold" xml:space="preserve">
+    <value>Bold</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic" xml:space="preserve">
+    <value>Italic</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard" xml:space="preserve">
+    <value>Clipboard</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
+    <value>Copy displayed form instead of raw characters</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
+    <value>Sysout for the Tool was configured, but there is no active logfile the Tool will be started without the Sysout Pipe</value>
+  </data>
+  <data name="HighlightDialog_UI_SelectionHighlight" xml:space="preserve">
+    <value>Selection highlight (all groups)</value>
+  </data>
+  <data name="HighlightDialog_UI_OutlineSelectedBlocks" xml:space="preserve">
+    <value>Outline selected blocks</value>
+  </data>
+  <data name="HighlightDialog_UI_ChangeSelectionColor" xml:space="preserve">
+    <value>Change selection highlight color...</value>
+  </data>
+  <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
+    <value>Use system color</value>
+  </data>
+  <data name="FolderDrop_Title" xml:space="preserve">
+    <value>Open files from folders</value>
+  </data>
+  <data name="FolderDrop_Discovering" xml:space="preserve">
+    <value>Discovering files… Cancel to open nothing.</value>
+  </data>
+  <data name="FolderDrop_Instructions" xml:space="preserve">
+    <value>Select the files to open. No files are selected automatically.</value>
+  </data>
+  <data name="FolderDrop_Filter" xml:space="preserve">
+    <value>Filter paths:</value>
+  </data>
+  <data name="FolderDrop_SelectAll" xml:space="preserve">
+    <value>Select all matching</value>
+  </data>
+  <data name="FolderDrop_SelectNone" xml:space="preserve">
+    <value>Select none</value>
+  </data>
+  <data name="FolderDrop_Open" xml:space="preserve">
+    <value>Open selected</value>
+  </data>
+  <data name="FolderDrop_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="FolderDrop_Path" xml:space="preserve">
+    <value>Full path</value>
+  </data>
+  <data name="FolderDrop_Select" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="FolderDrop_Summary" xml:space="preserve">
+    <value>{0:N0} files; {1:N0} matching; {2:N0} selected.</value>
+  </data>
+  <data name="FolderDrop_Empty" xml:space="preserve">
+    <value>No eligible files were found. Automatically discovered .lxp and .lxj files are excluded.</value>
+  </data>
+  <data name="FolderDrop_Skipped" xml:space="preserve">
+    <value>{0:N0} locations were skipped:</value>
+  </data>
+  <data name="FolderDrop_DirectoryLink" xml:space="preserve">
+    <value>Directory link skipped (junction or symbolic link).</value>
+  </data>
+  <data name="FolderDrop_Failed" xml:space="preserve">
+    <value>Could not prepare the dropped files: {0}</value>
+  </data>
+  <data name="FolderDrop_Previous" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="FolderDrop_Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="FolderDrop_Page" xml:space="preserve">
+    <value>{0:N0}–{1:N0} of {2:N0} matches</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
+    <value>Marker bar</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar" xml:space="preserve">
+    <value>Show marker bar</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers" xml:space="preserve">
+    <value>Show highlight markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers" xml:space="preserve">
+    <value>Show bookmark markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers" xml:space="preserve">
+    <value>Show search markers</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
+    <value>Show filter markers</value>
+  </data>
+  <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
+    <value>Could not create a parsing snapshot for columnizer '{0}'.</value>
+  </data>
+  <data name="MarkerBar_LineUnavailable" xml:space="preserve">
+    <value>Could not read log line {0} while discovering markers.</value>
+  </data>
+  <data name="MarkerBar_Highlights" xml:space="preserve"><value>Highlights</value></data>
+  <data name="MarkerBar_Bookmarks" xml:space="preserve"><value>Bookmarks</value></data>
+  <data name="MarkerBar_SearchHits" xml:space="preserve"><value>Search hits</value></data>
+  <data name="MarkerBar_FilterHits" xml:space="preserve"><value>Filter hits</value></data>
+  <data name="MarkerBar_ClearSearch" xml:space="preserve"><value>Clear search</value></data>
+  <data name="MarkerBar_Discovering" xml:space="preserve"><value>Discovering markers…</value></data>
+  <data name="MarkerBar_ToolTip" xml:space="preserve"><value>{0}: lines {1}–{2}, {3} matching lines</value></data>
+  <data name="MarkerBar_ScanFailed" xml:space="preserve"><value>Marker discovery failed: {0}</value></data>
+  <data name="MarkerBar_Title" xml:space="preserve"><value>Marker bar</value></data>
+  <data name="HighlightDialog_UI_CheckBox_HideLine" xml:space="preserve">
+    <value>Hide line</value>
+  </data>
+  <data name="LogWindow_UI_Label_HiddenLines" xml:space="preserve">
+    <value>{0:N0} lines hidden by highlight rules</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ShowHiddenLines" xml:space="preserve">
+    <value>Show hidden lines</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
+    <value>Hide rules could not be applied, all lines are shown: {0}</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameterNamed" xml:space="preserve">
+    <value>&amp;Value for "{0}":</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnAdd" xml:space="preserve">
+    <value>Create a new highlight item (opens the editor dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopy" xml:space="preserve">
+    <value>Copy the selected highlight into a new one (opens the editor dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnEdit" xml:space="preserve">
+    <value>Edit the selected highlight in the editor dialog</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDelete" xml:space="preserve">
+    <value>Delete the current highlight</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveUp" xml:space="preserve">
+    <value>Move the current highlight one position up</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveDown" xml:space="preserve">
+    <value>Move the current highlight one position down</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnExportGroup" xml:space="preserve">
+    <value>Export highlight groups</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnImportGroup" xml:space="preserve">
+    <value>Import highlight groups</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown" xml:space="preserve">
+    <value>Move the current highlight group one position down</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp" xml:space="preserve">
+    <value>Move the current highlight group one position up</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopyGroup" xml:space="preserve">
+    <value>Copy the current highlight group into a new one</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDeleteGroup" xml:space="preserve">
+    <value>Delete the current highlight group</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnNewGroup" xml:space="preserve">
+    <value>Create a new empty highlight group</value>
+  </data>
+  <data name="HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups" xml:space="preserve">
+    <value>Choose a group to create different highlight settings. Type in a name to change the name of a group.</value>
   </data>
 </root>

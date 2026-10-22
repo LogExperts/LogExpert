@@ -59,17 +59,23 @@ internal class TimeSyncList
     /// </summary>
     /// <param name="timestamp"></param>
     /// <param name="sender"></param>
+    /// <param name="onScrolled">
+    /// Invoked for each window that accepted the scroll (LED signalling). When this is called from
+    /// the sender's sync worker thread, a cross-thread scroll is dispatched via BeginInvoke and
+    /// reports acceptance, not completion — the callback then covers every sync-group member,
+    /// which is the intended "these tabs are moving" signal.
+    /// </param>
     [SupportedOSPlatform("windows")]
-    public void NavigateToTimestamp (DateTime timestamp, LogWindow sender)
+    public void NavigateToTimestamp (DateTime timestamp, LogWindow sender, Action<LogWindow> onScrolled = null)
     {
         CurrentTimestamp = timestamp;
         lock (logWindowList)
         {
             foreach (var logWindow in logWindowList)
             {
-                if (sender != logWindow)
+                if (sender != logWindow && logWindow.ScrollToTimestamp(timestamp, false, false))
                 {
-                    _ = logWindow.ScrollToTimestamp(timestamp, false, false);
+                    onScrolled?.Invoke(logWindow);
                 }
             }
         }

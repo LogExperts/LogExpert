@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    name: Build and Release ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for GitVersion to compute version from tags
+
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install InnoSetup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build and Package
+        run: ./build.ps1 --target Clean Pack --configuration Release
+
+      - name: Install nuget-license tool
+        run: dotnet tool install --global nuget-license
+
+      - name: Update usedComponents.json
+        shell: pwsh
+        run: |
+          # Generate updated component list (packages already restored by build).
+          # -override supplies license info for packages whose nuspec omits it (e.g. Nuke.GitHub),
+          # which otherwise makes nuget-license exit non-zero.
+          $output = nuget-license -i src/LogExpert.sln -o JsonPretty -override "src/Solution Items/nuget-license-overrides.json"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::error::nuget-license failed with exit code $LASTEXITCODE"
+            Write-Host $output
+            exit 1
+          }
+          Set-Content -Path "src/Solution Items/usedComponents.json" -Value $output -Encoding UTF8
+
+      # Mint a short-lived token for the dedicated GitHub App. The App is on the Development
+      # ruleset's bypass list, so it (and only it) can merge the chore PR without an approval.
+      # Minted here, right before use, so its ~1h lifetime is not consumed by the build.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: Open PR with generated files
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Built-in plugin hashes are not carried here: PluginRegistry generates its own table at
+          # build time, so there is nothing to commit back. usedComponents.json is all that is left.
+
+          # Save the generated file before switching branches (checkout would overwrite it)
+          $tempComponents = [System.IO.Path]::GetTempFileName()
+          Copy-Item "src/Solution Items/usedComponents.json" $tempComponents
+
+          # Development is PR-protected, so apply the updates on a fresh branch off Development
+          git fetch origin Development
+          $branch = "chore/generated-files-${{ github.ref_name }}"
+          git checkout -B $branch origin/Development
+
+          Copy-Item $tempComponents "src/Solution Items/usedComponents.json"
+
+          git add "src/Solution Items/usedComponents.json"
+
+          # usedComponents.json is regenerated every release but rarely differs (dependencies are
+          # stable), so skip the PR entirely when nothing actually changed.
+          $staged = git diff --staged --name-only
+          if ([string]::IsNullOrWhiteSpace($staged)) {
+            Write-Host "No changes to commit; skipping PR."
+            exit 0
+          }
+
+          $what = 'usedComponents.json'
+
+          git commit -m "chore: update $what for ${{ github.ref_name }} [skip ci]"
+          # Force-push so re-running the release for the same tag updates the existing branch
+          git push --force origin $branch
+
+          # Create the PR if one does not already exist for this branch
+          $existing = gh pr list --head $branch --base Development --state open --json number --jq '.[0].number'
+          if ([string]::IsNullOrWhiteSpace($existing)) {
+            gh pr create --base Development --head $branch `
+              --title "chore: update generated files for ${{ github.ref_name }} [skip ci]" `
+              --body "Automated update of $what for release ${{ github.ref_name }}."
+          } else {
+            Write-Host "PR #$existing already exists for $branch"
+          }
+
+          # Immediate squash-merge as the App. --admin merges despite the pending-review rule;
+          # the App is allowed to because it is on the ruleset bypass list. No repo-wide
+          # auto-merge setting is involved.
+          gh pr merge $branch --squash --admin --delete-branch 2>&1 | Write-Host
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "::warning::Could not merge $branch automatically; merge the PR manually."
+          }
+
+          # This PR is bookkeeping only — never fail the release job over it.
+          exit 0
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bin/LogExpert-Setup-*.exe
+            bin/LogExpert.*.zip
+            bin/LogExpert.ColumnizerLib.*.nupkg
+            bin/SftpFileSystem.x64.*.zip
+            bin/SftpFileSystem.x86.*.zip
+            bin/chocolatey/logexpert.*.nupkg
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

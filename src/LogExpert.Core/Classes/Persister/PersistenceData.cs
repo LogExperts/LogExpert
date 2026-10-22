@@ -38,6 +38,11 @@ public class PersistenceData
 
     public bool FilterAdvanced { get; set; }
 
+    /// <summary>
+    /// The Log Window's own filter, as the single entry of a list. A list for backward
+    /// compatibility only — <see cref="SessionFileComposer"/> owns the mapping and documents what
+    /// older Session Files carry here.
+    /// </summary>
     public List<FilterParams> FilterParamsList { get; set; } = [];
 
     public int FilterPosition { get; set; } = 222;

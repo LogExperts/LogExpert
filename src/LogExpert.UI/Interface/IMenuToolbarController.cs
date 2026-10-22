@@ -34,8 +34,8 @@ internal interface IMenuToolbarController : IDisposable
     void UpdateGuiState (GuiStateEventArgs state, bool timestampControlEnabled);
 
     /// <summary>
-    /// Updates encoding menu to show current encoding.
-    /// Also updates the ANSI menu item header text.
+    /// Checks the encoding menu row the file is currently read with, and unchecks every other row.
+    /// Leaves all rows unchecked when the encoding is null or is one the menu does not offer.
     /// </summary>
     void UpdateEncodingMenu (Encoding currentEncoding);
 

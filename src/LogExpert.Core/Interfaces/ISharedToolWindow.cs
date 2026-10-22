@@ -1,3 +1,5 @@
+using System.Drawing;
+
 using ColumnizerLib;
 
 using LogExpert.Core.Config;
@@ -26,7 +28,7 @@ public interface ISharedToolWindow
 
     void SetColumnizer (ILogLineMemoryColumnizer columnizer);
 
-    void PreferencesChanged (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags);
+    void PreferencesChanged (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags);
 
     #endregion
 }

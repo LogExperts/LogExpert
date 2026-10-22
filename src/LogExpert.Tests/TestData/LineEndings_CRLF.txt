@@ -1,0 +1,7 @@
+2026-06-25 10:00:01.000 [INFO] Line 1 - start of file
+2026-06-25 10:00:02.000 [INFO] Line 2 - second line
+2026-06-25 10:00:03.000 [WARN] Line 3 - multibyte: ü 世界
+2026-06-25 10:00:04.000 [INFO] Line 4 - line before the empty one
+
+2026-06-25 10:00:06.000 [ERROR] Line 6 - line after the empty one
+2026-06-25 10:00:07.000 [INFO] Line 7 - final line, no trailing newline

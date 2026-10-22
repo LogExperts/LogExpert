@@ -3,7 +3,9 @@ using System.Drawing.Drawing2D;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Entities;
+using LogExpert.Core.Config;
 using LogExpert.Core.EventArguments;
+using LogExpert.UI.Entities;
 
 using NLog;
 
@@ -75,6 +77,9 @@ internal partial class BufferedDataGridView : DataGridView
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool PaintWithOverlays { get; set; }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public SelectionHighlightSettings SelectionHighlight { get; set; } = new();
+
     #endregion
 
     #region Public methods
@@ -134,6 +139,37 @@ internal partial class BufferedDataGridView : DataGridView
 
     #region Overrides
 
+    protected override void OnSelectionChanged (EventArgs e)
+    {
+        base.OnSelectionChanged(e);
+        if (SelectionHighlight?.Outline == true)
+        {
+            // A changed cell can also remove an edge on a still-selected neighbor.
+            Invalidate();
+        }
+    }
+
+    protected override void OnGotFocus (EventArgs e)
+    {
+        base.OnGotFocus(e);
+        Invalidate();
+    }
+
+    protected override void OnScroll (ScrollEventArgs e)
+    {
+        base.OnScroll(e);
+        if (SelectionHighlight?.Outline == true)
+        {
+            Invalidate();
+        }
+    }
+
+    protected override void OnLostFocus (EventArgs e)
+    {
+        base.OnLostFocus(e);
+        Invalidate();
+    }
+
     protected override void Dispose (bool disposing)
     {
         if (disposing)
@@ -161,6 +197,8 @@ internal partial class BufferedDataGridView : DataGridView
             {
                 base.OnPaint(e);
             }
+
+            SelectionPainter.PaintOutline(this, e, SelectionHighlight);
         }
         catch (Exception ex)
         {

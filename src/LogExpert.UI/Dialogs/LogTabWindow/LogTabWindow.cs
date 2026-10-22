@@ -8,8 +8,7 @@ using System.Text;
 using ColumnizerLib;
 
 using LogExpert.Core.Classes;
-using LogExpert.Core.Classes.Columnizer;
-using LogExpert.Core.Classes.Filter;
+using LogExpert.Core.Classes.FileDrop;
 using LogExpert.Core.Classes.Persister;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
@@ -18,13 +17,17 @@ using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
 using LogExpert.UI.Dialogs;
+using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
+using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
 using LogExpert.UI.Services.MenuToolbarService;
+using LogExpert.UI.Services.SessionHandlerService;
 using LogExpert.UI.Services.TabControllerService;
+using LogExpert.UI.Services.ToolLaunchService;
 using LogExpert.UI.Services.ToolWindowCoordinatorService;
 
 using NLog;
@@ -50,6 +53,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly MenuToolbarController _menuToolbarController;
     private readonly LogWindowCoordinator _logWindowCoordinator;
     private readonly ToolWindowCoordinator _toolWindowCoordinator;
+    private readonly FileOperationService _fileOperationService;
+    private readonly SessionHandler _sessionHandler;
+    private readonly ToolLaunchService _toolLaunchService;
+
+    private CancellationTokenSource? _dropCancellation;
+    private FolderDropDialog? _dropDialog;
 
     private bool _disposed;
 
@@ -60,6 +69,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly bool _showInstanceNumbers;
 
     private readonly string[] _startupFileNames;
+    private readonly int? _startupTargetLine;
 
     [SupportedOSPlatform("windows")]
     private readonly StringFormat _tabStringFormat = new();
@@ -75,7 +85,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region cTor
 
     [SupportedOSPlatform("windows")]
-    public LogTabWindow (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager)
+    public LogTabWindow (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager, int? targetLine = null)
     {
         AutoScaleDimensions = new SizeF(96F, 96F);
         AutoScaleMode = AutoScaleMode.Dpi;
@@ -104,13 +114,22 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _deadIcon = _ledService.GetDeadIcon();
 
-        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService);
+        _fileOperationService = new FileOperationService(configManager, _tabController, _ledService, PluginRegistry.PluginRegistry.Instance, CreateLogWindowFromRequest, () => Clipboard.ContainsText() ? Clipboard.GetText() : null, LoadSession);
+
+        _fileOperationService.FileHistoryChanged += (_, _) => FillHistoryMenu();
+        _fileOperationService.FileOpened += OnFileOperationServiceFileOpened;
+
+        _sessionHandler = new SessionHandler(PluginRegistry.PluginRegistry.Instance, request => _fileOperationService.AddFileTab(request), CloseAllTabs);
+        _toolLaunchService = new ToolLaunchService(PluginRegistry.PluginRegistry.Instance);
+
+        _logWindowCoordinator = new LogWindowCoordinator(configManager, PluginRegistry.PluginRegistry.Instance, this, _tabController, _ledService, _fileOperationService);
 
         //Fix MainMenu and externalToolsToolStrip.Location, if the location has been changed in the designer
         mainMenuStrip.Location = new Point(0, 0);
         externalToolsToolStrip.Location = new Point(0, 54);
 
         _startupFileNames = fileNames;
+        _startupTargetLine = targetLine;
         _instanceNumber = instanceNumber;
         _showInstanceNumbers = showInstanceNumbers;
 
@@ -128,13 +147,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             BackColor = Color.FromKnownColor(KnownColor.Transparent)
         };
 
-        var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
+        // Built here rather than declared in the designer so the menu and the Preferences combo box
+        // cannot offer different encodings.
+        EncodingMenuBuilder.Fill(encodingToolStripMenuItem, OnEncodingToolStripMenuItemClick);
 
-        encodingASCIIToolStripMenuItem.Text = Encoding.ASCII.HeaderName;
-        encodingANSIToolStripMenuItem.Text = Encoding.Default.HeaderName;
-        encodingISO88591toolStripMenuItem.Text = Encoding.GetEncoding("iso-8859-1").HeaderName;
-        encodingUTF8toolStripMenuItem.Text = Encoding.UTF8.HeaderName;
-        encodingUTF16toolStripMenuItem.Text = Encoding.Unicode.HeaderName;
+        var index = buttonToolStrip.Items.IndexOfKey("toolStripButtonTail");
 
         if (index != -1)
         {
@@ -148,6 +165,71 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         FormClosing += OnLogTabWindowFormClosing;
 
         InitToolWindows();
+    }
+
+    [SupportedOSPlatform("windows")]
+    private LogWindow.LogWindow CreateLogWindowFromRequest (FileTabRequest request, EncodingOptions encodingOptions)
+    {
+        LogWindow.LogWindow logWindow = new(
+            _logWindowCoordinator,
+            PersisterHelpers.FindFilenameForSettings(request.FileName, PluginRegistry.PluginRegistry.Instance),
+            request.IsTempFile,
+            request.ForcePersistenceLoading,
+            ConfigManager,
+            PluginRegistry.PluginRegistry.Instance)
+        {
+            GivenFileName = request.FileName
+        };
+
+        if (request.PreProcessColumnizer != null)
+        {
+            logWindow.ForceColumnizerForLoading(request.PreProcessColumnizer);
+        }
+
+        if (request.IsTempFile)
+        {
+            logWindow.TempTitleName = request.Title ?? string.Empty;
+        }
+
+        AddLogWindow(logWindow, request.Title, request.DoNotAddToDockPanel);
+        return logWindow;
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void OnFileOperationServiceFileOpened (object? sender, FileOpenedEventArgs e)
+    {
+        if (e.LogWindow.Tag is LogWindowData data)
+        {
+            data.Color = _defaultTabColor;
+        }
+
+        if (!e.Request.IsTempFile)
+        {
+            SetTooltipText(e.LogWindow, e.ResolvedFileName);
+        }
+
+        // Filter tooltip setup
+        if (e.FilterPipe != null && e.FilterPipe.FilterParams.SearchText?.Length > 0)
+        {
+            ToolTip tip = new(components);
+            var isInvertText = e.FilterPipe.FilterParams.IsInvert ? Resources.LogTabWindow_UI_LogWindow_ToolTip_InvertMatch : string.Empty;
+            var isColumnRestrictText = e.FilterPipe.FilterParams.ColumnRestrict ? Resources.LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict : string.Empty;
+            tip.SetToolTip(e.LogWindow, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_ToolTip_Filter, e.FilterPipe.FilterParams.SearchText, isInvertText, isColumnRestrictText));
+            tip.AutomaticDelay = 10;
+            tip.AutoPopDelay = 5000;
+            if (e.LogWindow.Tag is LogWindowData filterData)
+            {
+                filterData.ToolTip = tip;
+            }
+        }
+
+        // Multi-file loading (used starting in Phase 4)
+        if (e.MultiFileNames != null && e.EncodingOptions != null)
+        {
+            multiFileToolStripMenuItem.Checked = true;
+            multiFileEnabledStripMenuItem.Checked = true;
+            _ = BeginInvoke(e.LogWindow.LoadFilesAsMulti, e.MultiFileNames, e.EncodingOptions);
+        }
     }
 
     private void InitializeMenuToolbarControllerEvents ()
@@ -170,7 +252,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnMenuControllerHistoryItemClicked (object? sender, HistoryItemClickedEventArgs e)
     {
-        _ = AddFileTab(e.FileName, false, null, false, null);
+        _ = _fileOperationService.AddFileTab(new FileTabRequest { FileName = e.FileName });
     }
 
     private void InitializeTabControllerEvents ()
@@ -190,7 +272,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     public LogWindow.LogWindow CurrentLogWindow
     {
         get => _currentLogWindow;
-        set => ChangeCurrentLogWindow(value);
+        set => BindActiveLogWindow(value);
     }
 
     public SearchParams SearchParams => _logWindowCoordinator.SearchParams;
@@ -213,19 +295,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     internal HighlightGroup FindHighlightGroup (string groupName)
     {
         return _logWindowCoordinator.ResolveHighlightGroup(groupName, null);
-
-        //lock (HighlightGroupList)
-        //{
-        //    foreach (var group in HighlightGroupList)
-        //    {
-        //        if (group.GroupName.Equals(groupName, StringComparison.Ordinal))
-        //        {
-        //            return group;
-        //        }
-        //    }
-
-        //    return null;
-        //}
     }
 
     #endregion
@@ -235,11 +304,21 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     public LogWindow.LogWindow AddTempFileTab (string fileName, string title)
     {
-        return AddFileTab(fileName, true, title, false, null);
+        return _fileOperationService.AddTempFileTab(fileName, title);
     }
 
     private void ConfigureDockPanel ()
     {
+        if (Application.IsDarkModeEnabled)
+        {
+            var darkTheme = new VS2015DarkTheme();
+            dockPanel.Theme = darkTheme;
+            dockPanel.DockBackColor = darkTheme.ColorPalette.MainWindowActive.Background;
+            dockPanel.ActiveAutoHideContent = null;
+            dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
+            return;
+        }
+
         var autoHideStripSkin1 = new AutoHideStripSkin();
         var dockPanelGradient1 = new DockPanelGradient();
         var tabGradient1 = new TabGradient();
@@ -359,8 +438,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         multiFileToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multiFileToolStripMenuItem;
         multiFileEnabledStripMenuItem.Text = Resources.LogTabWindow_UI_StripMenuItem_multiFileEnabledStripMenuItem;
         multifileMaskToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_multifileMaskToolStripMenuItem;
-        loadProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem;
-        saveProjectToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem;
+        loadSessionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem;
+        saveSessionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_saveProjectToolStripMenuItem;
         exportBookmarksToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exportBookmarksToolStripMenuItem;
         lastUsedToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem;
         exitToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem;
@@ -376,12 +455,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         jumpToPrevToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_jumpToPrevToolStripMenuItem;
         showBookmarkListToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_showBookmarkListToolStripMenuItem;
         columnFinderToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_columnFinderToolStripMenuItem;
+        // The rows below it are labelled with their encoding's header name, not from resources — an
+        // encoding name is the same in every language.
         encodingToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem;
-        encodingASCIIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem;
-        encodingANSIToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem;
-        encodingISO88591toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem;
-        encodingUTF8toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem;
-        encodingUTF16toolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem;
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
@@ -437,8 +513,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         openURIToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_openURIToolStripMenuItem;
         newFromClipboardToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_newFromClipboardToolStripMenuItem;
         multiFileToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_multiFileToolStripMenuItem;
-        loadProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
-        saveProjectToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
+        loadSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_loadProjectToolStripMenuItem;
+        saveSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
         timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
         copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
         columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
@@ -462,128 +538,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer preProcessColumnizer)
+    public void LoadFiles (string[] fileNames, int? targetLine = null)
     {
-        var logWin = AddFileTab(pipe.FileName, true, title, false, preProcessColumnizer);
-        if (pipe.FilterParams.SearchText?.Length > 0)
-        {
-            ToolTip tip = new(components);
-
-            //Resources.LogTabWindow_UI_LogWindow_ToolTip_Filter
-            var isInvertText = pipe.FilterParams.IsInvert ? Resources.LogTabWindow_UI_LogWindow_ToolTip_InvertMatch : string.Empty;
-            var isColumnRestrictText = pipe.FilterParams.ColumnRestrict ? Resources.LogTabWindow_UI_LogWindow_Tooltip_ColumnRestrict : string.Empty;
-            tip.SetToolTip(logWin, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_ToolTip_Filter, pipe.FilterParams.SearchText, isInvertText, isColumnRestrictText));
-            tip.AutomaticDelay = 10;
-            tip.AutoPopDelay = 5000;
-            var data = logWin.Tag as LogWindowData;
-            data.ToolTip = tip;
-        }
-
-        return logWin;
-    }
-
-    [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFileTabDeferred (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer)
-    {
-        return AddFileTab(givenFileName, isTempFile, title, forcePersistenceLoading, preProcessColumnizer, true);
-    }
-
-    [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddFileTab (string givenFileName, bool isTempFile, string title, bool forcePersistenceLoading, ILogLineMemoryColumnizer preProcessColumnizer, bool doNotAddToDockPanel = false)
-    {
-        var logFileName = PersisterHelpers.FindFilenameForSettings(givenFileName, PluginRegistry.PluginRegistry.Instance);
-        var win = FindWindowForFile(logFileName);
-        if (win != null)
-        {
-            if (!isTempFile)
-            {
-                AddToFileHistory(givenFileName);
-            }
-
-            _logWindowCoordinator.SelectTab(win);
-            return win;
-        }
-
-        EncodingOptions encodingOptions = new();
-        FillDefaultEncodingFromSettings(encodingOptions);
-        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, logFileName, isTempFile, forcePersistenceLoading, ConfigManager)
-        {
-            GivenFileName = givenFileName
-        };
-
-        if (preProcessColumnizer != null)
-        {
-            logWindow.ForceColumnizerForLoading(preProcessColumnizer);
-        }
-
-        if (isTempFile)
-        {
-            logWindow.TempTitleName = title;
-            encodingOptions.Encoding = new UnicodeEncoding(false, false);
-        }
-
-        AddLogWindow(logWindow, title, doNotAddToDockPanel);
-        if (!isTempFile)
-        {
-            AddToFileHistory(givenFileName);
-        }
-
-        var data = logWindow.Tag as LogWindowData;
-        data.Color = _defaultTabColor;
-        //TODO SetTabColor and the Coloring must be reimplemented with a different UI Framework
-        //SetTabColor(logWindow, _defaultTabColor);
-        //data.tabPage.BorderColor = this.defaultTabBorderColor;
-        //if (!isTempFile)
-        //{
-        //    foreach (var colorEntry in ConfigManager.Settings.FileColors)
-        //    {
-        //        if (colorEntry.FileName.ToUpperInvariant().Equals(logFileName.ToUpperInvariant(), StringComparison.Ordinal))
-        //        {
-        //            data.Color = colorEntry.Color;
-        //            //SetTabColor(logWindow, colorEntry.Color);
-        //            break;
-        //        }
-        //    }
-        //}
-
-        if (!isTempFile)
-        {
-            SetTooltipText(logWindow, logFileName);
-        }
-
-        if (givenFileName.EndsWith(".lxp", StringComparison.Ordinal))
-        {
-            logWindow.ForcedPersistenceFileName = givenFileName;
-        }
-
-        // this.BeginInvoke(new LoadFileDelegate(logWindow.LoadFile), new object[] { logFileName, encoding });
-        _ = Task.Run(() => logWindow.LoadFile(logFileName, encodingOptions));
-        return logWindow;
-    }
-
-    [SupportedOSPlatform("windows")]
-    public LogWindow.LogWindow AddMultiFileTab (string[] fileNames)
-    {
-        if (fileNames.Length < 1)
-        {
-            return null;
-        }
-
-        LogWindow.LogWindow logWindow = new(_logWindowCoordinator, fileNames[^1], false, false, ConfigManager);
-        AddLogWindow(logWindow, fileNames[^1], false);
-        multiFileToolStripMenuItem.Checked = true;
-        multiFileEnabledStripMenuItem.Checked = true;
-        EncodingOptions encodingOptions = new();
-        FillDefaultEncodingFromSettings(encodingOptions);
-        _ = BeginInvoke(logWindow.LoadFilesAsMulti, fileNames, encodingOptions);
-        AddToFileHistory(fileNames[0]);
-        return logWindow;
-    }
-
-    [SupportedOSPlatform("windows")]
-    public void LoadFiles (string[] fileNames)
-    {
-        _ = Invoke(AddFileTabs, [fileNames]);
+        Invoke(() => _fileOperationService.AddFileTabs(fileNames, targetLine));
     }
 
     [SupportedOSPlatform("windows")]
@@ -636,28 +593,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        // Update CurrentLogWindow - this triggers ChangeCurrentLogWindow internally
-        // which handles disconnecting from previous window and connecting to new window
+        // Routes through BindActiveLogWindow: unbinds the previous window, binds this one, and
+        // connects the tool windows. Must precede LogWindowActivated() below, which fires the
+        // status-line, progress-bar and GUI-state updates into the subscriptions made here.
         CurrentLogWindow = newWindow;
-
-        // Clear dirty state for the newly activated window
-        if (newWindow?.Tag is LogWindowData data)
-        {
-            data.LedState.IsDirty = false;
-
-            // Update the tab icon to reflect cleared dirty state
-            var icon = GetLedIcon(data.LedState.DiffSum, data);
-            _ = BeginInvoke(SetTabIcon, newWindow, icon);
-        }
 
         // Notify the window it has been activated
         newWindow?.LogWindowActivated();
-
-        // Connect tool windows (bookmark window, etc.) to new window
-        if (newWindow != null)
-        {
-            ConnectToolWindows(newWindow);
-        }
     }
 
     /// <summary>
@@ -682,7 +624,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             logWindow.Tag = data;
         }
 
-        _ledService.RegisterWindow(logWindow);
+        if (logWindow.Tag is LogWindowData ledData)
+        {
+            _ledService.RegisterWindow(logWindow, ledData.LedState);
+
+            var icon = GetLedIcon(ledData.LedState.DiffSum, ledData);
+            _ = BeginInvoke(SetTabIcon, logWindow, icon);
+        }
 
         ConnectEventHandlers(logWindow);
     }
@@ -795,6 +743,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
+        if (disposing)
+        {
+            CancelPendingDrop();
+        }
+
         if (disposing && (components != null))
         {
             _ledService?.StopService();
@@ -803,6 +756,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             _tabStringFormat?.Dispose();
             _menuToolbarController?.Dispose();
             _toolWindowCoordinator?.Dispose();
+            // Dispose TabController after FileOperationService is no longer reachable.
+            // FileOperationService holds a reference to _tabController but does not own it;
+            // after Dispose(), no caller invokes the service, so stale references are harmless.
+            _tabController?.Dispose();
         }
 
         _disposed = true;
@@ -815,24 +772,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void PasteFromClipboard ()
     {
-        if (Clipboard.ContainsText())
+        var logWindow = _fileOperationService.PasteFromClipboard();
+        if (logWindow?.Tag is LogWindowData)
         {
-            var text = Clipboard.GetText();
-            var fileName = Path.GetTempFileName();
-
-            using (FileStream fStream = new(fileName, FileMode.Append, FileAccess.Write, FileShare.Read))
-            using (StreamWriter writer = new(fStream, Encoding.Unicode))
-            {
-                writer.Write(text);
-                writer.Close();
-            }
-
-            var title = Resources.LogTabWindow_UI_LogWindow_Title_Text_From_Clipboard;
-            var logWindow = AddTempFileTab(fileName, title);
-            if (logWindow.Tag is LogWindowData)
-            {
-                SetTooltipText(logWindow, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn, DateTime.Now));
-            }
+            SetTooltipText(logWindow, string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_LogWindow_Title_ToolTip_PastedOn, DateTime.Now));
         }
     }
 
@@ -846,17 +789,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void DestroyBookmarkWindow ()
     {
         _toolWindowCoordinator.Destroy();
-    }
-
-    private void SaveLastOpenFilesList ()
-    {
-        foreach (var logWin in _tabController.GetAllWindowsFromDockPanel())
-        {
-            if (!logWin.IsTempFile)
-            {
-                ConfigManager.Settings.LastOpenFilesList.Add(logWin.GivenFileName);
-            }
-        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -884,44 +816,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.ToolTipText = logFileName;
     }
 
-    private void FillDefaultEncodingFromSettings (EncodingOptions encodingOptions)
-    {
-        if (ConfigManager.Settings.Preferences.DefaultEncoding != null)
-        {
-            try
-            {
-                encodingOptions.DefaultEncoding = Encoding.GetEncoding(ConfigManager.Settings.Preferences.DefaultEncoding);
-            }
-            catch (ArgumentException)
-            {
-                //ConfigManager.Settings.Preferences.DefaultEncoding
-                _logger.Warn($"### FillDefaultEncodingFromSettings: Encoding {ConfigManager.Settings.Preferences.DefaultEncoding} is not a valid encoding");
-                encodingOptions.DefaultEncoding = null;
-            }
-        }
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void AddFileTabs (string[] fileNames)
-    {
-        foreach (var fileName in fileNames)
-        {
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
-                {
-                    LoadProject(fileName, false);
-                }
-                else
-                {
-                    _ = AddFileTab(fileName, false, null, false, null);
-                }
-            }
-        }
-
-        Activate();
-    }
-
     /// <summary>
     /// Adds a LogWindow to the tab system. Sets up window properties, delegates to TabController, and performs
     /// additional setup.
@@ -939,7 +833,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _tabController.AddWindow(logWindow, title, doNotAddToPanel);
 
-        logWindow.Visible = true;
+        if (!doNotAddToPanel)
+        {
+            logWindow.Visible = true;
+        }
     }
 
     private void ConnectEventHandlers (LogWindow.LogWindow logWindow)
@@ -967,22 +864,29 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         logWindow.SyncModeChanged -= OnLogWindowSyncModeChanged;
     }
 
+    /// <summary>
+    /// Subscribes to the events that drive the shell's singleton widgets — the status line, the
+    /// progress bar and the GUI state. Only the <em>active</em> window may drive them, so unlike
+    /// <see cref="ConnectEventHandlers"/> (which lives for as long as the window does) this pair is
+    /// bound and unbound on every activation change.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    private void AddToFileHistory (string fileName)
+    private void ConnectActiveWindow (LogWindow.LogWindow logWindow)
     {
-        ConfigManager.AddToFileHistory(fileName);
-        FillHistoryMenu();
+        logWindow.StatusLineEvent += OnStatusLineEvent;
+        logWindow.ProgressBarUpdate += OnProgressBarUpdate;
+        logWindow.GuiStateUpdate += OnGuiStateUpdate;
     }
 
     /// <summary>
-    /// Finds an existing window for a file.
+    /// Mirror of <see cref="ConnectActiveWindow"/>.
     /// </summary>
-    /// <param name="fileName">File name to search for</param>
-    /// <returns>The LogWindow for the file, or null if not found</returns>
     [SupportedOSPlatform("windows")]
-    private LogWindow.LogWindow FindWindowForFile (string fileName)
+    private void DisconnectActiveWindow (LogWindow.LogWindow logWindow)
     {
-        return _tabController.FindWindowByFileName(fileName);
+        logWindow.StatusLineEvent -= OnStatusLineEvent;
+        logWindow.ProgressBarUpdate -= OnProgressBarUpdate;
+        logWindow.GuiStateUpdate -= OnGuiStateUpdate;
     }
 
     [SupportedOSPlatform("windows")]
@@ -1012,7 +916,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void ShowHighlightSettingsDialog ()
     {
-        HighlightDialog dlg = new(ConfigManager)
+        using HighlightDialog dlg = new(ConfigManager)
         {
             KeywordActionList = PluginRegistry.PluginRegistry.Instance.RegisteredKeywordActions,
             Owner = this,
@@ -1028,6 +932,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             HighlightGroupList = dlg.HighlightGroupList;
             FillHighlightComboBox();
             ConfigManager.Settings.Preferences.HighlightGroupList = HighlightGroupList;
+            ConfigManager.Settings.Preferences.SelectionHighlight = dlg.SelectionHighlight;
+            ConfigManager.Settings.Preferences.HighlightCustomColors = dlg.CustomColors;
             ConfigManager.Save(SettingsFlags.HighlightSettings);
             OnHighlightSettingsChanged();
         }
@@ -1084,64 +990,24 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
             if (info.Exists)
             {
-                LoadFiles(openFileDialog.FileNames, false);
-            }
-        }
-    }
+                var decision = _fileOperationService.LoadFilesWithOption(openFileDialog.FileNames, false);
+                if (decision == MultiFileDecision.AskUser)
+                {
+                    MultiLoadRequestDialog dlg = new();
+                    var res = dlg.ShowDialog();
+                    var sortedNames = openFileDialog.FileNames;
+                    Array.Sort(sortedNames);
 
-    [SupportedOSPlatform("windows")]
-    private void LoadFiles (string[] names, bool invertLogic)
-    {
-        Array.Sort(names);
-
-        if (names.Length == 1)
-        {
-            if (names[0].EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
-            {
-                LoadProject(names[0], true);
-                return;
+                    if (res == DialogResult.Yes)
+                    {
+                        _fileOperationService.AddFileTabs(sortedNames);
+                    }
+                    else if (res == DialogResult.No)
+                    {
+                        _ = _fileOperationService.AddMultiFileTab(sortedNames);
+                    }
+                }
             }
-
-            _ = AddFileTab(names[0], false, null, false, null);
-            return;
-        }
-
-        var option = ConfigManager.Settings.Preferences.MultiFileOption;
-        if (option == MultiFileOption.Ask)
-        {
-            MultiLoadRequestDialog dlg = new();
-            var res = dlg.ShowDialog();
-
-            if (res == DialogResult.Yes)
-            {
-                option = MultiFileOption.SingleFiles;
-            }
-            else if (res == DialogResult.No)
-            {
-                option = MultiFileOption.MultiFile;
-            }
-            else
-            {
-                return;
-            }
-        }
-        else
-        {
-            if (invertLogic)
-            {
-                option = option == MultiFileOption.SingleFiles
-                    ? MultiFileOption.MultiFile
-                    : MultiFileOption.SingleFiles;
-            }
-        }
-
-        if (option == MultiFileOption.SingleFiles)
-        {
-            AddFileTabs(names);
-        }
-        else
-        {
-            _ = AddMultiFileTab(names);
         }
     }
 
@@ -1185,19 +1051,20 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _currentLogWindow = newLogWindow;
         var titleName = _showInstanceNumbers ? "LogExpert #" + _instanceNumber : "LogExpert";
 
+        // Asymmetric on purpose: BindActiveLogWindow() owns connecting, because the connect must also
+        // run when the guard above short-circuits on re-activation of the already-current tab. The
+        // disconnect stays here, because ChangeCurrentLogWindow(null) — from OnTabControllerWindowRemoved
+        // and OnLogWindowDisposed — is the only path that unbinds a removed active window, and there is
+        // no activation to hang it off.
         if (oldLogWindow != null)
         {
-            oldLogWindow.StatusLineEvent -= OnStatusLineEvent;
-            oldLogWindow.ProgressBarUpdate -= OnProgressBarUpdate;
-            oldLogWindow.GuiStateUpdate -= OnGuiStateUpdate;
+            DisconnectActiveWindow(oldLogWindow);
             DisconnectToolWindows();
         }
 
         if (newLogWindow != null)
         {
-            newLogWindow.StatusLineEvent += OnStatusLineEvent;
-            newLogWindow.ProgressBarUpdate += OnProgressBarUpdate;
-            newLogWindow.GuiStateUpdate += OnGuiStateUpdate;
+            ConnectActiveWindow(newLogWindow);
 
             Text = newLogWindow.IsTempFile
                 ? titleName + @" - " + newLogWindow.TempTitleName
@@ -1212,7 +1079,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             searchToolStripMenuItem.Enabled = true;
             filterToolStripMenuItem.Enabled = true;
             goToLineToolStripMenuItem.Enabled = true;
-            ConnectToolWindows(newLogWindow);
         }
         else
         {
@@ -1233,6 +1099,35 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             filterToolStripMenuItem.Enabled = false;
             goToLineToolStripMenuItem.Enabled = false;
             dragControlDateTime.Visible = false;
+        }
+    }
+
+    /// <summary>
+    /// Binds the shell to its active Log Window: makes it current and connects the tool windows.
+    /// Both activation sources — the TabController's WindowActivated event and DockPanelSuite's
+    /// ActiveContentChanged — reach this through the <see cref="CurrentLogWindow"/> setter, so the
+    /// binding cannot drift between them. (They still differ in what else they do on activation;
+    /// only the binding is shared.)
+    /// <para>
+    /// Distinct from <see cref="ITabController.ActivateWindow"/>, which <em>causes</em> activation by
+    /// bringing a tab to the front. This is the shell's <em>response</em> to it.
+    /// </para>
+    /// <para>
+    /// <see cref="ChangeCurrentLogWindow"/> is guarded and no-ops when the window is already current;
+    /// the tool-window connect is not, because re-activating the current tab must still re-seat the
+    /// bookmark window's data. <see cref="ToolWindowCoordinator.Connect"/> disconnects any previous
+    /// window first, so calling it repeatedly is safe.
+    /// </para>
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    private void BindActiveLogWindow (LogWindow.LogWindow logWindow)
+    {
+        ChangeCurrentLogWindow(logWindow);
+
+        if (logWindow != null)
+        {
+            ConnectToolWindows(logWindow);
+            _ledService.ClearDirty(logWindow);
         }
     }
 
@@ -1268,7 +1163,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
             catch (Exception ex)
             {
-                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible), ex);
+                _logger.Error(string.Format(CultureInfo.InvariantCulture, Resources.LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45, e.Value, e.MinValue, e.MaxValue, e.Visible, ex), ex);
             }
 
             _ = Invoke(new MethodInvoker(statusStrip.Refresh));
@@ -1276,12 +1171,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    //TODO Crossthread Exception when a log file has been filtered to a new tab!
     private void StatusLineEventWorker (StatusLineEventArgs e)
     {
         if (e != null)
         {
-            //_logger.logDebug("StatusLineEvent: text = " + e.StatusText);
+#if DEBUG
+            _logger.Debug("StatusLineEvent: text = " + e.StatusText);
+#endif
             labelStatus.Text = e.StatusText;
             labelStatus.Size = TextRenderer.MeasureText(labelStatus.Text, labelStatus.Font);
             labelLines.Text = $"{e.LineCount} {Resources.LogTabWindow_StatusLineText_lowerCase_Lines}";
@@ -1400,18 +1296,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         var setLastColumnWidth = ConfigManager.Settings.Preferences.SetLastColumnWidth;
         var lastColumnWidth = ConfigManager.Settings.Preferences.LastColumnWidth;
-        var fontName = ConfigManager.Settings.Preferences.FontName;
-        var fontSize = ConfigManager.Settings.Preferences.FontSize;
 
-        //lock (_logWindowList)
-        //{
         foreach (var logWindow in _tabController.GetAllWindows())
         {
-            logWindow.PreferencesChanged(fontName, fontSize, setLastColumnWidth, lastColumnWidth, false, flags);
+            logWindow.PreferencesChanged(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, false, flags);
         }
-        //}
 
-        _toolWindowCoordinator.ApplyPreferences(fontName, fontSize, setLastColumnWidth, lastColumnWidth, flags);
+        _toolWindowCoordinator.ApplyPreferences(ConfigManager.Settings.Preferences.Font, setLastColumnWidth, lastColumnWidth, flags);
 
         HighlightGroupList = ConfigManager.Settings.Preferences.HighlightGroupList;
         if ((flags & SettingsFlags.HighlightSettings) == SettingsFlags.HighlightSettings)
@@ -1497,87 +1388,68 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
+        ToolLaunchRequest request;
+
         if (CurrentLogWindow != null)
         {
             var line = CurrentLogWindow.GetCurrentLine();
             var info = CurrentLogWindow.GetCurrentFileInfo();
-            if (line != null && info != null)
+            if (line == null || info == null)
             {
-                ArgParser parser = new(toolEntry.Args);
-                var argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
-                if (argLine != null)
-                {
-                    StartTool(toolEntry.Cmd, argLine, toolEntry.Sysout, toolEntry.ColumnizerName, toolEntry.WorkingDir);
-                }
-            }
-        }
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void StartTool (string cmd, string args, bool sysoutPipe, string columnizerName, string workingDir)
-    {
-        if (string.IsNullOrEmpty(cmd))
-        {
-            return;
-        }
-
-        Process process = new();
-        ProcessStartInfo startInfo = new(cmd, args);
-        if (!string.IsNullOrEmpty(workingDir))
-        {
-            startInfo.WorkingDirectory = workingDir;
-        }
-
-        process.StartInfo = startInfo;
-        process.EnableRaisingEvents = true;
-
-        if (sysoutPipe)
-        {
-            var columnizer = ColumnizerPicker.DecideMemoryColumnizerByName(columnizerName, PluginRegistry.PluginRegistry.Instance.RegisteredColumnizers);
-
-            //_logger.Info($"Starting external tool with sysout redirection: {cmd} {args}"));
-            startInfo.UseShellExecute = false;
-            startInfo.RedirectStandardOutput = true;
-            //process.OutputDataReceived += pipe.DataReceivedEventHandler;
-            try
-            {
-                _ = process.Start();
-            }
-            catch (Exception e) when (e is Win32Exception or
-                                            InvalidOperationException or
-                                            ObjectDisposedException or
-                                            PlatformNotSupportedException)
-            {
-                _logger.Error(e);
-                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
                 return;
             }
 
-            SysoutPipe pipe = new(process.StandardOutput);
+            ArgParser parser = new(toolEntry.Args);
+            var argLine = parser.BuildArgs(line, CurrentLogWindow.GetRealLineNum() + 1, info, this);
+            if (argLine == null)
+            {
+                return;
+            }
 
-            var logWin = AddTempFileTab(pipe.FileName,
-                CurrentLogWindow.IsTempFile
-                    ? CurrentLogWindow.TempTitleName
-                    : $"{Util.GetNameFromPath(CurrentLogWindow.FileName)}{Resources.LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix}");
-            logWin.ForceColumnizer(columnizer);
-
-            process.Exited += pipe.ProcessExitedEventHandler;
-            //process.BeginOutputReadLine();
+            request = new ToolLaunchRequest
+            {
+                Cmd = toolEntry.Cmd,
+                Args = argLine,
+                SysoutPipe = toolEntry.Sysout,
+                ColumnizerName = toolEntry.ColumnizerName,
+                WorkingDir = toolEntry.WorkingDir
+            };
         }
         else
         {
-            try
+            if (toolEntry.Sysout)
             {
-                startInfo.UseShellExecute = false;
-                _ = process.Start();
+                _ = MessageBox.Show(Resources.LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured, Resources.LogExpert_Common_UI_Title_LogExpert);
             }
-            catch (Exception e) when (e is Win32Exception or
-                                            InvalidOperationException or
-                                            ObjectDisposedException or
-                                            PlatformNotSupportedException)
+
+            request = new ToolLaunchRequest
             {
-                _logger.Error(e);
-                _ = MessageBox.Show(e.Message, Resources.LogExpert_Common_UI_Title_LogExpert);
+                Cmd = toolEntry.Cmd,
+                Args = string.Empty,
+                SysoutPipe = false,
+                ColumnizerName = toolEntry.ColumnizerName,
+                WorkingDir = toolEntry.WorkingDir
+            };
+        }
+
+        var result = _toolLaunchService.Launch(request);
+
+        if (result.HasError)
+        {
+            _ = MessageBox.Show(result.ErrorMessage, Resources.LogExpert_Common_UI_Title_LogExpert);
+            return;
+        }
+
+        if (result.PipeFileName != null)
+        {
+            var title = CurrentLogWindow!.IsTempFile
+                ? CurrentLogWindow.TempTitleName
+                : $"{Util.GetNameFromPath(CurrentLogWindow.FileName)}{Resources.LogTabWindow_UI_LogWindow_Title_ExternalStartTool_Suffix}";
+
+            var logWin = AddTempFileTab(result.PipeFileName, title);
+            if (result.Columnizer != null)
+            {
+                logWin.ForceColumnizer(result.Columnizer);
             }
         }
     }
@@ -1601,111 +1473,87 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     [SupportedOSPlatform("windows")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
-    private void LoadProject (string projectFileName, bool restoreLayout)
+    private void LoadSession (string sessionFileName, bool restoreLayout)
     {
-        try
+        var outcome = _sessionHandler.LoadSession(sessionFileName);
+        bool openedTabs = false;
+
+        switch (outcome.Status)
         {
-            // Load project with validation
-            var loadResult = ProjectPersister.LoadProjectData(projectFileName, PluginRegistry.PluginRegistry.Instance);
-
-            if (loadResult?.ProjectData == null)
-            {
-                ShowOkMessage(
-                    Resources.LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible,
-                    Resources.LoadProject_UI_Message_Error_Title_ProjectLoadFailed,
-                    MessageBoxIcon.Error);
-
-                return;
-            }
-
-            var projectData = loadResult.ProjectData;
-            var hasLayoutData = projectData.TabLayoutXml != null;
-
-            if (projectData.FileNames.Count == 0)
-            {
-                ShowOkMessage(
-                    Resources.LoadProject_UI_Message_Error_Title_SessionLoadFailed,
-                    Resources.LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // Handle missing files or layout options
-            if (loadResult.RequiresUserIntervention)
-            {
-                // Show enhanced dialog with browsing capability and layout options
-                var (dialogResult, updateSessionFile, selectedAlternatives) = MissingFilesDialog.ShowDialog(loadResult.ValidationResult, hasLayoutData);
-
-                if (dialogResult == MissingFilesDialogResult.Cancel)
+            case SessionLoadOutcome.LoadStatus.Error:
                 {
+                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
+                                  Resources.LoadSession_UI_Message_Error_Title_SessionLoadFailed,
+                                  MessageBoxIcon.Error);
                     return;
                 }
-
-                if (updateSessionFile)
+            case SessionLoadOutcome.LoadStatus.EmptySession:
                 {
-                    // Replace original paths with selected alternatives in project data
-                    for (int i = 0; i < projectData.FileNames.Count; i++)
+                    ShowOkMessage(outcome.ErrorMessage ?? Resources.LoadSession_UI_Message_Error_Title_SessionLoadFailed,
+                                  Resources.LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound,
+                                  MessageBoxIcon.Error);
+                    return;
+                }
+            case SessionLoadOutcome.LoadStatus.NeedsIntervention:
+                {
+                    var (dialogResult, updateSessionFile, selectedAlternatives) =
+                    MissingFilesDialog.ShowDialog(outcome.ValidationResult!, outcome.HasLayoutData);
+
+                    if (dialogResult == MissingFilesDialogResult.Cancel)
                     {
-                        var originalPath = projectData.FileNames[i];
-                        if (selectedAlternatives.TryGetValue(originalPath, out string value))
-                        {
-                            projectData.FileNames[i] = value;
-                        }
+                        return;
                     }
 
-                    ProjectPersister.SaveProjectData(projectFileName, projectData);
+                    if (dialogResult == MissingFilesDialogResult.IgnoreLayout)
+                    {
+                        restoreLayout = false;
+                    }
 
-                    ShowOkMessage(
-                        Resources.LoadProject_UI_Message_Error_Message_UpdateSessionFile,
-                        Resources.LoadProject_UI_Message_Error_Title_UpdateSessionFile,
-                        MessageBoxIcon.Information);
+                    var resolution = new MissingFilesResolution
+                    {
+                        CloseAllTabs = dialogResult == MissingFilesDialogResult.CloseTabsAndRestoreLayout,
+                        OpenInNewWindow = dialogResult == MissingFilesDialogResult.OpenInNewWindow,
+                        UpdateSessionFile = updateSessionFile,
+                        SelectedAlternatives = selectedAlternatives
+                    };
+
+                    // ContinueLoad closes existing tabs (when requested) before opening the
+                    // new session windows, so no post-hoc CloseAllTabs() is needed here.
+                    var interventionResult = _sessionHandler.ContinueLoad(outcome, resolution, restoreLayout);
+
+                    if (updateSessionFile)
+                    {
+                        ShowOkMessage(Resources.LoadSession_UI_Message_Error_Message_UpdateSessionFile,
+                                      Resources.LoadSession_UI_Message_Error_Title_UpdateSessionFile,
+                                      MessageBoxIcon.Information);
+                    }
+
+                    if (interventionResult.OpenInNewWindowFiles is not null)
+                    {
+                        LogExpertProxy.NewWindow([.. interventionResult.OpenInNewWindowFiles]);
+                        return;
+                    }
+
+                    openedTabs = interventionResult.OpenedTabs;
+                    break;
                 }
-
-                // Handle layout-related results
-                switch (dialogResult)
+            case SessionLoadOutcome.LoadStatus.Success:
                 {
-                    case MissingFilesDialogResult.CloseTabsAndRestoreLayout:
-                        CloseAllTabs();
-                        break;
-                    case MissingFilesDialogResult.OpenInNewWindow:
-                        {
-                            var logFileNames = PersisterHelpers.FindFilenameForSettings(projectData.FileNames.AsReadOnly(), PluginRegistry.PluginRegistry.Instance);
-                            LogExpertProxy.NewWindow([.. logFileNames]);
-                            return;
-                        }
-                    case MissingFilesDialogResult.IgnoreLayout:
-                        hasLayoutData = false;
-                        break;
+                    openedTabs = _sessionHandler.ContinueLoad(outcome, null, restoreLayout).OpenedTabs;
+                    break;
                 }
-            }
-
-            foreach (var fileName in projectData.FileNames)
-            {
-                _ = hasLayoutData
-                    ? AddFileTabDeferred(fileName, false, null, true, null)
-                    : AddFileTab(fileName, false, null, true, null);
-            }
-
-            // Restore layout only if we loaded at least one file
-            if (hasLayoutData && restoreLayout && _tabController.GetWindowCount() > 0)
-            {
-                _logger.Info("Restoring layout");
-                // Re-creating tool (non-document) windows is needed because the DockPanel control would throw strange errors
-                DestroyBookmarkWindow();
-                InitToolWindows();
-                RestoreLayout(projectData.TabLayoutXml);
-            }
-            else if (_tabController.GetWindowCount() == 0)
-            {
-                _logger.Warn("No files loaded, skipping layout restoration");
-            }
         }
-        catch (Exception ex)
+
+        if (restoreLayout && outcome.HasLayoutData && openedTabs)
         {
-            ShowOkMessage(
-                $"Error loading project: {ex.Message}",
-                Resources.LogExpert_Common_UI_Title_Error,
-                MessageBoxIcon.Error);
+            _logger.Info("Restoring layout");
+            DestroyBookmarkWindow();
+            InitToolWindows();
+            RestoreLayout(outcome.LayoutXml!);
+        }
+        else if (!openedTabs)
+        {
+            _logger.Warn("No files loaded, skipping layout restoration");
         }
     }
 
@@ -1822,7 +1670,23 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         _ = memStream.Seek(0, SeekOrigin.Begin);
 
-        dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+        try
+        {
+            dockPanel.LoadFromXml(memStream, DeserializeDockContent, true);
+        }
+        catch (InvalidOperationException e)
+        {
+            _logger.Warn($"Layout restoration failed, showing windows with default layout: {e.Message}");
+            ShowDeferredWindows();
+        }
+    }
+
+    private void ShowDeferredWindows ()
+    {
+        foreach (var window in _tabController.GetAllWindows().Where(w => w.DockPanel == null))
+        {
+            window.Show(dockPanel);
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -1837,7 +1701,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (persistString.StartsWith(WindowTypes.LogWindow.ToString(), StringComparison.OrdinalIgnoreCase))
         {
             var fileName = persistString[(WindowTypes.LogWindow.ToString().Length + 1)..];
-            var win = FindWindowForFile(fileName);
+            var win = _fileOperationService.FindWindowForFile(fileName);
             if (win != null)
             {
                 return win;
@@ -1873,25 +1737,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             }
         }
 
-        if (ConfigManager.Settings.Preferences.OpenLastFiles && _startupFileNames == null)
-        {
-            var tmpList = ObjectClone.Clone(ConfigManager.Settings.LastOpenFilesList);
-
-            foreach (var name in tmpList)
-            {
-                if (!string.IsNullOrEmpty(name))
-                {
-                    AddFileTab(name, false, null, false, null);
-                }
-            }
-
-            ConfigManager.ClearLastOpenFilesList();
-        }
-
-        if (_startupFileNames != null)
-        {
-            LoadFiles(_startupFileNames, false);
-        }
+        var lastOpenFiles = ObjectClone.Clone(ConfigManager.Settings.LastOpenFilesList);
+        _fileOperationService.LoadStartupFiles(lastOpenFiles, _startupFileNames, _startupTargetLine);
 
         FillHighlightComboBox();
         FillToolLauncherBar();
@@ -1904,11 +1751,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
+        CancelPendingDrop();
         try
         {
             IList<LogWindow.LogWindow> deleteLogWindowList = [];
             ConfigManager.Settings.AlwaysOnTop = TopMost && ConfigManager.Settings.Preferences.AllowOnlyOneInstance;
-            SaveLastOpenFilesList();
+            _fileOperationService.SaveLastOpenFilesList();
 
             foreach (var logWindow in _tabController.GetAllWindows())
             {
@@ -2062,38 +1910,97 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogWindowDragOver (object sender, DragEventArgs e)
     {
-        e.Effect = !e.Data.GetDataPresent(DataFormats.FileDrop)
-            ? DragDropEffects.None
-            : DragDropEffects.Copy;
+        e.Effect = _fileOperationService.CanHandleDrop(e.Data)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
     }
 
-    private void OnLogWindowDragDrop (object sender, DragEventArgs e)
+    private async void OnLogWindowDragDrop (object sender, DragEventArgs e)
     {
-#if DEBUG
-        var formats = e.Data.GetFormats();
-        var s = "Dropped formats: ";
-        foreach (var format in formats)
+        if (e.Data?.GetData(DataFormats.FileDrop) is not string[] names)
         {
-            s += format;
-            s += " , ";
+            return;
         }
 
-        s = s[..^3];
-        _logger.Debug(s);
-#endif
-
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        // Capture Shift at the drop, before discovery or the preview can yield to the UI.
+        var invertLogic = (e.KeyState & 4) == 4;
+        e.Effect = DragDropEffects.Copy;
+        CancelPendingDrop();
+        using var cancellation = new CancellationTokenSource();
+        _dropCancellation = cancellation;
+        try
         {
-            var o = e.Data.GetData(DataFormats.FileDrop);
-            if (o is string[] names)
+            var discovery = new DroppedFileDiscovery().DiscoverAsync(names, cancellation.Token);
+            // Ordinary file drops need no preview. Only show progress if discovery takes time.
+            await Task.WhenAny(discovery, Task.Delay(150, cancellation.Token)).ConfigureAwait(true);
+            cancellation.Token.ThrowIfCancellationRequested();
+            if (IsDisposed || Disposing)
             {
-                // (shift pressed) https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.drageventargs.keystate
-                LoadFiles(names, (e.KeyState & 4) == 4);
-                e.Effect = DragDropEffects.Copy;
+                return;
+            }
+
+            string[] selected;
+            if (discovery.IsCompletedSuccessfully && !discovery.Result.IncludesFolders && discovery.Result.Skipped.Length == 0)
+            {
+                selected = discovery.Result.Files;
+            }
+            else
+            {
+                using var dialog = new FolderDropDialog(discovery, cancellation.Token);
+                _dropDialog = dialog;
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                selected = dialog.SelectedFiles;
+                _dropDialog = null;
+            }
+
+            cancellation.Token.ThrowIfCancellationRequested();
+            if (!IsDisposed && !Disposing)
+            {
+                _fileOperationService.LoadDroppedFiles(selected, invertLogic, () =>
+                {
+                    using var dialog = new MultiLoadRequestDialog();
+                    return dialog.ShowDialog(this) switch
+                    {
+                        DialogResult.Yes => MultiFileDecision.SingleFiles,
+                        DialogResult.No => MultiFileDecision.MultiFile,
+                        _ => MultiFileDecision.Cancel
+                    };
+                });
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Closing/replacing the destination or cancelling the preview opens nothing.
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Could not open dropped files");
+            if (!IsDisposed && !Disposing && !cancellation.IsCancellationRequested)
+            {
+                MessageBox.Show(this, string.Format(CultureInfo.CurrentCulture, Resources.FolderDrop_Failed, ex.Message),
+                    Resources.FolderDrop_Title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        finally
+        {
+            cancellation.Cancel();
+            if (ReferenceEquals(_dropCancellation, cancellation))
+            {
+                _dropCancellation = null;
+                _dropDialog = null;
             }
         }
     }
 
+    private void CancelPendingDrop ()
+    {
+        _dropCancellation?.Cancel();
+        _dropDialog?.Close();
+        _dropDialog = null;
+    }
     [SupportedOSPlatform("windows")]
     private void OnTimeShiftToolStripMenuItemCheckStateChanged (object sender, EventArgs e)
     {
@@ -2215,7 +2122,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        if (logWindow.Tag is not LogWindowData)
+        if (logWindow.Tag is not LogWindowData data)
         {
             return;
         }
@@ -2226,7 +2133,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        _ledService.UpdateWindowActivity(logWindow, diff);
+        var markDirty = (CurrentLogWindow != null && CurrentLogWindow != logWindow) || data.LedState.TailState != TailFollowState.On;
+        _ledService.UpdateWindowActivity(logWindow, diff, markDirty);
     }
 
     private void OnLogWindowFileNotFound (object sender, EventArgs e)
@@ -2270,10 +2178,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             if (dockPanel.ActiveContent == sender)
             {
-                var data = ((LogWindow.LogWindow)sender).Tag as LogWindowData;
-                data.LedState.IsDirty = false;
-                var icon = GetLedIcon(data.LedState.DiffSum, data);
-                _ = BeginInvoke(SetTabIcon, (LogWindow.LogWindow)sender, icon);
+                _ledService.ClearDirty((LogWindow.LogWindow)sender);
             }
         }
     }
@@ -2311,34 +2216,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         CurrentLogWindow?.JumpPrevBookmark();
     }
 
+    /// <summary>
+    /// One handler for every row of the Encoding menu: the clicked row carries the encoding it stands
+    /// for, so this does not know which encodings are offered.
+    /// </summary>
     [SupportedOSPlatform("windows")]
-    private void OnASCIIToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnEncodingToolStripMenuItemClick (object sender, EventArgs e)
     {
-        CurrentLogWindow?.ChangeEncoding(Encoding.ASCII);
-    }
+        var encoding = EncodingMenuBuilder.EncodingOf(sender as ToolStripItem);
 
-    [SupportedOSPlatform("windows")]
-    private void OnANSIToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Default);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnUTF8ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(new UTF8Encoding(false));
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnUTF16ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.Unicode);
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void OnISO88591ToolStripMenuItemClick (object sender, EventArgs e)
-    {
-        CurrentLogWindow?.ChangeEncoding(Encoding.GetEncoding("iso-8859-1"));
+        if (encoding != null)
+        {
+            CurrentLogWindow?.ChangeEncoding(encoding);
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -2553,12 +2443,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnSaveProjectToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnSaveSessionToolStripMenuItemClick (object sender, EventArgs e)
     {
         SaveFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
@@ -2575,29 +2465,34 @@ internal partial class LogTabWindow : Form, ILogTabWindow
                 }
             }
 
-            ProjectData projectData = new()
+            SessionData sessionData = new()
             {
                 FileNames = fileNames,
                 TabLayoutXml = SaveLayout()
             };
 
-            ProjectPersister.SaveProjectData(fileName, projectData);
+            if (!_sessionHandler.SaveSession(fileName, sessionData, out var errorMessage))
+            {
+                ShowOkMessage(errorMessage ?? Resources.LogExpert_Common_UI_Title_Error,
+                              Resources.LogExpert_Common_UI_Title_Error,
+                              MessageBoxIcon.Error);
+            }
         }
     }
 
     [SupportedOSPlatform("windows")]
-    private void OnLoadProjectToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnLoadSessionToolStripMenuItemClick (object sender, EventArgs e)
     {
         OpenFileDialog dlg = new()
         {
             DefaultExt = "lxj",
-            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Project_Session_Default_Filter, "(*.lxj)|*.lxj")
+            Filter = string.Format(CultureInfo.InvariantCulture, Resources.LogTabWindow_UI_Session_Default_Filter, "(*.lxj)|*.lxj")
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
-            var projectFileName = dlg.FileName;
-            LoadProject(projectFileName, true);
+            var sessionFileName = dlg.FileName;
+            LoadSession(sessionFileName, true);
         }
     }
 
@@ -2610,8 +2505,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private void OnCopyPathToClipboardToolStripMenuItemClick (object sender, EventArgs e)
     {
-        var logWindow = dockPanel.ActiveContent as LogWindow.LogWindow;
-        Clipboard.SetText(logWindow.Title);
+        if (dockPanel.ActiveContent is not LogWindow.LogWindow logWindow)
+        {
+            return;
+        }
+
+        if (!ClipboardHelper.TrySetText(logWindow.Title))
+        {
+            _ = MessageBox.Show(this, Resources.LogExpert_Common_UI_Message_ClipboardInUse, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
     }
 
     private void OnFindInExplorerToolStripMenuItemClick (object sender, EventArgs e)
@@ -2815,7 +2717,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             {
                 ConfigManager.Settings.UriHistoryList = dlg.UriHistory;
                 ConfigManager.Save(SettingsFlags.FileHistory);
-                LoadFiles([dlg.Uri], false);
+                _fileOperationService.LoadFilesWithOption(new[] { dlg.Uri }, false);
             }
         }
     }
@@ -2834,9 +2736,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (dockPanel.ActiveContent is LogWindow.LogWindow window)
         {
+            // Unlike OnTabControllerWindowActivated this has no already-current guard, so it also
+            // fires when the current tab is re-activated. BindActiveLogWindow re-seats the tool
+            // windows in that case even though the window itself does not change.
             CurrentLogWindow = window;
             CurrentLogWindow.LogWindowActivated();
-            ConnectToolWindows(CurrentLogWindow);
         }
     }
 

@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using System.Windows.Forms;
 
 using ColumnizerLib;
 
@@ -127,12 +128,19 @@ public class RegexColumnizerErrorHandlingTests
         string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "{ corrupt json content }");
 
-        var columnizer = new Regex1Columnizer();
+        var errors = new List<(string Message, string Title, MessageBoxIcon Icon)>();
+        var columnizer = new Regex1Columnizer
+        {
+            ShowError = (message, title, icon) => errors.Add((message, title, icon))
+        };
 
         // Act - Should not throw, should handle gracefully
         Assert.DoesNotThrow(() => columnizer.LoadConfig(_testDirectory));
 
-        // Assert - Should fall back to defaults
+        // Assert - error was reported (dialog would have shown in release)
+        Assert.That(errors, Has.Count.EqualTo(1));
+
+        // Assert - and should have fallen back to defaults
         Assert.That(columnizer.GetName(), Is.EqualTo("Regex1"));
         Assert.That(columnizer.GetColumnCount(), Is.GreaterThan(0));
     }
@@ -173,12 +181,19 @@ public class RegexColumnizerErrorHandlingTests
         string xmlPath = Path.Join(_testDirectory, "Regex1Columnizer.xml");
         File.WriteAllText(xmlPath, "<InvalidXml>No closing tag");
 
-        var columnizer = new Regex1Columnizer();
+        var errors = new List<(string Message, string Title, MessageBoxIcon Icon)>();
+        var columnizer = new Regex1Columnizer
+        {
+            ShowError = (message, title, icon) => errors.Add((message, title, icon))
+        };
 
         // Act - Should not throw
         Assert.DoesNotThrow(() => columnizer.LoadConfig(_testDirectory));
 
-        // Assert - Should fall back to defaults
+        // Assert - error was reported (dialog would have shown in release)
+        Assert.That(errors, Has.Count.EqualTo(1));
+
+        // Assert - and should have fallen back to defaults
         Assert.That(columnizer.GetName(), Is.EqualTo("Regex1"));
     }
 

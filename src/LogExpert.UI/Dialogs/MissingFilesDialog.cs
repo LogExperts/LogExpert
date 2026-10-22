@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Classes.Persister;
+using LogExpert.UI.Dialogs.Helpers;
 
 namespace LogExpert.UI.Dialogs;
 
@@ -15,7 +16,7 @@ public partial class MissingFilesDialog : Form
 {
     #region Fields
 
-    private readonly ProjectValidationResult _validationResult;
+    private readonly SessionValidationResult _validationResult;
     private readonly Dictionary<string, MissingFileItem> _fileItems;
     private readonly bool _hasLayoutData;
 
@@ -49,7 +50,7 @@ public partial class MissingFilesDialog : Form
     /// <param name="validationResult">Validation result containing file information</param>
     /// <param name="showLayoutOptions">Whether to show layout restoration options</param>
     /// <param name="hasLayoutData">Whether the project has layout data to restore</param>
-    public MissingFilesDialog (ProjectValidationResult validationResult, bool hasLayoutData = false)
+    public MissingFilesDialog (SessionValidationResult validationResult, bool hasLayoutData = false)
     {
         ArgumentNullException.ThrowIfNull(validationResult);
 
@@ -77,7 +78,7 @@ public partial class MissingFilesDialog : Form
     /// <param name="validationResult">Validation result</param>
     /// <param name="hasLayoutData">Whether the project has layout data</param>
     /// <returns>Tuple containing the dialog result, whether to update session file, and selected alternatives</returns>
-    public static (MissingFilesDialogResult Result, bool UpdateSessionFile, Dictionary<string, string> SelectedAlternatives) ShowDialog (ProjectValidationResult validationResult, bool hasLayoutData)
+    public static (MissingFilesDialogResult Result, bool UpdateSessionFile, Dictionary<string, string> SelectedAlternatives) ShowDialog (SessionValidationResult validationResult, bool hasLayoutData)
     {
         using var dialog = new MissingFilesDialog(validationResult, hasLayoutData);
         _ = dialog.ShowDialog();

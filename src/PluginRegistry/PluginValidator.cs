@@ -40,6 +40,11 @@ public static partial class PluginValidator
     // Known safe dependencies (not plugins themselves)
     private static readonly HashSet<string> _knownDependencies = new(StringComparer.OrdinalIgnoreCase)
     {
+        // LogExpert's own assemblies are not plugins. LogExpert.Core defines the built-in
+        // columnizers; if it (or a copy) lands in the plugins folder it must not be scanned,
+        // or the built-in columnizers would be registered twice.
+        "LogExpert.Core.dll",
+        "LogExpert.Resources.dll",
         "ColumnizerLib.dll",
         "Newtonsoft.Json.dll",
         "CsvHelper.dll",
@@ -52,16 +57,6 @@ public static partial class PluginValidator
         "System.Runtime.CompilerServices.Unsafe.dll",
         "System.Threading.Tasks.Extensions.dll"
     };
-
-    #endregion
-
-    #region Constructor
-
-    static PluginValidator ()
-    {
-        // Load with default path; will be reloaded when Initialize() is called
-        LoadTrustedPluginConfiguration();
-    }
 
     #endregion
 
@@ -87,6 +82,23 @@ public static partial class PluginValidator
     }
 
     /// <summary>
+    /// Ensures the trusted plugin configuration is loaded. The configuration is loaded
+    /// lazily on first use (issue #658): an eager load at class-load time would read from
+    /// and create the file in the default %APPDATA% directory before Initialize() could
+    /// point the validator at the active (e.g. portable) configuration directory.
+    /// </summary>
+    private static void EnsureConfigLoaded ()
+    {
+        lock (_configLock)
+        {
+            if (_trustedPluginConfig == null)
+            {
+                LoadTrustedPluginConfiguration();
+            }
+        }
+    }
+
+    /// <summary>
     /// Loads trusted plugin configuration from disk.
     /// </summary>
     private static void LoadTrustedPluginConfiguration ()
@@ -106,6 +118,11 @@ public static partial class PluginValidator
                     {
                         _logger.Warn("Deserialized config is null, creating default");
                         _trustedPluginConfig = CreateDefaultConfiguration();
+                        SaveTrustedPluginConfiguration();
+                    }
+                    else if (RefreshBuiltInPlugins(_trustedPluginConfig))
+                    {
+                        _logger.Info("Refreshed built-in plugin hashes from the running build");
                         SaveTrustedPluginConfiguration();
                     }
                 }
@@ -146,6 +163,35 @@ public static partial class PluginValidator
             HashAlgorithm = "SHA256",
             LastUpdated = DateTime.UtcNow
         };
+    }
+
+    /// <summary>
+    /// Makes the running build's built-in names and hashes authoritative in a loaded configuration,
+    /// so an upgrade does not reject the new built-in plugins against hashes persisted by an older build.
+    /// </summary>
+    /// <returns>True if the configuration was changed</returns>
+    private static bool RefreshBuiltInPlugins (TrustedPluginConfig config)
+    {
+        var changed = false;
+
+        foreach (var name in _trustedPluginNames.Where(n => !config.PluginNames.Contains(n, StringComparer.OrdinalIgnoreCase)))
+        {
+            config.PluginNames.Add(name);
+            changed = true;
+        }
+
+        foreach (var (name, hash) in GetBuiltInPluginHashes().Where(e => !config.PluginHashes.TryGetValue(e.Key, out var persistedHash) || !string.Equals(persistedHash, e.Value, StringComparison.OrdinalIgnoreCase)))
+        {
+            config.PluginHashes[name] = hash;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            config.LastUpdated = DateTime.UtcNow;
+        }
+
+        return changed;
     }
 
     /// <summary>
@@ -198,6 +244,8 @@ public static partial class PluginValidator
             var fileName = Path.GetFileName(dllPath);
             var hash = PluginHashCalculator.CalculateHash(dllPath);
 
+            EnsureConfigLoaded();
+
             lock (_configLock)
             {
                 if (!_trustedPluginConfig.AllowUserTrustedPlugins)
@@ -243,6 +291,8 @@ public static partial class PluginValidator
     /// <returns>True if removed, false if not found</returns>
     public static bool RemoveTrustedPlugin (string fileName)
     {
+        EnsureConfigLoaded();
+
         lock (_configLock)
         {
             var removed = _trustedPluginConfig.PluginNames.Remove(fileName);
@@ -293,6 +343,8 @@ public static partial class PluginValidator
 
         try
         {
+            EnsureConfigLoaded();
+
             // 1. Check if file exists
             if (!File.Exists(dllPath))
             {

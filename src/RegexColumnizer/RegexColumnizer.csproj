@@ -1,18 +1,24 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
 
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
+    <OutputPath>$(LogExpertPluginsDirectory)</OutputPath>
     <AssemblyTitle>RegexColumnizer</AssemblyTitle>
     <RootNamespace>RegexColumnizer</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ColumnizerLib\ColumnizerLib.csproj" />
-    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
+    <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj">
+      <!-- Do not copy LogExpert.Core.dll (and its dependencies) into the plugins output folder.
+           It defines the built-in columnizers, so the plugin scanner would otherwise rediscover
+           and re-register them as duplicates. The assembly is resolved from the application base
+           directory at runtime (see PluginRegistry.ColumnizerResolveEventHandler). -->
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +27,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace></CustomToolNamespace>
     </EmbeddedResource>
-    
+
     <EmbeddedResource Update="Resources.de.resx">
       <DependentUpon>Resources.resx</DependentUpon>
     </EmbeddedResource>
@@ -35,7 +41,7 @@
     </Compile>
   </ItemGroup>
 
-  <ItemGroup>
+    <ItemGroup>
     <None Update="RegexColumnizer.manifest.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

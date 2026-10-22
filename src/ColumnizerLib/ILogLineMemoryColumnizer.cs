@@ -94,5 +94,17 @@ public interface ILogLineMemoryColumnizer
     /// <param name="oldValue">The previous value that was associated with the specified column before the update.</param>
     void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue);
 
+    // <summary>
+    /// <param name="callback">
+    /// The callback interface that receives the value update notification. Cannot be null.
+    /// </param>
+    /// <param name="column">The zero-based index of the column for which the value is being updated.</param>
+    /// <param name="value">The new value to be associated with the specified column.</param>
+    /// <param name="oldValue">
+    /// The previous value <see cref="ReadOnlyMemory{T}"/> associated with the specified
+    /// column before the update.
+    /// </param>
+    void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue);
+
     #endregion
 }

@@ -2,7 +2,7 @@ using ColumnizerLib;
 
 namespace LogExpert.Core.EventArguments;
 
-public class ColumnizerEventArgs(ILogLineMemoryColumnizer columnizer) : System.EventArgs
+public class ColumnizerEventArgs (ILogLineMemoryColumnizer columnizer) : EventArgs
 {
     #region Properties
 

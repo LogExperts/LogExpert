@@ -1,0 +1,27 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "dotnet build": true,
+        "dotnet test": true,
+        "dotnet clean": true,
+        "Out-Null": true,
+        "ForEach-Object": true,
+        "Set-Content": true,
+        "Start-Process": true,
+        "Test-Path": true,
+        "type": true,
+        "New-Item": true,
+        "/^git stash; dotnet test src/LogExpert\\.Tests/LogExpert\\.Tests\\.csproj --filter \"TestShiftBuffers1\" --no-restore 2>&1 \\| Select-Object -Last 30$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "git rev-parse": true
+    },
+    "dotnet.preferCSharpExtension": true,
+    "dotnet.defaultSolution": "src/LogExpert.sln",
+    "cSpell.words": [
+        "Columnizer",
+        "multifile",
+        "Respawned",
+        "timeshift"
+    ]
+}

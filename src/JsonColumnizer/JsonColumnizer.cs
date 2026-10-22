@@ -166,6 +166,11 @@ public partial class JsonColumnizer : ILogLineMemoryColumnizer, IInitColumnizerM
         throw new NotImplementedException();
     }
 
+    public virtual void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual void Selected (ILogLineMemoryColumnizerCallback callback)
     {
         ArgumentNullException.ThrowIfNull(callback, nameof(callback));

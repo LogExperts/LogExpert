@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-    <Version>1.31.0.0</Version>
-    <AssemblyVersion>1.31.0.0</AssemblyVersion>
-    <FileVersion>1.31.0.0</FileVersion>
-    <InformationalVersion>1.31.0.0</InformationalVersion>
+    <Version>1.40.1.0</Version>
+    <AssemblyVersion>1.40.4.0</AssemblyVersion>
+    <FileVersion>1.40.4.0</FileVersion>
+    <InformationalVersion>1.40.4.0</InformationalVersion>
     <Authors>Hirogen, zarunbal, RandallFlagg, TheNicker</Authors>
     <Company>LogExperts</Company>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -15,14 +15,36 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LogExpert</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <!--<OutputPath>$(SolutionDir)..\bin\$(Configuration)</OutputPath>--><!--TODO: Normalize this across solution-->
+
+    <!--
+      Where everything that ships is built. Anchored on this file rather than $(SolutionDir), which
+      is only defined when MSBuild is driven by the .sln: building a single project used to resolve
+      the same "$(SolutionDir)..\bin\..." to src\bin\ instead, so a lone `dotnet build Foo.csproj`
+      silently wrote somewhere other than the solution build - and the Nuke targets, the installer
+      and the CI artifact all look in bin\. Projects that do not ship (tests, benchmarks, the Nuke
+      build) keep the SDK default of a project-local bin\ and should not use these.
+
+      Configuration is defaulted here because this file is imported before the SDK gets round to
+      defaulting it, and an empty value would silently collapse bin\Debug\ to bin\. Same value the
+      SDK would pick, and the condition means an explicit -c or a solution build still wins.
+    -->
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <LogExpertBinRoot>$(MSBuildThisFileDirectory)..\bin\</LogExpertBinRoot>
+    <LogExpertBinDirectory>$(LogExpertBinRoot)$(Configuration)\</LogExpertBinDirectory>
+    <LogExpertPluginsDirectory>$(LogExpertBinDirectory)plugins\</LogExpertPluginsDirectory>
+    <LogExpertPluginsX86Directory>$(LogExpertBinDirectory)pluginsx86\</LogExpertPluginsX86Directory>
+    <!-- Deliberately outside the per-configuration folder; that is where it has always been. -->
+    <LogExpertDocsDirectory>$(LogExpertBinRoot)Docs\</LogExpertDocsDirectory>
+
     <SignAssembly>true</SignAssembly>
+    <!-- Hang timeout for every test run (dotnet test, Nuke, CI); see tests.runsettings. -->
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests.runsettings</RunSettingsFilePath>
     <PackageProjectUrl>https://github.com/LogExperts/LogExpert</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LogExperts/LogExpert</RepositoryUrl>
     <PackageTags>LogExpert, Columnizer, Logging, Windows, Winforms</PackageTags>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v.1.31.0</PackageReleaseNotes>
-    <PackageVersion>1.31.0.0</PackageVersion>
+    <PackageReleaseNotes>https://github.com/LogExperts/LogExpert/releases/tag/v.1.40.4</PackageReleaseNotes>
+    <PackageVersion>1.40.4.0</PackageVersion>
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
     <Product>LogExpert</Product>
     <Copyright>Copyright © LogExpert 2025</Copyright>

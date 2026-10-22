@@ -22,12 +22,12 @@ internal partial class ToolArgsDialog : Form
     {
         SuspendLayout();
 
+        AutoScaleDimensions = new SizeF(96F, 96F);
+        AutoScaleMode = AutoScaleMode.Dpi;
+
         _logTabWin = logTabWin;
         parent.AddOwnedForm(this);
         TopMost = parent.TopMost;
-
-        AutoScaleDimensions = new SizeF(96F, 96F);
-        AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
 

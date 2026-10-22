@@ -11,6 +11,12 @@ public class Settings
 {
     public Preferences Preferences { get; set; } = new();
 
+    /// <summary>
+    /// Settings schema version. Incremented when <see cref="LegacyPreferencesMigrator"/> introduces a
+    /// migration step. Pre-existing settings files have version <c>0</c>.
+    /// </summary>
+    public int SettingsVersion { get; set; }
+
     public RegexHistory RegexHistory { get; set; } = new();
 
     public bool AlwaysOnTop { get; set; }

@@ -32,7 +32,7 @@ public interface ILogTabWindow
     /// Loads the specified log files into the window.
     /// </summary>
     /// <param name="fileNames">An array of file paths to load.</param>
-    void LoadFiles (string[] fileNames);
+    void LoadFiles (string[] fileNames, int? targetLine = null);
 
     /// <summary>
     /// Sets the window to the foreground and gives it focus.

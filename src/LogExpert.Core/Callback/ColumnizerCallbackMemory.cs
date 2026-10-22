@@ -4,10 +4,10 @@ using LogExpert.Core.Interfaces;
 
 namespace LogExpert.Core.Callback;
 
-public class ColumnizerCallbackMemory (ILogWindow logWindow) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback, ICloneable
+public class ColumnizerCallbackMemory (ILogLineSource lineSource) : ILogLineMemoryColumnizerCallback, IAutoLogLineMemoryColumnizerCallback, ICloneable
 {
     #region Fields
-    private readonly ILogWindow _logWindow = logWindow;
+    private readonly ILogLineSource _lineSource = lineSource;
 
     #endregion
 
@@ -19,7 +19,7 @@ public class ColumnizerCallbackMemory (ILogWindow logWindow) : ILogLineMemoryCol
 
     #region cTor
 
-    private ColumnizerCallbackMemory (ColumnizerCallbackMemory original) : this(original._logWindow)
+    private ColumnizerCallbackMemory (ColumnizerCallbackMemory original) : this(original._lineSource)
     {
         LineNum = original.LineNum;
     }
@@ -35,12 +35,12 @@ public class ColumnizerCallbackMemory (ILogWindow logWindow) : ILogLineMemoryCol
 
     public string GetFileName ()
     {
-        return _logWindow.GetCurrentFileName(LineNum);
+        return _lineSource.GetCurrentFileName(LineNum);
     }
 
     public int GetLineCount ()
     {
-        return _logWindow.LogFileReader.LineCount;
+        return _lineSource.LineCount;
     }
 
     public void SetLineNum (int lineNum)
@@ -50,7 +50,7 @@ public class ColumnizerCallbackMemory (ILogWindow logWindow) : ILogLineMemoryCol
 
     public ILogLineMemory GetLogLineMemory (int lineNum)
     {
-        return _logWindow.GetLineMemory(lineNum);
+        return _lineSource.GetLineMemory(lineNum);
     }
 
     #endregion

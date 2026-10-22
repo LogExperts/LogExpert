@@ -26,7 +26,8 @@ internal sealed class LogWindowCoordinator (
     IPluginRegistry pluginRegistry,
     Controls.LogTabWindow.LogTabWindow logTabWindow,
     ITabController tabController,
-    ILedIndicatorService ledIndicatorService) : ILogWindowCoordinator
+    ILedIndicatorService ledIndicatorService,
+    IFileOperationService fileOperationService) : ILogWindowCoordinator
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -35,6 +36,7 @@ internal sealed class LogWindowCoordinator (
     private readonly Controls.LogTabWindow.LogTabWindow _logTabWindow = logTabWindow;
     private readonly ITabController _tabController = tabController;
     private readonly ILedIndicatorService _ledIndicatorService = ledIndicatorService;
+    private readonly IFileOperationService _fileOperationService = fileOperationService;
     private readonly Lock _highlightGroupLock = new();
 
     private const int DIFF_MAX = 100;
@@ -118,31 +120,33 @@ internal sealed class LogWindowCoordinator (
         var preferences = _configManager.Settings.Preferences;
         var shortName = Util.GetNameFromPath(fileName);
 
-        return preferences.MaskPrio
-            ? FindColumnizerByFileMask(shortName) ?? GetColumnizerHistoryEntry(fileName)
-            : GetColumnizerHistoryEntry(fileName) ?? FindColumnizerByFileMask(shortName);
+        // History lookup also cleans up stale entries — preserve that side-effect by routing through
+        // GetColumnizerHistoryEntry rather than a pure name lookup inside ColumnizerResolver.
+        var historyHit = GetColumnizerHistoryEntry(fileName);
+
+        var inputs = new ResolveInputs
+        {
+            Priority = preferences.ColumnizerSelectionPriority,
+            FileName = fileName,
+            ShortFileName = shortName,
+            MaskList = preferences.ColumnizerMaskList,
+            HistoryLookup = _ => historyHit?.GetName(),
+            Registered = _pluginRegistry.RegisteredColumnizers,
+            OnStaleMaskEntry = entry => _logger.Warn(
+                $"Columnizer mask '{entry.Mask}' matched '{shortName}' but its columnizer '{entry.ColumnizerName}' is not registered — skipping."),
+        };
+
+        return ColumnizerResolver.Resolve(inputs);
     }
 
-    private ILogLineMemoryColumnizer? FindColumnizerByFileMask (string fileName)
+    public ILogLineMemoryColumnizer? TryGetMaskColumnizer (string shortFileName)
     {
-        foreach (var entry in _configManager.Settings.Preferences.ColumnizerMaskList.Where(entry => entry.Mask != null))
-        {
-            try
-            {
-                if (Regex.IsMatch(fileName, entry.Mask))
-                {
-                    return ColumnizerPicker.FindMemorColumnizerByName(
-                        entry.ColumnizerName,
-                        _pluginRegistry.RegisteredColumnizers);
-                }
-            }
-            catch (ArgumentException e)
-            {
-                _logger.Error($"RegEx-error while finding columnizer: {e}");
-            }
-        }
-
-        return null;
+        return ColumnizerResolver.TryGetMaskColumnizer(
+            _configManager.Settings.Preferences.ColumnizerMaskList,
+            shortFileName,
+            _pluginRegistry.RegisteredColumnizers,
+            entry => _logger.Warn(
+                $"Columnizer mask '{entry.Mask}' matched '{shortFileName}' but its columnizer '{entry.ColumnizerName}' is not registered — skipping."));
     }
 
     private ILogLineMemoryColumnizer? GetColumnizerHistoryEntry (string fileName)
@@ -171,12 +175,12 @@ internal sealed class LogWindowCoordinator (
 
     public LogWindow AddFilterTab (FilterPipe pipe, string title, ILogLineMemoryColumnizer? preProcessColumnizer)
     {
-        return _logTabWindow.AddFilterTab(pipe, title, preProcessColumnizer);
+        return _fileOperationService.AddFilterTab(pipe, title, preProcessColumnizer);
     }
 
     public LogWindow AddTempFileTab (string fileName, string title)
     {
-        return _logTabWindow.AddTempFileTab(fileName, title);
+        return _fileOperationService.AddTempFileTab(fileName, title);
     }
 
     public void ScrollAllTabsToTimestamp (DateTime timestamp, LogWindow sender)
@@ -185,9 +189,14 @@ internal sealed class LogWindowCoordinator (
         {
             if (logWindow.ScrollToTimestamp(timestamp, false, false))
             {
-                _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX);
+                IndicateTimeSyncActivity(logWindow);
             }
         }
+    }
+
+    public void IndicateTimeSyncActivity (LogWindow logWindow)
+    {
+        _ledIndicatorService.UpdateWindowActivity(logWindow, DIFF_MAX, false);
     }
 
     public IList<WindowFileEntry> GetOpenFiles ()

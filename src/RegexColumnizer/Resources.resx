@@ -68,6 +68,9 @@
   <data name="RegexColumnizer_Description" xml:space="preserve">
     <value>Columns are filled by regular expression named capture groups</value>
   </data>
+  <data name="RegexColumnizer_Error_Message_SnapshotUnavailable" xml:space="preserve">
+    <value>Could not create a parsing snapshot for columnizer '{0}'.</value>
+  </data>
   <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
     <value>Configuration directory cannot be null or empty</value>
   </data>

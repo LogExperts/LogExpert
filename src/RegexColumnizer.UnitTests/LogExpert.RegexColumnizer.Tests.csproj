@@ -4,7 +4,6 @@
 
     <IsTestProject>true</IsTestProject>
 
-    <OutputPath>bin\$(Configuration)</OutputPath>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyTitle>RegexColumnizer.Tests</AssemblyTitle>
     <RootNamespace>LogExpert.RegexColumnizer.Tests</RootNamespace>

@@ -10,8 +10,8 @@ public abstract class AbstractLogTabWindow ()
     public static StaticLogTabWindowData StaticData { get; set; } = new StaticLogTabWindowData();
 
     [SupportedOSPlatform("windows")]
-    public static ILogTabWindow Create (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager)
+    public static ILogTabWindow Create (string[] fileNames, int instanceNumber, bool showInstanceNumbers, IConfigManager configManager, int? targetLine = null)
     {
-        return new LogTabWindow(fileNames, instanceNumber, showInstanceNumbers, configManager);
+        return new LogTabWindow(fileNames, instanceNumber, showInstanceNumbers, configManager, targetLine);
     }
 }

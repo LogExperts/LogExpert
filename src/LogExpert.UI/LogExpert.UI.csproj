@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LogExpert.Audio\LogExpert.Audio.csproj" />
     <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
     <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
@@ -18,14 +19,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <PackageReference Include="DockPanelSuite.ThemeVS2015" />
-    <PackageReference Include="Vanara.Library" />
+    <!-- Only the specific Vanara P/Invoke assemblies the code actually uses. The Vanara.Library
+         meta-package was previously referenced and dragged ~130 unused Vanara DLLs into the build
+         output (bloating the installer). User32/Shell32/RstrtMgr transitively bring Vanara.Core,
+         which provides Vanara.Extensions and the shared handle types (e.g. HICON). -->
     <PackageReference Include="Vanara.PInvoke.RstrtMgr" />
     <PackageReference Include="Vanara.PInvoke.Shell32" />
     <PackageReference Include="Vanara.PInvoke.User32" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Dialogs\Eminus\EminusConfigDlg.cs" />
+    </ItemGroup>
 
 </Project>

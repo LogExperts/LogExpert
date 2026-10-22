@@ -1,9 +1,8 @@
 using System.Text;
 
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Running;
 
-using LogExpert.Core.Classes.Log;
+using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 
@@ -149,13 +148,5 @@ public class StreamReaderBenchmarks
         {
             // Consume the line
         }
-    }
-}
-
-public static class Program
-{
-    public static void Main (string[] args)
-    {
-        _ = BenchmarkRunner.Run<StreamReaderBenchmarks>();
     }
 }

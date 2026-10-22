@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Applied to every test project through RunSettingsFilePath in Directory.Build.props. -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <!-- A single hung test (e.g. a WinForms deadlock) kills the test host after 3 minutes with a mini dump,
+           and the run reports which test was running, instead of the whole run freezing. -->
+      <DataCollector friendlyName="blame" enabled="true">
+        <Configuration>
+          <CollectDumpOnTestSessionHang TestTimeout="3m" HangDumpType="mini" />
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

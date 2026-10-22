@@ -1,11 +1,13 @@
 using System.Drawing;
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using System.Xml;
 
 using LogExpert.Core.Classes.Filter;
 using LogExpert.Core.Entities;
+using LogExpert.Core.Helpers;
+
+using Newtonsoft.Json;
 
 using NLog;
 
@@ -152,7 +154,16 @@ public static class PersisterXML
                         using MemoryStream stream = new(data);
                         try
                         {
-                            FilterParams filterParams = JsonSerializer.Deserialize<FilterParams>(stream);
+                            using StreamReader streamReader = new(stream);
+                            using JsonTextReader jsonReader = new(streamReader);
+                            JsonSerializer serializer = new();
+                            var filterParams = serializer.Deserialize<FilterParams>(jsonReader);
+
+                            if (filterParams == null)
+                            {
+                                continue;
+                            }
+
                             filterParams.Init();
                             filterList.Add(filterParams);
                         }
@@ -224,7 +235,13 @@ public static class PersisterXML
     private static PersistenceData ReadPersistenceDataFromNode (XmlNode node)
     {
         PersistenceData persistenceData = new();
-        var fileElement = node as XmlElement;
+        if (node is not XmlElement fileElement)
+        {
+            // Documented above: a node that is not an element yields defaults. ReadFilterTabs walks every
+            // child of filterTabs, so a comment or text node in a hand-edited .lxp arrives here.
+            return persistenceData;
+        }
+
         persistenceData.BookmarkList = ReadBookmarks(fileElement);
         persistenceData.RowHeightList = ReadRowHeightList(fileElement);
         ReadOptions(fileElement, persistenceData);
@@ -266,26 +283,24 @@ public static class PersisterXML
     private static Encoding ReadEncoding (XmlElement fileElement)
     {
         XmlNode encodingNode = fileElement.SelectSingleNode("encoding");
-        if (encodingNode != null)
+        if (encodingNode == null)
         {
-            XmlAttribute encAttr = encodingNode.Attributes["name"];
-            try
-            {
-                return encAttr == null ? null : Encoding.GetEncoding(encAttr.Value);
-            }
-            catch (ArgumentException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
-            catch (NotSupportedException e)
-            {
-                _logger.Error(e);
-                return Encoding.Default;
-            }
+            return null;
         }
 
-        return null;
+        XmlAttribute encAttr = encodingNode.Attributes["name"];
+        if (encAttr == null)
+        {
+            return null;
+        }
+
+        if (EncodingRegistry.TryGetEncoding(encAttr.Value, out var encoding))
+        {
+            return encoding;
+        }
+
+        _logger.Error($"Persisted encoding '{encAttr.Value}' is not supported, falling back to the default encoding");
+        return Encoding.Default;
     }
 
     /// <summary>
@@ -438,17 +453,59 @@ public static class PersisterXML
     }
 
     /// <summary>
-    /// Reads configuration options from the specified XML element and populates the provided <see
-    /// cref="PersistenceData"/> object with the extracted settings.
+    /// Reads the <c>options</c> section of a <c>file</c> element, plus the <c>tab</c>, <c>columnizer</c> and
+    /// <c>highlightGroup</c> elements that sit beside it, into the provided <see cref="PersistenceData"/>.
     /// </summary>
-    /// <remarks>This method processes various configuration options such as multi-file settings, current line
-    /// information, filter visibility, and more. It expects the XML structure to contain specific nodes and attributes
-    /// that define these settings. If certain attributes are missing or invalid, default values are applied.</remarks>
-    /// <param name="startNode">The XML element containing the configuration options to be read.</param>
+    /// <remarks>
+    /// The <c>options</c> section is delegated to <see cref="ReadOptionsNode"/> and is optional: a hand-edited
+    /// or very old <c>.lxp</c> may omit it, in which case every setting it carries keeps its
+    /// <see cref="PersistenceData"/> default. The three sibling elements are read either way, so a missing
+    /// <c>options</c> section does not cost the user their tab name, columnizer or highlight group.
+    /// </remarks>
+    /// <param name="startNode">The <c>file</c> element to read from.</param>
     /// <param name="persistenceData">The <see cref="PersistenceData"/> object to populate with the settings extracted from the XML element.</param>
     private static void ReadOptions (XmlElement startNode, PersistenceData persistenceData)
     {
         XmlNode optionsNode = startNode.SelectSingleNode("options");
+        if (optionsNode != null)
+        {
+            ReadOptionsNode(optionsNode, persistenceData);
+        }
+
+        // tab, columnizer and highlightGroup are siblings of options, not children, so they are read
+        // even when a hand-edited or very old .lxp carries no options section at all.
+        XmlNode tabNode = startNode.SelectSingleNode("tab");
+        if (tabNode != null)
+        {
+            persistenceData.TabName = (tabNode as XmlElement).GetAttribute("name");
+        }
+
+        XmlNode columnizerNode = startNode.SelectSingleNode("columnizer");
+        if (columnizerNode != null)
+        {
+            persistenceData.ColumnizerName = (columnizerNode as XmlElement).GetAttribute("name");
+        }
+
+        XmlNode highlightGroupNode = startNode.SelectSingleNode("highlightGroup");
+        if (highlightGroupNode != null)
+        {
+            persistenceData.HighlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
+        }
+    }
+
+    /// <summary>
+    /// Reads the settings held under the <c>options</c> element into the given <see cref="PersistenceData"/>.
+    /// </summary>
+    /// <remarks>
+    /// Boolean flags are written unconditionally, so an absent element or attribute reads as <c>false</c>.
+    /// The remaining settings keep the value they already have. Not calling this at all — which is what
+    /// <see cref="ReadOptions"/> does for a <c>file</c> element without an <c>options</c> child — therefore
+    /// leaves the whole group at its <see cref="PersistenceData"/> default, <c>FollowTail</c> included.
+    /// </remarks>
+    /// <param name="optionsNode">The <c>options</c> element. Must not be <c>null</c>.</param>
+    /// <param name="persistenceData">The <see cref="PersistenceData"/> object to populate.</param>
+    private static void ReadOptionsNode (XmlNode optionsNode, PersistenceData persistenceData)
+    {
         var value = GetOptionsAttribute(optionsNode, "multifile", "enabled");
         persistenceData.MultiFile = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
         persistenceData.MultiFilePattern = GetOptionsAttribute(optionsNode, "multifile", "pattern");
@@ -521,24 +578,6 @@ public static class PersisterXML
 
         value = GetOptionsAttribute(optionsNode, "filterSaveList", "visible");
         persistenceData.FilterSaveListVisible = value != null && value.Equals("1", StringComparison.OrdinalIgnoreCase);
-
-        XmlNode tabNode = startNode.SelectSingleNode("tab");
-        if (tabNode != null)
-        {
-            persistenceData.TabName = (tabNode as XmlElement).GetAttribute("name");
-        }
-
-        XmlNode columnizerNode = startNode.SelectSingleNode("columnizer");
-        if (columnizerNode != null)
-        {
-            persistenceData.ColumnizerName = (columnizerNode as XmlElement).GetAttribute("name");
-        }
-
-        XmlNode highlightGroupNode = startNode.SelectSingleNode("highlightGroup");
-        if (highlightGroupNode != null)
-        {
-            persistenceData.HighlightGroupName = (highlightGroupNode as XmlElement).GetAttribute("name");
-        }
     }
 
     /// <summary>
@@ -590,8 +629,19 @@ public static class PersisterXML
     /// when the file cannot be read or parsed (XML/IO/security related issues are logged).
     /// </returns>
     /// <remarks>
-    /// Only XML format is attempted. Any <see cref="XmlException"/>, <see cref="UnauthorizedAccessException"/>,
-    /// or <see cref="IOException"/> is caught and logged; in these cases <c>null</c> is returned.
+    /// Only XML format is attempted. Unreadable files (<see cref="UnauthorizedAccessException"/>,
+    /// <see cref="IOException"/>, <see cref="FileNotFoundException"/>) and unparseable content are caught
+    /// and logged; in these cases <c>null</c> is returned.
+    /// <para>
+    /// "Unparseable" covers more than malformed markup: this is a read-only fallback for a format LogExpert
+    /// no longer writes, so the readers below assume a well-formed document and let a hand-edited or truncated
+    /// one throw <see cref="FormatException"/> (unparseable numbers, invalid Base64),
+    /// <see cref="OverflowException"/> (numbers too large for their field), <see cref="ArgumentException"/>
+    /// (missing attributes, duplicate bookmark lines, a filter tab with no filter) or
+    /// <see cref="NullReferenceException"/> (attribute iteration over a comment or text node that stands where
+    /// an element was expected). The caller reaches this synchronously from the file-open path, so every one of
+    /// those has to degrade to "no persistence data" rather than escape.
+    /// </para>
     /// </remarks>
     public static PersistenceData Load (string fileName)
     {
@@ -602,7 +652,11 @@ public static class PersisterXML
         catch (Exception xmlParsingException) when (xmlParsingException is XmlException or
                                                                            UnauthorizedAccessException or
                                                                            IOException or
-                                                                           FileNotFoundException)
+                                                                           FileNotFoundException or
+                                                                           FormatException or
+                                                                           OverflowException or
+                                                                           ArgumentException or
+                                                                           NullReferenceException)
         {
             _logger.Error(xmlParsingException, $"Error loading persistence data from {fileName}, unknown format, parsing xml or json was not possible");
             return null;

@@ -65,6 +65,11 @@ public class DefaultLogfileColumnizer : ILogLineMemoryColumnizer
         // No special handling needed for default columnizer
     }
 
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+        // No special handling needed for default columnizer
+    }
+
     public string Text => GetName();
 
     public static Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)

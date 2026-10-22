@@ -19,13 +19,10 @@ public class FilterStarter
     private readonly List<Filter> _filterReadyList;
     private readonly SortedDictionary<int, int> _filterResultDict;
 
-    private readonly List<Filter> _filterWorkerList;
-
     private readonly SortedDictionary<int, int> _lastFilterLinesDict;
 
     private ProgressCallback _progressCallback;
     private int _progressLineCount;
-    private bool _shouldStop;
 
     #endregion
 
@@ -38,15 +35,10 @@ public class FilterStarter
         LastFilterLinesList = [];
         FilterHitList = [];
         _filterReadyList = [];
-        _filterWorkerList = [];
         _filterHitDict = [];
         _filterResultDict = [];
         _lastFilterLinesDict = [];
-        ThreadCount = Environment.ProcessorCount * 4;
         ThreadCount = minThreads;
-        ThreadPool.GetMinThreads(out _, out var completion);
-        _ = ThreadPool.SetMinThreads(minThreads, completion);
-        ThreadPool.GetMaxThreads(out _, out _);
     }
 
     #endregion
@@ -65,7 +57,7 @@ public class FilterStarter
 
     #region Public methods
 
-    public async Task DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
+    public async Task DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
         FilterResultLines.Clear();
         LastFilterLinesList.Clear();
@@ -74,8 +66,6 @@ public class FilterStarter
         _filterReadyList.Clear();
         _filterResultDict.Clear();
         _lastFilterLinesDict.Clear();
-        _filterWorkerList.Clear();
-        _shouldStop = false;
 
         var interval = maxCount / ThreadCount;
 
@@ -106,29 +96,12 @@ public class FilterStarter
             var capturedStartLine = workStartLine;
             var capturedInterval = interval;
 
-            tasks.Add(Task.Run(() => DoWork(filterParams, capturedStartLine, capturedInterval, ThreadProgressCallback)));
+            tasks.Add(Task.Run(() => DoWork(filterParams, capturedStartLine, capturedInterval, ThreadProgressCallback, cancellationToken)));
             workStartLine += interval;
         }
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
         MergeResults();
-    }
-
-    /// <summary>
-    /// Requests the FilterStarter to stop all filter threads. Call this from another thread (e.g. GUI). The function returns
-    /// immediately without waiting for filter end.
-    /// </summary>
-    public void CancelFilter ()
-    {
-        _shouldStop = true;
-        lock (_filterWorkerList)
-        {
-            _logger.Info(CultureInfo.InvariantCulture, "Filter cancel requested. Stopping all {0} threads.", _filterWorkerList.Count);
-            foreach (var filter in _filterWorkerList)
-            {
-                filter.ShouldCancel = true;
-            }
-        }
     }
 
     #endregion
@@ -141,22 +114,17 @@ public class FilterStarter
         _progressCallback(count);
     }
 
-    private Filter DoWork (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
+    private Filter DoWork (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
         _logger.Info(CultureInfo.InvariantCulture, "Started Filter worker [{0}] for line {1}", Environment.CurrentManagedThreadId, startLine);
 
         // Give every thread own copies of ColumnizerCallback and FilterParams, because the state of the objects changes while filtering
         var threadFilterParams = filterParams.CloneWithCurrentColumnizer();
         Filter filter = new(_callback.Clone());
-        lock (_filterWorkerList)
-        {
-            _filterWorkerList.Add(filter);
-        }
 
-        if (!_shouldStop)
+        if (!cancellationToken.IsCancellationRequested)
         {
-
-            _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback);
+            _ = filter.DoFilter(threadFilterParams, startLine, maxCount, progressCallback, cancellationToken);
             _logger.Info(CultureInfo.InvariantCulture, "Filter worker [{0}] for line {1} has completed.", Environment.CurrentManagedThreadId, startLine);
 
             lock (_filterReadyList)

@@ -15,9 +15,9 @@ namespace LogExpert.Core.Interfaces;
 /// <para>
 /// Implementations include:
 /// <list type="bullet">
-/// <item><description><c>PositionAwareStreamReaderLegacy</c> - Character-by-character reading for precise position control</description></item>
-/// <item><description><c>PositionAwareStreamReaderSystem</c> - Uses .NET's StreamReader.ReadLine() for improved performance</description></item>
-/// <item><description><c>PositionAwareStreamReaderPipeline</c> - Modern async pipeline-based implementation using System.IO.Pipelines</description></item>
+/// <item><description><c>PositionAwareStreamReaderDirect</c> - Default. Reads decoded chars into pooled blocks and returns zero-copy slices; fastest, assumes <c>\n</c>/<c>\r\n</c> line endings</description></item>
+/// <item><description><c>PositionAwareStreamReaderSystem</c> - Uses .NET's StreamReader.ReadLine(); also splits bare <c>\r</c> (classic-Mac) line endings</description></item>
+/// <item><description><c>PositionAwareStreamReaderLegacy</c> - Character-by-character reading; exact byte position on mixed/pathological line endings, slowest</description></item>
 /// <item><description><c>XmlLogReader</c> - Decorator for reading structured XML log blocks (e.g., Log4j XML format)</description></item>
 /// </list>
 /// </para>
@@ -109,8 +109,8 @@ public interface ILogStreamReader : IDisposable
     /// the character.
     /// </para>
     /// <para>
-    /// Some implementations (like <c>PositionAwareStreamReaderPipeline</c>) may not support this method
-    /// and will throw <see cref="NotSupportedException"/> as they are optimized for line-based reading only.
+    /// An implementation optimized purely for line-based reading may not support this method
+    /// and will throw <see cref="NotSupportedException"/>.
     /// </para>
     /// </remarks>
     /// <exception cref="ObjectDisposedException">The reader has been disposed.</exception>

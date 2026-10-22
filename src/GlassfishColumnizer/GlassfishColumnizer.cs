@@ -71,12 +71,18 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     /// <summary>
     /// Creates a new log line instance with text formatted for clipboard copying.
     /// </summary>
-    /// <remarks>The returned log line replaces separator characters in the original line with the '|'
-    /// character to ensure compatibility with clipboard operations.</remarks>
+    /// <remarks>
+    /// The returned log line replaces separator characters in the original line with the '|' character to ensure
+    /// compatibility with clipboard operations.
+    /// </remarks>
     /// <param name="logLine">The log line to be formatted for clipboard use. Cannot be null.</param>
-    /// <param name="callback">A callback interface for columnizer operations. This parameter is reserved for future use and is not utilized in
-    /// this method.</param>
-    /// <returns>A new <see cref="ILogLineMemory"/> instance containing the clipboard-formatted text of the specified log line.</returns>
+    /// <param name="callback">
+    /// A callback interface for columnizer operations. This parameter is reserved for future use and is not utilized in
+    /// this method.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="ILogLineMemory"/> instance containing the clipboard-formatted text of the specified log line.
+    /// </returns>
     public ILogLineMemory GetLineTextForClipboard (ILogLineMemory logLine, ILogLineMemoryColumnizerCallback callback)
     {
         return new GlassFishLogLine(ReplaceInMemory(logLine.FullLine, SEPARATOR_CHAR, '|'), logLine.Text, logLine.LineNumber);
@@ -85,13 +91,19 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     /// <summary>
     /// Parses a log line into its constituent columns according to the columnizer's format.
     /// </summary>
-    /// <remarks>If the input line does not conform to the expected format or is too short, only the log
-    /// message column is populated and date/time columns are left blank. The method is tolerant of malformed input and
-    /// will not throw for common formatting issues.</remarks>
-    /// <param name="callback">A callback interface used to provide context or services required during columnization.</param>
+    /// <remarks>
+    /// If the input line does not conform to the expected format or is too short, only the log message column is
+    /// populated and date/time columns are left blank. The method is tolerant of malformed input and will not throw for
+    /// common formatting issues.
+    /// </remarks>
+    /// <param name="callback">
+    /// A callback interface used to provide context or services required during columnization.
+    /// </param>
     /// <param name="logLine">The log line to be split into columns.</param>
-    /// <returns>An object representing the columnized log line, with each column populated based on the input line. If the line
-    /// does not match the expected format, the entire line is placed in the log message column.</returns>
+    /// <returns>
+    /// An object representing the columnized log line, with each column populated based on the input line. If the line
+    /// does not match the expected format, the entire line is placed in the log message column.
+    /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
     public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
@@ -173,8 +185,9 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     /// </summary>
     /// <param name="input">The memory to split</param>
     /// <param name="separator">The separator character</param>
-    /// <returns>Array with 2 elements: [before separator, after separator].
-    /// If separator not found, returns [input, Empty]</returns>
+    /// <returns>
+    /// Array with 2 elements: [before separator, after separator]. If separator not found, returns [input, Empty]
+    /// </returns>
     private static ReadOnlyMemory<char>[] SplitIntoTwo (ReadOnlyMemory<char> input, char separator)
     {
         var span = input.Span;
@@ -212,15 +225,23 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     /// <summary>
     /// Extracts the timestamp from the specified log line using the expected GlassFish log format.
     /// </summary>
-    /// <remarks>The method expects the log line to contain a timestamp in a specific format, typically used
-    /// by GlassFish logs. If the log line does not match the expected format or the timestamp cannot be parsed, the
-    /// method returns DateTime.MinValue.</remarks>
-    /// <param name="callback">A callback interface for columnizer operations. This parameter is not used by this method but is required by the
-    /// interface.</param>
-    /// <param name="logLine">The log line from which to extract the timestamp. Must not be null and should contain a timestamp in the
-    /// expected format.</param>
-    /// <returns>A DateTime value representing the parsed timestamp from the log line. Returns DateTime.MinValue if the timestamp
-    /// cannot be extracted or parsed.</returns>
+    /// <remarks>
+    /// The method expects the log line to contain a timestamp in a specific format, typically used by GlassFish logs.
+    /// If the log line does not match the expected format or the timestamp cannot be parsed, the method returns
+    /// DateTime.MinValue.
+    /// </remarks>
+    /// <param name="callback">
+    /// A callback interface for columnizer operations. This parameter is not used by this method but is required by the
+    /// interface.
+    /// </param>
+    /// <param name="logLine">
+    /// The log line from which to extract the timestamp. Must not be null and should contain a timestamp in the
+    /// expected format.
+    /// </param>
+    /// <returns>
+    /// A DateTime value representing the parsed timestamp from the log line. Returns DateTime.MinValue if the timestamp
+    /// cannot be extracted or parsed.
+    /// </returns>
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         var temp = logLine.FullLine;
@@ -268,23 +289,59 @@ internal class GlassfishColumnizer : ILogLineMemoryXmlColumnizer
     /// Updates the internal time offset based on the difference between the specified new and old values when the
     /// column index is zero.
     /// </summary>
-    /// <remarks>If the column index is not zero, this method performs no action. For column 0, both value and
-    /// oldValue must be valid date and time strings in the required format; otherwise, the time offset is not
-    /// updated.</remarks>
-    /// <param name="callback">The callback interface for columnizer operations. This parameter is not used in this method but may be required
-    /// for interface compatibility.</param>
-    /// <param name="column">The zero-based index of the column to update. Only a value of 0 triggers a time offset update.</param>
-    /// <param name="value">The new value to apply. For column 0, this should be a date and time string in the expected format.</param>
-    /// <param name="oldValue">The previous value to compare against. For column 0, this should be a date and time string in the expected
-    /// format.</param>
+    /// <remarks>
+    /// If the column index is not zero, this method performs no action. For column 0, both value and oldValue must be
+    /// valid date and time strings in the required format; otherwise, the time offset is not updated.
+    /// </remarks>
+    /// <param name="callback">
+    /// The callback interface for columnizer operations. This parameter is not used in this method but may be required
+    /// for interface compatibility.
+    /// </param>
+    /// <param name="column">
+    /// The zero-based index of the column to update. Only a value of 0 triggers a time offset update.
+    /// </param>
+    /// <param name="value">
+    /// The new value to apply. For column 0, this should be a date and time string in the expected format.
+    /// </param>
+    /// <param name="oldValue">
+    /// The previous value to compare against. For column 0, this should be a date and time string in the expected
+    /// format.
+    /// </param>
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        PushValue(callback, column, value, oldValue.AsMemory());
+    }
+
+    /// <summary>
+    /// Updates the internal time offset based on the difference between the specified new and old values when the
+    /// column index is zero.
+    /// </summary>
+    /// <remarks>
+    /// If the column index is not zero, this method performs no action. For column 0, both value and oldValue must be
+    /// valid date and time strings in the required format; otherwise, the time offset is not updated.
+    /// </remarks>
+    /// <param name="callback">
+    /// The callback interface for columnizer operations. This parameter is not used in this method but may be required
+    /// for interface compatibility.
+    /// </param>
+    /// <param name="column">
+    /// The zero-based index of the column to update. Only a value of 0 triggers a time offset update.
+    /// </param>
+    /// <param name="value">
+    /// The new value to apply. For column 0, this should be a date and time string in the expected format.
+    /// </param>
+    /// <param name="oldValue">
+    /// The previous value to compare against. For column 0, this should be a date and time string in the expected
+    /// format.
+    /// </param>
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
     {
         if (column == 0)
         {
             try
             {
                 var newDateTime = DateTime.ParseExact(value, DATETIME_FORMAT_OUT, _cultureInfo);
-                var oldDateTime = DateTime.ParseExact(oldValue, DATETIME_FORMAT_OUT, _cultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue.ToString(), DATETIME_FORMAT_OUT, _cultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 _timeOffset = (int)(mSecsNew - mSecsOld);

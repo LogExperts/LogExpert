@@ -127,6 +127,15 @@ namespace RegexColumnizer {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not create a parsing snapshot for columnizer &apos;{0}&apos;..
+        /// </summary>
+        public static string RegexColumnizer_Error_Message_SnapshotUnavailable {
+            get {
+                return ResourceManager.GetString("RegexColumnizer_Error_Message_SnapshotUnavailable", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Failed to create configuration directory: {0}.
         /// </summary>
         public static string RegexColumnizer_UI_Message_FailedToCreateConfigurationDirectory {

@@ -11,7 +11,6 @@ internal class Filter
     #region Fields
 
     private const int PROGRESS_BAR_MODULO = 1000;
-    private const int SPREAD_MAX = 50;
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     private readonly ColumnizerCallback _callback;
@@ -36,22 +35,21 @@ internal class Filter
     public List<int> FilterResultLines { get; }
     public List<int> LastFilterLinesList { get; }
     public List<int> FilterHitList { get; }
-    public bool ShouldCancel { get; set; }
 
     #endregion
 
     #region Public methods
 
-    public int DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback)
+    public int DoFilter (FilterParams filterParams, int startLine, int maxCount, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
-        return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback);
+        return DoFilter(filterParams, startLine, maxCount, FilterResultLines, LastFilterLinesList, FilterHitList, progressCallback, cancellationToken);
     }
 
     #endregion
 
     #region Private Methods
 
-    private int DoFilter (FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback)
+    private int DoFilter (FilterParams filterParams, int startLine, int maxCount, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList, ProgressCallback progressCallback, CancellationToken cancellationToken)
     {
         var lineNum = startLine;
         var count = 0;
@@ -61,7 +59,7 @@ internal class Filter
         {
             filterParams.Reset();
 
-            while ((count++ < maxCount || filterParams.IsInRange) && !ShouldCancel)
+            while ((count++ < maxCount || filterParams.IsInRange) && !cancellationToken.IsCancellationRequested)
             {
                 if (lineNum >= _callback.GetLineCount())
                 {
@@ -108,66 +106,13 @@ internal class Filter
     private void AddFilterLine (int lineNum, FilterParams filterParams, List<int> filterResultLines, List<int> lastFilterLinesList, List<int> filterHitList)
     {
         filterHitList.Add(lineNum);
-        var filterResult = GetAdditionalFilterResults(filterParams, lineNum, lastFilterLinesList);
+        var filterResult = FilterSpread.Expand(lineNum, filterParams.SpreadBefore, filterParams.SpreadBehind, _callback.GetLineCount(), lastFilterLinesList);
 
         filterResultLines.AddRange(filterResult);
 
         lastFilterLinesList.AddRange(filterResult);
 
-        if (lastFilterLinesList.Count > SPREAD_MAX * 2)
-        {
-            lastFilterLinesList.RemoveRange(0, lastFilterLinesList.Count - SPREAD_MAX * 2);
-        }
-    }
-
-    /// <summary>
-    ///  Returns a list with 'additional filter results'. This is the given line number
-    ///  and (if back spread and/or fore spread is enabled) some additional lines.
-    ///  This function doesn't check the filter condition!
-    /// </summary>
-    /// <param name="filterParams"></param>
-    /// <param name="lineNum"></param>
-    /// <param name="checkList"></param>
-    /// <returns></returns>
-    private IList<int> GetAdditionalFilterResults (FilterParams filterParams, int lineNum, IList<int> checkList)
-    {
-        IList<int> resultList = [];
-
-        if (filterParams.SpreadBefore == 0 && filterParams.SpreadBehind == 0)
-        {
-            resultList.Add(lineNum);
-            return resultList;
-        }
-
-        // back spread
-        for (var i = filterParams.SpreadBefore; i > 0; --i)
-        {
-            if (lineNum - i > 0)
-            {
-                if (!resultList.Contains(lineNum - i) && !checkList.Contains(lineNum - i))
-                {
-                    resultList.Add(lineNum - i);
-                }
-            }
-        }
-        // direct filter hit
-        if (!resultList.Contains(lineNum) && !checkList.Contains(lineNum))
-        {
-            resultList.Add(lineNum);
-        }
-        // after spread
-        for (var i = 1; i <= filterParams.SpreadBehind; ++i)
-        {
-            if (lineNum + i < _callback.GetLineCount())
-            {
-                if (!resultList.Contains(lineNum + i) && !checkList.Contains(lineNum + i))
-                {
-                    resultList.Add(lineNum + i);
-                }
-            }
-        }
-
-        return resultList;
+        FilterSpread.TrimHistory(lastFilterLinesList);
     }
 
     #endregion

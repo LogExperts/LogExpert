@@ -7,7 +7,6 @@
     <IsTestProject>true</IsTestProject>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <OutputPath>bin\$(Configuration)</OutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>LogExpert.Tests</AssemblyTitle>
     <RootNamespace>LogExpert.Tests</RootNamespace>
@@ -20,7 +19,9 @@
     <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" />
     <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" />
     <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" />
+    <ProjectReference Include="..\RegexColumnizer\RegexColumnizer.csproj" />
     <ProjectReference Include="..\LogExpert\LogExpert.csproj" />
+    <ProjectReference Include="..\LogExpert.Audio\LogExpert.Audio.csproj" />
     <ProjectReference Include="..\PluginRegistry\LogExpert.PluginRegistry.csproj" />
   </ItemGroup>
 
@@ -32,19 +33,37 @@
   </ItemGroup>
 
   <ItemGroup Label="Data">
-    <Content Include="Data\50 MB UTF16.txt">
+    <Content Include="TestData\50 MB UTF16.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\50 MB UTF8.txt">
+    <Content Include="TestData\50 MB UTF8.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\50 MB.txt">
+    <Content Include="TestData\50 MB.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\LineEndings_LF.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\LineEndings_CRLF.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\LineEndings_CR.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\LineEndings_Mixed.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\LineEndings_README.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup Label="Test Data">
     <Content Include="TestData\JsonColumnizerTest_01.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\SquareBracketColumnizerTest_06.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\SquareBracketColumnizerTest_05.txt">
@@ -75,6 +94,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestData\CsvTest_01.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\semicolon.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\tab.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\comma.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\app.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\app.log.1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\app.1.log">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\app.2.log">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Update="TestData\organizations-1000.csv">

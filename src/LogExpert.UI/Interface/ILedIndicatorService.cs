@@ -47,7 +47,8 @@ internal interface ILedIndicatorService : IDisposable
     /// Registers a window for LED state tracking
     /// </summary>
     /// <param name="window">LogWindow to track</param>
-    void RegisterWindow (LogWindow window);
+    /// <param name="state">The window's LED state; the service reads and updates this instance</param>
+    void RegisterWindow (LogWindow window, LedState state);
 
     /// <summary>
     /// Unregisters a window from LED state tracking
@@ -60,7 +61,14 @@ internal interface ILedIndicatorService : IDisposable
     /// </summary>
     /// <param name="window">Window to update</param>
     /// <param name="lineDiff">Number of new lines added</param>
-    void UpdateWindowActivity (LogWindow window, int lineDiff);
+    /// <param name="markDirty">Whether the window should be marked as having unseen changes</param>
+    void UpdateWindowActivity (LogWindow window, int lineDiff, bool markDirty);
+
+    /// <summary>
+    /// Clears the dirty state of a window
+    /// </summary>
+    /// <param name="window">Window whose changes have been seen</param>
+    void ClearDirty (LogWindow window);
 
     /// <summary>
     /// Regenerates all icons with new color

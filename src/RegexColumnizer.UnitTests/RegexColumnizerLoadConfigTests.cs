@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using System.Windows.Forms;
 
 using NUnit.Framework;
 
@@ -119,12 +120,19 @@ public class RegexColumnizerLoadConfigTests
         string jsonPath = Path.Join(_testDirectory, "Regex1Columnizer.json");
         File.WriteAllText(jsonPath, "{ this is not valid json }");
 
-        var columnizer = new Regex1Columnizer();
+        var errors = new List<(string Message, string Title, MessageBoxIcon Icon)>();
+        var columnizer = new Regex1Columnizer
+        {
+            ShowError = (message, title, icon) => errors.Add((message, title, icon))
+        };
 
         // Act - Should not throw, should fall back to defaults
         Assert.DoesNotThrow(() => columnizer.LoadConfig(_testDirectory));
 
-        // Assert
+        // Assert - error was reported (dialog would have shown in release)
+        Assert.That(errors, Has.Count.EqualTo(1));
+
+        // Assert - and should have fallen back to defaults
         Assert.That(columnizer.GetName(), Is.EqualTo("Regex1"));
     }
 

@@ -84,7 +84,7 @@ public static class HighlightBookmarkScanner
         var bookmarkCommentBuilder = new StringBuilder();
         var sourceHighlightText = string.Empty;
 
-        foreach (var entry in bookmarkEntries.Where(entry => CheckHighlightEntryMatch(entry, line)))
+        foreach (var entry in bookmarkEntries.Where(entry => HighlightEvaluator.IsMatch(entry, line)))
         {
             setBookmark = true;
             sourceHighlightText = entry.SearchText;
@@ -96,40 +96,6 @@ public static class HighlightBookmarkScanner
         }
 
         return (setBookmark, bookmarkCommentBuilder.ToString().TrimEnd('\r', '\n'), sourceHighlightText);
-    }
-
-    /// <summary>
-    /// Matches a highlight entry against a line. Replicates the logic from LogWindow.CheckHighlightEntryMatch so the
-    /// scanner works identically to the existing tail-mode matching.
-    /// </summary>
-    private static bool CheckHighlightEntryMatch (HighlightEntry entry, ITextValueMemory column)
-    {
-        if (entry.IsRegex)
-        {
-            if (entry.Regex.IsMatch(column.Text.ToString()))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if (entry.IsCaseSensitive)
-            {
-                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (column.Text.Span.Contains(entry.SearchText.AsSpan(), StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /// <summary>

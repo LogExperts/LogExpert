@@ -1,300 +1,72 @@
-﻿# Plugin Hash Management
+# Plugin Hash Management
 
 ## Overview
 
-LogExpert uses SHA256 hashes to verify plugin integrity and prevent tampering. When plugins are rebuilt, their hashes change, and the system needs to be updated.
+LogExpert verifies built-in plugins against a table of SHA256 hashes before loading them, so a
+tampered plugin DLL is rejected. `PluginValidator.GetBuiltInPluginHashes()` holds that table.
 
-## Automated Process
+**There is nothing to run and nothing to commit.** The table is generated during every build, from
+the plugin DLLs that build just produced. If you change a plugin, the next build picks it up.
 
-### Option 1: Using the Hash Generator Tool (Manual)
+## How it works
 
-After building plugins:
+[`src/PluginRegistry/PluginHashGenerator.targets`](../PluginRegistry/PluginHashGenerator.targets)
+defines a `GenerateBuiltInPluginHashes` target that runs `BeforeTargets="CoreCompile"`. It hashes
+every DLL in `bin/<Configuration>/plugins` and `bin/<Configuration>/pluginsx86` (minus a list of
+shipped-alongside dependencies such as `ColumnizerLib.dll`) and writes
+`obj/<Configuration>/BuiltInPluginHashes.g.cs`, which is compiled into `LogExpert.PluginRegistry`.
 
-```powershell
-# From repository root
-dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
-```
+The plugins have to exist before that target runs. `LogExpert.PluginRegistry.csproj` therefore
+carries a `ProjectReference` to each plugin project marked `ReferenceOutputAssembly="false"` — build
+order only, no assembly reference — so MSBuild always builds them first.
 
-This will:
-- Scan all plugin DLLs in `bin/Release/plugins/` and `bin/Release/pluginsx86/`
-- Calculate SHA256 hashes for each plugin
-- Generate `PluginHashGenerator.Generated.cs` with the `GetBuiltInPluginHashes()` method
-- Automatically integrate with the partial class `PluginValidator`
+`x86` plugins are keyed with a ` (x86)` suffix, matching what `PluginValidator` looks up at runtime.
 
-### Option 2: MSBuild Integration (Automatic during regular builds)
+### Why it is generated rather than committed
 
-The plugin hashes are automatically regenerated during Release builds if `GeneratePluginHashesEnabled` is set to `true`.
+A committed table describes whichever build produced it. Committing it creates a new commit, and the
+binaries a later build produces are not guaranteed to be byte-identical to the ones that were
+hashed — so the checked-in table went stale the moment it landed and never described the binaries it
+shipped beside. Generating it in-build removes the problem instead of policing it: every build's
+table matches that build's binaries by construction.
 
-**When Does It Run?**
-The hash generation only runs when ALL of these conditions are met:
-1. Building in **Release** configuration
-2. `GeneratePluginHashesEnabled` is set to `true`
-3. The `plugins` folder exists in the output directory
+This also means CI has no hash step. There is nothing to verify on a pull request and nothing to
+commit back, which is what previously made fork PRs unable to pass the build.
 
-This means:
-- ✅ Building the test projects won't trigger hash generation (plugins folder doesn't exist yet)
-- ✅ Building individual projects won't trigger it until plugins are actually built
-- ✅ Only runs when there are actually plugins to hash
+## Verifying
 
-To enable/disable:
-
-```xml
-<!-- In PluginRegistry/LogExpert.PluginRegistry.csproj -->
-<PropertyGroup>
-  <GeneratePluginHashesEnabled>true</GeneratePluginHashesEnabled>
-</PropertyGroup>
-```
-
-**Note**: The `GeneratePluginHashes` target only exists in the `LogExpert.PluginRegistry` project. To manually trigger hash generation:
+Hashes are only enforced in Release builds — `PluginHashCalculator.BypassHashVerification` defaults
+to `true` under `DEBUG`. To confirm a Release build's table matches its own binaries:
 
 ```powershell
-# From repository root - build the PluginRegistry project
-dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
-```
-
-**Important**: The target requires that plugins have already been built and are present in the output directory. Make sure to build the entire solution first:
-
-```powershell
-# 1. Build all projects (including plugins) in Release mode
-dotnet build src/LogExpert.sln --configuration Release
-
-# 2. The hash generation happens automatically if plugins exist
-# You can manually trigger it again if needed:
-dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
-```
-
-### Option 3: Nuke Build Integration (Recommended for Release builds)
-
-The Nuke build system now includes automatic plugin hash generation as part of the Release build process.
-
-**When Does It Run?**
-- Automatically as part of the `Pack` target when building in Release configuration
-- Can be run independently via the `GeneratePluginHashes` target
-- Only runs when building in Release configuration
-- Skips generation if no plugins directories exist
-
-**Usage Examples:**
-
-```powershell
-# From repository root
-
-# Full release build with hash generation
-./build.ps1 --target Pack --configuration Release
-
-# Only generate plugin hashes (after plugins are built)
-./build.ps1 --target GeneratePluginHashes --configuration Release
-
-# Complete release workflow
-./build.ps1 --target Clean Compile GeneratePluginHashes Pack --configuration Release
-```
-
-**What the Nuke target does:**
-1. Checks if plugins exist in `bin/Release/plugins` or `bin/Release/pluginsx86`
-2. Runs the PluginHashGenerator.Tool to scan and hash all plugin DLLs
-3. Generates `PluginHashGenerator.Generated.cs` with updated hashes
-4. Rebuilds the PluginRegistry project to include the newly generated file
-5. Logs detailed information about the process
-
-**Integration with other targets:**
-- `GeneratePluginHashes` runs **after** `Compile`
-- `Pack` target **depends on** `GeneratePluginHashes` (along with other packaging tasks)
-- When creating installers/packages, hashes are always up-to-date
-
-**Benefits:**
-- ✅ Ensures hashes are always generated during Release packaging
-- ✅ No manual intervention needed for release builds
-- ✅ Prevents shipping releases with outdated or missing hashes
-- ✅ Integrated logging for troubleshooting
-- ✅ Automatically rebuilds PluginRegistry to include generated file
-
-## File Structure
-
-```
-src/
-├── PluginRegistry/
-│   ├── PluginValidator.cs              # Original partial class
-│   ├── PluginHashGenerator.Generated.cs # Auto-generated (gitignored)
-│   ├── PluginHashGenerator.targets      # MSBuild integration
-│   └── LogExpert.PluginRegistry.csproj
-├── PluginHashGenerator.Tool/
-│   ├── Program.cs                       # Hash generator implementation
-│   └── PluginHashGenerator.Tool.csproj
-build/
-└── Build.cs                              # Nuke build with GeneratePluginHashes target
-```
-
-## Generated Code Example
-
-```csharp
-// PluginHashGenerator.Generated.cs (auto-generated)
-public static partial class PluginValidator
-{
-    /// <summary>
-    /// Gets pre-calculated SHA256 hashes for built-in plugins.
-    /// Generated: 2025-01-11 15:30:00 UTC
-    /// Configuration: Release
-    /// Plugin count: 11
-    /// </summary>
-    public static Dictionary<string, string> GetBuiltInPluginHashes()
-    {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["AutoColumnizer.dll"] = "F64B30FB8A4DF1C5...",
-            ["CsvColumnizer.dll"] = "19B94F2396423345...",
-            // ... rest of plugins
-        };
-    }
-}
-```
-
-## User Configuration Update
-
-The `trusted-plugins.json` file on user machines is managed separately:
-
-1. **First Launch**: Created with default hashes from `GetBuiltInPluginHashes()`
-2. **Plugin Updates**: When users install an updated version of LogExpert:
-   - The hardcoded hashes in `GetBuiltInPluginHashes()` reflect the new plugin versions
-   - `PluginValidator.ValidatePlugin()` will detect mismatches
-   - Users see a warning: "Plugin hash mismatch - file may have been modified"
-   - Users can re-trust plugins via Settings > Plugin Management
-
-### Automatic Trust Update (Future Enhancement)
-
-To automatically update user trust on official updates:
-
-```csharp
-// In PluginValidator.LoadTrustedPluginConfiguration()
-if (UpdatesAvailable())
-{
-    // Merge new hashes from GetBuiltInPluginHashes() into user config
-    foreach (var (plugin, hash) in GetBuiltInPluginHashes())
-    {
-        if (_trustedPluginConfig.PluginNames.Contains(plugin))
-        {
-            _trustedPluginConfig.PluginHashes[plugin] = hash;
-        }
-    }
-    SaveTrustedPluginConfiguration();
-}
+dotnet build src/LogExpert.sln -c Release
+Get-Content src/PluginRegistry/obj/Release/BuiltInPluginHashes.g.cs
+Get-FileHash bin/Release/plugins/*.dll -Algorithm SHA256
 ```
 
 ## Troubleshooting
 
-### "Plugin hash mismatch" after rebuild
+### Build fails: "No built-in plugin assemblies found in ..."
 
-1. Regenerate hashes: `dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/net10.0-windows/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release`
-2. Rebuild solution
-3. Delete `%APPDATA%\LogExpert\trusted-plugins.json` for testing
+The generation target found an empty plugins directory. An empty table would silently make every
+built-in plugin untrusted, so the build fails instead. Check that the build-order `ProjectReference`
+entries in `LogExpert.PluginRegistry.csproj` still cover every project that outputs into `plugins`
+or `pluginsx86`.
 
-### Generated file not found during build
+### IntelliSense cannot resolve `GetBuiltInPluginHashes()`
 
-The generated file is created during the first build. If missing:
-1. Run the hash generator tool manually (see Option 1 above)
-2. OR build twice (first build creates it, second build includes it)
+The generated file does not exist yet on a fresh clone. Build once and it appears.
 
-### Hashes don't match expected values
+### "Plugin hash mismatch" on a user's machine after an update
 
-- Ensure you're building in Release mode
-- Check that plugin DLLs haven't been modified after calculation
-- Verify the correct plugins folder is being scanned
+Every load of `trusted-plugins.json` reconciles the built-in names and hashes with the running build's
+`GetBuiltInPluginHashes()` (user-trusted entries are kept), so an upgrade does not cause this for
+built-in plugins. A mismatch on a built-in plugin therefore means its bytes differ from the build
+that is running: a partial or mixed install, or a modified file. Reinstall.
 
-### Error: "The target 'GeneratePluginHashes' does not exist in the project"
+## Adding a plugin
 
-**Cause**: You're trying to run the target on the wrong project (e.g., test project or solution file).
-
-**Solution**: The `GeneratePluginHashes` target only exists in the `LogExpert.PluginRegistry` project:
-
-```powershell
-# ❌ WRONG - Running on test project
-dotnet build src/PluginRegistry.Tests/LogExpert.PluginRegistry.Tests.csproj /t:GeneratePluginHashes
-
-# ❌ WRONG - Running on solution
-dotnet build src/LogExpert.sln /t:GeneratePluginHashes
-
-# ✅ CORRECT - Running on PluginRegistry project
-dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
-```
-
-**Prerequisites**: Make sure plugins are already built before generating hashes:
-```powershell
-# 1. Build everything first
-dotnet build src/LogExpert.sln --configuration Release
-
-# 2. Then generate hashes
-dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj /t:GeneratePluginHashes --configuration Release
-```
-
-### Error: Build fails with "exited with code 1" when building test projects in Release mode
-
-**Cause**: The hash generator was trying to run before plugins were built, or the `plugins` folder didn't exist.
-
-**Solution**: This has been fixed in the targets file. The hash generation now only runs when:
-1. Building in Release configuration
-2. The `plugins` folder actually exists in the output directory
-
-If you still encounter this:
-```powershell
-# Build solution first to create all plugins
-dotnet build src/LogExpert.sln --configuration Release
-
-# Then build the test project
-dotnet build src/PluginRegistry.Tests/LogExpert.PluginRegistry.Tests.csproj --configuration Release
-```
-
-### Error: "WARNING: No plugin DLLs found. Skipping hash generation."
-
-**Cause**: The hash generator ran but couldn't find any plugin DLLs in the expected location.
-
-**Solution**: Make sure plugins are built before running hash generation:
-```powershell
-# 1. Build all plugin projects
-dotnet build src/LogExpert.sln --configuration Release
-
-# 2. Verify plugins exist
-dir bin/Release/net10.0-windows/plugins/
-
-# 3. Then generate hashes
-dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/net10.0-windows/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
-```
-## Quick Start Guide
-
-### For Regular Development (Debug builds)
-No action needed - hashes are bypassed in Debug configuration.
-
-### For Release Builds
-
-**Using Nuke Build (Recommended):**
-```powershell
-# From repository root
-cd G:\Github\LogExpert
-
-# Full release build (hashes generated automatically)
-./build.ps1 --target Pack --configuration Release
-```
-
-**Manual Process:**
-```powershell
-# 1. Build the tool first (if not already built)
-cd G:\Github\LogExpert
-dotnet build src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj
-
-# 2. Build your plugins in Release mode
-dotnet build src/LogExpert.sln --configuration Release
-
-# 3. Generate the hashes
-dotnet run --project src/PluginHashGenerator.Tool/PluginHashGenerator.Tool.csproj -- "bin/Release/net10.0-windows/" "src/PluginRegistry/PluginHashGenerator.Generated.cs" Release
-
-# 4. Rebuild to include the generated file
-dotnet build src/PluginRegistry/LogExpert.PluginRegistry.csproj --configuration Release
-```
-
-### After Modifying Plugins
-
-If you modify any plugin code, regenerate hashes before creating a release:
-
-```powershell
-# Rebuild and regenerate hashes
-./build.ps1 --target Clean Compile GeneratePluginHashes --configuration Release
-
-# Or just regenerate if already built
-./build.ps1 --target GeneratePluginHashes --configuration Release
+Add its project to `src/LogExpert.sln` as usual, point its `OutputPath` at
+`$(SolutionDir)..\bin\$(Configuration)\plugins`, then add one build-order `ProjectReference` for it
+in `LogExpert.PluginRegistry.csproj`. Without that reference the plugin may build after the hash
+table is generated and be missing from it.

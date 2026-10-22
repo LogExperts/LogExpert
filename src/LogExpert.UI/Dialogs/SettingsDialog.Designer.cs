@@ -7,24 +7,10 @@ partial class SettingsDialog
     /// </summary>
     private System.ComponentModel.IContainer components = null;
 
-    /// <summary>
-    /// Clean up any resources being used.
-    /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && (components != null))
-        {
-            components.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-
     #region Windows Form Designer generated code
 
     /// <summary>
-    /// Required method for Designer support - do not modify
-    /// the contents of this method with the code editor.
+    /// Required method for Designer support - do not modify the contents of this method with the code editor.
     /// </summary>
     private void InitializeComponent ()
     {
@@ -55,7 +41,8 @@ partial class SettingsDialog
         groupBoxDefaults = new GroupBox();
         labelLanguage = new Label();
         comboBoxLanguage = new ComboBox();
-        checkBoxDarkMode = new CheckBox();
+        labelColorMode = new Label();
+        comboBoxColorMode = new ComboBox();
         checkBoxFollowTail = new CheckBox();
         checkBoxColumnFinder = new CheckBox();
         checkBoxSyncFilter = new CheckBox();
@@ -101,16 +88,47 @@ partial class SettingsDialog
         labelArguments = new Label();
         textBoxArguments = new TextBox();
         tabPageColumnizers = new TabPage();
+        groupBoxColumnizerPriority = new GroupBox();
         checkBoxAutoPick = new CheckBox();
-        checkBoxMaskPrio = new CheckBox();
+        radioColumnizerPriorityHistoryThenMask = new RadioButton();
+        radioColumnizerPriorityMaskThenHistory = new RadioButton();
+        radioColumnizerPriorityMaskOverridesPersistence = new RadioButton();
         buttonDelete = new Button();
         dataGridViewColumnizer = new DataGridView();
-        dataGridViewTextBoxColumnFileMask = new DataGridViewTextBoxColumn();
-        dataGridViewComboBoxColumnColumnizer = new DataGridViewComboBoxColumn();
         tabPageHighlightMask = new TabPage();
         dataGridViewHighlightMask = new DataGridView();
         dataGridViewTextBoxColumnFileName = new DataGridViewTextBoxColumn();
         dataGridViewComboBoxColumnHighlightGroup = new DataGridViewComboBoxColumn();
+        tabPageControlCharacters = new TabPage();
+        checkBoxControlCharsEnable = new CheckBox();
+        labelControlCharsWarning = new Label();
+        labelControlCharsHint = new Label();
+        groupBoxControlCharsStyle = new GroupBox();
+        radioButtonControlCharStyleControlPictures = new RadioButton();
+        radioButtonControlCharStyleCaret = new RadioButton();
+        radioButtonControlCharStyleCEscape = new RadioButton();
+        radioButtonControlCharStyleAbbreviation = new RadioButton();
+        radioButtonControlCharStyleIso2047 = new RadioButton();
+        buttonControlCharsPresetAll = new Button();
+        buttonControlCharsPresetNone = new Button();
+        buttonControlCharsPresetNonWhitespace = new Button();
+        dataGridViewControlChars = new DataGridView();
+        columnControlCharEnabled = new DataGridViewCheckBoxColumn();
+        columnControlCharHex = new DataGridViewTextBoxColumn();
+        columnControlCharAbbr = new DataGridViewTextBoxColumn();
+        columnControlCharCaret = new DataGridViewTextBoxColumn();
+        columnControlCharPreview = new DataGridViewTextBoxColumn();
+        groupBoxControlCharsAppearance = new GroupBox();
+        labelControlCharsForeColor = new Label();
+        buttonControlCharsForeColor = new Button();
+        labelControlCharsBackColor = new Label();
+        buttonControlCharsBackColor = new Button();
+        buttonControlCharsBackColorClear = new Button();
+        checkBoxControlCharsBold = new CheckBox();
+        checkBoxControlCharsItalic = new CheckBox();
+        labelControlCharsSample = new Label();
+        groupBoxControlCharsClipboard = new GroupBox();
+        checkBoxControlCharsCopyDisplayedForm = new CheckBox();
         tabPageMultiFile = new TabPage();
         groupBoxDefaultFileNamePattern = new GroupBox();
         labelMaxDays = new Label();
@@ -158,6 +176,10 @@ partial class SettingsDialog
         toolTip = new ToolTip(components);
         buttonExport = new Button();
         buttonImport = new Button();
+        dataGridViewImageColumnColumnizerStale = new DataGridViewImageColumn();
+        dataGridViewTextBoxColumnFileMask = new DataGridViewTextBoxColumn();
+        dataGridViewComboBoxColumnColumnizerMaskType = new DataGridViewComboBoxColumn();
+        dataGridViewComboBoxColumnColumnizer = new DataGridViewComboBoxColumn();
         tabControlSettings.SuspendLayout();
         tabPageViewSettings.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMaximumLineLength).BeginInit();
@@ -176,9 +198,15 @@ partial class SettingsDialog
         tabPageExternalTools.SuspendLayout();
         groupBoxToolSettings.SuspendLayout();
         tabPageColumnizers.SuspendLayout();
+        groupBoxColumnizerPriority.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewColumnizer).BeginInit();
         tabPageHighlightMask.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewHighlightMask).BeginInit();
+        tabPageControlCharacters.SuspendLayout();
+        groupBoxControlCharsStyle.SuspendLayout();
+        ((System.ComponentModel.ISupportInitialize)dataGridViewControlChars).BeginInit();
+        groupBoxControlCharsAppearance.SuspendLayout();
+        groupBoxControlCharsClipboard.SuspendLayout();
         tabPageMultiFile.SuspendLayout();
         groupBoxDefaultFileNamePattern.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMultifileDays).BeginInit();
@@ -204,6 +232,7 @@ partial class SettingsDialog
         tabControlSettings.Controls.Add(tabPageExternalTools);
         tabControlSettings.Controls.Add(tabPageColumnizers);
         tabControlSettings.Controls.Add(tabPageHighlightMask);
+        tabControlSettings.Controls.Add(tabPageControlCharacters);
         tabControlSettings.Controls.Add(tabPageMultiFile);
         tabControlSettings.Controls.Add(tabPagePlugins);
         tabControlSettings.Controls.Add(tabPageSessions);
@@ -245,7 +274,7 @@ partial class SettingsDialog
         labelWarningMaximumLineLength.AutoSize = true;
         labelWarningMaximumLineLength.Location = new Point(446, 101);
         labelWarningMaximumLineLength.Name = "labelWarningMaximumLineLength";
-        labelWarningMaximumLineLength.Size = new Size(483, 15);
+        labelWarningMaximumLineLength.Size = new Size(482, 15);
         labelWarningMaximumLineLength.TabIndex = 16;
         labelWarningMaximumLineLength.Text = "! Changing the Maximum Line Length can impact performance and is not recommended !";
         // 
@@ -267,7 +296,7 @@ partial class SettingsDialog
         labelMaximumLineLength.Location = new Point(467, 123);
         labelMaximumLineLength.Margin = new Padding(4, 0, 4, 0);
         labelMaximumLineLength.Name = "labelMaximumLineLength";
-        labelMaximumLineLength.Size = new Size(218, 15);
+        labelMaximumLineLength.Size = new Size(217, 15);
         labelMaximumLineLength.TabIndex = 14;
         labelMaximumLineLength.Text = "Maximum Line Length (restart required)";
         // 
@@ -289,7 +318,7 @@ partial class SettingsDialog
         labelMaxDisplayLength.Location = new Point(467, 151);
         labelMaxDisplayLength.Margin = new Padding(4, 0, 4, 0);
         labelMaxDisplayLength.Name = "labelMaxDisplayLength";
-        labelMaxDisplayLength.Size = new Size(234, 15);
+        labelMaxDisplayLength.Size = new Size(233, 15);
         labelMaxDisplayLength.TabIndex = 17;
         labelMaxDisplayLength.Text = "Maximum Display Length (restart required)";
         // 
@@ -310,7 +339,7 @@ partial class SettingsDialog
         labelMaximumFilterEntriesDisplayed.Location = new Point(467, 71);
         labelMaximumFilterEntriesDisplayed.Margin = new Padding(4, 0, 4, 0);
         labelMaximumFilterEntriesDisplayed.Name = "labelMaximumFilterEntriesDisplayed";
-        labelMaximumFilterEntriesDisplayed.Size = new Size(180, 15);
+        labelMaximumFilterEntriesDisplayed.Size = new Size(179, 15);
         labelMaximumFilterEntriesDisplayed.TabIndex = 12;
         labelMaximumFilterEntriesDisplayed.Text = "Maximum filter entries displayed";
         // 
@@ -330,7 +359,7 @@ partial class SettingsDialog
         labelMaximumFilterEntries.Location = new Point(467, 44);
         labelMaximumFilterEntries.Margin = new Padding(4, 0, 4, 0);
         labelMaximumFilterEntries.Name = "labelMaximumFilterEntries";
-        labelMaximumFilterEntries.Size = new Size(127, 15);
+        labelMaximumFilterEntries.Size = new Size(126, 15);
         labelMaximumFilterEntries.TabIndex = 10;
         labelMaximumFilterEntries.Text = "Maximum filter entries";
         // 
@@ -467,7 +496,8 @@ partial class SettingsDialog
         // 
         groupBoxDefaults.Controls.Add(labelLanguage);
         groupBoxDefaults.Controls.Add(comboBoxLanguage);
-        groupBoxDefaults.Controls.Add(checkBoxDarkMode);
+        groupBoxDefaults.Controls.Add(labelColorMode);
+        groupBoxDefaults.Controls.Add(comboBoxColorMode);
         groupBoxDefaults.Controls.Add(checkBoxFollowTail);
         groupBoxDefaults.Controls.Add(checkBoxColumnFinder);
         groupBoxDefaults.Controls.Add(checkBoxSyncFilter);
@@ -501,17 +531,26 @@ partial class SettingsDialog
         comboBoxLanguage.Size = new Size(177, 23);
         comboBoxLanguage.TabIndex = 9;
         toolTip.SetToolTip(comboBoxLanguage, "Userinterface language");
-        // 
-        // checkBoxDarkMode
-        // 
-        checkBoxDarkMode.AutoSize = true;
-        checkBoxDarkMode.Location = new Point(9, 144);
-        checkBoxDarkMode.Margin = new Padding(4);
-        checkBoxDarkMode.Name = "checkBoxDarkMode";
-        checkBoxDarkMode.Size = new Size(175, 19);
-        checkBoxDarkMode.TabIndex = 6;
-        checkBoxDarkMode.Text = "Dark Mode (restart required)";
-        checkBoxDarkMode.UseVisualStyleBackColor = true;
+        //
+        // labelColorMode
+        //
+        labelColorMode.AutoSize = true;
+        labelColorMode.Location = new Point(9, 147);
+        labelColorMode.Margin = new Padding(4, 0, 4, 0);
+        labelColorMode.Name = "labelColorMode";
+        labelColorMode.Size = new Size(160, 15);
+        labelColorMode.TabIndex = 18;
+        labelColorMode.Text = "Color mode (restart required)";
+        //
+        // comboBoxColorMode
+        //
+        comboBoxColorMode.DropDownStyle = ComboBoxStyle.DropDownList;
+        comboBoxColorMode.FormattingEnabled = true;
+        comboBoxColorMode.Location = new Point(204, 144);
+        comboBoxColorMode.Margin = new Padding(4, 5, 4, 5);
+        comboBoxColorMode.Name = "comboBoxColorMode";
+        comboBoxColorMode.Size = new Size(177, 23);
+        comboBoxColorMode.TabIndex = 6;
         // 
         // checkBoxFollowTail
         // 
@@ -650,7 +689,7 @@ partial class SettingsDialog
         radioButtonTimeView.Location = new Point(9, 29);
         radioButtonTimeView.Margin = new Padding(4, 5, 4, 5);
         radioButtonTimeView.Name = "radioButtonTimeView";
-        radioButtonTimeView.Size = new Size(78, 19);
+        radioButtonTimeView.Size = new Size(79, 19);
         radioButtonTimeView.TabIndex = 10;
         radioButtonTimeView.TabStop = true;
         radioButtonTimeView.Text = "Time view";
@@ -1022,8 +1061,7 @@ partial class SettingsDialog
         // 
         // tabPageColumnizers
         // 
-        tabPageColumnizers.Controls.Add(checkBoxAutoPick);
-        tabPageColumnizers.Controls.Add(checkBoxMaskPrio);
+        tabPageColumnizers.Controls.Add(groupBoxColumnizerPriority);
         tabPageColumnizers.Controls.Add(buttonDelete);
         tabPageColumnizers.Controls.Add(dataGridViewColumnizer);
         tabPageColumnizers.Location = new Point(4, 24);
@@ -1035,12 +1073,25 @@ partial class SettingsDialog
         tabPageColumnizers.Text = "Columnizers";
         tabPageColumnizers.UseVisualStyleBackColor = true;
         // 
+        // groupBoxColumnizerPriority
+        // 
+        groupBoxColumnizerPriority.Controls.Add(checkBoxAutoPick);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityHistoryThenMask);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityMaskThenHistory);
+        groupBoxColumnizerPriority.Controls.Add(radioColumnizerPriorityMaskOverridesPersistence);
+        groupBoxColumnizerPriority.Location = new Point(4, 339);
+        groupBoxColumnizerPriority.Name = "groupBoxColumnizerPriority";
+        groupBoxColumnizerPriority.Size = new Size(500, 98);
+        groupBoxColumnizerPriority.TabIndex = 4;
+        groupBoxColumnizerPriority.TabStop = false;
+        groupBoxColumnizerPriority.Text = "Columnizer selection priority";
+        // 
         // checkBoxAutoPick
         // 
         checkBoxAutoPick.AutoSize = true;
         checkBoxAutoPick.Checked = true;
         checkBoxAutoPick.CheckState = CheckState.Checked;
-        checkBoxAutoPick.Location = new Point(530, 386);
+        checkBoxAutoPick.Location = new Point(301, 72);
         checkBoxAutoPick.Margin = new Padding(4, 5, 4, 5);
         checkBoxAutoPick.Name = "checkBoxAutoPick";
         checkBoxAutoPick.Size = new Size(192, 19);
@@ -1048,20 +1099,41 @@ partial class SettingsDialog
         checkBoxAutoPick.Text = "Automatically pick for new files";
         checkBoxAutoPick.UseVisualStyleBackColor = true;
         // 
-        // checkBoxMaskPrio
+        // radioColumnizerPriorityHistoryThenMask
         // 
-        checkBoxMaskPrio.AutoSize = true;
-        checkBoxMaskPrio.Location = new Point(213, 388);
-        checkBoxMaskPrio.Margin = new Padding(4, 5, 4, 5);
-        checkBoxMaskPrio.Name = "checkBoxMaskPrio";
-        checkBoxMaskPrio.Size = new Size(192, 19);
-        checkBoxMaskPrio.TabIndex = 4;
-        checkBoxMaskPrio.Text = "Mask has priority before history";
-        checkBoxMaskPrio.UseVisualStyleBackColor = true;
+        radioColumnizerPriorityHistoryThenMask.AutoSize = true;
+        radioColumnizerPriorityHistoryThenMask.Checked = true;
+        radioColumnizerPriorityHistoryThenMask.Location = new Point(6, 22);
+        radioColumnizerPriorityHistoryThenMask.Name = "radioColumnizerPriorityHistoryThenMask";
+        radioColumnizerPriorityHistoryThenMask.Size = new Size(189, 19);
+        radioColumnizerPriorityHistoryThenMask.TabIndex = 0;
+        radioColumnizerPriorityHistoryThenMask.TabStop = true;
+        radioColumnizerPriorityHistoryThenMask.Text = "Use history then mask (default)";
+        radioColumnizerPriorityHistoryThenMask.UseVisualStyleBackColor = true;
+        // 
+        // radioColumnizerPriorityMaskThenHistory
+        // 
+        radioColumnizerPriorityMaskThenHistory.AutoSize = true;
+        radioColumnizerPriorityMaskThenHistory.Location = new Point(6, 48);
+        radioColumnizerPriorityMaskThenHistory.Name = "radioColumnizerPriorityMaskThenHistory";
+        radioColumnizerPriorityMaskThenHistory.Size = new Size(144, 19);
+        radioColumnizerPriorityMaskThenHistory.TabIndex = 1;
+        radioColumnizerPriorityMaskThenHistory.Text = "Use mask, then history";
+        radioColumnizerPriorityMaskThenHistory.UseVisualStyleBackColor = true;
+        // 
+        // radioColumnizerPriorityMaskOverridesPersistence
+        // 
+        radioColumnizerPriorityMaskOverridesPersistence.AutoSize = true;
+        radioColumnizerPriorityMaskOverridesPersistence.Location = new Point(6, 73);
+        radioColumnizerPriorityMaskOverridesPersistence.Name = "radioColumnizerPriorityMaskOverridesPersistence";
+        radioColumnizerPriorityMaskOverridesPersistence.Size = new Size(227, 19);
+        radioColumnizerPriorityMaskOverridesPersistence.TabIndex = 2;
+        radioColumnizerPriorityMaskOverridesPersistence.Text = "Use mask, override per-file persistence";
+        radioColumnizerPriorityMaskOverridesPersistence.UseVisualStyleBackColor = true;
         // 
         // buttonDelete
         // 
-        buttonDelete.Location = new Point(12, 380);
+        buttonDelete.Location = new Point(812, 395);
         buttonDelete.Margin = new Padding(4, 5, 4, 5);
         buttonDelete.Name = "buttonDelete";
         buttonDelete.Size = new Size(112, 35);
@@ -1076,28 +1148,17 @@ partial class SettingsDialog
         dataGridViewColumnizer.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         dataGridViewColumnizer.BackgroundColor = SystemColors.ControlLight;
         dataGridViewColumnizer.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-        dataGridViewColumnizer.Columns.AddRange(new DataGridViewColumn[] { dataGridViewTextBoxColumnFileMask, dataGridViewComboBoxColumnColumnizer });
+        dataGridViewColumnizer.Columns.AddRange(new DataGridViewColumn[] { dataGridViewImageColumnColumnizerStale, dataGridViewTextBoxColumnFileMask, dataGridViewComboBoxColumnColumnizerMaskType, dataGridViewComboBoxColumnColumnizer });
         dataGridViewColumnizer.Dock = DockStyle.Top;
         dataGridViewColumnizer.EditMode = DataGridViewEditMode.EditOnEnter;
         dataGridViewColumnizer.Location = new Point(4, 5);
         dataGridViewColumnizer.Margin = new Padding(4, 5, 4, 5);
         dataGridViewColumnizer.Name = "dataGridViewColumnizer";
         dataGridViewColumnizer.RowHeadersWidth = 62;
-        dataGridViewColumnizer.Size = new Size(934, 365);
+        dataGridViewColumnizer.Size = new Size(934, 326);
         dataGridViewColumnizer.TabIndex = 2;
-        dataGridViewColumnizer.RowsAdded += OnDataGridViewColumnizerRowsAdded;
-        // 
-        // dataGridViewTextBoxColumnFileMask
-        // 
-        dataGridViewTextBoxColumnFileMask.HeaderText = "File name mask (RegEx)";
-        dataGridViewTextBoxColumnFileMask.MinimumWidth = 40;
-        dataGridViewTextBoxColumnFileMask.Name = "dataGridViewTextBoxColumnFileMask";
-        // 
-        // dataGridViewComboBoxColumnColumnizer
-        // 
-        dataGridViewComboBoxColumnColumnizer.HeaderText = "Columnizer";
-        dataGridViewComboBoxColumnColumnizer.MinimumWidth = 230;
-        dataGridViewComboBoxColumnColumnizer.Name = "dataGridViewComboBoxColumnColumnizer";
+        dataGridViewColumnizer.DefaultValuesNeeded += OnDataGridViewColumnizerDefaultValuesNeeded;
+        dataGridViewColumnizer.CurrentCellDirtyStateChanged += OnDataGridViewColumnizerCurrentCellDirtyStateChanged;
         // 
         // tabPageHighlightMask
         // 
@@ -1136,6 +1197,326 @@ partial class SettingsDialog
         dataGridViewComboBoxColumnHighlightGroup.MinimumWidth = 50;
         dataGridViewComboBoxColumnHighlightGroup.Name = "dataGridViewComboBoxColumnHighlightGroup";
         // 
+        // tabPageControlCharacters
+        // 
+        tabPageControlCharacters.Controls.Add(checkBoxControlCharsEnable);
+        tabPageControlCharacters.Controls.Add(labelControlCharsWarning);
+        tabPageControlCharacters.Controls.Add(labelControlCharsHint);
+        tabPageControlCharacters.Controls.Add(groupBoxControlCharsStyle);
+        tabPageControlCharacters.Controls.Add(buttonControlCharsPresetAll);
+        tabPageControlCharacters.Controls.Add(buttonControlCharsPresetNone);
+        tabPageControlCharacters.Controls.Add(buttonControlCharsPresetNonWhitespace);
+        tabPageControlCharacters.Controls.Add(dataGridViewControlChars);
+        tabPageControlCharacters.Controls.Add(groupBoxControlCharsAppearance);
+        tabPageControlCharacters.Controls.Add(groupBoxControlCharsClipboard);
+        tabPageControlCharacters.Location = new Point(4, 24);
+        tabPageControlCharacters.Margin = new Padding(4, 5, 4, 5);
+        tabPageControlCharacters.Name = "tabPageControlCharacters";
+        tabPageControlCharacters.Padding = new Padding(8);
+        tabPageControlCharacters.Size = new Size(942, 440);
+        tabPageControlCharacters.TabIndex = 9;
+        tabPageControlCharacters.Text = "Control characters";
+        tabPageControlCharacters.UseVisualStyleBackColor = true;
+        // 
+        // checkBoxControlCharsEnable
+        // 
+        checkBoxControlCharsEnable.AutoSize = true;
+        checkBoxControlCharsEnable.Location = new Point(12, 12);
+        checkBoxControlCharsEnable.Name = "checkBoxControlCharsEnable";
+        checkBoxControlCharsEnable.Size = new Size(230, 19);
+        checkBoxControlCharsEnable.TabIndex = 0;
+        checkBoxControlCharsEnable.Tag = "";
+        checkBoxControlCharsEnable.Text = "Substitute control characters in display";
+        checkBoxControlCharsEnable.UseVisualStyleBackColor = true;
+        checkBoxControlCharsEnable.CheckedChanged += OnControlCharsEnableChanged;
+        // 
+        // labelControlCharsWarning
+        // 
+        labelControlCharsWarning.Location = new Point(12, 38);
+        labelControlCharsWarning.Name = "labelControlCharsWarning";
+        labelControlCharsWarning.Size = new Size(900, 36);
+        labelControlCharsWarning.TabIndex = 1;
+        labelControlCharsWarning.Text = "Display only — does not modify file contents or affect search, filter, or copy-to-clipboard (unless the option below is enabled). Enabling this can make some log files look unusual.";
+        // 
+        // labelControlCharsHint
+        // 
+        labelControlCharsHint.AutoSize = true;
+        labelControlCharsHint.ForeColor = SystemColors.GrayText;
+        labelControlCharsHint.Location = new Point(12, 78);
+        labelControlCharsHint.Name = "labelControlCharsHint";
+        labelControlCharsHint.Size = new Size(192, 15);
+        labelControlCharsHint.TabIndex = 2;
+        labelControlCharsHint.Text = "Enable substitution above to apply.";
+        // 
+        // groupBoxControlCharsStyle
+        // 
+        groupBoxControlCharsStyle.Controls.Add(radioButtonControlCharStyleControlPictures);
+        groupBoxControlCharsStyle.Controls.Add(radioButtonControlCharStyleCaret);
+        groupBoxControlCharsStyle.Controls.Add(radioButtonControlCharStyleCEscape);
+        groupBoxControlCharsStyle.Controls.Add(radioButtonControlCharStyleAbbreviation);
+        groupBoxControlCharsStyle.Controls.Add(radioButtonControlCharStyleIso2047);
+        groupBoxControlCharsStyle.Location = new Point(12, 102);
+        groupBoxControlCharsStyle.Name = "groupBoxControlCharsStyle";
+        groupBoxControlCharsStyle.Size = new Size(360, 160);
+        groupBoxControlCharsStyle.TabIndex = 3;
+        groupBoxControlCharsStyle.TabStop = false;
+        groupBoxControlCharsStyle.Text = "Display style";
+        // 
+        // radioButtonControlCharStyleControlPictures
+        // 
+        radioButtonControlCharStyleControlPictures.AutoSize = true;
+        radioButtonControlCharStyleControlPictures.Location = new Point(12, 22);
+        radioButtonControlCharStyleControlPictures.Name = "radioButtonControlCharStyleControlPictures";
+        radioButtonControlCharStyleControlPictures.Size = new Size(205, 19);
+        radioButtonControlCharStyleControlPictures.TabIndex = 0;
+        radioButtonControlCharStyleControlPictures.Text = "Unicode Control Pictures (default)";
+        radioButtonControlCharStyleControlPictures.UseVisualStyleBackColor = true;
+        radioButtonControlCharStyleControlPictures.CheckedChanged += OnControlCharStyleChanged;
+        // 
+        // radioButtonControlCharStyleCaret
+        // 
+        radioButtonControlCharStyleCaret.AutoSize = true;
+        radioButtonControlCharStyleCaret.Location = new Point(12, 48);
+        radioButtonControlCharStyleCaret.Name = "radioButtonControlCharStyleCaret";
+        radioButtonControlCharStyleCaret.Size = new Size(127, 19);
+        radioButtonControlCharStyleCaret.TabIndex = 1;
+        radioButtonControlCharStyleCaret.Text = "Caret notation (^X)";
+        radioButtonControlCharStyleCaret.UseVisualStyleBackColor = true;
+        radioButtonControlCharStyleCaret.CheckedChanged += OnControlCharStyleChanged;
+        // 
+        // radioButtonControlCharStyleCEscape
+        // 
+        radioButtonControlCharStyleCEscape.AutoSize = true;
+        radioButtonControlCharStyleCEscape.Location = new Point(12, 74);
+        radioButtonControlCharStyleCEscape.Name = "radioButtonControlCharStyleCEscape";
+        radioButtonControlCharStyleCEscape.Size = new Size(158, 19);
+        radioButtonControlCharStyleCEscape.TabIndex = 2;
+        radioButtonControlCharStyleCEscape.Text = "C escape sequence (\\x01)";
+        radioButtonControlCharStyleCEscape.UseVisualStyleBackColor = true;
+        radioButtonControlCharStyleCEscape.CheckedChanged += OnControlCharStyleChanged;
+        // 
+        // radioButtonControlCharStyleAbbreviation
+        // 
+        radioButtonControlCharStyleAbbreviation.AutoSize = true;
+        radioButtonControlCharStyleAbbreviation.Location = new Point(12, 100);
+        radioButtonControlCharStyleAbbreviation.Name = "radioButtonControlCharStyleAbbreviation";
+        radioButtonControlCharStyleAbbreviation.Size = new Size(144, 19);
+        radioButtonControlCharStyleAbbreviation.TabIndex = 3;
+        radioButtonControlCharStyleAbbreviation.Text = "Abbreviation (<SOH>)";
+        radioButtonControlCharStyleAbbreviation.UseVisualStyleBackColor = true;
+        radioButtonControlCharStyleAbbreviation.CheckedChanged += OnControlCharStyleChanged;
+        // 
+        // radioButtonControlCharStyleIso2047
+        // 
+        radioButtonControlCharStyleIso2047.AutoSize = true;
+        radioButtonControlCharStyleIso2047.Location = new Point(12, 126);
+        radioButtonControlCharStyleIso2047.Name = "radioButtonControlCharStyleIso2047";
+        radioButtonControlCharStyleIso2047.Size = new Size(118, 19);
+        radioButtonControlCharStyleIso2047.TabIndex = 4;
+        radioButtonControlCharStyleIso2047.Text = "ISO 2047 graphics";
+        radioButtonControlCharStyleIso2047.UseVisualStyleBackColor = true;
+        radioButtonControlCharStyleIso2047.CheckedChanged += OnControlCharStyleChanged;
+        // 
+        // buttonControlCharsPresetAll
+        // 
+        buttonControlCharsPresetAll.Location = new Point(384, 109);
+        buttonControlCharsPresetAll.Name = "buttonControlCharsPresetAll";
+        buttonControlCharsPresetAll.Size = new Size(188, 28);
+        buttonControlCharsPresetAll.TabIndex = 4;
+        buttonControlCharsPresetAll.Text = "Enable all";
+        buttonControlCharsPresetAll.UseVisualStyleBackColor = true;
+        buttonControlCharsPresetAll.Click += OnControlCharsPresetAllClick;
+        // 
+        // buttonControlCharsPresetNone
+        // 
+        buttonControlCharsPresetNone.Location = new Point(384, 143);
+        buttonControlCharsPresetNone.Name = "buttonControlCharsPresetNone";
+        buttonControlCharsPresetNone.Size = new Size(188, 28);
+        buttonControlCharsPresetNone.TabIndex = 5;
+        buttonControlCharsPresetNone.Text = "Disable all";
+        buttonControlCharsPresetNone.UseVisualStyleBackColor = true;
+        buttonControlCharsPresetNone.Click += OnControlCharsPresetNoneClick;
+        // 
+        // buttonControlCharsPresetNonWhitespace
+        // 
+        buttonControlCharsPresetNonWhitespace.Location = new Point(384, 177);
+        buttonControlCharsPresetNonWhitespace.Name = "buttonControlCharsPresetNonWhitespace";
+        buttonControlCharsPresetNonWhitespace.Size = new Size(188, 28);
+        buttonControlCharsPresetNonWhitespace.TabIndex = 6;
+        buttonControlCharsPresetNonWhitespace.Text = "Non-whitespace defaults";
+        buttonControlCharsPresetNonWhitespace.UseVisualStyleBackColor = true;
+        buttonControlCharsPresetNonWhitespace.Click += OnControlCharsPresetNonWhitespaceClick;
+        // 
+        // dataGridViewControlChars
+        // 
+        dataGridViewControlChars.AllowUserToAddRows = false;
+        dataGridViewControlChars.AllowUserToDeleteRows = false;
+        dataGridViewControlChars.AllowUserToResizeRows = false;
+        dataGridViewControlChars.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+        dataGridViewControlChars.Columns.AddRange(new DataGridViewColumn[] { columnControlCharEnabled, columnControlCharHex, columnControlCharAbbr, columnControlCharCaret, columnControlCharPreview });
+        dataGridViewControlChars.EditMode = DataGridViewEditMode.EditOnEnter;
+        dataGridViewControlChars.Location = new Point(12, 268);
+        dataGridViewControlChars.MultiSelect = false;
+        dataGridViewControlChars.Name = "dataGridViewControlChars";
+        dataGridViewControlChars.RowHeadersVisible = false;
+        dataGridViewControlChars.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.AutoSizeToDisplayedHeaders;
+        dataGridViewControlChars.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        dataGridViewControlChars.Size = new Size(560, 161);
+        dataGridViewControlChars.TabIndex = 7;
+        dataGridViewControlChars.CellValueChanged += OnControlCharsGridCellValueChanged;
+        dataGridViewControlChars.CurrentCellDirtyStateChanged += OnControlCharsGridCurrentCellDirtyStateChanged;
+        // 
+        // columnControlCharEnabled
+        // 
+        columnControlCharEnabled.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+        columnControlCharEnabled.HeaderText = "On";
+        columnControlCharEnabled.MinimumWidth = 30;
+        columnControlCharEnabled.Name = "columnControlCharEnabled";
+        columnControlCharEnabled.Resizable = DataGridViewTriState.False;
+        columnControlCharEnabled.Width = 30;
+        // 
+        // columnControlCharHex
+        // 
+        columnControlCharHex.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        columnControlCharHex.HeaderText = "Hex";
+        columnControlCharHex.Name = "columnControlCharHex";
+        columnControlCharHex.ReadOnly = true;
+        // 
+        // columnControlCharAbbr
+        // 
+        columnControlCharAbbr.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        columnControlCharAbbr.HeaderText = "Abbr";
+        columnControlCharAbbr.Name = "columnControlCharAbbr";
+        columnControlCharAbbr.ReadOnly = true;
+        // 
+        // columnControlCharCaret
+        // 
+        columnControlCharCaret.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        columnControlCharCaret.HeaderText = "Caret";
+        columnControlCharCaret.Name = "columnControlCharCaret";
+        columnControlCharCaret.ReadOnly = true;
+        // 
+        // columnControlCharPreview
+        // 
+        columnControlCharPreview.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+        columnControlCharPreview.HeaderText = "Preview";
+        columnControlCharPreview.Name = "columnControlCharPreview";
+        columnControlCharPreview.ReadOnly = true;
+        // 
+        // groupBoxControlCharsAppearance
+        // 
+        groupBoxControlCharsAppearance.Controls.Add(labelControlCharsForeColor);
+        groupBoxControlCharsAppearance.Controls.Add(buttonControlCharsForeColor);
+        groupBoxControlCharsAppearance.Controls.Add(labelControlCharsBackColor);
+        groupBoxControlCharsAppearance.Controls.Add(buttonControlCharsBackColor);
+        groupBoxControlCharsAppearance.Controls.Add(buttonControlCharsBackColorClear);
+        groupBoxControlCharsAppearance.Controls.Add(checkBoxControlCharsBold);
+        groupBoxControlCharsAppearance.Controls.Add(checkBoxControlCharsItalic);
+        groupBoxControlCharsAppearance.Controls.Add(labelControlCharsSample);
+        groupBoxControlCharsAppearance.Location = new Point(588, 102);
+        groupBoxControlCharsAppearance.Name = "groupBoxControlCharsAppearance";
+        groupBoxControlCharsAppearance.Size = new Size(340, 220);
+        groupBoxControlCharsAppearance.TabIndex = 8;
+        groupBoxControlCharsAppearance.TabStop = false;
+        groupBoxControlCharsAppearance.Text = "Appearance";
+        // 
+        // labelControlCharsForeColor
+        // 
+        labelControlCharsForeColor.AutoSize = true;
+        labelControlCharsForeColor.Location = new Point(12, 28);
+        labelControlCharsForeColor.Name = "labelControlCharsForeColor";
+        labelControlCharsForeColor.Size = new Size(109, 15);
+        labelControlCharsForeColor.TabIndex = 0;
+        labelControlCharsForeColor.Text = "Foreground colour:";
+        // 
+        // buttonControlCharsForeColor
+        // 
+        buttonControlCharsForeColor.Location = new Point(150, 24);
+        buttonControlCharsForeColor.Name = "buttonControlCharsForeColor";
+        buttonControlCharsForeColor.Size = new Size(40, 24);
+        buttonControlCharsForeColor.TabIndex = 1;
+        buttonControlCharsForeColor.UseVisualStyleBackColor = false;
+        buttonControlCharsForeColor.Click += OnControlCharsForeColorClick;
+        // 
+        // labelControlCharsBackColor
+        // 
+        labelControlCharsBackColor.AutoSize = true;
+        labelControlCharsBackColor.Location = new Point(12, 60);
+        labelControlCharsBackColor.Name = "labelControlCharsBackColor";
+        labelControlCharsBackColor.Size = new Size(111, 15);
+        labelControlCharsBackColor.TabIndex = 2;
+        labelControlCharsBackColor.Text = "Background colour:";
+        // 
+        // buttonControlCharsBackColor
+        // 
+        buttonControlCharsBackColor.Location = new Point(150, 56);
+        buttonControlCharsBackColor.Name = "buttonControlCharsBackColor";
+        buttonControlCharsBackColor.Size = new Size(40, 24);
+        buttonControlCharsBackColor.TabIndex = 3;
+        buttonControlCharsBackColor.UseVisualStyleBackColor = false;
+        buttonControlCharsBackColor.Click += OnControlCharsBackColorClick;
+        // 
+        // buttonControlCharsBackColorClear
+        // 
+        buttonControlCharsBackColorClear.Location = new Point(196, 56);
+        buttonControlCharsBackColorClear.Name = "buttonControlCharsBackColorClear";
+        buttonControlCharsBackColorClear.Size = new Size(90, 24);
+        buttonControlCharsBackColorClear.TabIndex = 4;
+        buttonControlCharsBackColorClear.Text = "(no color)";
+        buttonControlCharsBackColorClear.UseVisualStyleBackColor = true;
+        buttonControlCharsBackColorClear.Click += OnControlCharsBackColorClearClick;
+        // 
+        // checkBoxControlCharsBold
+        // 
+        checkBoxControlCharsBold.AutoSize = true;
+        checkBoxControlCharsBold.Location = new Point(12, 96);
+        checkBoxControlCharsBold.Name = "checkBoxControlCharsBold";
+        checkBoxControlCharsBold.Size = new Size(50, 19);
+        checkBoxControlCharsBold.TabIndex = 5;
+        checkBoxControlCharsBold.Text = "Bold";
+        checkBoxControlCharsBold.UseVisualStyleBackColor = true;
+        checkBoxControlCharsBold.CheckedChanged += OnControlCharsBoldChanged;
+        // 
+        // checkBoxControlCharsItalic
+        // 
+        checkBoxControlCharsItalic.AutoSize = true;
+        checkBoxControlCharsItalic.Location = new Point(100, 96);
+        checkBoxControlCharsItalic.Name = "checkBoxControlCharsItalic";
+        checkBoxControlCharsItalic.Size = new Size(51, 19);
+        checkBoxControlCharsItalic.TabIndex = 6;
+        checkBoxControlCharsItalic.Text = "Italic";
+        checkBoxControlCharsItalic.UseVisualStyleBackColor = true;
+        checkBoxControlCharsItalic.CheckedChanged += OnControlCharsItalicChanged;
+        // 
+        // labelControlCharsSample
+        // 
+        labelControlCharsSample.BorderStyle = BorderStyle.FixedSingle;
+        labelControlCharsSample.Font = new Font("Courier New", 12F);
+        labelControlCharsSample.Location = new Point(12, 132);
+        labelControlCharsSample.Name = "labelControlCharsSample";
+        labelControlCharsSample.Size = new Size(316, 64);
+        labelControlCharsSample.TabIndex = 7;
+        labelControlCharsSample.TextAlign = ContentAlignment.MiddleCenter;
+        // 
+        // groupBoxControlCharsClipboard
+        // 
+        groupBoxControlCharsClipboard.Controls.Add(checkBoxControlCharsCopyDisplayedForm);
+        groupBoxControlCharsClipboard.Location = new Point(588, 332);
+        groupBoxControlCharsClipboard.Name = "groupBoxControlCharsClipboard";
+        groupBoxControlCharsClipboard.Size = new Size(340, 60);
+        groupBoxControlCharsClipboard.TabIndex = 9;
+        groupBoxControlCharsClipboard.TabStop = false;
+        groupBoxControlCharsClipboard.Text = "Clipboard";
+        // 
+        // checkBoxControlCharsCopyDisplayedForm
+        // 
+        checkBoxControlCharsCopyDisplayedForm.AutoSize = true;
+        checkBoxControlCharsCopyDisplayedForm.Location = new Point(12, 24);
+        checkBoxControlCharsCopyDisplayedForm.Name = "checkBoxControlCharsCopyDisplayedForm";
+        checkBoxControlCharsCopyDisplayedForm.Size = new Size(15, 14);
+        checkBoxControlCharsCopyDisplayedForm.TabIndex = 0;
+        checkBoxControlCharsCopyDisplayedForm.UseVisualStyleBackColor = true;
+        // 
         // tabPageMultiFile
         // 
         tabPageMultiFile.Controls.Add(groupBoxDefaultFileNamePattern);
@@ -1172,7 +1553,7 @@ partial class SettingsDialog
         labelMaxDays.Location = new Point(10, 75);
         labelMaxDays.Margin = new Padding(4, 0, 4, 0);
         labelMaxDays.Name = "labelMaxDays";
-        labelMaxDays.Size = new Size(60, 15);
+        labelMaxDays.Size = new Size(59, 15);
         labelMaxDays.TabIndex = 3;
         labelMaxDays.Text = "Max days:";
         // 
@@ -1222,7 +1603,7 @@ partial class SettingsDialog
         labelNoteMultiFile.Name = "labelNoteMultiFile";
         labelNoteMultiFile.Size = new Size(705, 82);
         labelNoteMultiFile.TabIndex = 1;
-        labelNoteMultiFile.Text = "Note: You can always load your logfiles as MultiFile automatically if the files names follow the MultiFile naming rule (<filename>, <filename>.1, <filename>.2, ...). Simply choose 'MultiFile' from the File menu after loading the first file.";
+        labelNoteMultiFile.Text = resources.GetString("labelNoteMultiFile.Text");
         // 
         // groupBoxWhenOpeningMultiFile
         // 
@@ -1256,7 +1637,7 @@ partial class SettingsDialog
         radioButtonTreatAllFilesAsOneMultifile.Location = new Point(10, 68);
         radioButtonTreatAllFilesAsOneMultifile.Margin = new Padding(4, 5, 4, 5);
         radioButtonTreatAllFilesAsOneMultifile.Name = "radioButtonTreatAllFilesAsOneMultifile";
-        radioButtonTreatAllFilesAsOneMultifile.Size = new Size(181, 19);
+        radioButtonTreatAllFilesAsOneMultifile.Size = new Size(182, 19);
         radioButtonTreatAllFilesAsOneMultifile.TabIndex = 1;
         radioButtonTreatAllFilesAsOneMultifile.TabStop = true;
         radioButtonTreatAllFilesAsOneMultifile.Text = "Treat all files as one 'MultiFile'";
@@ -1442,7 +1823,7 @@ partial class SettingsDialog
         radioButtonsessionSaveDocuments.Location = new Point(10, 65);
         radioButtonsessionSaveDocuments.Margin = new Padding(4, 5, 4, 5);
         radioButtonsessionSaveDocuments.Name = "radioButtonsessionSaveDocuments";
-        radioButtonsessionSaveDocuments.Size = new Size(161, 19);
+        radioButtonsessionSaveDocuments.Size = new Size(160, 19);
         radioButtonsessionSaveDocuments.TabIndex = 1;
         radioButtonsessionSaveDocuments.TabStop = true;
         radioButtonsessionSaveDocuments.Text = "MyDocuments/LogExpert";
@@ -1479,7 +1860,7 @@ partial class SettingsDialog
         checkBoxSaveSessions.Location = new Point(35, 40);
         checkBoxSaveSessions.Margin = new Padding(4, 5, 4, 5);
         checkBoxSaveSessions.Name = "checkBoxSaveSessions";
-        checkBoxSaveSessions.Size = new Size(242, 19);
+        checkBoxSaveSessions.Size = new Size(241, 19);
         checkBoxSaveSessions.TabIndex = 0;
         checkBoxSaveSessions.Text = "Automatically save persistence files (.lxp)";
         checkBoxSaveSessions.UseVisualStyleBackColor = true;
@@ -1574,7 +1955,7 @@ partial class SettingsDialog
         labelInfo.Location = new Point(9, 145);
         labelInfo.Margin = new Padding(4, 0, 4, 0);
         labelInfo.Name = "labelInfo";
-        labelInfo.Size = new Size(220, 15);
+        labelInfo.Size = new Size(219, 15);
         labelInfo.TabIndex = 4;
         labelInfo.Text = "Changes will take effect on next file load";
         // 
@@ -1671,6 +2052,37 @@ partial class SettingsDialog
         buttonImport.UseVisualStyleBackColor = true;
         buttonImport.Click += OnBtnImportClick;
         // 
+        // dataGridViewImageColumnColumnizerStale
+        // 
+        dataGridViewImageColumnColumnizerStale.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        dataGridViewImageColumnColumnizerStale.HeaderText = "";
+        dataGridViewImageColumnColumnizerStale.ImageLayout = DataGridViewImageCellLayout.Zoom;
+        dataGridViewImageColumnColumnizerStale.MinimumWidth = 24;
+        dataGridViewImageColumnColumnizerStale.Name = "dataGridViewImageColumnColumnizerStale";
+        dataGridViewImageColumnColumnizerStale.ReadOnly = true;
+        dataGridViewImageColumnColumnizerStale.Resizable = DataGridViewTriState.False;
+        dataGridViewImageColumnColumnizerStale.Width = 24;
+        // 
+        // dataGridViewTextBoxColumnFileMask
+        // 
+        dataGridViewTextBoxColumnFileMask.HeaderText = "File name mask";
+        dataGridViewTextBoxColumnFileMask.MinimumWidth = 40;
+        dataGridViewTextBoxColumnFileMask.Name = "dataGridViewTextBoxColumnFileMask";
+        // 
+        // dataGridViewComboBoxColumnColumnizerMaskType
+        // 
+        dataGridViewComboBoxColumnColumnizerMaskType.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        dataGridViewComboBoxColumnColumnizerMaskType.HeaderText = "Type";
+        dataGridViewComboBoxColumnColumnizerMaskType.MinimumWidth = 80;
+        dataGridViewComboBoxColumnColumnizerMaskType.Name = "dataGridViewComboBoxColumnColumnizerMaskType";
+        dataGridViewComboBoxColumnColumnizerMaskType.Width = 80;
+        // 
+        // dataGridViewComboBoxColumnColumnizer
+        // 
+        dataGridViewComboBoxColumnColumnizer.HeaderText = "Columnizer";
+        dataGridViewComboBoxColumnColumnizer.MinimumWidth = 230;
+        dataGridViewComboBoxColumnColumnizer.Name = "dataGridViewComboBoxColumnColumnizer";
+        // 
         // SettingsDialog
         // 
         AcceptButton = buttonOk;
@@ -1718,10 +2130,20 @@ partial class SettingsDialog
         groupBoxToolSettings.ResumeLayout(false);
         groupBoxToolSettings.PerformLayout();
         tabPageColumnizers.ResumeLayout(false);
-        tabPageColumnizers.PerformLayout();
+        groupBoxColumnizerPriority.ResumeLayout(false);
+        groupBoxColumnizerPriority.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)dataGridViewColumnizer).EndInit();
         tabPageHighlightMask.ResumeLayout(false);
         ((System.ComponentModel.ISupportInitialize)dataGridViewHighlightMask).EndInit();
+        tabPageControlCharacters.ResumeLayout(false);
+        tabPageControlCharacters.PerformLayout();
+        groupBoxControlCharsStyle.ResumeLayout(false);
+        groupBoxControlCharsStyle.PerformLayout();
+        ((System.ComponentModel.ISupportInitialize)dataGridViewControlChars).EndInit();
+        groupBoxControlCharsAppearance.ResumeLayout(false);
+        groupBoxControlCharsAppearance.PerformLayout();
+        groupBoxControlCharsClipboard.ResumeLayout(false);
+        groupBoxControlCharsClipboard.PerformLayout();
         tabPageMultiFile.ResumeLayout(false);
         groupBoxDefaultFileNamePattern.ResumeLayout(false);
         groupBoxDefaultFileNamePattern.PerformLayout();
@@ -1777,10 +2199,11 @@ partial class SettingsDialog
     private System.Windows.Forms.TabPage tabPageColumnizers;
     private System.Windows.Forms.DataGridView dataGridViewColumnizer;
     private System.Windows.Forms.Button buttonDelete;
-    private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileMask;
-    private System.Windows.Forms.DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizer;
     private System.Windows.Forms.CheckBox checkBoxSysout;
-    private System.Windows.Forms.CheckBox checkBoxMaskPrio;
+    private System.Windows.Forms.GroupBox groupBoxColumnizerPriority;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityHistoryThenMask;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityMaskThenHistory;
+    private System.Windows.Forms.RadioButton radioColumnizerPriorityMaskOverridesPersistence;
     private System.Windows.Forms.GroupBox groupBoxMisc;
     private System.Windows.Forms.CheckBox checkBoxAskCloseTabs;
     private System.Windows.Forms.TabPage tabPageMultiFile;
@@ -1868,13 +2291,48 @@ partial class SettingsDialog
     private System.Windows.Forms.CheckBox checkBoxPortableMode;
     private System.Windows.Forms.RadioButton radioButtonSessionApplicationStartupDir;
     private System.Windows.Forms.CheckBox checkBoxShowErrorMessageOnlyOneInstance;
-    private System.Windows.Forms.CheckBox checkBoxDarkMode;
+    private System.Windows.Forms.Label labelColorMode;
+    private System.Windows.Forms.ComboBox comboBoxColorMode;
     private System.Windows.Forms.NumericUpDown upDownMaximumLineLength;
     private System.Windows.Forms.Label labelMaximumLineLength;
     private System.Windows.Forms.Label labelWarningMaximumLineLength;
+    private System.Windows.Forms.TabPage tabPageControlCharacters;
+    private System.Windows.Forms.CheckBox checkBoxControlCharsEnable;
+    private System.Windows.Forms.Label labelControlCharsWarning;
+    private System.Windows.Forms.Label labelControlCharsHint;
+    private System.Windows.Forms.GroupBox groupBoxControlCharsStyle;
+    private System.Windows.Forms.RadioButton radioButtonControlCharStyleControlPictures;
+    private System.Windows.Forms.RadioButton radioButtonControlCharStyleCaret;
+    private System.Windows.Forms.RadioButton radioButtonControlCharStyleCEscape;
+    private System.Windows.Forms.RadioButton radioButtonControlCharStyleAbbreviation;
+    private System.Windows.Forms.RadioButton radioButtonControlCharStyleIso2047;
+    private System.Windows.Forms.Button buttonControlCharsPresetAll;
+    private System.Windows.Forms.Button buttonControlCharsPresetNone;
+    private System.Windows.Forms.Button buttonControlCharsPresetNonWhitespace;
+    private System.Windows.Forms.DataGridView dataGridViewControlChars;
+    private System.Windows.Forms.GroupBox groupBoxControlCharsAppearance;
+    private System.Windows.Forms.Label labelControlCharsForeColor;
+    private System.Windows.Forms.Button buttonControlCharsForeColor;
+    private System.Windows.Forms.Label labelControlCharsBackColor;
+    private System.Windows.Forms.Button buttonControlCharsBackColor;
+    private System.Windows.Forms.Button buttonControlCharsBackColorClear;
+    private System.Windows.Forms.CheckBox checkBoxControlCharsBold;
+    private System.Windows.Forms.CheckBox checkBoxControlCharsItalic;
+    private System.Windows.Forms.Label labelControlCharsSample;
+    private System.Windows.Forms.GroupBox groupBoxControlCharsClipboard;
+    private System.Windows.Forms.CheckBox checkBoxControlCharsCopyDisplayedForm;
     private System.Windows.Forms.NumericUpDown upDownMaxDisplayLength;
     private System.Windows.Forms.Label labelMaxDisplayLength;
     private Label labelLanguage;
     private ComboBox comboBoxLanguage;
     private ComboBox comboBoxReaderType;
+    private DataGridViewCheckBoxColumn columnControlCharEnabled;
+    private DataGridViewTextBoxColumn columnControlCharHex;
+    private DataGridViewTextBoxColumn columnControlCharAbbr;
+    private DataGridViewTextBoxColumn columnControlCharCaret;
+    private DataGridViewTextBoxColumn columnControlCharPreview;
+    private DataGridViewImageColumn dataGridViewImageColumnColumnizerStale;
+    private DataGridViewTextBoxColumn dataGridViewTextBoxColumnFileMask;
+    private DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizerMaskType;
+    private DataGridViewComboBoxColumn dataGridViewComboBoxColumnColumnizer;
 }

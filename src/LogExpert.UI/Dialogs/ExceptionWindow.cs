@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using LogExpert.UI.Extensions;
+
 namespace LogExpert.UI.Dialogs;
 
 [SupportedOSPlatform("windows")]
@@ -28,7 +30,7 @@ public partial class ExceptionWindow : Form
         _errorText = errorText;
         _stackTrace = stackTrace;
 
-        stackTraceTextBox.Text = _errorText + @"\n\n" + _stackTrace;
+        stackTraceTextBox.Text = _errorText + Environment.NewLine + Environment.NewLine + _stackTrace;
         stackTraceTextBox.Select(0, 0);
 
         ResumeLayout();
@@ -51,7 +53,8 @@ public partial class ExceptionWindow : Form
 
     private void CopyToClipboard ()
     {
-        Clipboard.SetText(_errorText + @"\n\n" + _stackTrace);
+        // Never let a failed clipboard access escalate out of the error dialog itself
+        _ = ClipboardHelper.TrySetText(_errorText + Environment.NewLine + Environment.NewLine + _stackTrace);
     }
 
     #endregion

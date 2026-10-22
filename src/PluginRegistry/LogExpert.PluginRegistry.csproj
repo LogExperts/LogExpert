@@ -5,13 +5,33 @@
     <RootNamespace>LogExpert.PluginRegistry</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <GeneratePluginHashesEnabled>true</GeneratePluginHashesEnabled>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\LogExpert.Core\LogExpert.Core.csproj" />
     <ProjectReference Include="..\LogExpert.Resources\LogExpert.Resources.csproj" />
+  </ItemGroup>
+
+  <!--
+    Build order only - nothing here is referenced in code. The built-in hash table compiled into this
+    assembly is derived from these plugins' output, so they have to be built first. PluginRegistry
+    already hardcodes their hashes; these references make that existing dependency explicit and let
+    MSBuild enforce it. See PluginHashGenerator.targets.
+
+    SkipGetTargetFrameworkProperties because several plugins target net10.0-windows while this project
+    targets net10.0; without it MSBuild rejects the reference as incompatible even though no assembly
+    is being referenced.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\AutoColumnizer\AutoColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\CsvColumnizer\CsvColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\DefaultPlugins\DefaultPlugins.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\FlashIconHighlighter\FlashIconHighlighter.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\GlassfishColumnizer\GlassfishColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\JsonColumnizer\JsonColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\JsonCompactColumnizer\JsonCompactColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\Log4jXmlColumnizer\Log4jXmlColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\RegexColumnizer\RegexColumnizer.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\SftpFileSystemx64\SftpFileSystemx64.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\SftpFileSystemx86\SftpFileSystemx86.csproj" ReferenceOutputAssembly="false" PrivateAssets="all" SkipGetTargetFrameworkProperties="true" />
   </ItemGroup>
 
   <ItemGroup>

@@ -152,6 +152,21 @@
   <data name="Bookmark_added" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority" xml:space="preserve">
+		<value>Priorität der Columnizer-Auswahl</value>
+	</data>
+  <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
+		<value>Maximale Anzeigelänge (Neustart nötig)</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask" xml:space="preserve">
+		<value>Zuerst Verlauf, dann Maske (Standard)</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence" xml:space="preserve">
+		<value>Maske verwenden, per-Date-Persistenz überschreiben</value>
+	</data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory" xml:space="preserve">
+		<value>Zuerst Maske, dann Verlauf</value>
+	</data>
   <data name="bookmark_bubbles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\bookmark_bubbles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -187,6 +202,9 @@
   </data>
   <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LogExpert_Common_UI_Message_ClipboardInUse" xml:space="preserve">
+    <value>Kopieren in die Zwischenablage nicht möglich. Sie wird von einer anderen Anwendung verwendet. Bitte versuchen Sie es erneut.</value>
   </data>
   <data name="LogExpert_Common_UI_Title_LogExpert" xml:space="preserve">
 		<value>LogExpert</value>
@@ -230,7 +248,7 @@
 		<value>Exportieren der Einstellungen in eine Datei</value>
 	</data>
   <data name="HighlightDialog_UI_Export_Filter" xml:space="preserve">
-		<value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)</value>
+		<value>Einstellungen (*.json)|*.json|Alle Dateien (*.*)|*.*</value>
 	</data>
   <data name="HighlightDialog_UI_Snippet_CopyOf" xml:space="preserve">
 		<value>Kopie von</value>
@@ -398,6 +416,11 @@
   <data name="LogWindow_UI_ToolStripMenuItem_TimeSyncedFiles" xml:space="preserve">
 		<value>Zeitsynchronisierte Dateien</value>
 	</data>
+  <data name="LogWindow_UI_TimeSync_TimestampControlHint" xml:space="preserve">
+		<value>Die Dateien sind jetzt zeitsynchronisiert.
+
+Damit die anderen Fenster beim Auswählen einer Zeile (Mausklick oder Pfeiltasten) mitlaufen, aktiviere "Show timestamp control" unter Einstellungen &gt; Timestamp features. Ohne diese Option bewegt nur "Scroll all tabs to current timestamp" die anderen Fenster.</value>
+	</data>
   <data name="LogWindow_UI_ToolStripMenuItem_TempHighlights" xml:space="preserve">
 		<value>Temp Highlights</value>
 	</data>
@@ -524,6 +547,9 @@
   <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
 		<value>Nicht gefunden: {0}</value>
 	</data>
+  <data name="LogWindow_UI_StatusLineError_FilterFailed" xml:space="preserve">
+		<value>Filter fehlgeschlagen: {0}</value>
+	</data>
   <data name="LogWindow_UI_StatusLineError_InvalidRegularExpression" xml:space="preserve">
 		<value>Ungültige Regular Expression</value>
 	</data>
@@ -642,7 +668,7 @@
 		<value>Unzureichende Rechte {0}: {1}</value>
 	</data>
   <data name="LogExpert_Common_Error_5Parameters_ErrorDuring0Value1Min2Max3Visible45" xml:space="preserve">
-		<value>Fehler während {0} value {1}, min {2}, max {3}, visible {4}: {5}</value>
+		<value>Fehler während Wert {0}, min {1}, max {2}, sichtbar {3}: {4}</value>
 	</data>
   <data name="LogTabWindow_StatusLineText_lowerCase_Lines" xml:space="preserve">
 		<value>linien</value>
@@ -659,7 +685,7 @@
   <data name="LogTabWindow_ThrowTestExceptionThread_ThisIsATestExceptionThrownByABackgroundThread" xml:space="preserve">
 		<value>Das ist eine Test Fehlermeldung, geworfen durch einen Hintergrund Thread</value>
 	</data>
-  <data name="LogTabWindow_UI_Project_Session_Default_Filter" xml:space="preserve">
+  <data name="LogTabWindow_UI_Session_Default_Filter" xml:space="preserve">
 		<value>LogExpert Session {0}</value>
 	</data>
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
@@ -965,8 +991,8 @@
   <data name="SettingsDialog_UI_CheckBox_checkBoxFollowTail" xml:space="preserve">
 		<value>Dem Ende folgen aktivieren</value>
 	</data>
-  <data name="SettingsDialog_UI_CheckBox_checkBoxDarkMode" xml:space="preserve">
-		<value>Dark Mode (neustart benötigt)</value>
+  <data name="SettingsDialog_UI_Label_labelColorMode" xml:space="preserve">
+		<value>Farbmodus (Neustart benötigt)</value>
 	</data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxAskCloseTabs" xml:space="preserve">
 		<value>Fragen vor dem schließen des Tabs</value>
@@ -1313,21 +1339,6 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_encodingToolStripMenuItem" xml:space="preserve">
 		<value>Encoding</value>
 	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingASCIIToolStripMenuItem" xml:space="preserve">
-		<value>ASCII</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingANSIToolStripMenuItem" xml:space="preserve">
-		<value>ANSI</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingISO88591toolStripMenuItem" xml:space="preserve">
-		<value>ISO-8859-1</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF8toolStripMenuItem" xml:space="preserve">
-		<value>UTF8</value>
-	</data>
-  <data name="LogTabWindow_UI_ToolStripMenuItem_encodingUTF16toolStripMenuItem" xml:space="preserve">
-		<value>Unicode</value>
-	</data>
   <data name="LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox" xml:space="preserve">
 		<value>+00:00:00.000</value>
 	</data>
@@ -1533,6 +1544,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="HighlightDialog_UI_Button_Copy" xml:space="preserve">
 		<value>Kopieren</value>
 	</data>
+  <data name="HighlightDialog_UI_Button_CopyEntry" xml:space="preserve">
+		<value>Ko&amp;pieren</value>
+	</data>
   <data name="HighlightDialog_UI_Button_DeleteGroup" xml:space="preserve">
 		<value>Gruppe löschen</value>
 	</data>
@@ -1650,45 +1664,6 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="ExceptionWindow_UI_Label_ErrorMessage" xml:space="preserve">
 		<value>Ein unbehandelter Fehler ist aufgetreten. Bitte melden Sie dies dem Entwickler.</value>
 	</data>
-  <data name="PatternWindow_UI_Title" xml:space="preserve">
-		<value>Muster</value>
-	</data>
-  <data name="PatternWindow_UI_Label_NumberOfBlocks" xml:space="preserve">
-		<value>Anzahl der Blöcke (Mustervarianten):</value>
-	</data>
-  <data name="PatternWindow_UI_Label_BlockLines" xml:space="preserve">
-		<value>Block Zeilen:</value>
-	</data>
-  <data name="PatternWindow_UI_Label_FeatureDescription" xml:space="preserve">
-		<value>Diese Funktion befindet sich in der Pre-Beta-Phase und funktioniert nicht :)
-		Verwendung: Wählen Sie einen Bereich im Protokollfenster aus und klicken Sie auf „Recalc“. 
-		Dadurch wird nach Textbereichen gesucht, die dem ausgewählten Bereich ähneln.</value>
-	</data>
-  <data name="PatternWindow_UI_Label_Fuzzy" xml:space="preserve">
-		<value>Fuzzy</value>
-	</data>
-  <data name="PatternWindow_UI_Label_MaxDiff" xml:space="preserve">
-		<value>Max diff</value>
-	</data>
-  <data name="PatternWindow_UI_Label_MaxMisses" xml:space="preserve">
-		<value>Max misses</value>
-	</data>
-  <data name="PatternWindow_UI_Label_Weight" xml:space="preserve">
-		<value>Gewichtung</value>
-	</data>
-  <data name="PatternWindow_UI_Label_NoRangeSet" xml:space="preserve">
-		<value>(keine Reichweite gesetzt)</value>
-	</data>
-  <data name="PatternWindow_UI_Button_Recalc" xml:space="preserve">
-		<value>Neuberechnen</value>
-	</data>
-  <data name="PatternWindow_UI_Button_SetRange" xml:space="preserve">
-		<value>Bereich setzen</value>
-	</data>
-  <data name="PatternWindow_UI_Label_RangeFormat" xml:space="preserve">
-		<value>Start: {0}
-		Ende: {1}</value>
-	</data>
   <data name="MissingFilesDialog_UI_Title" xml:space="preserve">
 		<value>Sitzung laden</value>
 	</data>
@@ -1723,12 +1698,16 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Muster syntax:
 
 * = alle Zeichen (wildcard)
-$D(&amp;lt;date&amp;gt;) = Datumsmuster
+$D(&lt;date&gt;) = Datumsmuster
 $I = Dateiindexnummer
-$J = Dateiindexnummer, versteckt wenn 09
-$J(&amp;lt;prefix&amp;gt;) = Wie $J, jedoch wird ein &amp;lt;prefix&amp;gt; hinzugefügt when es nicht 0 ist
+$J = Dateiindexnummer, versteckt wenn null
+$J(&lt;prefix&gt;) = Wie $J, jedoch wird ein &lt;prefix&gt; hinzugefügt wenn es nicht 0 ist
 
-&amp;lt;date&amp;gt;:
+Beispiele:
+*$J(.) → app.log, app.log.1, app.log.2
+*$J(.).log → app.log, app.1.log, app.2.log
+
+&lt;date&gt;:
 DD = Tag
 MM = Monat
 YY[YY] = Jahr
@@ -2074,29 +2053,26 @@ Fortfahren?</value>
   <data name="MissingFilesDialog_UI_FileStatus_Valid" xml:space="preserve">
     <value>Gültig</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Sitzungsaktualisierung fehlgeschlagen</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_FailedToUpdateSessionFile" xml:space="preserve">
     <value>Sitzungsdatei konnte nicht aktualisiert werden: {0}</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_UpdateSessionFile" xml:space="preserve">
     <value>Sitzung aktualisiert</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Message_UpdateSessionFile" xml:space="preserve">
     <value>Die Sitzungsdatei wurde mit den neuen Dateipfaden aktualisiert.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Error_Title_SessionLoadFailed" xml:space="preserve">
     <value>Das Laden der Sitzung ist fehlgeschlagen</value>
   </data>
-  <data name="LoadProject_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
+  <data name="LoadSession_UI_Message_Message_FilesForSessionCouldNotBeFound" xml:space="preserve">
     <value>Keine der Dateien in dieser Sitzung konnte gefunden werden. Die Sitzung kann nicht geladen werden.</value>
   </data>
-  <data name="LoadProject_UI_Message_Error_Title_ProjectLoadFailed" xml:space="preserve">
-    <value>Das Laden des Projekts ist fehlgeschlagen</value>
-  </data>
-  <data name="LoadProject_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
-    <value>Fehler beim Laden der Projektdatei. Die Datei ist möglicherweise beschädigt oder nicht zugänglich.</value>
+  <data name="LoadSession_UI_Message_Error_FileMaybeCorruptedOrInaccessible" xml:space="preserve">
+    <value>Fehler beim Laden der Sitzung. Die Datei ist möglicherweise beschädigt oder nicht zugänglich.</value>
   </data>
   <data name="LogExpert_DefaultLogfileColumnicer_Name" xml:space="preserve">
     <value>Standard (einzelne Zeile)</value>
@@ -2165,5 +2141,290 @@ LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_ScanningBookmarksEnded" xml:space="preserve">
     <value>Scanne Lesezeichen beendet / abgebrochen!</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_AlertOnHit" xml:space="preserve">
+    <value>Alarm bei Treffer</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_SoundFile" xml:space="preserve">
+    <value>Sounddatei:</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_BrowseSoundFile" xml:space="preserve">
+    <value>Durchsuchen...</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Cooldown" xml:space="preserve">
+    <value>Abklingzeit:</value>
+  </data>
+  <data name="HighlightDialog_UI_Label_Seconds" xml:space="preserve">
+    <value>Sekunden</value>
+  </data>
+  <data name="HighlightDialog_UI_OpenFileFilter_Audio" xml:space="preserve">
+    <value>Audiodateien (*.wav;*.mp3;*.wma;*.aiff;*.aif)|*.wav;*.mp3;*.wma;*.aiff;*.aif|Alle Dateien (*.*)|*.*</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_Add" xml:space="preserve">
+    <value>Highlight hinzufügen</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Title_EditFormat" xml:space="preserve">
+    <value>Hervorhebung bearbeiten – „{0}“</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_LineMatchCriteria" xml:space="preserve">
+    <value>Kriterien für Linienübereinstimmung</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Coloring" xml:space="preserve">
+    <value>Farben</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Tab_Actions" xml:space="preserve">
+    <value>Aktionen</value>
+  </data>
+  <data name="LogExpert_Common_UI_Button_Edit" xml:space="preserve">
+    <value>&amp;Bearbeiten</value>
+  </data>
+  <data name="HighlightEntryEditDialog_UI_Preview_Placeholder" xml:space="preserve">
+    <value>(Vorschau)</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageControlCharacters" xml:space="preserve">
+    <value>Steuerzeichen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsEnable" xml:space="preserve">
+    <value>Steuerzeichen in der Anzeige ersetzen</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsWarning" xml:space="preserve">
+    <value>Nur Anzeige — der Dateiinhalt wird nicht verändert und Suche, Filter sowie Zwischenablage bleiben unberührt (sofern die untenstehende Option nicht aktiviert ist). Manche Logdateien können dadurch ungewohnt aussehen.</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsHint" xml:space="preserve">
+    <value>Aktiviere oben die Ersetzung, damit diese Einstellungen wirken.</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsStyle" xml:space="preserve">
+    <value>Anzeigestil</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleControlPictures" xml:space="preserve">
+    <value>Unicode-Steuerzeichen-Bilder (Standard)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCaret" xml:space="preserve">
+    <value>Caret-Notation (^X)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleCEscape" xml:space="preserve">
+    <value>C-Escape-Sequenz (\x01)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleAbbreviation" xml:space="preserve">
+    <value>Abkürzung (&lt;SOH&gt;)</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioButtonControlCharStyleIso2047" xml:space="preserve">
+    <value>ISO-2047-Grafiken</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetAll" xml:space="preserve">
+    <value>Alle aktivieren</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNone" xml:space="preserve">
+    <value>Alle deaktivieren</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsPresetNonWhitespace" xml:space="preserve">
+    <value>Nur Nicht-Whitespace</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsAppearance" xml:space="preserve">
+    <value>Darstellung</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsForeColor" xml:space="preserve">
+    <value>Vordergrundfarbe:</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelControlCharsBackColor" xml:space="preserve">
+    <value>Hintergrundfarbe:</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsForeColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColorClear" xml:space="preserve">
+    <value>(keine Farbe)</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsBold" xml:space="preserve">
+    <value>Fett</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsItalic" xml:space="preserve">
+    <value>Kursiv</value>
+  </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxControlCharsClipboard" xml:space="preserve">
+    <value>Zwischenablage</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxControlCharsCopyDisplayedForm" xml:space="preserve">
+    <value>Angezeigte Form statt der Rohzeichen kopieren</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_NoLogfileWithSysOutPipeToolConfigured" xml:space="preserve">
+    <value>Sysout für das Tool wurde konfiguriert, aber es gibt keine aktive Logdatei. Das Tool wird ohne die Sysout-Pipe gestartet</value>
+  </data>
+  <data name="HighlightDialog_UI_SelectionHighlight" xml:space="preserve">
+    <value>Auswahlhervorhebung (alle Gruppen)</value>
+  </data>
+  <data name="HighlightDialog_UI_OutlineSelectedBlocks" xml:space="preserve">
+    <value>Ausgewählte Blöcke umranden</value>
+  </data>
+  <data name="HighlightDialog_UI_ChangeSelectionColor" xml:space="preserve">
+    <value>Farbe der Auswahlhervorhebung ändern...</value>
+  </data>
+  <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
+    <value>Systemfarbe verwenden</value>
+  </data>
+  <data name="FolderDrop_Title" xml:space="preserve">
+    <value>Dateien aus Ordnern öffnen</value>
+  </data>
+  <data name="FolderDrop_Discovering" xml:space="preserve">
+    <value>Dateien werden gesucht… Abbrechen öffnet keine Dateien.</value>
+  </data>
+  <data name="FolderDrop_Instructions" xml:space="preserve">
+    <value>Wählen Sie die zu öffnenden Dateien. Es wird nichts automatisch ausgewählt.</value>
+  </data>
+  <data name="FolderDrop_Filter" xml:space="preserve">
+    <value>Pfade filtern:</value>
+  </data>
+  <data name="FolderDrop_SelectAll" xml:space="preserve">
+    <value>Alle passenden auswählen</value>
+  </data>
+  <data name="FolderDrop_SelectNone" xml:space="preserve">
+    <value>Auswahl aufheben</value>
+  </data>
+  <data name="FolderDrop_Open" xml:space="preserve">
+    <value>Auswahl öffnen</value>
+  </data>
+  <data name="FolderDrop_Cancel" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="FolderDrop_Path" xml:space="preserve">
+    <value>Vollständiger Pfad</value>
+  </data>
+  <data name="FolderDrop_Select" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="FolderDrop_Summary" xml:space="preserve">
+    <value>{0:N0} Dateien; {1:N0} passend; {2:N0} ausgewählt.</value>
+  </data>
+  <data name="FolderDrop_Empty" xml:space="preserve">
+    <value>Keine geeigneten Dateien gefunden. Automatisch gefundene .lxp- und .lxj-Dateien werden ausgeschlossen.</value>
+  </data>
+  <data name="FolderDrop_Skipped" xml:space="preserve">
+    <value>{0:N0} Speicherorte wurden übersprungen:</value>
+  </data>
+  <data name="FolderDrop_DirectoryLink" xml:space="preserve">
+    <value>Ordnerverknüpfung übersprungen (Junction oder symbolischer Link).</value>
+  </data>
+  <data name="FolderDrop_Failed" xml:space="preserve">
+    <value>Die abgelegten Dateien konnten nicht vorbereitet werden: {0}</value>
+  </data>
+  <data name="FolderDrop_Previous" xml:space="preserve">
+    <value>Zurück</value>
+  </data>
+  <data name="FolderDrop_Next" xml:space="preserve">
+    <value>Weiter</value>
+  </data>
+  <data name="FolderDrop_Page" xml:space="preserve">
+    <value>{0:N0}–{1:N0} von {2:N0} Treffern</value>
+  </data>
+  <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
+    <value>Markierungsleiste</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowMarkerBar" xml:space="preserve">
+    <value>Markierungsleiste anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowHighlightMarkers" xml:space="preserve">
+    <value>Hervorhebungsmarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowBookmarkMarkers" xml:space="preserve">
+    <value>Lesezeichenmarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowSearchMarkers" xml:space="preserve">
+    <value>Suchtreffermarkierungen anzeigen</value>
+  </data>
+  <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
+    <value>Filtertreffermarkierungen anzeigen</value>
+  </data>
+  <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
+    <value>Für den Columnizer „{0}“ konnte kein Snapshot des Parsing-Zustands erstellt werden.</value>
+  </data>
+  <data name="MarkerBar_LineUnavailable" xml:space="preserve">
+    <value>Die Protokollzeile {0} konnte beim Ermitteln der Markierungen nicht gelesen werden.</value>
+  </data>
+  <data name="MarkerBar_Highlights" xml:space="preserve">
+    <value>Hervorhebungen</value>
+  </data>
+  <data name="MarkerBar_Bookmarks" xml:space="preserve">
+    <value>Lesezeichen</value>
+  </data>
+  <data name="MarkerBar_SearchHits" xml:space="preserve">
+    <value>Suchtreffer</value>
+  </data>
+  <data name="MarkerBar_FilterHits" xml:space="preserve">
+    <value>Filtertreffer</value>
+  </data>
+  <data name="MarkerBar_ClearSearch" xml:space="preserve">
+    <value>Suche löschen</value>
+  </data>
+  <data name="MarkerBar_Discovering" xml:space="preserve">
+    <value>Markierungen werden ermittelt…</value>
+  </data>
+  <data name="MarkerBar_ToolTip" xml:space="preserve">
+    <value>{0}: Zeilen {1}–{2}, {3} passende Zeilen</value>
+  </data>
+  <data name="MarkerBar_ScanFailed" xml:space="preserve">
+    <value>Die Ermittlung der Markierungen ist fehlgeschlagen: {0}</value>
+  </data>
+  <data name="MarkerBar_Title" xml:space="preserve">
+    <value>Markierungsleiste</value>
+  </data>
+  <data name="HighlightDialog_UI_CheckBox_HideLine" xml:space="preserve">
+    <value>Zeile ausblenden</value>
+  </data>
+  <data name="LogWindow_UI_Label_HiddenLines" xml:space="preserve">
+    <value>{0:N0} Zeilen durch Hervorhebungsregeln ausgeblendet</value>
+  </data>
+  <data name="LogWindow_UI_CheckBox_ShowHiddenLines" xml:space="preserve">
+    <value>Ausgeblendete Zeilen anzeigen</value>
+  </data>
+  <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
+    <value>Ausblendregeln konnten nicht angewendet werden, alle Zeilen werden angezeigt: {0}</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameterNamed" xml:space="preserve">
+    <value>&amp;Wert für "{0}":</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnAdd" xml:space="preserve">
+    <value>Neues Highlight-Element erstellen (öffnet den Editor-Dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopy" xml:space="preserve">
+    <value>Das ausgewählte Highlight in ein neues kopieren (öffnet den Editor-Dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnEdit" xml:space="preserve">
+    <value>Das ausgewählte Highlight im Editor-Dialog bearbeiten</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDelete" xml:space="preserve">
+    <value>Das aktuelle Highlight löschen</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveUp" xml:space="preserve">
+    <value>Das aktuelle Highlight um eine Position nach oben verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveDown" xml:space="preserve">
+    <value>Das aktuelle Highlight um eine Position nach unten verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnExportGroup" xml:space="preserve">
+    <value>Highlight-Gruppen exportieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnImportGroup" xml:space="preserve">
+    <value>Highlight-Gruppen importieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe um eine Position nach unten verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe um eine Position nach oben verschieben</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopyGroup" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe in eine neue kopieren</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDeleteGroup" xml:space="preserve">
+    <value>Die aktuelle Highlight-Gruppe löschen</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnNewGroup" xml:space="preserve">
+    <value>Neue leere Highlight-Gruppe erstellen</value>
+  </data>
+  <data name="HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups" xml:space="preserve">
+    <value>Wählen Sie eine Gruppe, um unterschiedliche Highlight-Einstellungen zu erstellen. Geben Sie einen Namen ein, um den Namen der Gruppe zu ändern.</value>
   </data>
 </root>

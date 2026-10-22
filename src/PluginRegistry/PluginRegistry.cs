@@ -28,7 +28,7 @@ public class PluginRegistry : IPluginRegistry
     #region Fields
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private static PluginRegistry? _instance;
+    private static volatile PluginRegistry? _instance;
     private static readonly Lock _lock = new();
 
     private readonly IFileSystemCallback _fileSystemCallback = new FileSystemCallback();
@@ -71,7 +71,6 @@ public class PluginRegistry : IPluginRegistry
         _applicationConfigurationFolder = applicationConfigurationFolder;
         PollingInterval = pollingInterval;
 
-        // Initialize Priority 3 & 4 components
         _pluginLoader = new DefaultPluginLoader();
         _eventBus = new PluginEventBus();
 
@@ -102,14 +101,36 @@ public class PluginRegistry : IPluginRegistry
 
         lock (_lock)
         {
-            _instance = new PluginRegistry(applicationConfigurationFolder, pollingInterval);
+            // Re-check inside the lock: another thread may have created the
+            // instance while this one was waiting on the lock.
+            // Happens mostly in UnitTests where Create() is called multiple times.
+            // CA1508 is not applicable here because the null check is intentional for initialization.
+#pragma warning disable CA1508 // Avoid dead conditional code
+            if (_instance == null)
+            {
+                var registry = new PluginRegistry(applicationConfigurationFolder, pollingInterval);
+
+                // Fully initialize before publishing so the lock-free fast path
+                // above never returns a half-loaded registry.
+                registry.LoadPlugins();
+
+                _instance = registry;
+            }
+#pragma warning restore CA1508 // Avoid dead conditional code
         }
 
-        _applicationConfigurationFolder = applicationConfigurationFolder;
-        PollingInterval = pollingInterval;
+        return _instance;
+    }
 
-        _instance.LoadPlugins();
-        return Instance;
+    /// <summary>
+    /// Registers the assembly resolve handler so that plugin assemblies in the "plugins" subdirectory
+    /// can be found during type resolution (e.g., when deserializing settings that reference plugin types).
+    /// Must be called before any code that may trigger Type.GetType() for plugin types.
+    /// </summary>
+    public static void RegisterAssemblyResolver ()
+    {
+        AppDomain.CurrentDomain.AssemblyResolve -= ColumnizerResolveEventHandler;
+        AppDomain.CurrentDomain.AssemblyResolve += ColumnizerResolveEventHandler;
     }
 
     #endregion
@@ -134,7 +155,9 @@ public class PluginRegistry : IPluginRegistry
                 foreach (var loader in _lazyColumnizers.ToList())
                 {
                     var instance = loader.GetInstance();
-                    if (instance != null && !field.Contains(instance))
+                    // Data duplication by type, not by reference: GetInstance() returns a freshly constructed
+                    // object, so Contains() (reference equality) would never catch a same-type duplicate.
+                    if (instance != null && !field.Any(c => c.GetType() == instance.GetType()))
                     {
                         field.Add(instance);
                         InitializePluginIfNeeded(instance, loader.Manifest, loader.DllPath);
@@ -858,6 +881,15 @@ public class PluginRegistry : IPluginRegistry
             return;
         }
 
+        // Skip if a columnizer of this type is already registered. RegisteredColumnizers holds one
+        // template instance per type, so a same-type entry is always a duplicate (e.g. a built-in
+        // columnizer rediscovered because its defining assembly was scanned).
+        if (RegisteredColumnizers.Any(c => c.GetType() == columnizer.GetType()))
+        {
+            _logger.Debug("Columnizer type {Type} already registered, skipping duplicate", columnizer.GetType().FullName);
+            return;
+        }
+
         // Add to registered columnizers
         RegisteredColumnizers.Add(columnizer);
 
@@ -876,8 +908,7 @@ public class PluginRegistry : IPluginRegistry
             }
         }
 
-        // Existing IColumnizerConfigurator support
-        if (columnizer is IColumnizerConfigurator configurator)
+        if (columnizer is IColumnizerConfiguratorMemory configurator)
         {
             try
             {
@@ -1246,7 +1277,17 @@ public class PluginRegistry : IPluginRegistry
 
     private static Assembly ColumnizerResolveEventHandler (object? sender, ResolveEventArgs args)
     {
-        var fileName = new AssemblyName(args.Name).Name + ".dll";
+        var assemblyName = new AssemblyName(args.Name).Name;
+
+        // Type names come from settings and .lxp files; a name like "../x" must not reach outside our directories.
+        if (string.IsNullOrEmpty(assemblyName) ||
+            assemblyName != Path.GetFileName(assemblyName) ||
+            assemblyName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            return null;
+        }
+
+        var fileName = assemblyName + ".dll";
 
         var mainDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
         var pluginDir = Path.Join(AppDomain.CurrentDomain.BaseDirectory, "plugins", fileName);

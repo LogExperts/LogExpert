@@ -48,7 +48,7 @@ internal interface IToolWindowCoordinator : IDisposable
     /// <summary>
     /// Forwards preference changes to the BookmarkWindow.
     /// </summary>
-    void ApplyPreferences (string fontName, float fontSize, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags);
+    void ApplyPreferences (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags);
 
     /// <summary>
     /// Sets the line column visibility on the BookmarkWindow.

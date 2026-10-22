@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Override the single-../ path injected by Directory.Build.props because
+         this tool sits one level deeper than the standard src/<project>/ layout. -->
+    <AssemblyOriginatorKeyFile>..\..\Solution Items\Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Directory.Build.props (in src/) injects a Compile item with a single ../
+         relative path. This tool sits one level deeper (src/tools/LogRotator/),
+         so drop the injected item and add the corrected path. -->
+    <Compile Remove="..\Solution Items\AssemblyInfo.cs" />
+    <Compile Include="..\..\Solution Items\AssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
+  </ItemGroup>
+</Project>

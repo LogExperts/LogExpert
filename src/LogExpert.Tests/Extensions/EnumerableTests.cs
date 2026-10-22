@@ -1,8 +1,6 @@
-﻿using LogExpert.Core.Extensions;
+using LogExpert.Core.Extensions;
 
 using NUnit.Framework;
-
-using System.Collections.Generic;
 
 namespace LogExpert.Tests.Extensions;
 
@@ -10,7 +8,7 @@ namespace LogExpert.Tests.Extensions;
 public class EnumerableTests
 {
     [Test]
-    public void Extensions_IsEmpty_NullArray()
+    public void Extensions_IsEmpty_NullArray ()
     {
         object[] arrayObject = null;
 
@@ -18,7 +16,7 @@ public class EnumerableTests
     }
 
     [Test]
-    public void Extensions_IsEmpty_EmptyArray()
+    public void Extensions_IsEmpty_EmptyArray ()
     {
         object[] arrayObject = [];
 
@@ -26,7 +24,7 @@ public class EnumerableTests
     }
 
     [Test]
-    public void Extensions_IsEmpty_FilledArray()
+    public void Extensions_IsEmpty_FilledArray ()
     {
         object[] arrayObject = [new()];
 
@@ -34,7 +32,7 @@ public class EnumerableTests
     }
 
     [Test]
-    public void Extensions_IsEmpty_NullIEnumerable()
+    public void Extensions_IsEmpty_NullIEnumerable ()
     {
         IEnumerable<object> arrayObject = null;
 
@@ -42,7 +40,7 @@ public class EnumerableTests
     }
 
     [Test]
-    public void Extensions_IsEmpty_EmptyIEnumerable()
+    public void Extensions_IsEmpty_EmptyIEnumerable ()
     {
         IEnumerable<object> arrayObject = [];
 
@@ -50,7 +48,7 @@ public class EnumerableTests
     }
 
     [Test]
-    public void Extensions_IsEmpty_FilledIEnumerable()
+    public void Extensions_IsEmpty_FilledIEnumerable ()
     {
         IEnumerable<object> arrayObject = new List<object>([new object()]);
 

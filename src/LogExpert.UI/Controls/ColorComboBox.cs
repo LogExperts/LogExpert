@@ -7,12 +7,6 @@ namespace LogExpert.UI.Controls;
 [SupportedOSPlatform("windows")]
 internal class ColorComboBox : ComboBox
 {
-    #region Fields
-
-    private Color _customColor = Color.FromKnownColor(KnownColor.Black);
-
-    #endregion
-
     #region cTor
 
     public ColorComboBox ()
@@ -23,7 +17,7 @@ internal class ColorComboBox : ComboBox
         {
             Items.AddRange(
                 [
-                    _customColor,
+                    CustomColor,
                     Color.Black,
                     Color.White,
                     Color.Gray,
@@ -53,14 +47,14 @@ internal class ColorComboBox : ComboBox
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public Color CustomColor
     {
-        get => _customColor;
+        get;
         set
         {
-            _customColor = value;
+            field = value;
             Items.RemoveAt(0);
-            Items.Insert(0, _customColor);
+            Items.Insert(0, field);
         }
-    }
+    } = Color.FromKnownColor(KnownColor.Black);
 
     public Color SelectedColor => (Color)(SelectedIndex != -1 ? Items[SelectedIndex] : null);
 

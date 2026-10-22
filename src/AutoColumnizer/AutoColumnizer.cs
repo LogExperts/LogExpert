@@ -62,5 +62,9 @@ public class AutoColumnizer : ILogLineMemoryColumnizer
     {
     }
 
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
+    }
+
     #endregion ILogLineColumnizer implementation
 }

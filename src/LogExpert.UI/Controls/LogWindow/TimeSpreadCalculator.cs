@@ -1,6 +1,5 @@
-using LogExpert.Core.Callback;
 using LogExpert.Core.Classes;
-using LogExpert.Core.Interfaces;
+using LogExpert.Core.Classes.Timestamp;
 
 namespace LogExpert.UI.Controls.LogWindow;
 
@@ -13,31 +12,22 @@ internal class TimeSpreadCalculator
     private const int MAX_CONTRAST = 1300;
 
     private readonly EventWaitHandle _calcEvent = new ManualResetEvent(false);
-    private readonly ColumnizerCallback _callback;
 
     private readonly Lock _diffListLock = new();
     private readonly EventWaitHandle _lineCountEvent = new ManualResetEvent(false);
 
-    //TODO Refactor that it does not need LogWindow
-    private readonly ILogWindow _logWindow;
+    private readonly TimestampLocator _locator;
+    private readonly ITimestampSource _source;
 
     // for DoCalc_via_Time
     private double _average;
-
-    private int _contrast = 400;
-
     private int _displayHeight;
-
-    private bool _enabled;
-
     private DateTime _endTimestamp;
     private int _lineCount;
     private int _maxDiff;
     private bool _shouldStop;
     private readonly CancellationTokenSource _cts = new();
     private DateTime _startTimestamp;
-
-    private bool _timeMode = true;
 
     // for DoCalc
     private int _timePerLine;
@@ -46,10 +36,10 @@ internal class TimeSpreadCalculator
 
     #region cTor
 
-    public TimeSpreadCalculator (ILogWindow logWindow)
+    public TimeSpreadCalculator (TimestampLocator locator, ITimestampSource source)
     {
-        _logWindow = logWindow;
-        _callback = new ColumnizerCallback(_logWindow);
+        _locator = locator;
+        _source = source;
 
         _ = Task.Run(WorkerFx, _cts.Token);
     }
@@ -67,11 +57,11 @@ internal class TimeSpreadCalculator
 
     public bool Enabled
     {
-        get => _enabled;
+        get;
         set
         {
-            _enabled = value;
-            if (_enabled)
+            field = value;
+            if (field)
             {
                 _ = _calcEvent.Set();
                 _ = _lineCountEvent.Set();
@@ -81,30 +71,30 @@ internal class TimeSpreadCalculator
 
     public bool TimeMode
     {
-        get => _timeMode;
+        get;
         set
         {
-            _timeMode = value;
-            if (_enabled)
+            field = value;
+            if (Enabled)
             {
                 _ = _calcEvent.Set();
                 _ = _lineCountEvent.Set();
             }
         }
-    }
+    } = true;
 
     public int Contrast
     {
         set
         {
-            _contrast = value;
-            if (_contrast < 0)
+            field = value;
+            if (field < 0)
             {
-                _contrast = 0;
+                field = 0;
             }
-            else if (_contrast > MAX_CONTRAST)
+            else if (field > MAX_CONTRAST)
             {
-                _contrast = MAX_CONTRAST;
+                field = MAX_CONTRAST;
             }
 
             if (TimeMode)
@@ -119,8 +109,8 @@ internal class TimeSpreadCalculator
             OnCalcDone(EventArgs.Empty);
         }
 
-        get => _contrast;
-    }
+        get;
+    } = 400;
 
     public List<SpreadEntry> DiffList { get; set; } = [];
 
@@ -199,16 +189,17 @@ internal class TimeSpreadCalculator
     {
         OnStartCalc(EventArgs.Empty);
 
-        if (_callback.GetLineCount() < 1)
+        var lineCount = _source.Reader.LineCount;
+        if (lineCount < 1)
         {
             OnCalcDone(EventArgs.Empty);
             return;
         }
 
         var lineNum = 0;
-        var lastLineNum = _callback.GetLineCount() - 1;
-        _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
-        (_endTimestamp, lastLineNum) = _logWindow.GetTimestampForLine(lastLineNum, false);
+        var lastLineNum = lineCount - 1;
+        (_startTimestamp, lineNum) = _locator.FindForward(lineNum, lineCount, false);
+        (_endTimestamp, lastLineNum) = _locator.FindBackward(lastLineNum, lineCount, false);
 
         var timePerLineSum = 0;
 
@@ -217,7 +208,7 @@ internal class TimeSpreadCalculator
             var overallSpan = _endTimestamp - _startTimestamp;
             var overallSpanMillis = (int)(overallSpan.Ticks / TimeSpan.TicksPerMillisecond);
             _timePerLine = (int)Math.Round(overallSpanMillis / (double)_lineCount);
-            var oldTime = _logWindow.GetTimestampForLineForward(ref lineNum, false);
+            (var oldTime, lineNum) = _locator.FindForward(lineNum, lineCount, false);
             var step = _lineCount > _displayHeight
                 ? (int)Math.Round(_lineCount / (double)_displayHeight)
                 : 1;
@@ -231,7 +222,7 @@ internal class TimeSpreadCalculator
             for (var i = lineNum; i < lastLineNum; i += step)
             {
                 var currLineNum = i;
-                var time = _logWindow.GetTimestampForLineForward(ref currLineNum, false);
+                (var time, _) = _locator.FindForward(currLineNum, lineCount, false);
                 if (time != DateTime.MinValue)
                 {
                     var span = time - oldTime;
@@ -255,6 +246,10 @@ internal class TimeSpreadCalculator
                 OnCalcDone(EventArgs.Empty);
             }
         }
+        else
+        {
+            OnCalcDone(EventArgs.Empty);
+        }
     }
 
     //TODO Refactor this method
@@ -262,7 +257,8 @@ internal class TimeSpreadCalculator
     {
         OnStartCalc(EventArgs.Empty);
 
-        if (_callback.GetLineCount() < 1)
+        var lineCount = _source.Reader.LineCount;
+        if (lineCount < 1)
         {
             OnCalcDone(EventArgs.Empty);
             //_logger.Debug($"End because of line count < 1");
@@ -270,9 +266,9 @@ internal class TimeSpreadCalculator
         }
 
         var lineNum = 0;
-        var lastLineNum = _callback.GetLineCount() - 1;
-        _startTimestamp = _logWindow.GetTimestampForLineForward(ref lineNum, false);
-        (_endTimestamp, lastLineNum) = _logWindow.GetTimestampForLine(lastLineNum, false);
+        var lastLineNum = lineCount - 1;
+        (_startTimestamp, _) = _locator.FindForward(lineNum, lineCount, false);
+        (_endTimestamp, lastLineNum) = _locator.FindBackward(lastLineNum, lineCount, false);
 
         if (_startTimestamp != DateTime.MinValue && _endTimestamp != DateTime.MinValue)
         {
@@ -296,7 +292,7 @@ internal class TimeSpreadCalculator
 
             while (searchTimeStamp.CompareTo(_endTimestamp) <= 0)
             {
-                lineNum = _logWindow.FindTimestampLineInternal(lineNum, lineNum, lastLineNum, searchTimeStamp, false);
+                lineNum = _locator.FindNearestLine(searchTimeStamp, lineNum, lineNum, lastLineNum, lineCount, false);
                 if (lineNum < 0)
                 {
                     lineNum = -lineNum;
@@ -358,6 +354,10 @@ internal class TimeSpreadCalculator
                 OnCalcDone(EventArgs.Empty);
             }
         }
+        else
+        {
+            OnCalcDone(EventArgs.Empty);
+        }
     }
 
     private DateTime CalcValuesViaLines (int timePerLine)
@@ -378,7 +378,7 @@ internal class TimeSpreadCalculator
                     diffFromAverage = 0;
                 }
 
-                var value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond) * _contrast);
+                var value = (int)(diffFromAverage / (timePerLine / TimeSpan.TicksPerMillisecond) * Contrast);
                 entry.Value = 255 - value;
                 oldTime = entry.Timestamp;
             }
@@ -399,7 +399,7 @@ internal class TimeSpreadCalculator
                 diffFromAverage = 0;
             }
 
-            var value = (int)(diffFromAverage / maxDiff * _contrast);
+            var value = (int)(diffFromAverage / maxDiff * Contrast);
             entry.Value = 255 - value;
 
             //var timestamp = $"{entry.Timestamp:HH:mm:ss.fff}";

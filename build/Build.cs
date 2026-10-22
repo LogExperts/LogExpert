@@ -7,7 +7,6 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
 using Nuke.GitHub;
@@ -18,12 +17,12 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
-using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.GitHub.GitHubTasks;
 
 [UnsetVisualStudioEnvironmentVariables]
@@ -34,7 +33,7 @@ partial class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main () => Execute<Build>(x => x.Test);
+    public static int Main() => Execute<Build>(x => x.Test);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -104,7 +103,7 @@ partial class Build : NukeBuild
         ChocolateyDirectory / $"logexpert.{VersionString}.nupkg"
     ];
 
-    protected override void OnBuildInitialized ()
+    protected override void OnBuildInitialized()
     {
         SetVariable("DOTNET_CLI_TELEMETRY_OPTOUT", "1");
 
@@ -153,9 +152,8 @@ partial class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Restore"));
+            DotNetRestore(s => s
+                .SetProjectFile(Solution));
         });
 
     Target Compile => _ => _
@@ -165,67 +163,18 @@ partial class Build : NukeBuild
 
             Log.Information($"Version: '{VersionString}'");
 
-            MSBuild(s => s
-                .SetTargetPath(Solution)
-                .SetTargets("Rebuild")
-                .SetAssemblyVersion(VersionString)
-                .SetInformationalVersion(VersionInformationString)
-                .SetTargetPlatform(MSBuildTargetPlatform.MSIL)
+            DotNetBuild(s => s
+                .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .SetMaxCpuCount(Environment.ProcessorCount));
+                .SetAssemblyVersion(VersionString)
+                .SetFileVersion(VersionFileString)
+                .SetInformationalVersion(VersionInformationString)
+                .EnableNoRestore());
         });
 
-    AbsolutePath PluginHashGeneratorProject => SourceDirectory / "PluginHashGenerator.Tool" / "PluginHashGenerator.Tool.csproj";
-
-    AbsolutePath PluginHashGeneratedFile => SourceDirectory / "PluginRegistry" / "PluginHashGenerator.Generated.cs";
-
-    Target GeneratePluginHashes => _ => _
-        .After(Compile)
-        .OnlyWhenStatic(() => Configuration == Configuration.Release)
-        .Executes(() =>
-        {
-            var pluginsDir = OutputDirectory / "plugins";
-            var pluginsx86Dir = OutputDirectory / "pluginsx86";
-
-            // Check if any plugins exist
-            if (!pluginsDir.DirectoryExists() && !pluginsx86Dir.DirectoryExists())
-            {
-                Log.Warning("No plugins directories found. Skipping plugin hash generation.");
-                return;
-            }
-
-            Log.Information("Generating plugin hashes...");
-            Log.Information($"  Output Path: {OutputDirectory}");
-            Log.Information($"  Target File: {PluginHashGeneratedFile}");
-            Log.Information($"  Configuration: {Configuration}");
-
-            try
-            {
-                DotNetRun(s => s
-                    .SetProjectFile(PluginHashGeneratorProject)
-                    .SetApplicationArguments([OutputDirectory, PluginHashGeneratedFile, Configuration])
-                    .SetProcessWorkingDirectory(RootDirectory));
-
-                Log.Information("Plugin hashes generated successfully");
-
-                // Rebuild PluginRegistry project to include the generated file
-                // IMPORTANT: Set OutputPath to match the main build output directory
-                Log.Information("Rebuilding PluginRegistry to include generated hashes...");
-                MSBuild(s => s
-                    .SetTargetPath(SourceDirectory / "PluginRegistry" / "LogExpert.PluginRegistry.csproj")
-                    .SetTargets("Build")
-                    .SetConfiguration(Configuration)
-                    .SetProperty("OutputPath", OutputDirectory)
-                    .SetMaxCpuCount(Environment.ProcessorCount));
-
-                Log.Information("PluginRegistry rebuilt successfully to {OutputDir}", OutputDirectory);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Failed to generate plugin hashes");
-                throw;
-            }
-        });
+    // Built-in plugin hashes need no target here: PluginRegistry generates them itself, before it
+    // compiles, from the plugins its build-order ProjectReferences have already produced. See
+    // src/PluginRegistry/PluginHashGenerator.targets.
 
     Target Test => _ => _
         .DependsOn(Compile)
@@ -280,27 +229,6 @@ partial class Build : NukeBuild
         .Before(Compile)
         .Executes(() =>
         {
-            Log.Information($"AssemblyVersion {VersionString}\r\nAssemblyFileVersion {VersionFileString}\r\nAssemblyInformationalVersion {VersionInformationString}");
-
-            AbsolutePath assemblyInfo = SourceDirectory / "Solution Items" / "AssemblyInfo.cs";
-
-            string text = assemblyInfo.ReadAllText();
-            Regex configurationRegex = AssemblyConfiguration();
-            Regex assemblyVersionRegex = AssemblyVersion();
-            Regex assemblyFileVersionRegex = AssemblyFileVersion();
-            Regex assemblyInformationalVersionRegex = AssemblyInformationalVersion();
-
-            text = configurationRegex.Replace(text, (match) => ReplaceVersionMatch(match, $"\"{Configuration}\""));
-            text = assemblyVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionString));
-            text = assemblyFileVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionFileString));
-            text = assemblyInformationalVersionRegex.Replace(text, (match) => ReplaceVersionMatch(match, VersionInformationString));
-
-            Log.Verbose("Content of AssemblyInfo.cs file");
-            Log.Verbose(text);
-            Log.Verbose("End of Content");
-
-            assemblyInfo.WriteAllText(text);
-
             SourceDirectory.GlobFiles("**sftp-plugin/*.cs").ForEach(file =>
             {
                 if (string.IsNullOrWhiteSpace(MyVariable))
@@ -341,11 +269,13 @@ partial class Build : NukeBuild
                 .SetProject(columnizerFolder / "ColumnizerLib.csproj")
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(BinDirectory)
-                .SetVersion(VersionString));
+                .SetVersion(VersionString)
+                // Directory.Build.props pins PackageVersion, which would otherwise win over Version.
+                .SetProperty("PackageVersion", VersionString));
         });
 
     Target Pack => _ => _
-        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, GeneratePluginHashes, CreateSetup);
+        .DependsOn(BuildChocolateyPackage, CreatePackage, PackageSftpFileSystem, ColumnizerLibCreate, CopyLicenses, CreateSetup);
 
     Target CopyFilesForSetup => _ => _
         .DependsOn(Compile)
@@ -358,10 +288,54 @@ partial class Build : NukeBuild
             SetupDirectory.GlobDirectories(ExcludeDirectoryGlob).ForEach(dir => dir.DeleteDirectory());
         });
 
+    // Regenerates src/setup/GeneratedFiles.iss from LogExpert.deps.json (the app's actual
+    // dependency closure). Replaces the former hand-maintained [Files] DLL list, which drifted and
+    // omitted LogExpert.Audio/NAudio — that killed the follow-tail worker thread in installed
+    // builds (#634). Driven by deps.json (not the raw bin/Release listing) so stray DLLs left in the
+    // shared output by other projects — e.g. BenchmarkDotNet's System.Management — are NOT shipped.
+    // Guarded by InstallerCoverageTests.
+    Target GenerateInstallerFileList => _ => _
+        .DependsOn(Compile)
+        .Before(CreateSetup)
+        .OnlyWhenStatic(() => Configuration == Configuration.Release)
+        .Executes(() =>
+        {
+            var generated = SourceDirectory / "setup" / "GeneratedFiles.iss";
+            var depsJson = File.ReadAllText(OutputDirectory / "LogExpert.deps.json");
+
+            // Ship a root *.dll only when it is referenced by the app's deps.json. The ".dll\""
+            // match keys on the runtime/resource/native path entries and never the package-id keys
+            // in the "libraries" section (those carry no ".dll").
+            var dllNames = OutputDirectory.GlobFiles("*.dll")
+                .Select(file => file.Name)
+                .Where(name => depsJson.Contains($"{name}\"", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var builder = new StringBuilder()
+                .AppendLine("; =============================================================================")
+                .AppendLine("; AUTO-GENERATED by the Nuke GenerateInstallerFileList target. DO NOT EDIT BY HAND.")
+                .AppendLine(";")
+                .AppendLine("; Ships exactly the runtime assemblies declared in LogExpert.deps.json (the app's")
+                .AppendLine("; dependency closure). Driven by deps.json rather than the raw bin/Release listing so")
+                .AppendLine("; stray files from other projects that share the output folder (e.g. BenchmarkDotNet's")
+                .AppendLine("; System.Management) are not shipped. Regression guard for #634 (LogExpert.Audio/NAudio")
+                .AppendLine("; were missing from the former hand-maintained list).")
+                .AppendLine("; =============================================================================")
+                .AppendLine();
+
+            foreach (var name in dllNames)
+            {
+                builder.AppendLine($"Source: \"{{#ReleaseFolder}}\\{name}\"; DestDir: \"{{app}}\"; Flags: ignoreversion");
+            }
+
+            generated.WriteAllText(builder.ToString());
+            Log.Information("Generated installer file list with {Count} DLL entries at {Path}", dllNames.Count, generated);
+        });
+
     Target CreateSetup => _ => _
-        .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile)
+        .DependsOn(CopyFilesForSetup, ChangeVersionNumber, Compile, CopyLicenses, GenerateInstallerFileList)
         .Before(Publish)
-        .After(GeneratePluginHashes)
         .OnlyWhenStatic(() => Configuration == Configuration.Release)
         .Executes(() =>
         {
@@ -385,7 +359,7 @@ partial class Build : NukeBuild
 
             if (!executed)
             {
-                Assert.True(true, "Inno setup was not found");
+                Assert.Fail("Inno setup was not found");
             }
         });
 
@@ -517,7 +491,7 @@ partial class Build : NukeBuild
         }
     });
 
-    private void ExecuteInnoSetup (AbsolutePath innoPath)
+    private void ExecuteInnoSetup(AbsolutePath innoPath)
     {
         Process proc = new();
 
@@ -526,7 +500,7 @@ partial class Build : NukeBuild
         proc.StartInfo = new ProcessStartInfo(innoPath, $"{SetupCommandLineParameter} \"{InnoSetupScript}\"");
         if (!proc.Start())
         {
-            Assert.True(true, $"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
+            Assert.Fail($"Failed to start {innoPath} with \"{SetupCommandLineParameter}\" \"{InnoSetupScript}\"");
         }
 
         proc.WaitForExit();
@@ -535,16 +509,11 @@ partial class Build : NukeBuild
 
         if (proc.ExitCode != 0)
         {
-            Assert.True(true, $"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
+            Assert.Fail($"Error during execution of {innoPath}, exitcode {proc.ExitCode}");
         }
     }
 
-    private string ReplaceVersionMatch (Match match, string replacement)
-    {
-        return $"{match.Groups[1]}{replacement}{match.Groups[3]}";
-    }
-
-    private void TransformTemplateFile (AbsolutePath path, bool deleteTemplate)
+    private void TransformTemplateFile(AbsolutePath path, bool deleteTemplate)
     {
         string text = path.ReadAllText();
         text = text.Replace("##version##", VersionString);
@@ -557,21 +526,9 @@ partial class Build : NukeBuild
         }
     }
 
-    [GeneratedRegex(@"(\[assembly: AssemblyInformationalVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyInformationalVersion ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyVersion ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyConfiguration\()(""[^""]*"")(\)\])")]
-    private static partial Regex AssemblyConfiguration ();
-
-    [GeneratedRegex(@"(\[assembly: AssemblyFileVersion\("")([^""]*)(""\)\])")]
-    private static partial Regex AssemblyFileVersion ();
-
     [GeneratedRegex(@"\w\w{2}[_]p?[tso]?[erzliasx]+[_rhe]{5}", RegexOptions.IgnoreCase, "en-GB")]
-    private static partial Regex SFTPPlugin ();
+    private static partial Regex SFTPPlugin();
 
     [GeneratedRegex("\\.template$")]
-    private static partial Regex TemplateRegex ();
+    private static partial Regex TemplateRegex();
 }

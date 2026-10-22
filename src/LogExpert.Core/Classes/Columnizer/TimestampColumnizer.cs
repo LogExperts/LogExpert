@@ -49,13 +49,18 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     /// <summary>
     /// Splits a log line into its constituent columns, typically separating date, time, and the remainder of the line.
     /// </summary>
-    /// <remarks>If the log line does not match a recognized date/time format, the entire line is returned as
-    /// a single column. Columns typically represent the date, time, and the rest of the log entry. If parsing fails due
-    /// to format issues, column values are set to "n/a" except for the remainder, which contains the original
-    /// line.</remarks>
-    /// <param name="callback">A callback interface used to provide additional context or services required during columnization.</param>
+    /// <remarks>
+    /// If the log line does not match a recognized date/time format, the entire line is returned as a single column.
+    /// Columns typically represent the date, time, and the rest of the log entry. If parsing fails due to format
+    /// issues, column values are set to "n/a" except for the remainder, which contains the original line.
+    /// </remarks>
+    /// <param name="callback">
+    /// A callback interface used to provide additional context or services required during columnization.
+    /// </param>
     /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized log line, with each column containing a segment of the original log line.</returns>
+    /// <returns>
+    /// An object representing the columnized log line, with each column containing a segment of the original log line.
+    /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
     public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
@@ -144,13 +149,16 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     /// <summary>
     /// Extracts and parses the timestamp from the specified log line using the provided callback.
     /// </summary>
-    /// <remarks>If the log line does not contain a valid timestamp in the expected columns or if parsing
-    /// fails, the method returns DateTime.MinValue. The timestamp is expected to be composed from the first two columns
-    /// of the log line.</remarks>
+    /// <remarks>
+    /// If the log line does not contain a valid timestamp in the expected columns or if parsing fails, the method
+    /// returns DateTime.MinValue. The timestamp is expected to be composed from the first two columns of the log line.
+    /// </remarks>
     /// <param name="callback">The callback used to access column information for the log line.</param>
     /// <param name="logLine">The log line from which to extract the timestamp.</param>
-    /// <returns>A DateTime value representing the parsed timestamp if extraction and parsing succeed; otherwise,
-    /// DateTime.MinValue.</returns>
+    /// <returns>
+    /// A DateTime value representing the parsed timestamp if extraction and parsing succeed; otherwise,
+    /// DateTime.MinValue.
+    /// </returns>
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         var cols = SplitLine(callback, logLine);
@@ -193,18 +201,23 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
 
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
     {
+        PushValue(callback, column, value, oldValue.AsMemory());
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
+    {
         if (column == 1)
         {
             try
             {
-                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue.AsSpan());
+                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue.Span);
                 if (formatInfo == null)
                 {
                     return;
                 }
 
                 var newDateTime = DateTime.ParseExact(value, formatInfo.TimeFormat, formatInfo.CultureInfo);
-                var oldDateTime = DateTime.ParseExact(oldValue, formatInfo.TimeFormat, formatInfo.CultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue.Span, formatInfo.TimeFormat, formatInfo.CultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 _timeOffset = (int)(mSecsNew - mSecsOld);
@@ -221,8 +234,10 @@ public class TimestampColumnizer : ILogLineMemoryColumnizer, IColumnizerPriority
     /// </summary>
     /// <param name="fileName">The name of the log file to evaluate. Cannot be null.</param>
     /// <param name="samples">A collection of log lines to analyze for timestamp patterns. Cannot be null.</param>
-    /// <returns>A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
-    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.</returns>
+    /// <returns>
+    /// A value indicating the priority for processing the specified log file. Returns Priority.WellSupport if the
+    /// majority of log lines contain recognizable timestamps; otherwise, returns Priority.NotSupport.
+    /// </returns>
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentNullException.ThrowIfNull(samples, nameof(samples));

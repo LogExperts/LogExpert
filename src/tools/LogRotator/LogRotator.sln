@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11716.220 stable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogRotator", "LogRotator.csproj", "{13BEA7F4-66F6-3314-2479-039532FA6CA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13BEA7F4-66F6-3314-2479-039532FA6CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13BEA7F4-66F6-3314-2479-039532FA6CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13BEA7F4-66F6-3314-2479-039532FA6CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13BEA7F4-66F6-3314-2479-039532FA6CA2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {277855DC-5659-4E52-AF27-A97F40DBCF01}
+	EndGlobalSection
+EndGlobal

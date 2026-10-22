@@ -63,7 +63,7 @@ internal class RolloverHandlerTestBase
             _ = enumerator.MoveNext();
         }
 
-        _ = CreateFile(null, nextEnumerator.Current);
+        _ = CreateFile(null, enumerator.Current);
 
         if (deleteLatestFile)
         {

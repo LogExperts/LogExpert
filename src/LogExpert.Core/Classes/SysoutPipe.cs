@@ -12,6 +12,7 @@ public class SysoutPipe : IDisposable
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    private readonly Process _process;
     private readonly StreamReader _sysout;
     private StreamWriter _writer;
     private bool _disposed;
@@ -20,10 +21,21 @@ public class SysoutPipe : IDisposable
 
     #region cTor
 
-    public SysoutPipe (StreamReader sysout)
+    public SysoutPipe (Process process)
     {
         _disposed = false;
-        _sysout = sysout;
+
+        // Hold a strong reference to the process for the lifetime of the pipe. Without it the
+        // process becomes unrooted as soon as the launcher returns, gets finalized, and reading
+        // StandardOutput then throws ObjectDisposedException (races on fast-exiting processes).
+        // `process` is rooted as the constructor argument here, so reading StandardOutput is safe.
+        _process = process;
+        _sysout = process.StandardOutput;
+
+        // Subscribe here rather than at the call site so the process cannot exit/dispose between
+        // construction and subscription.
+        process.Exited += ProcessExitedEventHandler;
+
         FileName = Path.GetTempFileName();
         _logger.Info(CultureInfo.InvariantCulture, "sysoutPipe created temp file: {0}", FileName);
 
@@ -95,6 +107,9 @@ public class SysoutPipe : IDisposable
         }
 
         ClosePipe();
+
+        // Output is fully drained — release the process handle deterministically.
+        _process.Dispose();
     }
 
     public void Dispose ()

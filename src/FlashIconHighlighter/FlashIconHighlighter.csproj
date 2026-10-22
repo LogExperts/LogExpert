@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\plugins</OutputPath>
+    <OutputPath>$(LogExpertPluginsDirectory)</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyTitle>FlashIconHighlighter</AssemblyTitle>
     <RootNamespace>FlashIconHighlighter</RootNamespace>

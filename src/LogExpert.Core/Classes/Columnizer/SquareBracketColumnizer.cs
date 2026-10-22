@@ -6,12 +6,14 @@ namespace LogExpert.Core.Classes.Columnizer;
 /// Provides functionality to split log lines into columns based on square bracket delimiters, typically extracting
 /// date, time, and message fields for log analysis.
 /// </summary>
-/// <remarks>This columnizer is designed for log formats where fields are enclosed in square brackets or separated
-/// by whitespace, with optional date and time columns at the beginning of each line. It supports dynamic detection of
-/// column structure based on sample log lines and can apply a time offset to parsed timestamps. The class implements
-/// interfaces for memory-efficient log line processing and columnizer prioritization, making it suitable for
-/// integration with log viewers or analysis tools that require flexible column extraction.</remarks>
-public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory
+/// <remarks>
+/// This columnizer is designed for log formats where fields are enclosed in square brackets or separated by whitespace,
+/// with optional date and time columns at the beginning of each line. It supports dynamic detection of column structure
+/// based on sample log lines and can apply a time offset to parsed timestamps. The class implements interfaces for
+/// memory-efficient log line processing and columnizer prioritization, making it suitable for integration with log
+/// viewers or analysis tools that require flexible column extraction.
+/// </remarks>
+public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPriorityMemory, IColumnizerSnapshotMemory
 {
     #region ILogLineMemoryColumnizer implementation
 
@@ -40,6 +42,19 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     }
 
     /// <summary>
+    /// Creates an independent copy of the detected column layout and time offset.
+    /// </summary>
+    public ILogLineMemoryColumnizer CreateSnapshot ()
+    {
+        return new SquareBracketColumnizer
+        {
+            _columnCount = _columnCount,
+            _isTimeExists = _isTimeExists,
+            _timeOffset = _timeOffset
+        };
+    }
+
+    /// <summary>
     /// Determines whether timeshift functionality is implemented.
     /// </summary>
     /// <returns><see langword="true"/> if timeshift is implemented; otherwise, <see langword="false"/>.</returns>
@@ -51,7 +66,9 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Sets the time offset, in milliseconds, to be applied to time calculations.
     /// </summary>
-    /// <param name="msecOffset">The time offset, in milliseconds, to apply. Positive values advance the time; negative values delay it.</param>
+    /// <param name="msecOffset">
+    /// The time offset, in milliseconds, to apply. Positive values advance the time; negative values delay it.
+    /// </param>
     public void SetTimeOffset (int msecOffset)
     {
         _timeOffset = msecOffset;
@@ -60,8 +77,10 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Gets the current time offset, in seconds, applied to time calculations.
     /// </summary>
-    /// <returns>The time offset, in seconds. A positive value indicates a forward offset; a negative value indicates a backward
-    /// offset.</returns>
+    /// <returns>
+    /// The time offset, in seconds. A positive value indicates a forward offset; a negative value indicates a backward
+    /// offset.
+    /// </returns>
     public int GetTimeOffset ()
     {
         return _timeOffset;
@@ -70,13 +89,16 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Extracts and parses the timestamp from the specified log line.
     /// </summary>
-    /// <remarks>If the log line does not contain a valid timestamp or if parsing fails, the method returns
-    /// DateTime.MinValue. The expected timestamp is typically composed of the first two columns in the log
-    /// line.</remarks>
+    /// <remarks>
+    /// If the log line does not contain a valid timestamp or if parsing fails, the method returns DateTime.MinValue.
+    /// The expected timestamp is typically composed of the first two columns in the log line.
+    /// </remarks>
     /// <param name="callback">A callback interface used to assist with columnizing the log line.</param>
     /// <param name="logLine">The log line from which to extract the timestamp.</param>
-    /// <returns>A DateTime value representing the parsed timestamp if extraction and parsing succeed; otherwise,
-    /// DateTime.MinValue.</returns>
+    /// <returns>
+    /// A DateTime value representing the parsed timestamp if extraction and parsing succeed; otherwise,
+    /// DateTime.MinValue.
+    /// </returns>
     public DateTime GetTimestamp (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
         var cols = SplitLine(callback, logLine);
@@ -119,7 +141,9 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Gets a description of the log line splitting format, including the expected fields.
     /// </summary>
-    /// <returns>A string describing how each log line is split into fields: Date, Time, and the remainder of the log message.</returns>
+    /// <returns>
+    /// A string describing how each log line is split into fields: Date, Time, and the remainder of the log message.
+    /// </returns>
     public string GetDescription ()
     {
         return "Splits every line into n fields: Date, Time and the rest of the log message";
@@ -137,13 +161,17 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Returns an array of column names based on the current log format configuration.
     /// </summary>
-    /// <remarks>The set and order of column names depend on the log format and configuration. If time
-    /// information is present, the array includes "Date" and "Time" columns. Additional columns such as "Level" and
-    /// "Source" are included if the log contains more than three or four columns, respectively. Any extra columns are
-    /// named sequentially as "Source1", "Source2", etc., before the final "Message" column.</remarks>
-    /// <returns>An array of strings containing the names of all columns in the log. The array includes standard columns such as
+    /// <remarks>
+    /// The set and order of column names depend on the log format and configuration. If time information is present,
+    /// the array includes "Date" and "Time" columns. Additional columns such as "Level" and "Source" are included if
+    /// the log contains more than three or four columns, respectively. Any extra columns are named sequentially as
+    /// "Source1", "Source2", etc., before the final "Message" column.
+    /// </remarks>
+    /// <returns>
+    /// An array of strings containing the names of all columns in the log. The array includes standard columns such as
     /// "Date", "Time", "Level", "Source", and "Message", as well as additional source columns if present. The array
-    /// will contain one element for each column in the log, in the order they appear.</returns>
+    /// will contain one element for each column in the log, in the order they appear.
+    /// </returns>
     public string[] GetColumnNames ()
     {
         var columnNames = new List<string>(GetColumnCount());
@@ -178,14 +206,19 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Splits the specified log line into its constituent columns based on detected date and time formats.
     /// </summary>
-    /// <remarks>If the log line does not match a recognized date and time format, the entire line is treated
-    /// as a single column. If the log line is too short to contain date or time information, it is returned as a single
-    /// column as well.</remarks>
-    /// <param name="callback">A callback interface that can be used during the columnization process. This parameter may be used to provide
-    /// additional context or services required for columnization.</param>
+    /// <remarks>
+    /// If the log line does not match a recognized date and time format, the entire line is treated as a single column.
+    /// If the log line is too short to contain date or time information, it is returned as a single column as well.
+    /// </remarks>
+    /// <param name="callback">
+    /// A callback interface that can be used during the columnization process. This parameter may be used to provide
+    /// additional context or services required for columnization.
+    /// </param>
     /// <param name="logLine">The log line to be split into columns. Cannot be null.</param>
-    /// <returns>An object representing the columnized version of the input log line. The returned object contains the extracted
-    /// columns, which may include date, time, and the remainder of the line, depending on the detected format.</returns>
+    /// <returns>
+    /// An object representing the columnized version of the input log line. The returned object contains the extracted
+    /// columns, which may include date, time, and the remainder of the line, depending on the detected format.
+    /// </returns>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Intentionally passed")]
     public IColumnizedLogLineMemory SplitLine (ILogLineMemoryColumnizerCallback callback, ILogLineMemory logLine)
     {
@@ -258,16 +291,22 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Splits a log line into an array of columns based on date, time, and bracketed field positions.
     /// </summary>
-    /// <remarks>If the input line does not contain enough fields to match the expected column count, empty
-    /// columns are inserted to ensure the returned array has the correct length. The method associates each column with
-    /// the provided parent log line object.</remarks>
+    /// <remarks>
+    /// If the input line does not contain enough fields to match the expected column count, empty columns are inserted
+    /// to ensure the returned array has the correct length. The method associates each column with the provided parent
+    /// log line object.
+    /// </remarks>
     /// <param name="line">The log line to split, provided as a read-only memory buffer of characters.</param>
     /// <param name="dateLen">The length, in characters, of the date field at the start of the line.</param>
     /// <param name="timeLen">The length, in characters, of the time field following the date field.</param>
-    /// <param name="dateTimeEndPos">The zero-based position in the line immediately after the date and time fields.</param>
+    /// <param name="dateTimeEndPos">
+    /// The zero-based position in the line immediately after the date and time fields.
+    /// </param>
     /// <param name="clogLine">The parent log line object to associate with each resulting column.</param>
-    /// <returns>An array of columns parsed from the input line. The array contains one element for each expected column, with
-    /// empty columns inserted if the input does not provide enough fields.</returns>
+    /// <returns>
+    /// An array of columns parsed from the input line. The array contains one element for each expected column, with
+    /// empty columns inserted if the input does not provide enough fields.
+    /// </returns>
     private Column[] SquareSplit (ReadOnlyMemory<char> line, int dateLen, int timeLen, int dateTimeEndPos, ColumnizedLogLine clogLine)
     {
         List<Column> columnList = [];
@@ -307,7 +346,24 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
                 break;
             }
 
-            var closingBracketIndex = trimmed.Span.IndexOf(']');
+            // Find the ']' that matches the opening '[', accounting for nested brackets
+            // (e.g. "[ProgramName/MethodName[41]]" is a single field).
+            var closeSpan = trimmed.Span;
+            var depth = 0;
+            var closingBracketIndex = -1;
+            for (var j = 0; j < closeSpan.Length; j++)
+            {
+                if (closeSpan[j] == '[')
+                {
+                    depth++;
+                }
+                else if (closeSpan[j] == ']' && --depth == 0)
+                {
+                    closingBracketIndex = j;
+                    break;
+                }
+            }
+
             if (closingBracketIndex < 0)
             {
                 columnList.Add(new Column { FullValue = rest, Parent = clogLine });
@@ -331,12 +387,16 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// Determines the priority level for parsing log lines based on the specified file name and a collection of log
     /// line samples.
     /// </summary>
-    /// <remarks>The returned priority reflects how well the log format is supported based on the structure
-    /// and content of the provided samples. This method does not modify the input collection.</remarks>
+    /// <remarks>
+    /// The returned priority reflects how well the log format is supported based on the structure and content of the
+    /// provided samples. This method does not modify the input collection.
+    /// </remarks>
     /// <param name="fileName">The name of the log file to analyze. Cannot be null.</param>
     /// <param name="samples">A collection of log line samples to evaluate for format support. Cannot be null.</param>
-    /// <returns>A value indicating the priority level for parsing the provided log lines. Returns a higher priority if the
-    /// format is well supported or perfectly supported; otherwise, returns a lower priority.</returns>
+    /// <returns>
+    /// A value indicating the priority level for parsing the provided log lines. Returns a higher priority if the
+    /// format is well supported or perfectly supported; otherwise, returns a lower priority.
+    /// </returns>
     public Priority GetPriority (string fileName, IEnumerable<ILogLineMemory> samples)
     {
         ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
@@ -430,8 +490,12 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// <summary>
     /// Determines the priority for processing the specified log file based on the provided log line samples.
     /// </summary>
-    /// <param name="fileName">The name of the log file for which to determine the processing priority. Cannot be null or empty.</param>
-    /// <param name="samples">A collection of log line samples used to assess the file's priority. Cannot be null.</param>
+    /// <param name="fileName">
+    /// The name of the log file for which to determine the processing priority. Cannot be null or empty.
+    /// </param>
+    /// <param name="samples">
+    /// A collection of log line samples used to assess the file's priority. Cannot be null.
+    /// </param>
     /// <returns>A value indicating the determined priority for the specified log file.</returns>
     public Priority GetPriority (string fileName, IEnumerable<ILogLine> samples)
     {
@@ -442,28 +506,39 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
     /// Processes a value change for a specified column and updates the time offset if the column represents a
     /// timestamp.
     /// </summary>
-    /// <remarks>This method only updates the time offset when the specified column index is 1 and both the
-    /// new and old values can be parsed as valid timestamps according to the determined time format. No action is taken
-    /// for other columns or if the values cannot be parsed as dates.</remarks>
-    /// <param name="callback">The callback interface used to interact with the columnizer during value processing.</param>
-    /// <param name="column">The zero-based index of the column for which the value is being processed. If the value is 1, the method
-    /// attempts to update the time offset.</param>
+    /// <remarks>
+    /// This method only updates the time offset when the specified column index is 1 and both the new and old values
+    /// can be parsed as valid timestamps according to the determined time format. No action is taken for other columns
+    /// or if the values cannot be parsed as dates.
+    /// </remarks>
+    /// <param name="callback">
+    /// The callback interface used to interact with the columnizer during value processing.
+    /// </param>
+    /// <param name="column">
+    /// The zero-based index of the column for which the value is being processed. If the value is 1, the method
+    /// attempts to update the time offset.
+    /// </param>
     /// <param name="value">The new value to be processed for the specified column.</param>
     /// <param name="oldValue">The previous value of the specified column before the change.</param>
     public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, string oldValue)
+    {
+        PushValue(callback, column, value, oldValue.AsMemory());
+    }
+
+    public void PushValue (ILogLineMemoryColumnizerCallback callback, int column, string value, ReadOnlyMemory<char> oldValue)
     {
         if (column == 1)
         {
             try
             {
-                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue.AsSpan());
+                var formatInfo = _timeFormatDeterminer.DetermineTimeFormatInfo(oldValue.Span);
                 if (formatInfo == null)
                 {
                     return;
                 }
 
                 var newDateTime = DateTime.ParseExact(value, formatInfo.TimeFormat, formatInfo.CultureInfo);
-                var oldDateTime = DateTime.ParseExact(oldValue, formatInfo.TimeFormat, formatInfo.CultureInfo);
+                var oldDateTime = DateTime.ParseExact(oldValue.Span, formatInfo.TimeFormat, formatInfo.CultureInfo);
                 var mSecsOld = oldDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 var mSecsNew = newDateTime.Ticks / TimeSpan.TicksPerMillisecond;
                 _timeOffset = (int)(mSecsNew - mSecsOld);

@@ -96,7 +96,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterListContextMenuStrip = new ContextMenuStrip(components);
             colorToolStripMenuItem = new ToolStripMenuItem();
             pnlFilterInput = new Panel();
-            filterSplitContainer = new SplitContainer();
+            filterSplitContainer = new LogExpert.UI.Controls.BufferedSplitContainer();
             filterComboBox = new ComboBox();
             lblTextFilter = new Label();
             btnAdvanced = new Button();
@@ -893,7 +893,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterSplitContainer.Panel2.Controls.Add(filterRegexCheckBox);
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
             filterSplitContainer.Panel2.Controls.Add(btnfilterSearch);
-            filterSplitContainer.Panel2MinSize = 550;
+            filterSplitContainer.Panel2MinSize = 726;
             filterSplitContainer.Size = new Size(1855, 46);
             filterSplitContainer.SplitterDistance = 518;
             filterSplitContainer.TabIndex = 11;
@@ -1271,7 +1271,7 @@ namespace LogExpert.UI.Controls.LogWindow
         private System.Windows.Forms.Panel columnFinderPanel;
         private System.Windows.Forms.ComboBox columnComboBox;
         private System.Windows.Forms.Label lblColumnName;
-        private System.Windows.Forms.SplitContainer filterSplitContainer;
+        private LogExpert.UI.Controls.BufferedSplitContainer filterSplitContainer;
         private System.Windows.Forms.Label lblTextFilter;
         private System.Windows.Forms.ComboBox filterComboBox;
         private System.Windows.Forms.Button btnAdvanced;

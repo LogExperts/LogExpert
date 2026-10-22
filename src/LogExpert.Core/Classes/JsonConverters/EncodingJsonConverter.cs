@@ -1,6 +1,8 @@
 using System;
 using System.Text;
 
+using LogExpert.Core.Helpers;
+
 using Newtonsoft.Json;
 
 namespace LogExpert.Core.Classes.JsonConverters;
@@ -53,19 +55,6 @@ public class EncodingJsonConverter : JsonConverter
             return null;
         }
 
-        var encodingName = reader.Value?.ToString();
-        if (string.IsNullOrEmpty(encodingName))
-        {
-            return Encoding.Default;
-        }
-
-        try
-        {
-            return Encoding.GetEncoding(encodingName);
-        }
-        catch (ArgumentException)
-        {
-            return Encoding.Default;
-        }
+        return EncodingRegistry.GetEncoding(reader.Value?.ToString(), Encoding.Default);
     }
 }

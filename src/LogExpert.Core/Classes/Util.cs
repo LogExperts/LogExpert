@@ -9,12 +9,14 @@ using LogExpert.Core.Classes.Filter;
 
 namespace LogExpert.Core.Classes;
 
-public class Util
+public static class Util
 {
     #region Public methods
 
     public static string GetNameFromPath (string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+
         var i = fileName.LastIndexOf('\\');
 
         if (i < 0)
@@ -30,9 +32,10 @@ public class Util
         return fileName[(i + 1)..];
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
     public static string StripExtension (string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+
         var i = fileName.LastIndexOf('.');
 
         if (i < 0)
@@ -43,9 +46,10 @@ public class Util
         return fileName[..i];
     }
 
-    //TODO Add Null Check (https://github.com/LogExperts/LogExpert/issues/403)
     public static string GetExtension (string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+
         var i = fileName.LastIndexOf('.');
 
         return i < 0 || i >= fileName.Length - 1
@@ -174,6 +178,24 @@ public class Util
 
     public static unsafe int YetiLevenshtein (string s1, string s2)
     {
+        ArgumentNullException.ThrowIfNull(s1, nameof(s1));
+        ArgumentNullException.ThrowIfNull(s2, nameof(s2));
+
+        if (ReferenceEquals(s1, s2))
+        {
+            return 0;
+        }
+
+        if (s1.Length == 0)
+        {
+            return s2.Length;
+        }
+
+        if (s2.Length == 0)
+        {
+            return s1.Length;
+        }
+
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
         {
@@ -183,6 +205,19 @@ public class Util
 
     public static unsafe int YetiLevenshtein (ReadOnlySpan<char> s1, ReadOnlySpan<char> s2)
     {
+        int len1 = s1.Length;
+        int len2 = s2.Length;
+
+        if (len1 == 0)
+        {
+            return len2;
+        }
+
+        if (len2 == 0)
+        {
+            return len1;
+        }
+
         fixed (char* p1 = s1)
         fixed (char* p2 = s2)
         {
@@ -208,7 +243,8 @@ public class Util
 
     /// <summary>
     /// Cetin Sert, David Necas
-    /// <a href="http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&amp;view=markup">Source Code</a>
+    /// <a href="http://webcleaner.svn.sourceforge.net/viewvc/webcleaner/trunk/webcleaner2/wc/levenshtein.c?revision=6015&amp;view=markup">
+    /// Source Code</a>
     /// </summary>
     /// <param name="s1"></param>
     /// <param name="l1"></param>

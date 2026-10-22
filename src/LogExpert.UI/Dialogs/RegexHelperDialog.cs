@@ -107,7 +107,7 @@ internal partial class RegexHelperDialog : Form
         }
     }
 
-    private void LoadHistory ()
+    internal void LoadHistory ()
     {
         comboBoxRegex.Items.Clear();
         comboBoxRegex.DataSource = ExpressionHistoryList;
@@ -131,26 +131,27 @@ internal partial class RegexHelperDialog : Form
         UpdateMatches();
     }
 
-    private void OnButtonOkClick (object sender, EventArgs e)
+    internal void OnButtonOkClick (object sender, EventArgs e)
     {
+        // Both combos are DataSource-bound to the history lists (LoadHistory), so their
+        // Items collections must not be touched — mutate the bound lists instead. The
+        // dialog closes with DialogResult.OK right after, so no rebind is needed.
         var text = comboBoxRegex.Text;
         _ = ExpressionHistoryList.Remove(text);
         ExpressionHistoryList.Insert(0, text);
-        comboBoxRegex.Items.Remove(text);
-        comboBoxRegex.Items.Insert(0, text);
 
         text = comboBoxTestText.Text;
         _ = TesttextHistoryList.Remove(text);
         TesttextHistoryList.Insert(0, text);
 
-        if (comboBoxRegex.Items.Count > MAX_HISTORY)
+        if (ExpressionHistoryList.Count > MAX_HISTORY)
         {
-            comboBoxRegex.Items.Remove(comboBoxRegex.Items.Count - 1);
+            ExpressionHistoryList.RemoveAt(ExpressionHistoryList.Count - 1);
         }
 
-        if (comboBoxTestText.Items.Count > MAX_HISTORY)
+        if (TesttextHistoryList.Count > MAX_HISTORY)
         {
-            comboBoxTestText.Items.Remove(comboBoxTestText.Items.Count - 1);
+            TesttextHistoryList.RemoveAt(TesttextHistoryList.Count - 1);
         }
     }
 

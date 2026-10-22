@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
@@ -9,7 +9,7 @@
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyTitle>SftpFileSystemx86</AssemblyTitle>
-    <OutputPath>$(SolutionDir)..\bin\$(Configuration)\pluginsx86</OutputPath>
+    <OutputPath>$(LogExpertPluginsX86Directory)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

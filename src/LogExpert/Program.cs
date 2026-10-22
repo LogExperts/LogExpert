@@ -1,3 +1,4 @@
+using System.CommandLine;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO.Pipes;
@@ -9,10 +10,10 @@ using System.Text;
 using System.Windows.Forms;
 
 using LogExpert.Classes;
-using LogExpert.Classes.CommandLine;
 using LogExpert.Configuration;
 using LogExpert.Core.Classes.IPC;
 using LogExpert.Core.Config;
+using LogExpert.Core.Interfaces;
 using LogExpert.PluginRegistry;
 using LogExpert.UI.Dialogs;
 using LogExpert.UI.Extensions.LogWindow;
@@ -54,6 +55,10 @@ internal static class Program
         Application.EnableVisualStyles();
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
+        // Register the plugin assembly resolver early so that settings deserialization
+        // can find plugin types (e.g., CsvColumnizer) before PluginRegistry.Create() runs.
+        PluginRegistry.PluginRegistry.RegisterAssemblyResolver();
+
         // Initialize ConfigManager with application-specific paths and screen information
         ConfigManager.Instance.Initialize(Application.StartupPath, SystemInformation.VirtualScreen);
         PluginValidator.Initialize(ConfigManager.Instance.ActiveConfigDir);
@@ -63,18 +68,25 @@ internal static class Program
         CancellationTokenSource cts = new();
         try
         {
-            CmdLineString configFile = new("config", false, "A configuration (settings) file");
-            CmdLine cmdLine = new();
-            cmdLine.RegisterParameter(configFile);
-            if (configFile.Exists)
-            {
-                FileInfo cfgFileInfo = new(configFile.Value);
-                //TODO: The config file import and the try catch for the primary instance and secondary instance should be separated functions
-                if (cfgFileInfo.Exists)
-                {
-                    ImportResult importResult = ConfigManager.Instance.Import(cfgFileInfo, ExportImportFlags.All);
+            var options = new CommandLineOptions();
+            ParseResult parseResult = options.Parse(args);
 
-                    // Handle import result
+            if (parseResult.Errors.Count > 0)
+            {
+                string errorText = string.Join(Environment.NewLine, parseResult.Errors.Select(e => e.Message));
+                _logger.Error(CultureInfo.InvariantCulture, $"Command-line error: {errorText}");
+                _ = MessageBox.Show(errorText, Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            FileInfo? configFile = parseResult.GetValue(options.ConfigOption) ?? parseResult.GetValue(options.LegacyConfigOption);
+
+            if (configFile is not null)
+            {
+                if (configFile.Exists)
+                {
+                    ImportResult importResult = ConfigManager.Instance.Import(configFile, ExportImportFlags.All);
+
                     if (!importResult.Success)
                     {
                         string message = importResult.RequiresUserConfirmation
@@ -101,7 +113,7 @@ internal static class Program
             _ = PluginRegistry.PluginRegistry.Create(ConfigManager.Instance.ActiveConfigDir, ConfigManager.Instance.Settings.Preferences.PollingInterval);
 
             SetCulture();
-            SetDarkMode();
+            SetColorMode();
 
             ColumnizerLib.Column.SetMaxDisplayLength(ConfigManager.Instance.Settings.Preferences.MaxDisplayLength);
 
@@ -110,8 +122,9 @@ internal static class Program
             try
             {
                 Mutex mutex = new(false, "Local\\LogExpertInstanceMutex" + pId, out var isCreated);
-                var remainingArgs = cmdLine.Parse(args);
-                var absoluteFilePaths = GenerateAbsoluteFilePaths(remainingArgs);
+                string[] positionalFiles = parseResult.GetValue(options.FilesArgument) ?? [];
+                var absoluteFilePaths = GenerateAbsoluteFilePaths(positionalFiles);
+                var targetLine = parseResult.GetValue(options.LineOption);
 
                 if (isCreated)
                 {
@@ -124,7 +137,8 @@ internal static class Program
                             : null,
                         1,
                         false,
-                        ConfigManager.Instance);
+                        ConfigManager.Instance,
+                        targetLine);
 
                     // first instance
                     var wi = WindowsIdentity.GetCurrent();
@@ -147,7 +161,7 @@ internal static class Program
                         try
                         {
                             var wi = WindowsIdentity.GetCurrent();
-                            var command = SerializeCommandIntoNonFormattedJSON(absoluteFilePaths, settings.Preferences.AllowOnlyOneInstance);
+                            var command = SerializeCommandIntoNonFormattedJSON(absoluteFilePaths, settings.Preferences.AllowOnlyOneInstance, targetLine);
                             SendCommandToServer(command);
                             ipcSucceeded = true;
                             break;
@@ -219,17 +233,14 @@ internal static class Program
     }
 
     [SupportedOSPlatform("windows")]
-    private static void SetDarkMode ()
+    private static void SetColorMode ()
     {
-        var darkModeEnabled = ConfigManager.Instance.Settings.Preferences.DarkMode;
-        if (darkModeEnabled)
+        Application.SetColorMode(ConfigManager.Instance.Settings.Preferences.ColorMode switch
         {
-            Application.SetColorMode(SystemColorMode.Dark);
-        }
-        else
-        {
-            Application.SetColorMode(SystemColorMode.System);
-        }
+            ColorMode.Dark => SystemColorMode.Dark,
+            ColorMode.System => SystemColorMode.System,
+            _ => SystemColorMode.Classic,
+        });
     }
 
     [SupportedOSPlatform("windows")]
@@ -241,12 +252,12 @@ internal static class Program
         CultureInfo.CurrentCulture = defaultCulture;
     }
 
-    private static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance)
+    internal static string SerializeCommandIntoNonFormattedJSON (string[] fileNames, bool allowOnlyOneInstance, int? targetLine = null)
     {
         var message = new IpcMessage()
         {
             Type = allowOnlyOneInstance ? IpcMessageType.NewWindowOrLockedWindow : IpcMessageType.NewWindow,
-            Payload = JObject.FromObject(new LoadPayload { Files = [.. fileNames] })
+            Payload = JObject.FromObject(new LoadPayload { Files = [.. fileNames], TargetLine = targetLine })
         };
 
         return JsonConvert.SerializeObject(message, Formatting.None);
@@ -281,22 +292,38 @@ internal static class Program
     }
 
     [SupportedOSPlatform("windows")]
-    private static void SendMessageToProxy (IpcMessage message, LogExpertProxy proxy)
+    internal static void SendMessageToProxy (IpcMessage message, ILogExpertProxy proxy)
     {
-        var payLoad = message.Payload.ToObject<LoadPayload>();
+        LoadPayload? payLoad;
+        try
+        {
+            var target = message?.Payload?.GetValue(nameof(LoadPayload.TargetLine), StringComparison.OrdinalIgnoreCase);
+            if (target != null && target.Type is not JTokenType.Integer and not JTokenType.Null)
+            {
+                _logger.Error("Invalid IPC target: the line number must be an integer.");
+                return;
+            }
+
+            payLoad = message?.Payload?.ToObject<LoadPayload>();
+        }
+        catch (JsonException ex)
+        {
+            _logger.Error(ex, "Invalid IPC load payload.");
+            return;
+        }
 
         if (CheckPayload(payLoad))
         {
             switch (message.Type)
             {
                 case IpcMessageType.Load:
-                    proxy.LoadFiles([.. payLoad.Files]);
+                    proxy.LoadFiles([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 case IpcMessageType.NewWindow:
-                    proxy.NewWindow([.. payLoad.Files]);
+                    proxy.NewWindow([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 case IpcMessageType.NewWindowOrLockedWindow:
-                    proxy.NewWindowOrLockedWindow([.. payLoad.Files]);
+                    proxy.NewWindowOrLockedWindow([.. payLoad.Files], payLoad.TargetLine);
                     break;
                 default:
                     _logger.Error($"Unknown IPC Message Type: {message.Type} with payload: {payLoad}");
@@ -310,6 +337,12 @@ internal static class Program
         if (payLoad == null)
         {
             _logger.Error("Invalid payload command: null");
+            return false;
+        }
+
+        if (payLoad.GetValidationError() is string error)
+        {
+            _logger.Error($"Invalid IPC load payload: {error}");
             return false;
         }
 

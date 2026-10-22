@@ -1,27 +1,121 @@
 <Project>
+
+  <!--
+    Builds the SHA256 table that PluginValidator compares built-in plugins against at runtime.
+
+    The table has to be compiled into this assembly, but it can only be computed once the plugin
+    DLLs exist. So it is generated here, before CoreCompile, and the build-order-only
+    ProjectReferences in LogExpert.PluginRegistry.csproj guarantee the plugins are already built by
+    the time this runs.
+
+    Generating it rather than committing it is the point: a committed table describes whichever
+    build produced it, so it went stale the moment it was committed and never matched the binaries
+    it shipped beside. Nothing here depends on builds being byte-reproducible across commits.
+
+    LogExpertPluginsDirectory / LogExpertPluginsX86Directory come from Directory.Build.props and are
+    the very directories the plugin projects build into, so the two cannot drift apart.
+  -->
+
   <PropertyGroup>
-    <GeneratePluginHashesEnabled>true</GeneratePluginHashesEnabled>
-    <PluginHashGeneratorFile>$(MSBuildThisFileDirectory)PluginHashGenerator.Generated.cs</PluginHashGeneratorFile>
+    <!-- Spelled out from BaseIntermediateOutputPath rather than using IntermediateOutputPath: this
+         file is imported before the SDK's common targets define the latter, so it would evaluate
+         empty here and drop the generated file into the project directory. Per-configuration so
+         Debug and Release do not overwrite each other's table. -->
+    <BuiltInPluginHashesFile>$(BaseIntermediateOutputPath)$(Configuration)\BuiltInPluginHashes.g.cs</BuiltInPluginHashesFile>
   </PropertyGroup>
 
-  <!-- Target to generate plugin hashes during build -->
-  <Target Name="GeneratePluginHashes" 
-          AfterTargets="Build" 
-          Condition="'$(GeneratePluginHashesEnabled)' == 'true' AND '$(Configuration)' == 'Release' AND Exists('$(OutputPath)plugins')">
-    
-    <Message Text="Generating plugin hashes from $(OutputPath)plugins..." Importance="high" />
-    
-    <!-- Run the hash generator tool -->
-    <Exec Command="dotnet run --project $(MSBuildThisFileDirectory)..\PluginHashGenerator.Tool\PluginHashGenerator.Tool.csproj -- &quot;$(OutputPath)&quot; &quot;$(PluginHashGeneratorFile)&quot; $(Configuration)" 
-          WorkingDirectory="$(MSBuildThisFileDirectory).."
-          ContinueOnError="false"
-          IgnoreExitCode="false" />
-          
-    <Message Text="Plugin hash file generated: $(PluginHashGeneratorFile)" Importance="high" />
+  <ItemGroup>
+    <!-- Ships next to the plugins but is not itself a plugin, so PluginValidator never checks it. -->
+    <NonPluginAssembly Include="ColumnizerLib.dll" />
+    <NonPluginAssembly Include="Newtonsoft.Json.dll" />
+    <NonPluginAssembly Include="CsvHelper.dll" />
+    <NonPluginAssembly Include="Renci.SshNet.dll" />
+    <NonPluginAssembly Include="Microsoft.Bcl.AsyncInterfaces.dll" />
+    <NonPluginAssembly Include="Microsoft.Bcl.HashCode.dll" />
+    <NonPluginAssembly Include="System.Buffers.dll" />
+    <NonPluginAssembly Include="System.Memory.dll" />
+    <NonPluginAssembly Include="System.Numerics.Vectors.dll" />
+    <NonPluginAssembly Include="System.Runtime.CompilerServices.Unsafe.dll" />
+    <NonPluginAssembly Include="System.Threading.Tasks.Extensions.dll" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Semicolons are escaped as %3B so WriteLinesToFile does not split these on them. -->
+    <BuiltInPluginHashesHeader>
+// &lt;auto-generated/&gt;
+// Generated during build from the compiled built-in plugins - see PluginHashGenerator.targets.
+// Not committed: a checked-in table describes some earlier build, not this one.
+
+using System.Collections.Generic%3B
+
+namespace LogExpert.PluginRegistry%3B
+
+public static partial class PluginValidator
+{
+    /// &lt;summary&gt;
+    /// Gets pre-calculated SHA256 hashes for built-in plugins.
+    /// &lt;/summary&gt;
+    public static Dictionary&lt;string, string&gt; GetBuiltInPluginHashes()
+    {
+        return new Dictionary&lt;string, string&gt;(StringComparer.OrdinalIgnoreCase)
+        {</BuiltInPluginHashesHeader>
+    <!-- The first line is flush-left because MSBuild trims leading whitespace off a property value.
+         It is generated code that only the compiler reads, so the lost indent does not matter. -->
+    <BuiltInPluginHashesFooter>}%3B
+    }
+}</BuiltInPluginHashesFooter>
+  </PropertyGroup>
+
+  <Target Name="GenerateBuiltInPluginHashes" BeforeTargets="CoreCompile">
+
+    <!-- Flattened into properties first. Referencing @(NonPluginAssembly) directly in an Exclude
+         alongside bare %(Filename) metadata makes MSBuild batch the item element over
+         NonPluginAssembly, which silently resolves the metadata against the wrong item. -->
+    <PropertyGroup>
+      <ExcludedFromPlugins>@(NonPluginAssembly->'$(LogExpertPluginsDirectory)%(Identity)')</ExcludedFromPlugins>
+      <ExcludedFromPluginsX86>@(NonPluginAssembly->'$(LogExpertPluginsX86Directory)%(Identity)')</ExcludedFromPluginsX86>
+    </PropertyGroup>
+
+    <!-- Globbed inside the target, not at evaluation: the plugins are built during this same build,
+         so at evaluation time they may not exist yet. Kept as two lists because the x86 entries need
+         a suffixed key, which the transforms below apply. -->
+    <ItemGroup>
+      <BuiltInPlugin Include="$(LogExpertPluginsDirectory)*.dll" Exclude="$(ExcludedFromPlugins)" />
+      <BuiltInPluginX86 Include="$(LogExpertPluginsX86Directory)*.dll" Exclude="$(ExcludedFromPluginsX86)" />
+    </ItemGroup>
+
+    <!-- An empty table would silently make every built-in plugin untrusted, so fail loudly instead. -->
+    <Error Condition="'@(BuiltInPlugin)' == ''"
+           Text="No built-in plugin assemblies found in $(LogExpertPluginsDirectory). The plugin projects should have been built first - check the build-order ProjectReferences in LogExpert.PluginRegistry.csproj." />
+
+    <GetFileHash Files="@(BuiltInPlugin)" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="HashedBuiltInPlugin" />
+    </GetFileHash>
+    <GetFileHash Files="@(BuiltInPluginX86)" Algorithm="SHA256" HashEncoding="hex">
+      <Output TaskParameter="Items" ItemName="HashedBuiltInPluginX86" />
+    </GetFileHash>
+
+    <ItemGroup>
+      <BuiltInPluginHashesLine Include="$(BuiltInPluginHashesHeader)" />
+      <BuiltInPluginHashesLine Include="@(HashedBuiltInPlugin->'            [&quot;%(Filename)%(Extension)&quot;] = &quot;%(FileHash)&quot;,')" />
+      <BuiltInPluginHashesLine Include="@(HashedBuiltInPluginX86->'            [&quot;%(Filename)%(Extension) (x86)&quot;] = &quot;%(FileHash)&quot;,')" />
+      <BuiltInPluginHashesLine Include="$(BuiltInPluginHashesFooter)" />
+    </ItemGroup>
+
+    <!-- WriteOnlyWhenDifferent so an unchanged table does not retrigger the compile. -->
+    <WriteLinesToFile File="$(BuiltInPluginHashesFile)"
+                      Lines="@(BuiltInPluginHashesLine)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+
+    <Message Text="Built-in plugin hashes: @(HashedBuiltInPlugin->Count()) + @(HashedBuiltInPluginX86->Count()) (x86) -> $(BuiltInPluginHashesFile)"
+             Importance="normal" />
   </Target>
 
-  <!-- Make the generated file part of the compilation if it exists -->
   <ItemGroup>
-    <Compile Include="$(PluginHashGeneratorFile)" Condition="Exists('$(PluginHashGeneratorFile)')" />
+    <!-- Included unconditionally so IntelliSense resolves GetBuiltInPluginHashes; the target above
+         always writes the file before csc runs. On a fresh clone it appears after the first build. -->
+    <Compile Include="$(BuiltInPluginHashesFile)" />
   </ItemGroup>
+
 </Project>

@@ -5,7 +5,6 @@
     <IsTestProject>true</IsTestProject>
     <AssemblyTitle>ColumnizerLib.Tests</AssemblyTitle>
     <Company>Microsoft</Company>
-    <OutputPath>bin\$(Configuration)</OutputPath>
     <RootNamespace>LogExpert.ColumnizerLib.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>

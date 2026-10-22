@@ -1,22 +1,27 @@
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
 namespace LogExpert.Core.Enums;
 
 /// <summary>
 /// Defines the available stream reader implementations.
 /// </summary>
+[JsonConverter(typeof(StringEnumConverter))]
 public enum ReaderType
 {
     /// <summary>
-    /// System.IO.Pipelines based reader implementation (high performance).
+    /// Direct-read implementation: reads decoded chars directly into pooled blocks via
+    /// StreamReader.Read(char[], offset, count), eliminating per-line string allocation.
     /// </summary>
-    Pipeline,
+    SystemDirect = 0,
 
     /// <summary>
     /// Legacy reader implementation (original).
     /// </summary>
-    Legacy,
+    Legacy = 1,
 
     /// <summary>
     /// System.IO.StreamReader based implementation.
     /// </summary>
-    System
+    System = 2
 }

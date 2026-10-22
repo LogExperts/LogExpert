@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <RootNamespace>LogExpert.Audio</RootNamespace>
+    <AssemblyTitle>LogExpert.Audio</AssemblyTitle>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- AudioPlayer uses AudioFileReader, which lives in the aggregate NAudio package (it pulls in
+         the Core/WinMM/Wasapi/MediaFoundation backends needed to decode WAV/MP3/AIFF). The system
+         beep fallback (SystemSounds) also relies on System.Windows.Extensions brought in transitively
+         here, so this meta-package reference is required and cannot be trimmed to sub-packages. -->
+    <PackageReference Include="NAudio" />
+    <PackageReference Include="NLog" />
+  </ItemGroup>
+
+</Project>

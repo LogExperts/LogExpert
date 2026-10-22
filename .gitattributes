@@ -1,0 +1,19 @@
+# Generated at release time by `nuget-license | Set-Content` on a Windows runner,
+# which writes CRLF. Pin to LF so the regenerated file matches the committed blob
+# regardless of the runner's core.autocrlf setting — otherwise releases would
+# commit pure line-ending churn (or treat the file as binary). See release.yml.
+# (Pattern has no slash so it matches the file regardless of path — its directory
+# "Solution Items" contains a space, which .gitattributes cannot express in a path.)
+usedComponents.json text eol=lf
+
+# Git executes hooks with its shell, including on Windows.
+.githooks/* text eol=lf
+
+# Line-ending test fixtures (src/LogExpert.Tests/TestData). Their whole point is
+# byte-exact terminators (bare \r, mixed \n/\r\n/\r), so git must NOT normalize
+# EOLs on them — otherwise core.autocrlf would rewrite \r\n<->\n and corrupt the
+# fixtures. Mark binary to store and check out the exact bytes.
+LineEndings_LF.txt binary
+LineEndings_CRLF.txt binary
+LineEndings_CR.txt binary
+LineEndings_Mixed.txt binary

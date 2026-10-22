@@ -22,6 +22,7 @@ public class LogWindowCoordinatorTests
     private LogWindowCoordinator _coordinator;
     private Mock<ITabController> _tabControllerMock;
     private Mock<ILedIndicatorService> _ledServiceMock;
+    private Mock<IFileOperationService> _fileOperationServiceMock;
     private Settings _settings;
     private Preferences _preferences;
 
@@ -32,20 +33,19 @@ public class LogWindowCoordinatorTests
         _pluginRegistryMock = new Mock<IPluginRegistry>();
         _tabControllerMock = new Mock<ITabController>();
         _ledServiceMock = new Mock<ILedIndicatorService>();
+        _fileOperationServiceMock = new Mock<IFileOperationService>();
         _settings = new Settings();
         _preferences = _settings.Preferences;
         _ = _configManagerMock.Setup(cm => cm.Settings).Returns(_settings);
         _ = _pluginRegistryMock.Setup(pr => pr.RegisteredColumnizers).Returns([]);
 
-        // Tab creation methods (AddFilterTab, AddTempFileTab) are pure delegation
-        // to LogTabWindow and are verified via smoke tests rather than unit tests,
-        // as they require a full WinForms context.
         _coordinator = new LogWindowCoordinator(
             _configManagerMock.Object,
             _pluginRegistryMock.Object,
             null!,
             _tabControllerMock.Object,
-            _ledServiceMock.Object);
+            _ledServiceMock.Object,
+            _fileOperationServiceMock.Object);
     }
 
     [Test]

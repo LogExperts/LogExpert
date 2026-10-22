@@ -18,7 +18,7 @@ public static class ColumnizerPicker
     /// Cannot be null.</param>
     /// <param name="list">The list of available columnizers to search. Cannot be null.</param>
     /// <returns>The first columnizer from the list whose name matches the specified value; otherwise, null if no match is found.</returns>
-    public static ILogLineMemoryColumnizer FindMemorColumnizerByName (string name, IList<ILogLineMemoryColumnizer> list)
+    public static ILogLineMemoryColumnizer FindMemoryColumnizerByName (string name, IList<ILogLineMemoryColumnizer> list)
     {
         ArgumentNullException.ThrowIfNull(name, nameof(name));
         ArgumentNullException.ThrowIfNull(list, nameof(list));

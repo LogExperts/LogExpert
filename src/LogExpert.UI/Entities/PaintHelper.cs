@@ -44,24 +44,22 @@ internal static class PaintHelper
             var entry = logPaintCtx.FindHighlightEntry(line, true);
             e.Graphics.SetClip(e.CellBounds);
 
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
+            var selection = SelectionPainter.GetStyle(logPaintCtx.SelectionHighlight,
+                e.State.HasFlag(DataGridViewElementStates.Selected), focused, e.CellStyle.SelectionBackColor, Application.IsDarkModeEnabled);
+            if (!selection.PaintBackground(e))
             {
-                using var brush = GetBrushForFocusedControl(focused, e.CellStyle.SelectionBackColor);
-                e.Graphics.FillRectangle(brush, e.CellBounds);
-            }
-            else
-            {
-                e.CellStyle.BackColor = GetBackColorFromHighlightEntry(entry);
+                e.CellStyle.BackColor = GetBackColorFromHighlightEntry(entry, Application.IsDarkModeEnabled);
                 e.PaintBackground(e.ClipBounds, false);
             }
 
             if (DebugOptions.DisableWordHighlight)
             {
+                e.CellStyle.SelectionForeColor = selection.Foreground(e.CellStyle.ForeColor);
                 e.PaintContent(e.CellBounds);
             }
             else
             {
-                PaintCell(logPaintCtx, e, entry);
+                PaintCell(logPaintCtx, e, entry, selection);
             }
 
             if (e.ColumnIndex == 0)
@@ -89,17 +87,28 @@ internal static class PaintHelper
         }
     }
 
-    public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry)
+    // Matches what SystemColors.Window resolves to under Application.SetColorMode(Dark).
+    private static readonly Color _darkModeWindowBackColor = Color.FromArgb(32, 32, 32);
+
+    public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
     {
-        return entry?.BackgroundColor ?? Color.White;
+        return entry?.BackgroundColor ?? (darkMode ? _darkModeWindowBackColor : Color.White);
+    }
+
+    public static Color GetForeColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
+    {
+        if (entry != null && entry.ForegroundColor != Color.Empty)
+        {
+            return entry.ForegroundColor;
+        }
+
+        return darkMode ? Color.White : Color.Black;
     }
 
     [SupportedOSPlatform("windows")]
-    public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor)
+    public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)
     {
-        return focused
-            ? new SolidBrush(selectionColor)
-            : new SolidBrush(Color.FromArgb(255, 170, 170, 170)); //Gray
+        return new SolidBrush(SelectionPainter.GetStyle(new(), true, focused, selectionColor, darkMode).Background);
     }
 
     [SupportedOSPlatform("windows")]
@@ -152,6 +161,8 @@ internal static class PaintHelper
     [SupportedOSPlatform("windows")]
     public static void SetColumnizer (ILogLineMemoryColumnizer columnizer, BufferedDataGridView gridView)
     {
+        ApplyGridViewTheme(gridView, Application.IsDarkModeEnabled);
+
         var rowCount = gridView.RowCount;
         var currLine = gridView.CurrentCellAddress.Y;
         var currFirstLine = gridView.FirstDisplayedScrollingRowIndex;
@@ -217,9 +228,9 @@ internal static class PaintHelper
     }
 
     /// <summary>
-    /// This returns Black or White based on the color that is given
-    /// If the color is smaller than 128 it means its a darker color and white should be the fore color,
-    /// if the color is bigger than 128 it means its a lighter color and black should be the fore color
+    /// This returns Black or White based on the color that is given If the color is smaller than 128 it means its a
+    /// darker color and white should be the fore color, if the color is bigger than 128 it means its a lighter color
+    /// and black should be the fore color
     /// </summary>
     /// <param name="backColor">lighter or darker back color</param>
     /// <returns>White or Black based on the given back color</returns>
@@ -232,14 +243,14 @@ internal static class PaintHelper
 
     //TODO Make this configurable => this should close https://github.com/LogExperts/LogExpert/issues/85
     [SupportedOSPlatform("windows")]
-    public static DataGridViewCellStyle GetDataGridViewCellStyle ()
+    public static DataGridViewCellStyle GetDataGridViewCellStyle (bool darkMode)
     {
         return new()
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
             Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-            ForeColor = Color.White,
+            ForeColor = darkMode ? Color.White : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
@@ -248,18 +259,50 @@ internal static class PaintHelper
 
     //TODO Make this configurable => this should close https://github.com/LogExperts/LogExpert/issues/85
     [SupportedOSPlatform("windows")]
-    public static DataGridViewCellStyle GetDataGridDefaultRowStyle ()
+    public static DataGridViewCellStyle GetDataGridDefaultRowStyle (bool darkMode)
     {
         return new DataGridViewCellStyle
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
-            Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-            ForeColor = Color.Black,
+            ForeColor = darkMode ? Color.White : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
         };
+    }
+
+    /// <summary>
+    /// Applies theme-dependent settings to a grid. With visual styles enabled the column
+    /// headers are painted by the Windows visual-style renderer, which only exists in a
+    /// light flavor and ignores <c>Application.SetColorMode</c>. Disabling them makes the
+    /// headers fall back to <c>ColumnHeadersDefaultCellStyle</c>, whose defaults are
+    /// dark-mode-aware system colors.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static void ApplyGridViewTheme (DataGridView gridView, bool darkMode)
+    {
+        gridView.EnableHeadersVisualStyles = !darkMode;
+    }
+
+    /// <summary>
+    /// Applies theme-dependent settings to a tab control. With
+    /// <c>UseVisualStyleBackColor</c> enabled the tab page body is painted by the
+    /// light-only visual-style renderer while child controls inherit the dark ambient
+    /// color, giving light pages with dark patches in dark mode.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static void ApplyTabControlTheme (TabControl tabControl, bool darkMode)
+    {
+        if (!darkMode)
+        {
+            return;
+        }
+
+        foreach (TabPage page in tabControl.TabPages)
+        {
+            page.UseVisualStyleBackColor = false;
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -321,13 +364,13 @@ internal static class PaintHelper
     #region Private Methods
 
     [SupportedOSPlatform("windows")]
-    private static void PaintCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private static void PaintCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
-        PaintHighlightedCell(logPaintCtx, e, groundEntry);
+        PaintHighlightedCell(logPaintCtx, e, groundEntry, selection);
     }
 
     [SupportedOSPlatform("windows")]
-    private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry)
+    private static void PaintHighlightedCell (ILogPaintContextUI logPaintCtx, DataGridViewCellPaintingEventArgs e, HighlightEntry groundEntry, SelectionCellStyle selection)
     {
         var value = e.Value ?? string.Empty;
 
@@ -351,9 +394,8 @@ internal static class PaintHelper
                 var he = new HighlightEntry
                 {
                     SearchText = column.FullValue.ToString(),
-                    //TODO change to white if the background color is darker
                     BackgroundColor = groundEntry?.BackgroundColor ?? Color.Empty,
-                    ForegroundColor = groundEntry?.ForegroundColor ?? Color.FromKnownColor(KnownColor.Black),
+                    ForegroundColor = GetForeColorFromHighlightEntry(groundEntry, Application.IsDarkModeEnabled),
                     IsRegex = false,
                     IsCaseSensitive = false,
                     IsLedSwitch = false,
@@ -424,15 +466,8 @@ internal static class PaintHelper
             wordSize.Height = e.CellBounds.Height;
             Rectangle wordRect = new(wordPos, wordSize);
 
-            var foreColor = matchEntry.HighlightEntry.ForegroundColor;
-            if (e.State.HasFlag(DataGridViewElementStates.Selected))
-            {
-                if (foreColor.Equals(Color.Black))
-                {
-                    foreColor = Color.White;
-                }
-            }
-            else
+            var foreColor = selection.Foreground(matchEntry.HighlightEntry.ForegroundColor);
+            if (!selection.FillBackground)
             {
                 if (bgBrush != null && !matchEntry.HighlightEntry.NoBackground)
                 {
@@ -446,14 +481,17 @@ internal static class PaintHelper
     }
 
     /// <summary>
-    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the same foreground and
-    /// background colors.
-    /// All regions which don't match a word-mode entry will be painted with the colors of a default entry (groundEntry). This is either the
-    /// first matching non-word-mode highlight entry or a black-on-white default (if no matching entry was found).
+    /// Builds a list of HilightMatchEntry objects. A HilightMatchEntry spans over a region that is painted with the
+    /// same foreground and background colors. All regions which don't match a word-mode entry will be painted with the
+    /// colors of a default entry (groundEntry). This is either the first matching non-word-mode highlight entry or a
+    /// black-on-white default (if no matching entry was found).
     /// </summary>
     /// <param name="matchList">List of all highlight matches for the current cell</param>
     /// <param name="groundEntry">The entry that is used as the default.</param>
-    /// <returns>List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every substring.</returns>
+    /// <returns>
+    /// List of HilightMatchEntry objects. The list spans over the whole cell and contains color infos for every
+    /// substring.
+    /// </returns>
     private static IList<HighlightMatchEntry> MergeHighlightMatchEntries (IList<HighlightMatchEntry> matchList, HighlightMatchEntry groundEntry)
     {
         // Fill an area with lenth of whole text with a default hilight entry

@@ -24,10 +24,10 @@ public class FilterPipe : IDisposable
 
     #region cTor
 
-    public FilterPipe (FilterParams filterParams, ILogWindow logWindow)
+    public FilterPipe (FilterParams filterParams, ILineSelectable originWindow)
     {
         FilterParams = filterParams;
-        LogWindow = logWindow;
+        OriginWindow = originWindow;
         IsStopped = false;
         FileName = Path.GetTempFileName();
         _disposed = false;
@@ -53,9 +53,11 @@ public class FilterPipe : IDisposable
 
     public IList<int> LastLinesHistoryList { get; } = [];
 
-    public ILogWindow LogWindow { get; }
+    /// <summary>The origin window the pipe filters from; "Locate line in original file" selects lines here.</summary>
+    public ILineSelectable OriginWindow { get; }
 
-    public ILogWindow OwnLogWindow { get; set; }
+    /// <summary>The window displaying the pipe's results; saving a Session File gathers its child snapshot.</summary>
+    public ISessionSnapshotSource ResultWindow { get; set; }
 
     #endregion
 
