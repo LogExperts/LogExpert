@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using System.Runtime.Versioning;
 using System.Text;
 
@@ -658,6 +659,46 @@ internal class FileOperationServiceTests : IDisposable
     }
 
     [Test]
+    public void LoadFilesWithOption_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        // The .lxj check has to run on the resolved name, or the shortcut gets opened as a raw log.
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            var decision = _sut.LoadFilesWithOption(new[] { shortcut }, false);
+
+            Assert.That(decision, Is.EqualTo(MultiFileDecision.Cancel));
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTabs_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            _sut.AddFileTabs(new[] { shortcut });
+
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
     public void LoadFilesWithOption_SingleLxjFile_CallsProjectCallback ()
     {
         // Arrange
@@ -1223,6 +1264,42 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls, Has.Count.EqualTo(2));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("a.log"));
         Assert.That(_factoryCalls[1].Request.FileName, Is.EqualTo("b.log"));
+    }
+
+    /// <summary>
+    /// Creates a temporary directory holding a session file and a shortcut to it, and returns the
+    /// three paths. The caller owns the directory and deletes it.
+    /// </summary>
+    private static (string Directory, string Shortcut, string Session) CreateShortcutToSession ()
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertTests", "ShortcutSession", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+
+        var session = Path.Join(directory, "project.lxj");
+        File.WriteAllText(session, "<Project></Project>");
+
+        var shortcut = Path.Join(directory, "session.lnk");
+        WriteShortcut(shortcut, "project.lxj");
+
+        return (directory, shortcut, session);
+    }
+
+    /// <summary>
+    /// Writes a minimal shortcut: the header, IS_UNICODE | HAS_RELATIVE_PATH, then one StringData
+    /// entry. MS-SHLLINK 2.4 puts no NULL terminator after it.
+    /// </summary>
+    private static void WriteShortcut (string shortcutPath, string relativePath)
+    {
+        var bytes = new byte[0x4C + 2 + (relativePath.Length * 2)];
+
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes, 0x4C);
+        new byte[] { 0x01, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 }
+            .CopyTo(bytes, 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20), 0x00000088);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(0x4C), (ushort)relativePath.Length);
+        _ = Encoding.Unicode.GetBytes(relativePath, bytes.AsSpan(0x4E));
+
+        File.WriteAllBytes(shortcutPath, bytes);
     }
 
     /// <summary>

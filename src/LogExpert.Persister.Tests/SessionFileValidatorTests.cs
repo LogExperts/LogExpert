@@ -1,6 +1,9 @@
+using System.Buffers.Binary;
 using System.Globalization;
+using System.Text;
 
 using LogExpert.Core.Classes.Persister;
+using LogExpert.Core.Helpers;
 
 namespace LogExpert.Persister.Tests;
 
@@ -203,6 +206,42 @@ public class SessionFileValidatorTests
         Assert.That(result, Has.Count.EqualTo(2));
         Assert.That(result[0], Does.EndWith("direct.log"), "Direct log should be unchanged");
         Assert.That(result[1], Does.EndWith("referenced.log"), ".lxp should resolve to referenced log");
+    }
+
+    [Test]
+    public void PersisterHelpers_FindFilenameForSettings_ShortcutToLxp_ResolvesToLog ()
+    {
+        // Arrange - a shortcut to the settings file, which in turn names the log
+        CreateTestLogFiles("actual.log");
+        CreatePersistenceFile("settings.lxp", "actual.log");
+        var shortcutPath = Path.Join(_testDirectory, "settings.lnk");
+        File.WriteAllBytes(shortcutPath, BuildRelativePathShortcut("settings.lxp"));
+
+        // Act - the shortcut is resolved at the entry point, then the settings file is followed
+        var shortcutTarget = ShellLinkResolver.Resolve(shortcutPath);
+        var result = PersisterHelpers.FindFilenameForSettings(shortcutTarget, PluginRegistry.PluginRegistry.Instance);
+
+        // Assert
+        Assert.That(shortcutTarget, Does.EndWith("settings.lxp"), "Shortcut should resolve to the settings file");
+        Assert.That(result, Does.EndWith("actual.log"), "Settings file should then resolve to the log");
+    }
+
+    /// <summary>
+    /// Builds a shortcut whose only target is RELATIVE_PATH. The other projects build theirs with a
+    /// fixture; this one needs a handful of bytes, so it writes them here.
+    /// </summary>
+    private static byte[] BuildRelativePathShortcut (string relativePath)
+    {
+        var bytes = new byte[0x4C + 2 + (relativePath.Length * 2)];
+
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes, 0x4C);
+        new byte[] { 0x01, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 }
+            .CopyTo(bytes, 4);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(20), 0x00000088);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(0x4C), (ushort)relativePath.Length);
+        _ = Encoding.Unicode.GetBytes(relativePath, bytes.AsSpan(0x4E));
+
+        return bytes;
     }
 
     [Test]

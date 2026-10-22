@@ -8,9 +8,16 @@ namespace LogExpert.UI.Services.FileOperationService;
 internal sealed record FileTabRequest
 {
     /// <summary>
-    /// The file name as provided by the caller (may be relative, may be a .lxp settings file).
+    /// The file name as provided by the caller (may be relative, may be a .lxp settings file or a
+    /// shortcut). This is what gets shown and remembered.
     /// </summary>
     public required string FileName { get; init; }
+
+    /// <summary>
+    /// The file the reader actually opens, after shortcuts and .lxp indirection. Filled in by
+    /// <c>FileOperationService</c> at the entry point; null means "same as <see cref="FileName"/>".
+    /// </summary>
+    public string? ResolvedFileName { get; init; }
 
     /// <summary>Optional one-based line to select after loading and Session File restoration.</summary>
     public int? TargetLine { get; init; }

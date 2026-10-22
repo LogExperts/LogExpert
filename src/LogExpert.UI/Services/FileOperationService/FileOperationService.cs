@@ -68,9 +68,8 @@ internal sealed class FileOperationService (
 
     public LogWindow AddFileTab (FileTabRequest request)
     {
-        // A shortcut names a file the user did not open: resolve it before anything else, so the tab,
-        // the reader and the Session File all deal with the target. The request keeps the original
-        // path, so what the user picked is still what is shown and remembered.
+        // The one place a shortcut is resolved: everything downstream opens the target, while the
+        // request keeps the path the user picked for the title, history and recent files.
         var requestedFile = ShellLinkResolver.Resolve(request.FileName);
         var logFileName = PersisterHelpers.FindFilenameForSettings(requestedFile, _pluginRegistry);
         var normalizedPath = Path.GetFullPath(logFileName);
@@ -99,7 +98,8 @@ internal sealed class FileOperationService (
             encodingOptions.Encoding = new UnicodeEncoding(false, false);
         }
 
-        var logWindow = _logWindowFactory(request, encodingOptions);
+        var tabRequest = request with { ResolvedFileName = logFileName };
+        var logWindow = _logWindowFactory(tabRequest, encodingOptions);
 
         if (!request.IsTempFile)
         {
@@ -208,8 +208,8 @@ internal sealed class FileOperationService (
             return null;
         }
 
-        // Shortcuts are resolved for the same reason as in AddFileTab: only the reader needs the
-        // targets, while the request keeps the path the user dropped.
+        // Resolved here as well: only the reader needs the targets, the request keeps the dropped
+        // paths for history and the title.
         var resolvedFileNames = fileNames.Select(ShellLinkResolver.Resolve).ToArray();
 
         // Session files (.lxj) aren't logs — dispatch them to the project loader and
@@ -229,7 +229,8 @@ internal sealed class FileOperationService (
         var request = new FileTabRequest
         {
             FileName = fileNames[^1],
-            IsTempFile = false
+            IsTempFile = false,
+            ResolvedFileName = PersisterHelpers.FindFilenameForSettings(resolvedFileNames[^1], _pluginRegistry)
         };
 
         var logWindow = _logWindowFactory(request, encodingOptions);
@@ -278,9 +279,12 @@ internal sealed class FileOperationService (
 
         if (fileNames.Length == 1)
         {
-            if (fileNames[0].EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+            // Resolve first: a shortcut to a session file must not be opened as a raw log.
+            var resolved = ShellLinkResolver.Resolve(fileNames[0]);
+
+            if (resolved.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
-                _loadSessionCallback(fileNames[0], true);
+                _loadSessionCallback(resolved, true);
                 return MultiFileDecision.Cancel; // Already handled
             }
 
@@ -318,9 +322,12 @@ internal sealed class FileOperationService (
         {
             try
             {
-                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+                // Resolve first: a shortcut to a session file must not be opened as a raw log.
+                var resolved = ShellLinkResolver.Resolve(fileName);
+
+                if (resolved.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
                 {
-                    _loadSessionCallback(fileName, false);
+                    _loadSessionCallback(resolved, false);
                 }
                 else
                 {

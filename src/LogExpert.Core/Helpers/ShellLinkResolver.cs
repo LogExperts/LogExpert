@@ -2,28 +2,17 @@ using System.Buffers.Binary;
 using System.Globalization;
 using System.Text;
 
+using NLog;
+
 namespace LogExpert.Core.Helpers;
 
 /// <summary>
-/// Resolves a Windows shortcut (<c>.lnk</c>) to the file it points at.
+/// Resolves a Windows shortcut (<c>.lnk</c>) to the local file it points at.
 /// </summary>
 /// <remarks>
-/// <para>
-/// A shortcut is a binary file, not a log: handing one to the reader shows its header bytes as log
-/// lines. Callers that accept a path from the user — a drop, the Open dialog, the command line —
-/// pass it through <see cref="Resolve"/> first, so everything downstream only ever sees the target.
-/// </para>
-/// <para>
-/// The Shell Link binary format (MS-SHLLINK) is parsed here directly instead of through
-/// <c>IShellLink</c>, because this class lives in the Core assembly, which carries no COM or
-/// Windows-only dependency. Every unresolvable case — an unreadable or corrupt shortcut, a target
-/// that no longer exists, a shortcut to a folder — returns the input unchanged, so the caller keeps
-/// the behaviour it had before.
-/// </para>
-/// <para>
-/// Only the extension is inspected for non-shortcut paths; nothing is read from disk unless the path
-/// actually names an existing <c>.lnk</c>.
-/// </para>
+/// The MS-SHLLINK format is parsed directly rather than through <c>IShellLink</c>, because this
+/// lives in the Core assembly, which carries no COM. Only local targets are followed: UNC and
+/// device paths are skipped, and anything unresolvable is returned unchanged.
 /// </remarks>
 public static class ShellLinkResolver
 {
@@ -43,9 +32,11 @@ public static class ShellLinkResolver
     /// <summary><c>LinkInfoHeaderSize</c> of a <c>LinkInfo</c> that carries the Unicode offsets.</summary>
     private const int LINK_INFO_HEADER_SIZE_UNICODE = 0x24;
 
-    private const int NETWORK_LINK_NET_NAME_OFFSET = 8;
-    private const int NETWORK_LINK_NET_NAME_UNICODE_OFFSET = 20;
-    private const int NETWORK_LINK_MIN_SIZE = 0x1C;
+    /// <summary>
+    /// Real shortcuts are a few KB. Anything larger is not one, and reading it whole would let a
+    /// dropped file exhaust memory.
+    /// </summary>
+    private const int MAX_SHORTCUT_SIZE = 1024 * 1024;
 
     /// <summary>
     /// Upper bound for chained shortcuts. A shortcut pointing at a shortcut is legitimate; longer
@@ -62,7 +53,6 @@ public static class ShellLinkResolver
 
     // LinkInfoFlags
     private const uint VOLUME_ID_AND_LOCAL_BASE_PATH = 0x00000001;
-    private const uint COMMON_NETWORK_RELATIVE_LINK_AND_PATH_SUFFIX = 0x00000002;
 
     /// <summary>
     /// CLSID of a Shell Link: 00021401-0000-0000-C000-000000000046, in its on-disk byte order.
@@ -77,10 +67,11 @@ public static class ShellLinkResolver
 
     #region Fields
 
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
     /// <summary>
-    /// Encoding for the ANSI strings in the older parts of the format. Resolved lazily and only for
-    /// shortcuts that are not flagged Unicode; the system ANSI code page keeps non-ASCII paths
-    /// intact, and Latin1 is a sufficient fallback where no code pages are available.
+    /// Encoding of the ANSI strings. Resolved lazily and only for shortcuts that are not flagged
+    /// Unicode; Latin1 is a sufficient fallback where no code pages are available.
     /// </summary>
     private static readonly Lazy<Encoding> _ansiEncoding = new(ResolveAnsiEncoding);
 
@@ -93,8 +84,8 @@ public static class ShellLinkResolver
     /// </summary>
     /// <param name="fileName">A path that may or may not be a shortcut.</param>
     /// <returns>
-    /// The target path when it resolves to an existing file; otherwise <paramref name="fileName"/>
-    /// unchanged.
+    /// The target path when the whole chain resolves to an existing local file; otherwise
+    /// <paramref name="fileName"/> unchanged.
     /// </returns>
     public static string Resolve (string fileName)
     {
@@ -103,27 +94,134 @@ public static class ShellLinkResolver
             return fileName;
         }
 
-        var resolved = fileName;
+        var current = fileName;
 
         for (var depth = 0; depth < MAX_RESOLVE_DEPTH; depth++)
         {
-            if (!IsShortcut(resolved))
+            if (!IsShortcutFile(current))
             {
-                return resolved;
+                return current;
             }
 
-            var target = TryResolveSingle(resolved);
+            var target = TryResolveSingle(current);
             if (target is null)
             {
-                // Unresolvable shortcut: keep the current path, so the caller behaves as it did
-                // before this class existed.
-                return resolved;
+                // Keep what the caller passed in, not a half-followed chain, so a broken second link
+                // behaves exactly like a broken first one.
+                _logger.Debug("Shortcut {Shortcut} is unresolvable, keeping {Original}", current, fileName);
+                return fileName;
             }
 
-            resolved = target;
+            current = target;
         }
 
-        return resolved;
+        _logger.Warn("Shortcut chain starting at {Shortcut} exceeds {Depth} links, keeping the original path", fileName, MAX_RESOLVE_DEPTH);
+        return fileName;
+    }
+
+    #endregion
+
+    #region Internal parsing core
+
+    /// <summary>
+    /// Parses the path fields out of shortcut bytes. Separate from <see cref="Resolve"/> and free of
+    /// I/O so tests can feed crafted shortcuts in.
+    /// </summary>
+    internal static bool TryParseTargets (ReadOnlySpan<byte> data, out ShortcutTargets targets)
+    {
+        targets = new ShortcutTargets();
+
+        if (!IsShellLink(data))
+        {
+            return false;
+        }
+
+        var flags = BinaryPrimitives.ReadUInt32LittleEndian(data[LINK_FLAGS_OFFSET..]);
+        var isUnicode = (flags & IS_UNICODE) != 0;
+        var position = SHELL_LINK_HEADER_SIZE;
+
+        if ((flags & HAS_LINK_TARGET_ID_LIST) != 0 && !TrySkipIdList(data, ref position))
+        {
+            return false;
+        }
+
+        if ((flags & HAS_LINK_INFO) != 0 && !TryReadLinkInfo(data, ref position, targets))
+        {
+            return false;
+        }
+
+        // StringData follows LinkInfo, one entry per flag, in a fixed order. Only RELATIVE_PATH is
+        // needed, but NAME_STRING has to be stepped over to reach it.
+        if ((flags & HAS_NAME) != 0 && !TryReadStringData(data, ref position, isUnicode, out _))
+        {
+            return false;
+        }
+
+        if ((flags & HAS_RELATIVE_PATH) != 0)
+        {
+            if (!TryReadStringData(data, ref position, isUnicode, out var relativePath))
+            {
+                return false;
+            }
+
+            targets.RelativePath = relativePath;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Turns the parsed fields into absolute paths, most specific first, dropping anything that is
+    /// not on this machine. No file is touched.
+    /// </summary>
+    internal static IReadOnlyList<string> BuildCandidatePaths (string shortcutPath, ShortcutTargets targets)
+    {
+        var shortcutDirectory = Path.GetDirectoryName(shortcutPath);
+        var candidates = new List<string>(3);
+
+        AddCandidate(candidates, targets.LocalBasePath);
+        AddCandidate(candidates, JoinPath(targets.LocalBasePath, targets.CommonPathSuffix));
+        AddCandidate(candidates, targets.RelativePath);
+
+        var result = new List<string>(candidates.Count);
+
+        foreach (var candidate in candidates)
+        {
+            var path = candidate;
+
+            if (!Path.IsPathRooted(path))
+            {
+                if (shortcutDirectory is null)
+                {
+                    continue;
+                }
+
+                path = Path.Join(shortcutDirectory, path);
+            }
+
+            try
+            {
+                path = Path.GetFullPath(path);
+            }
+            catch (Exception ex) when (ex is ArgumentException
+                                           or NotSupportedException
+                                           or PathTooLongException
+                                           or System.Security.SecurityException)
+            {
+                continue;
+            }
+
+            if (IsLocalFilePath(path))
+            {
+                result.Add(path);
+            }
+            else
+            {
+                _logger.Debug("Not following non-local shortcut target {Target}", path);
+            }
+        }
+
+        return result;
     }
 
     #endregion
@@ -134,7 +232,7 @@ public static class ShellLinkResolver
     /// Whether <paramref name="path"/> names an existing file with the shortcut extension. Paths with
     /// any other extension never touch the disk.
     /// </summary>
-    private static bool IsShortcut (string path)
+    private static bool IsShortcutFile (string path)
     {
         if (!Path.GetExtension(path).Equals(SHORTCUT_EXTENSION, StringComparison.OrdinalIgnoreCase))
         {
@@ -156,17 +254,42 @@ public static class ShellLinkResolver
     }
 
     /// <summary>
-    /// Reads one shortcut and returns its target, without following a shortcut target that is itself
-    /// a shortcut.
+    /// Reads one shortcut and returns its target, without following a target that is itself a
+    /// shortcut.
     /// </summary>
     /// <returns>The first candidate that exists on disk, or <c>null</c>.</returns>
     private static string? TryResolveSingle (string shortcutPath)
     {
-        byte[] bytes;
+        var data = TryReadShortcut(shortcutPath);
+        if (data is null)
+        {
+            return null;
+        }
 
+        if (!TryParseTargets(data, out var targets))
+        {
+            _logger.Warn("Ignoring {Shortcut}: not a valid shortcut", shortcutPath);
+            return null;
+        }
+
+        return FindExistingTarget(shortcutPath, targets);
+    }
+
+    private static byte[]? TryReadShortcut (string shortcutPath)
+    {
         try
         {
-            bytes = File.ReadAllBytes(shortcutPath);
+            using var stream = new FileStream(shortcutPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+
+            if (stream.Length > MAX_SHORTCUT_SIZE)
+            {
+                _logger.Warn("Ignoring {Shortcut}: {Size} bytes is above the {Limit} byte shortcut limit", shortcutPath, stream.Length, MAX_SHORTCUT_SIZE);
+                return null;
+            }
+
+            var bytes = new byte[stream.Length];
+            stream.ReadExactly(bytes);
+            return bytes;
         }
         catch (Exception ex) when (ex is IOException
                                        or UnauthorizedAccessException
@@ -174,44 +297,9 @@ public static class ShellLinkResolver
                                        or NotSupportedException
                                        or System.Security.SecurityException)
         {
+            _logger.Debug(ex, "Could not read shortcut {Shortcut}", shortcutPath);
             return null;
         }
-
-        var data = bytes.AsSpan();
-        if (!IsShellLink(data))
-        {
-            return null;
-        }
-
-        var flags = BinaryPrimitives.ReadUInt32LittleEndian(data[LINK_FLAGS_OFFSET..]);
-        var isUnicode = (flags & IS_UNICODE) != 0;
-        var position = SHELL_LINK_HEADER_SIZE;
-        var targets = new LinkTargets();
-
-        if ((flags & HAS_LINK_TARGET_ID_LIST) != 0 && !TrySkipIdList(data, ref position))
-        {
-            return null;
-        }
-
-        if ((flags & HAS_LINK_INFO) != 0 && !TryReadLinkInfo(data, ref position, targets))
-        {
-            return null;
-        }
-
-        // StringData follows LinkInfo. Only RELATIVE_PATH is needed, but the entries before it have
-        // variable length and have to be walked over to reach it.
-        if ((flags & HAS_NAME) != 0)
-        {
-            _ = TryReadCountedString(data, ref position, isUnicode, out _);
-        }
-
-        if ((flags & HAS_RELATIVE_PATH) != 0
-            && TryReadCountedString(data, ref position, isUnicode, out var relativePath))
-        {
-            targets.RelativePath = relativePath;
-        }
-
-        return FindExistingTarget(shortcutPath, targets);
     }
 
     private static bool IsShellLink (ReadOnlySpan<byte> data)
@@ -245,9 +333,10 @@ public static class ShellLinkResolver
     }
 
     /// <summary>
-    /// Reads <c>LinkInfo</c>: the local base path, the network path, and the common path suffix.
+    /// Reads the local base path and the common path suffix out of <c>LinkInfo</c>. The network part
+    /// is deliberately not read: its targets are never followed.
     /// </summary>
-    private static bool TryReadLinkInfo (ReadOnlySpan<byte> data, ref int position, LinkTargets targets)
+    private static bool TryReadLinkInfo (ReadOnlySpan<byte> data, ref int position, ShortcutTargets targets)
     {
         if (position + LINK_INFO_MIN_SIZE > data.Length)
         {
@@ -287,38 +376,8 @@ public static class ShellLinkResolver
         targets.CommonPathSuffix = ReadStringAt(linkInfo, commonPathSuffixUnicodeOffset, isUnicode: true)
                                    ?? ReadStringAt(linkInfo, commonPathSuffixOffset, isUnicode: false);
 
-        if ((linkInfoFlags & COMMON_NETWORK_RELATIVE_LINK_AND_PATH_SUFFIX) != 0)
-        {
-            targets.NetworkPath = ReadNetworkPath(linkInfo, BinaryPrimitives.ReadUInt32LittleEndian(linkInfo[20..]));
-        }
-
         position += (int)linkInfoSize;
         return true;
-    }
-
-    /// <summary>
-    /// Reads the server name out of <c>CommonNetworkRelativeLink</c>. The offsets there are relative
-    /// to that structure, not to <c>LinkInfo</c>.
-    /// </summary>
-    private static string? ReadNetworkPath (ReadOnlySpan<byte> linkInfo, uint offset)
-    {
-        if (offset == 0 || offset >= (uint)linkInfo.Length)
-        {
-            return null;
-        }
-
-        var start = (int)offset;
-        if (start + NETWORK_LINK_MIN_SIZE > linkInfo.Length)
-        {
-            return null;
-        }
-
-        var networkLink = linkInfo[start..];
-        var netNameOffset = BinaryPrimitives.ReadUInt32LittleEndian(networkLink[NETWORK_LINK_NET_NAME_OFFSET..]);
-        var netNameUnicodeOffset = BinaryPrimitives.ReadUInt32LittleEndian(networkLink[NETWORK_LINK_NET_NAME_UNICODE_OFFSET..]);
-
-        return ReadStringAt(networkLink, netNameUnicodeOffset, isUnicode: true)
-               ?? ReadStringAt(networkLink, netNameOffset, isUnicode: false);
     }
 
     /// <summary>
@@ -372,9 +431,10 @@ public static class ShellLinkResolver
     }
 
     /// <summary>
-    /// Reads one <c>StringData</c> entry: a character count, the characters, then a terminator.
+    /// Reads one <c>StringData</c> entry: a character count followed by that many characters, with
+    /// no terminator (MS-SHLLINK 2.4).
     /// </summary>
-    private static bool TryReadCountedString (ReadOnlySpan<byte> data, ref int position, bool isUnicode, out string value)
+    private static bool TryReadStringData (ReadOnlySpan<byte> data, ref int position, bool isUnicode, out string value)
     {
         value = string.Empty;
 
@@ -397,65 +457,44 @@ public static class ShellLinkResolver
             : _ansiEncoding.Value.GetString(data.Slice(position, byteCount));
 
         position += byteCount;
-
-        // Some writers omit the terminator on the last entry; clamp instead of failing the parse.
-        position = Math.Min(position + (isUnicode ? 2 : 1), data.Length);
         return true;
     }
 
     /// <summary>
-    /// Builds the candidate paths a shortcut may point at and returns the first one that exists.
+    /// Returns the first candidate path that exists as a file.
     /// </summary>
-    /// <remarks>
-    /// Modern shortcuts usually fill <c>LocalBasePath</c> with the full path, but the field may also
-    /// hold only the directory (with the rest in <c>CommonPathSuffix</c>), and shortcuts that were
-    /// never saved with a volume fall back to a path relative to the shortcut's own directory. All
-    /// of those are tried, most specific first.
-    /// </remarks>
-    private static string? FindExistingTarget (string shortcutPath, LinkTargets targets)
+    private static string? FindExistingTarget (string shortcutPath, ShortcutTargets targets)
     {
-        var shortcutDirectory = Path.GetDirectoryName(shortcutPath);
-        var candidates = new List<string>(5);
-
-        AddCandidate(candidates, targets.LocalBasePath);
-        AddCandidate(candidates, JoinPath(targets.LocalBasePath, targets.CommonPathSuffix));
-        AddCandidate(candidates, JoinPath(targets.NetworkPath, targets.CommonPathSuffix));
-        AddCandidate(candidates, targets.NetworkPath);
-        AddCandidate(candidates, targets.RelativePath);
-
-        foreach (var candidate in candidates)
+        foreach (var candidate in BuildCandidatePaths(shortcutPath, targets))
         {
-            var path = candidate;
-
-            if (!Path.IsPathRooted(path))
-            {
-                if (shortcutDirectory is null)
-                {
-                    continue;
-                }
-
-                path = Path.Join(shortcutDirectory, path);
-            }
-
             try
             {
-                path = Path.GetFullPath(path);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
             }
-            catch (Exception ex) when (ex is ArgumentException
+            catch (Exception ex) when (ex is IOException
+                                           or UnauthorizedAccessException
+                                           or ArgumentException
                                            or NotSupportedException
-                                           or PathTooLongException
                                            or System.Security.SecurityException)
             {
-                continue;
-            }
-
-            if (File.Exists(path))
-            {
-                return path;
+                _logger.Debug(ex, "Could not look up shortcut target {Target}", candidate);
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Whether <paramref name="path"/> stays on this machine. <c>\\host\share</c> would make Windows
+    /// authenticate to that host, handing it the user's NetNTLM hash, and <c>\\.\</c> or
+    /// <c>\\?\</c> reach devices and pipes that can block.
+    /// </summary>
+    private static bool IsLocalFilePath (string path)
+    {
+        return !path.StartsWith(@"\\", StringComparison.Ordinal);
     }
 
     private static void AddCandidate (List<string> candidates, string? path)
@@ -465,20 +504,9 @@ public static class ShellLinkResolver
             return;
         }
 
-        string expanded;
-
-        try
+        if (!candidates.Contains(path, StringComparer.OrdinalIgnoreCase))
         {
-            expanded = Environment.ExpandEnvironmentVariables(path);
-        }
-        catch (Exception ex) when (ex is ArgumentException or System.Security.SecurityException)
-        {
-            return;
-        }
-
-        if (expanded.Length > 0 && !candidates.Contains(expanded, StringComparer.OrdinalIgnoreCase))
-        {
-            candidates.Add(expanded);
+            candidates.Add(path);
         }
     }
 
@@ -522,15 +550,14 @@ public static class ShellLinkResolver
     #region Data types
 
     /// <summary>
-    /// The path fields a shortcut may carry, in the order they are parsed.
+    /// The path fields a shortcut carries, as parsed. A plain holder: resolving them against the
+    /// file system is <see cref="Resolve"/>'s job.
     /// </summary>
-    private sealed class LinkTargets
+    internal sealed class ShortcutTargets
     {
         public string? LocalBasePath { get; set; }
 
         public string? CommonPathSuffix { get; set; }
-
-        public string? NetworkPath { get; set; }
 
         public string? RelativePath { get; set; }
     }

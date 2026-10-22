@@ -170,9 +170,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [SupportedOSPlatform("windows")]
     private LogWindow.LogWindow CreateLogWindowFromRequest (FileTabRequest request, EncodingOptions encodingOptions)
     {
+        // Resolved by FileOperationService at the entry point; FileName keeps the path the user
+        // picked, which the window reports back as GivenFileName.
         LogWindow.LogWindow logWindow = new(
             _logWindowCoordinator,
-            PersisterHelpers.FindFilenameForSettings(request.FileName, PluginRegistry.PluginRegistry.Instance),
+            request.ResolvedFileName ?? request.FileName,
             request.IsTempFile,
             request.ForcePersistenceLoading,
             ConfigManager,
@@ -205,7 +207,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (!e.Request.IsTempFile)
         {
-            SetTooltipText(e.LogWindow, e.ResolvedFileName);
+            // Show both sides when they differ: a shortcut or a settings file would otherwise hide
+            // which file the tab is really showing.
+            SetTooltipText(e.LogWindow, string.Equals(e.Request.FileName, e.ResolvedFileName, StringComparison.Ordinal)
+                ? e.ResolvedFileName
+                : $"{e.Request.FileName} → {e.ResolvedFileName}");
         }
 
         // Filter tooltip setup
