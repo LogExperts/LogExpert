@@ -78,6 +78,21 @@ internal partial class HighlightDialog : Form
         checkBoxSelectionOutline.Text = Resources.HighlightDialog_UI_OutlineSelectedBlocks;
         btnSelectionColor.Text = Resources.HighlightDialog_UI_ChangeSelectionColor;
         btnResetSelectionColor.Text = Resources.HighlightDialog_UI_ResetSelectionColor;
+
+        toolTip.SetToolTip(btnAdd, Resources.HighlightDialog_UI_Button_ToolTip_btnAdd);
+        toolTip.SetToolTip(btnCopy, Resources.HighlightDialog_UI_Button_ToolTip_btnCopy);
+        toolTip.SetToolTip(btnEdit, Resources.HighlightDialog_UI_Button_ToolTip_btnEdit);
+        toolTip.SetToolTip(btnDelete, Resources.HighlightDialog_UI_Button_ToolTip_btnDelete);
+        toolTip.SetToolTip(btnMoveUp, Resources.HighlightDialog_UI_Button_ToolTip_btnMoveUp);
+        toolTip.SetToolTip(btnMoveDown, Resources.HighlightDialog_UI_Button_ToolTip_btnMoveDown);
+        toolTip.SetToolTip(btnExportGroup, Resources.HighlightDialog_UI_Button_ToolTip_btnExportGroup);
+        toolTip.SetToolTip(btnImportGroup, Resources.HighlightDialog_UI_Button_ToolTip_btnImportGroup);
+        toolTip.SetToolTip(btnMoveGroupDown, Resources.HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown);
+        toolTip.SetToolTip(btnMoveGroupUp, Resources.HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp);
+        toolTip.SetToolTip(btnCopyGroup, Resources.HighlightDialog_UI_Button_ToolTip_btnCopyGroup);
+        toolTip.SetToolTip(btnDeleteGroup, Resources.HighlightDialog_UI_Button_ToolTip_btnDeleteGroup);
+        toolTip.SetToolTip(btnNewGroup, Resources.HighlightDialog_UI_Button_ToolTip_btnNewGroup);
+        toolTip.SetToolTip(comboBoxGroups, Resources.HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups);
     }
 
     #endregion
