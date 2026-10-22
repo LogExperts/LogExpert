@@ -73,6 +73,73 @@ public class PaintHelperTests
     }
 
     [Test]
+    public void GetDefaultForeColor_DarkMode_UsesTheSoftOffWhite ()
+    {
+        // 220,220,220 rather than pure white; the grid, the color combo box and the highlight
+        // preview have to agree on it.
+        var foreColor = PaintHelper.GetDefaultForeColor(darkMode: true);
+
+        Assert.That(foreColor.ToArgb(), Is.EqualTo(Color.FromArgb(220, 220, 220).ToArgb()));
+    }
+
+    [Test]
+    public void GetDefaultForeColor_LightMode_UsesBlack ()
+    {
+        var foreColor = PaintHelper.GetDefaultForeColor(darkMode: false);
+
+        Assert.That(foreColor, Is.EqualTo(Color.Black));
+    }
+
+    [Test]
+    public void GetDefaultBackColor_MatchesTheWindowBackgroundOfEachColorMode ()
+    {
+        // 32,32,32 is the surface the grid paints cells with in dark mode; the highlight
+        // preview has to use the same one instead of SystemColors.Window.
+        Assert.Multiple(() =>
+        {
+            Assert.That(PaintHelper.GetDefaultBackColor(darkMode: true), Is.EqualTo(Color.FromArgb(32, 32, 32)));
+            Assert.That(PaintHelper.GetDefaultBackColor(darkMode: false), Is.EqualTo(Color.White));
+        });
+    }
+
+    [Test]
+    public void GetForeColorFromHighlightEntry_EntryWithoutForeColor_UsesTheDefaultForeColor ()
+    {
+        // HighlightEntry.ForegroundColor defaults to Color.Empty ("not set"). Both callers of
+        // a highlight without a color must end up with exactly the same result.
+        Assert.Multiple(() =>
+        {
+            Assert.That(PaintHelper.GetForeColorFromHighlightEntry(null, darkMode: true),
+                Is.EqualTo(PaintHelper.GetDefaultForeColor(darkMode: true)));
+            Assert.That(PaintHelper.GetForeColorFromHighlightEntry(new HighlightEntry(), darkMode: false),
+                Is.EqualTo(PaintHelper.GetDefaultForeColor(darkMode: false)));
+        });
+    }
+
+    [Test]
+    public void GetBookmarkMarkerTextColor_LightMode_KeepsDarkOrange ()
+    {
+        var markerColor = PaintHelper.GetBookmarkMarkerTextColor(darkMode: false);
+
+        Assert.That(markerColor.ToArgb(), Is.EqualTo(Color.FromArgb(255, 190, 100, 0).ToArgb()));
+    }
+
+    [Test]
+    public void GetBookmarkMarkerTextColor_DarkMode_IsBrighterAndStaysOrange ()
+    {
+        var dark = PaintHelper.GetBookmarkMarkerTextColor(darkMode: true);
+        var light = PaintHelper.GetBookmarkMarkerTextColor(darkMode: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(dark.GetBrightness(), Is.GreaterThan(light.GetBrightness()),
+                $"expected a brighter dark-mode marker but got {dark} vs {light}");
+            Assert.That(dark.R, Is.GreaterThan(dark.G), "marker is expected to stay orange");
+            Assert.That(dark.G, Is.GreaterThan(dark.B), "marker is expected to stay orange");
+        });
+    }
+
+    [Test]
     public void GetForeColorFromHighlightEntry_NoEntryInLightMode_FallsBackToBlack ()
     {
         var foreColor = PaintHelper.GetForeColorFromHighlightEntry(null, darkMode: false);

@@ -2,6 +2,8 @@ using System.ComponentModel;
 using System.Drawing.Drawing2D;
 using System.Runtime.Versioning;
 
+using LogExpert.UI.Entities;
+
 namespace LogExpert.UI.Controls;
 
 [SupportedOSPlatform("windows")]
@@ -68,12 +70,16 @@ internal class ColorComboBox : ComboBox
         if (e.Index >= 0)
         {
             var darkMode = Application.IsDarkModeEnabled;
-            var textBrush = darkMode ? Brushes.White : Brushes.Black;
-            var borderPen = darkMode ? Pens.White : Pens.Black;
+
+            // Same off-white the grid uses, so the swatch labels match the log view.
+            var textColor = PaintHelper.GetDefaultForeColor(darkMode);
+            using var textBrush = new SolidBrush(textColor);
+            using var borderPen = new Pen(textColor);
 
             Rectangle rectangle = new(4, e.Bounds.Top + 2, 30, e.Bounds.Height - 4);
             var rectColor = (Color)Items[e.Index];
-            e.Graphics.FillRectangle(new SolidBrush(rectColor), rectangle);
+            using var swatchBrush = new SolidBrush(rectColor);
+            e.Graphics.FillRectangle(swatchBrush, rectangle);
             e.Graphics.DrawRectangle(borderPen, rectangle);
 
             if (e.Index == 0)

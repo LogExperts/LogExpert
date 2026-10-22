@@ -58,6 +58,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const string FONT_VERDANA = "Verdana";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    // Bookmark marker colors: the dark variants are more saturated so the small square keeps
+    // enough contrast against the dark grid.
+    private static readonly Color _bookmarkColor = Color.FromArgb(165, 200, 225);
+    private static readonly Color _autoBookmarkColor = Color.FromArgb(180, 210, 180);
+    private static readonly Color _bookmarkColorDark = Color.FromArgb(140, 195, 240);
+    private static readonly Color _autoBookmarkColorDark = Color.FromArgb(150, 215, 150);
+
     private readonly Image _advancedButtonImage;
 
     private readonly BookmarkDataProvider _bookmarkProvider = new();
@@ -352,14 +359,15 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region Properties
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
+    public Color BookmarkColor { get; set; } = _bookmarkColor;
 
     /// <summary>
     /// Color used to paint the bookmark marker in column 0 for auto-generated (highlight-triggered) bookmarks. Uses a
-    /// lighter/more desaturated shade to distinguish from manual bookmarks.
+    /// slightly different shade to distinguish from manual bookmarks; the dark variant is brighter, not dimmer,
+    /// because the marker has to stand out against the dark grid.
     /// </summary>
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public Color AutoBookmarkColor { get; set; } = Color.FromArgb(180, 210, 180);
+    public Color AutoBookmarkColor { get; set; } = _autoBookmarkColor;
 
     public ILogLineMemoryColumnizer CurrentColumnizer
     {
@@ -2742,12 +2750,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         PaintHelper.ApplyGridViewTheme(dataGridView, darkMode);
         PaintHelper.ApplyGridViewTheme(filterGridView, darkMode);
 
-        // Bookmark marker column colors need more saturation against dark backgrounds.
-        if (darkMode)
-        {
-            BookmarkColor = Color.FromArgb(140, 195, 240);     // brighter blue than light-mode #A5C8E1
-            AutoBookmarkColor = Color.FromArgb(150, 215, 150); // brighter green than light-mode #B4D2B4
-        }
+        // Bookmark marker colors need more saturation against dark backgrounds. Both variants
+        // are assigned explicitly: the color mode is fixed for the lifetime of the process
+        // (Program.SetColorMode runs before the first window is created), so this never has to
+        // be re-applied at runtime.
+        BookmarkColor = darkMode ? _bookmarkColorDark : _bookmarkColor;
+        AutoBookmarkColor = darkMode ? _autoBookmarkColorDark : _autoBookmarkColor;
     }
 
     [SupportedOSPlatform("windows")]
@@ -6642,7 +6650,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
-                        using var brush2 = new SolidBrush(PaintHelper.BookmarkMarkerTextColor);
+                        using var brush2 = new SolidBrush(PaintHelper.GetBookmarkMarkerTextColor(Application.IsDarkModeEnabled));
                         using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }

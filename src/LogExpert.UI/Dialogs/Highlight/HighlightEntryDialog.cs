@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 using ColumnizerLib;
 
@@ -10,6 +9,7 @@ using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Helpers;
 using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
+using LogExpert.UI.Entities;
 
 namespace LogExpert.UI.Dialogs.Highlight;
 
@@ -405,11 +405,16 @@ public partial class HighlightEntryDialog : Form
             ? Resources.HighlightEntryEditDialog_UI_Preview_Placeholder
             : text;
 
-        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, Application.IsDarkModeEnabled ? Color.White : Color.Black);
+        // Preview with the same defaults the grid paints with. SystemColors.Window stays white
+        // in dark mode, which would put the off-white preview text on a white background.
+        var darkMode = Application.IsDarkModeEnabled;
+        var defaultBackColor = PaintHelper.GetDefaultBackColor(darkMode);
+
+        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, PaintHelper.GetDefaultForeColor(darkMode));
 
         _previewLabel.BackColor = _checkBoxNoBackground != null && _checkBoxNoBackground.Checked
-            ? SystemColors.Window
-            : GetSelectedColor(_colorBoxBackground, SystemColors.Window);
+            ? defaultBackColor
+            : GetSelectedColor(_colorBoxBackground, defaultBackColor);
 
         var bold = _checkBoxBold != null && _checkBoxBold.Checked;
         var baseFont = Font;

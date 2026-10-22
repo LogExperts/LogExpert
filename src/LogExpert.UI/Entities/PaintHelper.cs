@@ -75,7 +75,7 @@ internal static class PaintHelper
 
                     if (bookmark.Text.Length > 0)
                     {
-                        using var brush2 = new SolidBrush(BookmarkMarkerTextColor);
+                        using var brush2 = new SolidBrush(GetBookmarkMarkerTextColor(Application.IsDarkModeEnabled));
                         using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
@@ -98,7 +98,28 @@ internal static class PaintHelper
 
     public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
     {
-        return entry?.BackgroundColor ?? (darkMode ? _darkModeWindowBackColor : Color.White);
+        return entry?.BackgroundColor ?? GetDefaultBackColor(darkMode);
+    }
+
+    /// <summary>
+    /// Background of a cell that has no background of its own: the dark window surface in dark
+    /// mode, white otherwise. Callers that preview log output outside the grid - the highlight
+    /// dialog, for example - have to use this instead of <see cref="SystemColors"/>.
+    /// </summary>
+    public static Color GetDefaultBackColor (bool darkMode)
+    {
+        return darkMode ? _darkModeWindowBackColor : Color.White;
+    }
+
+    /// <summary>
+    /// Default foreground color for text that has no explicitly configured color: the soft
+    /// off-white in dark mode, black otherwise. Everything that paints text on a themed
+    /// surface should use this instead of <see cref="Color.White"/>, so the grid, the color
+    /// combo box and the highlight preview cannot drift apart.
+    /// </summary>
+    public static Color GetDefaultForeColor (bool darkMode)
+    {
+        return darkMode ? _darkModeForeColor : Color.Black;
     }
 
     public static Color GetForeColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
@@ -108,17 +129,19 @@ internal static class PaintHelper
             return entry.ForegroundColor;
         }
 
-        return darkMode ? _darkModeForeColor : Color.Black;
+        return GetDefaultForeColor(darkMode);
     }
 
     /// <summary>
     /// Color of the "i" / "!" marker text drawn on bookmark / filter squares in column 0.
     /// Dark mode uses a brighter orange so the marker stays visible against the dark background.
     /// </summary>
-    public static Color BookmarkMarkerTextColor =>
-        Application.IsDarkModeEnabled
+    public static Color GetBookmarkMarkerTextColor (bool darkMode)
+    {
+        return darkMode
             ? Color.FromArgb(255, 220, 130, 20)  // brighter orange on dark
-            : Color.FromArgb(255, 190, 100, 0); // DarkOrange baseline
+            : Color.FromArgb(255, 190, 100, 0);  // DarkOrange baseline
+    }
 
     [SupportedOSPlatform("windows")]
     public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)

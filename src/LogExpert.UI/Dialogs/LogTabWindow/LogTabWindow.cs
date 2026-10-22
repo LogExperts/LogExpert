@@ -29,6 +29,7 @@ using LogExpert.UI.Services.SessionHandlerService;
 using LogExpert.UI.Services.TabControllerService;
 using LogExpert.UI.Services.ToolLaunchService;
 using LogExpert.UI.Services.ToolWindowCoordinatorService;
+using LogExpert.UI.Theming;
 
 using NLog;
 
@@ -386,16 +387,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Switches the main ToolStrip and MenuStrip family to a dark ProfessionalColorTable.
-    /// WinForms ToolStrip does not honour Application.SetColorMode(Dark); the default
-    /// ToolStripProfessionalRenderer keeps drawing light gradients regardless.
-    /// Icons are re-coloured on-the-fly by DarkToolStripRenderer (see below).
+    /// Switches this window's ToolStrip family to the dark renderer. WinForms ignores
+    /// Application.SetColorMode(Dark) for ToolStrips, so the renderer is installed
+    /// process-wide by <see cref="ToolStripTheme"/>; see there for the global scope.
     ///
-    /// ToolStripContainer.TopToolStripPanel forces RenderMode = System on every child
-    /// ToolStrip, which overrides any per-toolstrip Renderer we set here. We bypass that
-    /// by installing the renderer globally via ToolStripManager.Renderer and switching
-    /// every ToolStrip / MenuStrip to ManagerRenderMode — then each parent panel stops
-    /// fighting us.
+    /// ToolStripContainer forces RenderMode = System on the strips it hosts, which overrides
+    /// the manager renderer. Putting the strips and their panels back to ManagerRenderMode is
+    /// what makes the container stop fighting us.
     /// </summary>
     private void ConfigureToolStripDark ()
     {
@@ -404,11 +402,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        var renderer = new DarkToolStripRenderer(new DarkToolStripColorTable());
-
-        // Global override — every ToolStrip that opts into ManagerRenderMode uses this.
-        ToolStripManager.Renderer = renderer;
-        ToolStripManager.VisualStylesEnabled = false;
+        ToolStripTheme.Apply();
 
         buttonToolStrip.RenderMode = ToolStripRenderMode.ManagerRenderMode;
         externalToolsToolStrip.RenderMode = ToolStripRenderMode.ManagerRenderMode;
@@ -2813,121 +2807,5 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         public Icon OwnedIcon { get; set; }
 
         #endregion
-    }
-
-    /// <summary>
-    /// ToolStripProfessionalRenderer subclass that inverts icon colours at paint time.
-    /// All icons on the main ToolStrip family are light-mode PNGs with dark strokes —
-    /// painting them as-is on a dark ToolStrip background renders them invisible.
-    /// This renderer applies a ColorMatrix in OnRenderItemImage so glyphs go from
-    /// near-black → near-white during paint, regardless of how or when each item's
-    /// Image property was assigned.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    private sealed class DarkToolStripRenderer : ToolStripProfessionalRenderer
-    {
-        // Invert RGB channels (black↔white) while preserving alpha.
-        private static readonly System.Drawing.Imaging.ColorMatrix _invertMatrix = new(
-        [
-            [ -1f,  0f,  0f, 0f, 0f ],
-            [  0f, -1f,  0f, 0f, 0f ],
-            [  0f,  0f, -1f, 0f, 0f ],
-            [  0f,  0f,  0f, 1f, 0f ],
-            [  1f,  1f,  1f, 0f, 1f ],
-        ]);
-
-        private static readonly System.Drawing.Imaging.ImageAttributes _imageAttrs = new();
-
-        static DarkToolStripRenderer ()
-        {
-            _imageAttrs.SetColorMatrix(_invertMatrix);
-        }
-
-        public DarkToolStripRenderer (ProfessionalColorTable colorTable) : base(colorTable)
-        {
-        }
-
-        protected override void OnRenderItemImage (ToolStripItemImageRenderEventArgs e)
-        {
-            if (e.Image == null)
-            {
-                return;
-            }
-
-            // Original icons are light-mode PNGs with dark strokes on transparent background.
-            // Invert RGB channels so glyphs become light-on-transparent against the dark bar,
-            // while preserving alpha (so transparency stays clean — no opaque white halo).
-            e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-            e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-            e.Graphics.DrawImage(e.Image, e.ImageRectangle, 0, 0, e.Image.Width, e.Image.Height, GraphicsUnit.Pixel, _imageAttrs);
-        }
-
-        // Force text to use a light foreground so it stays readable on the dark background.
-        protected override void OnRenderItemText (ToolStripItemTextRenderEventArgs e)
-        {
-            var tc = e.TextColor;
-            if (tc.GetBrightness() <= 0.5f)
-            {
-                tc = e.Item.Enabled ? Color.FromArgb(220, 220, 220) : Color.FromArgb(140, 140, 140);
-            }
-
-            var rect = e.TextRectangle;
-            TextRenderer.DrawText(e.Graphics, e.Text, e.TextFont, rect, tc, e.TextFormat);
-        }
-    }
-
-    /// <summary>
-    /// Minimal dark palette for ToolStripProfessionalRenderer. WinForms does not switch the
-    /// default ProfessionalColorTable to dark under Application.SetColorMode(Dark), so we
-    /// override the essential surface/accent colors here.
-    /// </summary>
-    private sealed class DarkToolStripColorTable : ProfessionalColorTable
-    {
-        private static readonly Color _bg = Color.FromArgb(37, 37, 38);    // Visual Studio dark
-        private static readonly Color _border = Color.FromArgb(70, 70, 70);
-        private static readonly Color _hover = Color.FromArgb(62, 62, 66);
-        private static readonly Color _press = Color.FromArgb(0, 122, 204);   // VS blue accent
-        private static readonly Color _menuBorder = Color.FromArgb(100, 100, 100);
-        private static readonly Color _sep = Color.FromArgb(80, 80, 80);
-
-        public override Color ToolStripPanelGradientBegin => _bg;
-        public override Color ToolStripPanelGradientEnd => _bg;
-        public override Color ToolStripBorder => _border;
-        public override Color ToolStripDropDownBackground => _bg;
-
-        public override Color MenuItemSelected => _hover;
-        public override Color MenuItemSelectedGradientBegin => _hover;
-        public override Color MenuItemSelectedGradientEnd => _hover;
-        public override Color MenuItemPressedGradientBegin => _press;
-        public override Color MenuItemPressedGradientEnd => _press;
-        public override Color MenuBorder => _menuBorder;
-        public override Color MenuItemBorder => _menuBorder;
-
-        public override Color SeparatorDark => _sep;
-        public override Color SeparatorLight => _border;
-
-        public override Color ImageMarginGradientBegin => _bg;
-        public override Color ImageMarginGradientMiddle => _bg;
-        public override Color ImageMarginGradientEnd => _bg;
-        public override Color ImageMarginRevealedGradientBegin => _hover;
-        public override Color ImageMarginRevealedGradientMiddle => _hover;
-        public override Color ImageMarginRevealedGradientEnd => _hover;
-
-        public override Color ButtonSelectedBorder => _border;
-        public override Color ButtonSelectedGradientBegin => _hover;
-        public override Color ButtonSelectedGradientMiddle => _hover;
-        public override Color ButtonSelectedGradientEnd => _hover;
-        public override Color ButtonPressedBorder => _press;
-        public override Color ButtonPressedGradientBegin => _press;
-        public override Color ButtonPressedGradientMiddle => _press;
-        public override Color ButtonPressedGradientEnd => _press;
-
-        public override Color GripDark => _sep;
-        public override Color GripLight => _border;
-
-        public override Color CheckBackground => _bg;
-        public override Color CheckSelectedBackground => _hover;
-        public override Color CheckPressedBackground => _press;
     }
 }

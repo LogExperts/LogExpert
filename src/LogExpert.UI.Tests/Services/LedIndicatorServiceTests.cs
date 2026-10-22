@@ -451,6 +451,34 @@ public class LedIndicatorServiceTests : IDisposable
         Assert.That(raisedIcon, Is.SameAs(_service.GetIcon(50, new LedState())));
     }
 
+    [TestCase(false, 100)]
+    [TestCase(true, 170)]
+    public void GetInactiveLedColor_FollowsColorMode (bool darkMode, int expectedGray)
+    {
+        var color = LedIndicatorService.GetInactiveLedColor(darkMode);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(color.R, Is.EqualTo(expectedGray));
+            Assert.That(color.G, Is.EqualTo(expectedGray));
+            Assert.That(color.B, Is.EqualTo(expectedGray));
+        });
+    }
+
+    [TestCase(false, 160)]
+    [TestCase(true, 175)]
+    public void GetTailOffLedColor_FollowsColorMode (bool darkMode, int expectedGray)
+    {
+        var color = LedIndicatorService.GetTailOffLedColor(darkMode);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(color.R, Is.EqualTo(expectedGray));
+            Assert.That(color.G, Is.EqualTo(expectedGray));
+            Assert.That(color.B, Is.EqualTo(expectedGray));
+        });
+    }
+
     private static LogWindow CreateLogWindow ()
     {
         var configManagerMock = new Mock<IConfigManager>();
