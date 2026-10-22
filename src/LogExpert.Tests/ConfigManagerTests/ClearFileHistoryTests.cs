@@ -25,9 +25,8 @@ public class ClearFileHistoryTests
     {
         _configManager = Configuration.ConfigManager.Instance;
 
-        // Capture the state of the shared singleton before touching it. Other fixtures in
-        // this assembly rely on ConfigManager.Instance still pointing at the directory that
-        // ConfigDirIsolationSetup prepared for the whole run.
+        // Capture the singleton state before touching it. Other fixtures in this assembly rely on
+        // ConfigManager.Instance still pointing at the directory ConfigDirIsolationSetup prepared.
         _originalIsInitialized = GetPrivateField("_isInitialized") is true;
         _originalSettings = GetPrivateField("_settings");
         _originalConfigDir = _configManager.ConfigDir;
@@ -43,9 +42,9 @@ public class ClearFileHistoryTests
     [TearDown]
     public void TearDown ()
     {
-        // Restore the singleton before removing the directory. While ConfigDir still points
-        // at this test's directory, the next fixture that saves its settings recreates that
-        // directory and writes into it instead of the shared isolation directory.
+        // Restore the singleton before removing the directory. While ConfigDir still points at this
+        // test's directory, the next fixture that saves recreates it and writes there instead of the
+        // shared isolation directory.
         SetPrivateField("_isInitialized", _originalIsInitialized);
         SetPrivateField("_settings", _originalSettings);
         _configManager.ConfigDir = _originalConfigDir;
@@ -94,12 +93,21 @@ public class ClearFileHistoryTests
         Assert.That(saved.FileHistoryList, Is.Empty);
     }
 
+    /// <summary>
+    /// Clearing the recent files list leaves every other history list alone — including the ones the
+    /// settings dialog and the regex test dialog keep for their own inputs.
+    /// </summary>
     [Test]
     public void ClearFileHistory_LeavesOtherHistoryListsUntouched ()
     {
         _configManager.AddToFileHistory(@"C:\logs\one.log");
+        _configManager.Settings.LastOpenFilesList.Add(@"C:\logs\one.log");
         _configManager.Settings.SearchHistoryList.Add("error");
         _configManager.Settings.FilterHistoryList.Add("WARN");
+        _configManager.Settings.FilterRangeHistoryList.Add("10");
+        _configManager.Settings.UriHistoryList.Add("https://example.org/one.log");
+        _configManager.Settings.RegexHistory.ExpressionHistoryList.Add(@"^\d+");
+        _configManager.Settings.RegexHistory.TesttextHistoryList.Add("42");
         _configManager.Settings.ColumnizerHistoryList.Add(new ColumnizerHistoryEntry(@"C:\logs\one.log", "JsonColumnizer"));
 
         _configManager.ClearFileHistory();
@@ -107,8 +115,13 @@ public class ClearFileHistoryTests
         Assert.Multiple(() =>
         {
             Assert.That(_configManager.Settings.FileHistoryList, Is.Empty);
+            Assert.That(_configManager.Settings.LastOpenFilesList, Has.Count.EqualTo(1));
             Assert.That(_configManager.Settings.SearchHistoryList, Has.Count.EqualTo(1));
             Assert.That(_configManager.Settings.FilterHistoryList, Has.Count.EqualTo(1));
+            Assert.That(_configManager.Settings.FilterRangeHistoryList, Has.Count.EqualTo(1));
+            Assert.That(_configManager.Settings.UriHistoryList, Has.Count.EqualTo(1));
+            Assert.That(_configManager.Settings.RegexHistory.ExpressionHistoryList, Has.Count.EqualTo(1));
+            Assert.That(_configManager.Settings.RegexHistory.TesttextHistoryList, Has.Count.EqualTo(1));
             Assert.That(_configManager.Settings.ColumnizerHistoryList, Has.Count.EqualTo(1));
         });
     }
@@ -124,15 +137,21 @@ public class ClearFileHistoryTests
 
     private object? GetPrivateField (string fieldName)
     {
-        return typeof(Configuration.ConfigManager)
-            .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)?
-            .GetValue(_configManager);
+        return Field(fieldName).GetValue(_configManager);
     }
 
     private void SetPrivateField (string fieldName, object? value)
     {
-        typeof(Configuration.ConfigManager)
-            .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)?
-            .SetValue(_configManager, value);
+        Field(fieldName).SetValue(_configManager, value);
+    }
+
+    /// <summary>
+    /// Throws instead of returning null: a renamed field would otherwise make the reset silently do
+    /// nothing and the whole fixture pass against settings it never re-loaded.
+    /// </summary>
+    private static FieldInfo Field (string fieldName)
+    {
+        return typeof(Configuration.ConfigManager).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
+            ?? throw new InvalidOperationException($"ConfigManager.{fieldName} is gone; update this fixture's reset.");
     }
 }

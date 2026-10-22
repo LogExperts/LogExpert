@@ -185,7 +185,10 @@ public interface IConfigManager
     /// <summary>
     /// Removes all entries from the file history list.
     /// </summary>
-    /// <remarks>The settings are saved immediately after the list has been cleared.</remarks>
+    /// <remarks>Only the file history list is cleared — the other history lists (search, filter, filter
+    /// range, URI, regex, columnizer) keep their entries. The settings are saved immediately; because
+    /// the save writes the whole settings file, the flag passed along names the change rather than
+    /// narrowing what is written.</remarks>
     void ClearFileHistory ();
 
     /// <summary>

@@ -14,6 +14,7 @@ namespace LogExpert.UI.Services.MenuToolbarService;
 [SupportedOSPlatform("windows")]
 internal sealed class MenuToolbarController : IMenuToolbarController
 {
+    // Identifies the row for tests and UI automation. The handlers do not look the item up by it.
     private const string CLEAR_HISTORY_ITEM_NAME = "clearFileHistoryToolStripMenuItem";
 
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
@@ -50,6 +51,11 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     // History menu
     private ToolStripMenuItem _lastUsedMenuItem;
+
+    // The "clear recently used files" row of the history dropdown. The click handler tells it apart
+    // from the file entries by this reference; the right-click handler needs no special case, because
+    // only the file entries carry a Tag with a path.
+    private ToolStripMenuItem _clearHistoryItem;
 
     private readonly SynchronizationContext _uiContext;
     private readonly int _uiThreadId = Environment.CurrentManagedThreadId;
@@ -258,9 +264,12 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             return;
         }
 
+        // Copy before the hop: callers hand over the live Settings.FileHistoryList, which can change
+        // while the post is still queued.
         if (Environment.CurrentManagedThreadId != _uiThreadId)
         {
-            _uiContext.Post(_ => PopulateFileHistory(fileHistory), null);
+            var snapshot = fileHistory.ToList();
+            _uiContext.Post(_ => PopulateFileHistory(snapshot), null);
             return;
         }
 
@@ -277,7 +286,8 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
         foreach (var file in history)
         {
-            _ = strip.Items.Add(new ToolStripMenuItem(file));
+            // The path lives in Tag, so the handlers never have to treat the displayed text as data.
+            _ = strip.Items.Add(new ToolStripMenuItem(file) { Tag = file });
         }
 
         if (history.Count > 0)
@@ -285,11 +295,13 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             _ = strip.Items.Add(new ToolStripSeparator());
         }
 
-        _ = strip.Items.Add(new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
+        _clearHistoryItem = new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
         {
             Name = CLEAR_HISTORY_ITEM_NAME,
             Enabled = history.Count > 0
-        });
+        };
+
+        _ = strip.Items.Add(_clearHistoryItem);
 
         strip.ItemClicked += OnHistoryMenuItemClicked;
         strip.MouseUp += OnHistoryStripMouseUp;
@@ -318,22 +330,26 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     private void OnHistoryMenuItemClicked (object sender, ToolStripItemClickedEventArgs e)
     {
-        if (e.ClickedItem?.Name == CLEAR_HISTORY_ITEM_NAME)
+        if (ReferenceEquals(e.ClickedItem, _clearHistoryItem))
         {
             HistoryClearRequested?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        var fileName = e.ClickedItem?.Text;
-        if (!string.IsNullOrEmpty(fileName))
+        if (e.ClickedItem?.Tag is string fileName && !string.IsNullOrEmpty(fileName))
         {
             HistoryItemClicked?.Invoke(this, new HistoryItemClickedEventArgs(fileName));
         }
     }
 
+    /// <summary>
+    /// Right-click on a file entry removes that file from the history.
+    /// </summary>
+    /// <remarks>Separators and the clear row carry no file path, so they never reach the remove path.
+    /// Pre-existing: <see cref="ToolStripDropDown"/>'s <c>OnMouseUp</c> override does not call the base
+    /// implementation, so the dropdown never raises this event. Behavior is unchanged here.</remarks>
     private void OnHistoryStripMouseUp (object sender, MouseEventArgs e)
     {
-        // Right-click to remove from history (preserves existing LogTabWindow behavior)
         if (e.Button != MouseButtons.Right)
         {
             return;
@@ -341,10 +357,9 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
         if (sender is ToolStripDropDownMenu strip)
         {
-            var item = strip.GetItemAt(e.Location);
-            if (item != null && item.Name != CLEAR_HISTORY_ITEM_NAME && !string.IsNullOrEmpty(item.Text))
+            if (strip.GetItemAt(e.Location)?.Tag is string fileName && !string.IsNullOrEmpty(fileName))
             {
-                HistoryItemRemoveRequested?.Invoke(this, new HistoryItemClickedEventArgs(item.Text));
+                HistoryItemRemoveRequested?.Invoke(this, new HistoryItemClickedEventArgs(fileName));
             }
         }
     }

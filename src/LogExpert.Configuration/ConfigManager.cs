@@ -329,11 +329,19 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
+    /// <summary>
+    /// Removes every entry from the file history list and persists the result immediately.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
     public void ClearFileHistory ()
     {
-        Instance.Settings.FileHistoryList.Clear();
+        // Held across the save so a concurrent save cannot serialise the list while it is being cleared.
+        lock (_loadSaveLock)
+        {
+            Instance.Settings.FileHistoryList.Clear();
 
-        Save(SettingsFlags.FileHistory);
+            Save(SettingsFlags.FileHistory);
+        }
     }
 
     public void ClearLastOpenFilesList ()
