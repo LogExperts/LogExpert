@@ -2438,6 +2438,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compact mode.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_compactModeToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_compactModeToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Configure....
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_configureToolStripMenuItem {
@@ -2903,6 +2912,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hides the menu, toolbar, tabs and status bar. Leave with ESC.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_compactModeToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_compactModeToolStripMenuItem", resourceCulture);
             }
         }
         

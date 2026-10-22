@@ -21,6 +21,8 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
     private BookmarkWindow? _bookmarkWindow;
     private LogWindow? _connectedLogWindow;
     private bool _firstBookmarkWindowShow = true;
+    private bool _bookmarkWindowHiddenForCompactMode;
+    private DockState _bookmarkWindowDockState = DockState.DockBottom;
     private bool _disposed;
 
     public void Initialize ()
@@ -111,6 +113,41 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         return persistString.Equals(WindowTypes.BookmarkWindow.ToString(), StringComparison.Ordinal)
             ? _bookmarkWindow
             : (IDockContent?)null;
+    }
+
+    [SupportedOSPlatform("windows")]
+    public void HideForCompactMode ()
+    {
+        if (_bookmarkWindow is { Visible: true })
+        {
+            // Remembered before Hide(): the dock state becomes Hidden afterwards.
+            _bookmarkWindowDockState = _bookmarkWindow.DockState;
+            _bookmarkWindowHiddenForCompactMode = true;
+            _bookmarkWindow.Hide();
+        }
+        else
+        {
+            _bookmarkWindowHiddenForCompactMode = false;
+        }
+    }
+
+    [SupportedOSPlatform("windows")]
+    public void RestoreAfterCompactMode (DockPanel dockPanel)
+    {
+        if (!_bookmarkWindowHiddenForCompactMode || _bookmarkWindow == null)
+        {
+            return;
+        }
+
+        _bookmarkWindowHiddenForCompactMode = false;
+
+        // Show(dockPanel) would only activate a hidden content (DockContentHandler.Show), so the
+        // remembered dock state has to be passed explicitly.
+        var state = _bookmarkWindowDockState is DockState.Hidden or DockState.Unknown
+            ? DockState.DockBottom
+            : _bookmarkWindowDockState;
+
+        _bookmarkWindow.Show(dockPanel, state);
     }
 
     public void ApplyPreferences (Font font, bool setLastColumnWidth, int lastColumnWidth, SettingsFlags flags)

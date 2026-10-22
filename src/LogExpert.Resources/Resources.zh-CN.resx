@@ -1070,6 +1070,12 @@
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
     <value>复制到标签页</value>
   </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_compactModeToolStripMenuItem" xml:space="preserve">
+    <value>精简模式</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_compactModeToolStripMenuItem" xml:space="preserve">
+    <value>隐藏菜单栏、工具栏、页签和状态栏。按 ESC 退出。</value>
+  </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
     <value>选项</value>
   </data>

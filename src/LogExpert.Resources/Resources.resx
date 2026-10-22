@@ -1212,6 +1212,12 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
         <value>Copy to Tab</value>
     </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_compactModeToolStripMenuItem" xml:space="preserve">
+        <value>Compact mode</value>
+    </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_compactModeToolStripMenuItem" xml:space="preserve">
+        <value>Hides the menu, toolbar, tabs and status bar. Leave with ESC</value>
+    </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
         <value>Options</value>
     </data>

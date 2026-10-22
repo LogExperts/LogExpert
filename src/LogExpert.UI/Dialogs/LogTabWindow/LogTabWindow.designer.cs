@@ -63,6 +63,8 @@ namespace LogExpert.UI.Controls.LogTabWindow
             timeshiftToolStripTextBox = new ToolStripTextBox();
             ToolStripSeparator4 = new ToolStripSeparator();
             copyMarkedLinesIntoNewTabToolStripMenuItem = new ToolStripMenuItem();
+            compactModeSeparator = new ToolStripSeparator();
+            compactModeToolStripMenuItem = new ToolStripMenuItem();
             optionToolStripMenuItem = new ToolStripMenuItem();
             columnizerToolStripMenuItem = new ToolStripMenuItem();
             hilightingToolStripMenuItem = new ToolStripMenuItem();
@@ -333,7 +335,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // viewNavigateToolStripMenuItem
             // 
-            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem });
+            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem, compactModeSeparator, compactModeToolStripMenuItem });
             viewNavigateToolStripMenuItem.Name = "viewNavigateToolStripMenuItem";
             viewNavigateToolStripMenuItem.Size = new Size(96, 19);
             viewNavigateToolStripMenuItem.Text = "View/Navigate";
@@ -471,6 +473,20 @@ namespace LogExpert.UI.Controls.LogTabWindow
             copyMarkedLinesIntoNewTabToolStripMenuItem.Text = "Copy to Tab";
             copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = "Copies all selected lines into a new tab page";
             copyMarkedLinesIntoNewTabToolStripMenuItem.Click += OnCopyMarkedLinesIntoNewTabToolStripMenuItemClick;
+            // 
+            // compactModeSeparator
+            // 
+            compactModeSeparator.Name = "compactModeSeparator";
+            compactModeSeparator.Size = new Size(174, 6);
+            // 
+            // compactModeToolStripMenuItem
+            // 
+            compactModeToolStripMenuItem.Name = "compactModeToolStripMenuItem";
+            compactModeToolStripMenuItem.ShortcutKeys = Keys.F11;
+            compactModeToolStripMenuItem.Size = new Size(177, 22);
+            compactModeToolStripMenuItem.Text = "Compact mode";
+            compactModeToolStripMenuItem.ToolTipText = "Hides the menu, toolbar, tabs and status bar. Leave with ESC.";
+            compactModeToolStripMenuItem.Click += OnCompactModeToolStripMenuItemClick;
             // 
             // optionToolStripMenuItem
             // 
@@ -1159,6 +1175,8 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private ToolStripSeparator configureToolStripSeparator;
         private ToolStripSeparator ToolStripSeparator11;
         private ToolStripMenuItem pluginTrustManagementToolStripMenuItem;
+        private ToolStripSeparator compactModeSeparator;
+        private ToolStripMenuItem compactModeToolStripMenuItem;
     }
 }
 

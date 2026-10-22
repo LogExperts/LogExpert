@@ -40,6 +40,18 @@ internal interface IToolWindowCoordinator : IDisposable
     void ToggleBookmarkVisibility (DockPanel dockPanel);
 
     /// <summary>
+    /// Hides the BookmarkWindow if it is visible, remembering that it has to come back.
+    /// Used while the log tab window shows only log content.
+    /// </summary>
+    void HideForCompactMode ();
+
+    /// <summary>
+    /// Re-shows the BookmarkWindow that <see cref="HideForCompactMode"/> hid, in the dock state it
+    /// had before.
+    /// </summary>
+    void RestoreAfterCompactMode (DockPanel dockPanel);
+
+    /// <summary>
     /// Returns the appropriate IDockContent for layout deserialization.
     /// Returns the BookmarkWindow if the persist string matches, null otherwise.
     /// </summary>
