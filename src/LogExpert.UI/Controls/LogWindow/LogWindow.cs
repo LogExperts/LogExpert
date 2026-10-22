@@ -2741,6 +2741,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle(darkMode);
         PaintHelper.ApplyGridViewTheme(dataGridView, darkMode);
         PaintHelper.ApplyGridViewTheme(filterGridView, darkMode);
+
+        // Bookmark marker column colors need more saturation against dark backgrounds.
+        if (darkMode)
+        {
+            BookmarkColor = Color.FromArgb(140, 195, 240);     // brighter blue than light-mode #A5C8E1
+            AutoBookmarkColor = Color.FromArgb(150, 215, 150); // brighter green than light-mode #B4D2B4
+        }
     }
 
     [SupportedOSPlatform("windows")]
@@ -6635,7 +6642,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
-                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
+                        using var brush2 = new SolidBrush(PaintHelper.BookmarkMarkerTextColor);
                         using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }

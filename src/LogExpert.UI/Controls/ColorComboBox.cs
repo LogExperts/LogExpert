@@ -67,23 +67,28 @@ internal class ColorComboBox : ComboBox
         e.DrawBackground();
         if (e.Index >= 0)
         {
+            var darkMode = Application.IsDarkModeEnabled;
+            var textBrush = darkMode ? Brushes.White : Brushes.Black;
+            var borderPen = darkMode ? Pens.White : Pens.Black;
+
             Rectangle rectangle = new(4, e.Bounds.Top + 2, 30, e.Bounds.Height - 4);
             var rectColor = (Color)Items[e.Index];
             e.Graphics.FillRectangle(new SolidBrush(rectColor), rectangle);
-            e.Graphics.DrawRectangle(Pens.Black, rectangle);
+            e.Graphics.DrawRectangle(borderPen, rectangle);
 
             if (e.Index == 0)
             {
-                e.Graphics.DrawString(Resources.ColorComboBox_UI_ColorComboBox_Text_Custom, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(Resources.ColorComboBox_UI_ColorComboBox_Text_Custom, e.Font, textBrush, new PointF(42, e.Bounds.Top + 2));
             }
             else
             {
-                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, Brushes.Black, new PointF(42, e.Bounds.Top + 2));
+                e.Graphics.DrawString(((Color)Items[e.Index]).Name, e.Font, textBrush, new PointF(42, e.Bounds.Top + 2));
             }
 
             if (!Enabled)
             {
-                HatchBrush brush = new(HatchStyle.Percent50, Color.LightGray, Color.FromArgb(10, Color.LightGray));
+                var hatchLight = darkMode ? Color.DarkGray : Color.LightGray;
+                HatchBrush brush = new(HatchStyle.Percent50, hatchLight, Color.FromArgb(10, hatchLight));
                 rectangle.Inflate(1, 1);
                 e.Graphics.FillRectangle(brush, rectangle);
                 brush.Dispose();

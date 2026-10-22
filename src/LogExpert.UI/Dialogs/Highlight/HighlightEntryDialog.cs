@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 using ColumnizerLib;
 
@@ -404,7 +405,7 @@ public partial class HighlightEntryDialog : Form
             ? Resources.HighlightEntryEditDialog_UI_Preview_Placeholder
             : text;
 
-        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, Color.Black);
+        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, Application.IsDarkModeEnabled ? Color.White : Color.Black);
 
         _previewLabel.BackColor = _checkBoxNoBackground != null && _checkBoxNoBackground.Checked
             ? SystemColors.Window
