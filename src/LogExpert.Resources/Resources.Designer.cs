@@ -4582,6 +4582,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &amp;Value for "{0}":.
+        /// </summary>
+        public static string ParamRequesterDialog_UI_Label_ValueForParameterNamed {
+            get {
+                return ResourceManager.GetString("ParamRequesterDialog_UI_Label_ValueForParameterNamed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tool parameter.
         /// </summary>
         public static string ParamRequesterDialog_UI_Title {
@@ -6220,6 +6229,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Maximum Display Length (restart required).
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelMaxDisplayLength {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDisplayLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum filter entries displayed.
         /// </summary>
         public static string SettingsDialog_UI_Label_labelMaximumFilterEntriesDisplayed {
@@ -6808,6 +6826,132 @@ namespace LogExpert {
         public static string ToolArgsDialog_UI_Title {
             get {
                 return ResourceManager.GetString("ToolArgsDialog_UI_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a new highlight item (opens the editor dialog).
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnAdd {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy the selected highlight into a new one (opens the editor dialog).
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnCopy {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnCopy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit the selected highlight in the editor dialog.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnEdit {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnEdit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete the current highlight.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnDelete {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the current highlight one position up.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnMoveUp {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnMoveUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the current highlight one position down.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnMoveDown {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnMoveDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export highlight groups.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnExportGroup {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnExportGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import highlight groups.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnImportGroup {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnImportGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the current highlight group one position down.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the current highlight group one position up.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy the current highlight group into a new one.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnCopyGroup {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnCopyGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete the current highlight group.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnDeleteGroup {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnDeleteGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create a new empty highlight group.
+        /// </summary>
+        public static string HighlightDialog_UI_Button_ToolTip_btnNewGroup {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_Button_ToolTip_btnNewGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose a group to create different highlight settings. Type in a name to change the name of a group..
+        /// </summary>
+        public static string HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups {
+            get {
+                return ResourceManager.GetString("HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups", resourceCulture);
             }
         }
     }

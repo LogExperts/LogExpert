@@ -130,10 +130,10 @@
     <value>密钥类型</value>
   </data>
   <data name="ConfigDialog_UI_RadioButton_PuttyKey" xml:space="preserve">
-    <value>Putty 私钥</value>
+    <value>PuTTY 私钥</value>
   </data>
   <data name="ConfigDialog_UI_RadioButton_SSHKey" xml:space="preserve">
-    <value>Open SSH 私钥</value>
+    <value>OpenSSH 私钥</value>
   </data>
   <data name="ConfigDialog_UI_Label_KeyInfo" xml:space="preserve">
     <value>密钥将在首次使用时加载。届时将要求输入密码。</value>

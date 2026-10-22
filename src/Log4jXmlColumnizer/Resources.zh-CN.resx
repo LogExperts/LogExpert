@@ -145,4 +145,7 @@
   <data name="Log4jXmlColumnizer_UI_Title_Deserialize" xml:space="preserve">
     <value>反序列化</value>
   </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_ToolTipMaxLen" xml:space="preserve">
+    <value>最多显示的字符数（从左侧截断）</value>
+  </data>
 </root>
