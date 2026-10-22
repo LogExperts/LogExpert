@@ -152,6 +152,9 @@
   <data name="Bookmark_added" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
+        <value>Maximum Display Length (restart required)</value>
+    </data>
   <data name="bookmark_bubbles" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\bookmark_bubbles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -2385,5 +2388,50 @@ Restart LogExpert to apply changes?</value>
   </data>
   <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
     <value>Hide rules could not be applied, all lines are shown: {0}</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameterNamed" xml:space="preserve">
+    <value>&amp;Value for "{0}":</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnAdd" xml:space="preserve">
+    <value>Create a new highlight item (opens the editor dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopy" xml:space="preserve">
+    <value>Copy the selected highlight into a new one (opens the editor dialog)</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnEdit" xml:space="preserve">
+    <value>Edit the selected highlight in the editor dialog</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDelete" xml:space="preserve">
+    <value>Delete the current highlight</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveUp" xml:space="preserve">
+    <value>Move the current highlight one position up</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveDown" xml:space="preserve">
+    <value>Move the current highlight one position down</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnExportGroup" xml:space="preserve">
+    <value>Export highlight groups</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnImportGroup" xml:space="preserve">
+    <value>Import highlight groups</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown" xml:space="preserve">
+    <value>Move the current highlight group one position down</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp" xml:space="preserve">
+    <value>Move the current highlight group one position up</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopyGroup" xml:space="preserve">
+    <value>Copy the current highlight group into a new one</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDeleteGroup" xml:space="preserve">
+    <value>Delete the current highlight group</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnNewGroup" xml:space="preserve">
+    <value>Create a new empty highlight group</value>
+  </data>
+  <data name="HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups" xml:space="preserve">
+    <value>Choose a group to create different highlight settings. Type in a name to change the name of a group.</value>
   </data>
 </root>

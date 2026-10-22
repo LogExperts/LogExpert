@@ -128,7 +128,7 @@
     <value>未找到配置文件</value>
   </data>
   <data name="Program_UI_Error_InsufficientRights" xml:space="preserve">
-    <value>LogExpert 权限不足。可能您是从网络驱动器启动的。请从本地驱动器启动 LogExpert。
+    <value>LogExpert 系统权限不足。可能您是从网络驱动器启动的。请从本地驱动器启动 LogExpert。
 		({0})</value>
   </data>
   <data name="LogExpert_Common_UI_Title_Error" xml:space="preserve">
@@ -142,7 +142,7 @@
     <value>设置已导入</value>
   </data>
   <data name="HighlightDialog_UI_SettingsCouldNotBeImported" xml:space="preserve">
-    <value>设置无法导入: {0}</value>
+    <value>设置无法导入：{0}</value>
   </data>
   <data name="HighlightDialog_UI_Title_ExportSettings" xml:space="preserve">
     <value>导出设置到文件</value>
@@ -215,13 +215,13 @@
     <value>正在加载 {0}</value>
   </data>
   <data name="Logger_Error_In_Function" xml:space="preserve">
-    <value>{0} 中的错误: {1}</value>
+    <value>{0} 中的错误：{1}</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_TimeDiff" xml:space="preserve">
     <value>时间差为 {0}</value>
   </data>
   <data name="LogWindow_UI_StatusLineError_NotFound" xml:space="preserve">
-    <value>未找到: {0}</value>
+    <value>未找到：{0}</value>
   </data>
   <data name="LogWindow_UI_StatusLineError_StartedFromBeginningOfFile" xml:space="preserve">
     <value>从文件开头开始</value>
@@ -236,7 +236,7 @@
     <value>书签中包含一些注释。真的要移除书签吗?</value>
   </data>
   <data name="LogWindow_UI_ErrorWhileImportingBookmarkList" xml:space="preserve">
-    <value>导入书签列表时出错: {0}</value>
+    <value>导入书签列表时出错：{0}</value>
   </data>
   <data name="LogWindow_UI_Title_ImportBookmarkList" xml:space="preserve">
     <value>选择用于加载书签的文件</value>
@@ -245,7 +245,7 @@
     <value>CSV 文件 (*.csv)|*.csv|书签文件 (*.bmk)|*.bmk</value>
   </data>
   <data name="LogWindow_UI_ErrorWhileExportingBookmarkList" xml:space="preserve">
-    <value>导出书签列表时出错: {0}</value>
+    <value>导出书签列表时出错：{0}</value>
   </data>
   <data name="LogWindow_UI_Title_ExportBookMarkList" xml:space="preserve">
     <value>选择用于保存书签的文件</value>
@@ -263,10 +263,10 @@
     <value>截断文件时出现意外问题</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_TruncateFailedFileIsLockedByName" xml:space="preserve">
-    <value>截断失败: 文件被 {0} 锁定</value>
+    <value>截断失败：文件被 {0} 锁定</value>
   </data>
   <data name="LogWindow_UI_SavePersistenceData_ErrorWhileSaving" xml:space="preserve">
-    <value>保存持久化数据时出现意外错误: {0}</value>
+    <value>保存持久化数据时出现意外错误：{0}</value>
   </data>
   <data name="LogWindow_UI_LoadFile_CannotLoadFile" xml:space="preserve">
     <value>无法加载文件
@@ -285,18 +285,18 @@
     <value>显示高级选项...</value>
   </data>
   <data name="LogWindow_UI_Error_ClearFilterList_WhileClearingFilterList" xml:space="preserve">
-    <value>清除筛选列表时出错: {0}</value>
+    <value>清除筛选列表时出错：{0}</value>
   </data>
   <data name="LogWindow_UI_SelectLine_SearchResultNotFound" xml:space="preserve">
     <value>未找到搜索结果</value>
   </data>
   <data name="LogWindow_UI_Filter_ExceptionWhileFiltering" xml:space="preserve">
-    <value>"筛选时发生异常。请向开发者报告:
+    <value>筛选时发生异常。请向开发者报告：
 {0}
 {1}</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_Filter_FilterDurationMs" xml:space="preserve">
-    <value>筛选耗时: {0} 毫秒。</value>
+    <value>筛选耗时：{0} 毫秒。</value>
   </data>
   <data name="LogWindow_UI_StatusLineText_FilterSearch_Filtering" xml:space="preserve">
     <value>正在筛选... 按 ESC 取消。</value>
@@ -308,7 +308,7 @@
     <value>选择要滚动到的列</value>
   </data>
   <data name="LogWindow_UI_Label_ColumnName" xml:space="preserve">
-    <value>列名:</value>
+    <value>列名：</value>
   </data>
   <data name="LogWindow_UI_ToolStripMenuItem_CopyToClipboard" xml:space="preserve">
     <value>复制到剪贴板</value>
@@ -580,6 +580,12 @@
   <data name="LogTabWindow_OnThrowTestExceptionGUIThread_ThisIsATestExceptionThrownByTheGUIThread" xml:space="preserve">
     <value>这是由 GUI 线程抛出的测试异常</value>
   </data>
+  <data name="SettingsDialog_UI_GroupBox_groupBoxColumnizerPriority" xml:space="preserve">
+    <value>列分隔器选择优先级</value>
+  </data>
+  <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
+    <value>最大显示长度（需重启）</value>
+  </data>
   <data name="SettingsDialog_UI_Label_labelWarningMaximumLineLength" xml:space="preserve">
     <value>! 更改最大行长度可能会影响性能，不建议这样做 !</value>
   </data>
@@ -785,7 +791,7 @@
     <value>如果列分隔器支持，则显示时间戳控件</value>
   </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxSysout" xml:space="preserve">
-    <value>将标准输出通过管道传输到标签页</value>
+    <value>标准输出管道导入标签页</value>
   </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxAutoPick" xml:space="preserve">
     <value>对新文件自动选择</value>
@@ -807,6 +813,15 @@
   </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxMultiThread" xml:space="preserve">
     <value>多线程筛选</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityHistoryThenMask" xml:space="preserve">
+    <value>先用历史，再用掩码（默认）</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskOverridesPersistence" xml:space="preserve">
+    <value>用掩码，覆盖按文件的持久化</value>
+  </data>
+  <data name="SettingsDialog_UI_RadioButton_radioColumnizerPriorityMaskThenHistory" xml:space="preserve">
+    <value>先用掩码，再用历史</value>
   </data>
   <data name="SettingsDialog_UI_TabPage_tabPageViewSettings" xml:space="preserve">
     <value>视图设置</value>
@@ -1392,7 +1407,7 @@
     <value>搜索</value>
   </data>
   <data name="SearchDialog_UI_Error_CreatingSearchParameter" xml:space="preserve">
-    <value>"创建搜索参数时出错
+    <value>创建搜索参数时出错
 		{0}</value>
   </data>
   <data name="SearchDialog_UI_Error_SearchTextEmpty" xml:space="preserve">
@@ -2199,7 +2214,7 @@ YY[YY] = 年
     <value>下一页</value>
   </data>
   <data name="FolderDrop_Page" xml:space="preserve">
-    <value>显示第 {0:N0}–{1:N0} 个，共 {2:N0} 个匹配文件</value>
+    <value>第 {0:N0}–{1:N0} 个，共 {2:N0} 个匹配</value>
   </data>
   <data name="SettingsDialog_UI_TabPage_tabPageMarkerBar" xml:space="preserve">
     <value>标记栏</value>
@@ -2217,7 +2232,7 @@ YY[YY] = 年
     <value>显示搜索匹配标记</value>
   </data>
   <data name="SettingsDialog_UI_CheckBox_checkBoxShowFilterMarkers" xml:space="preserve">
-    <value>显示过滤匹配标记</value>
+    <value>显示筛选标记</value>
   </data>
   <data name="Columnizer_SnapshotUnavailable" xml:space="preserve">
     <value>无法为列分隔器 &apos;{0}&apos; 创建解析状态快照。</value>
@@ -2235,7 +2250,7 @@ YY[YY] = 年
     <value>搜索匹配</value>
   </data>
   <data name="MarkerBar_FilterHits" xml:space="preserve">
-    <value>过滤匹配</value>
+    <value>筛选命中</value>
   </data>
   <data name="MarkerBar_ClearSearch" xml:space="preserve">
     <value>清除搜索</value>
@@ -2263,5 +2278,82 @@ YY[YY] = 年
   </data>
   <data name="LogWindow_UI_StatusLineError_HideRulesFailed" xml:space="preserve">
     <value>无法应用隐藏规则，显示所有行：{0}</value>
+  </data>
+  <data name="HighlightDialog_UI_SelectionHighlight" xml:space="preserve">
+    <value>选区高亮（所有分组）</value>
+  </data>
+  <data name="HighlightDialog_UI_OutlineSelectedBlocks" xml:space="preserve">
+    <value>为选中的块绘制边框</value>
+  </data>
+  <data name="HighlightDialog_UI_ChangeSelectionColor" xml:space="preserve">
+    <value>更改选区高亮颜色...</value>
+  </data>
+  <data name="HighlightDialog_UI_ResetSelectionColor" xml:space="preserve">
+    <value>使用系统颜色</value>
+  </data>
+  <data name="LogWindow_UI_TimeSync_TimestampControlHint" xml:space="preserve">
+    <value>文件现已按时间同步。
+
+若要在选择行时（鼠标点击或方向键）让其他窗口跟随同步，请在“设置 &gt; 时间戳功能”中启用“显示时间戳控件”。否则，只有“将所有标签页滚动到当前时间戳”会移动其他窗口。</value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsBackColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_Button_buttonControlCharsForeColor" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType" xml:space="preserve">
+    <value>Glob 使用 * 和 ? 通配符。Regex 使用 .NET 正则表达式语法。</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale" xml:space="preserve">
+    <value>列分隔器“{0}”未安装——该条目将被跳过。</value>
+  </data>
+  <data name="ParamRequesterDialog_UI_Label_ValueForParameterNamed" xml:space="preserve">
+    <value>参数“{0}”的值：</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnAdd" xml:space="preserve">
+    <value>新建高亮条目（打开编辑对话框）</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopy" xml:space="preserve">
+    <value>将所选高亮复制为新条目（打开编辑对话框）</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnEdit" xml:space="preserve">
+    <value>在编辑对话框中编辑所选高亮</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDelete" xml:space="preserve">
+    <value>删除当前高亮</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveUp" xml:space="preserve">
+    <value>将当前高亮上移一位</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveDown" xml:space="preserve">
+    <value>将当前高亮下移一位</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnExportGroup" xml:space="preserve">
+    <value>导出高亮分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnImportGroup" xml:space="preserve">
+    <value>导入高亮分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupDown" xml:space="preserve">
+    <value>将当前高亮分组下移一位</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnMoveGroupUp" xml:space="preserve">
+    <value>将当前高亮分组上移一位</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnCopyGroup" xml:space="preserve">
+    <value>将当前高亮分组复制为新分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnDeleteGroup" xml:space="preserve">
+    <value>删除当前高亮分组</value>
+  </data>
+  <data name="HighlightDialog_UI_Button_ToolTip_btnNewGroup" xml:space="preserve">
+    <value>新建空高亮分组</value>
+  </data>
+  <data name="HighlightDialog_UI_ComboBox_ToolTip_comboBoxGroups" xml:space="preserve">
+    <value>选择分组以使用不同的高亮设置；输入名称可修改分组名称。</value>
   </data>
 </root>
