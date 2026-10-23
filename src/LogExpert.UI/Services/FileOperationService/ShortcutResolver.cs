@@ -1,7 +1,13 @@
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Versioning;
+using System.Text;
 
 using NLog;
+
+using IShellLinkW = Vanara.PInvoke.Shell32.IShellLinkW;
+using CShellLinkW = Vanara.PInvoke.Shell32.CShellLinkW;
+using SLGP = Vanara.PInvoke.Shell32.SLGP;
 
 namespace LogExpert.UI.Services.FileOperationService;
 
@@ -10,14 +16,15 @@ namespace LogExpert.UI.Services.FileOperationService;
 /// </summary>
 /// <remarks>
 /// <para>
-/// Resolution goes through the shell's own <c>IShellLink</c> implementation instead of parsing the
-/// MS-SHLLINK format by hand. This class lives in the UI assembly, which is
-/// <c>net10.0-windows</c>, so the COM dependency is safe here.
+/// Resolution goes through the shell's own <c>IShellLink</c> implementation (Vanara's
+/// <see cref="IShellLinkW"/>) instead of parsing the MS-SHLLINK format by hand. This class lives in
+/// the UI assembly, which is <c>net10.0-windows</c>, so the COM dependency is safe here.
 /// </para>
 /// <para>
 /// Anything that is not a <c>.lnk</c>, does not exist, is implausibly large, cannot be resolved, or
 /// points off the local machine is returned unchanged: such a shortcut opens as a regular file,
-/// exactly as before.
+/// exactly as before. Resolution is one hop: a target that is itself a shortcut is returned as-is
+/// and resolved by the next caller.
 /// </para>
 /// </remarks>
 [SupportedOSPlatform("windows")]
@@ -27,20 +34,19 @@ internal static class ShortcutResolver
 
     private const string SHORTCUT_EXTENSION = ".lnk";
 
-    /// <summary>Buffer size for <c>IShellLinkW::GetPath</c>, following the shell's own MAX_PATH.</summary>
-    private const int TARGET_PATH_CAPACITY = 260;
+    /// <summary>
+    /// Buffer size for <c>IShellLinkW::GetPath</c>, above MAX_PATH so long-path targets are not truncated.
+    /// </summary>
+    private const int TARGET_PATH_CAPACITY = 1024;
 
     /// <summary>
     /// Real shortcuts are a few KB. Anything larger is not one, and handing it to the shell parser
     /// whole would let a dropped file spike memory.
     /// </summary>
-    private const int MAX_SHORTCUT_SIZE = 1024 * 1024;
-
-    /// <summary><c>SLGP_RAWPATH</c>: retrieve the stored target path without resolving it against the current shell state.</summary>
-    private const uint SLGP_RAWPATH = 0x00000004;
+    internal const int MAX_SHORTCUT_SIZE = 1024 * 1024;
 
     /// <summary><c>STGM_READ</c>: open the shortcut file read-only.</summary>
-    private const uint STGM_READ = 0x00000000;
+    private const int STGM_READ = 0;
 
     #endregion
 
@@ -53,7 +59,7 @@ internal static class ShortcutResolver
     #region Public methods
 
     /// <summary>
-    /// Resolves <paramref name="fileName"/> to the file a shortcut points at.
+    /// Resolves <paramref name="fileName"/> to the file a shortcut points at (one hop).
     /// </summary>
     /// <param name="fileName">A path that may or may not be a shortcut.</param>
     /// <returns>
@@ -76,11 +82,11 @@ internal static class ShortcutResolver
                 return fileName;
             }
 
-            IShellLink shellLink = (IShellLink)new ShellLinkClass();
+            IShellLinkW shellLink = (IShellLinkW)new CShellLinkW();
             ((IPersistFile)shellLink).Load(fileName, STGM_READ);
 
-            var buffer = new System.Text.StringBuilder(TARGET_PATH_CAPACITY);
-            shellLink.GetPath(buffer, buffer.Capacity, IntPtr.Zero, SLGP_RAWPATH);
+            var buffer = new StringBuilder(TARGET_PATH_CAPACITY);
+            shellLink.GetPath(buffer, buffer.Capacity, out _, SLGP.SLGP_RAWPATH);
 
             var target = buffer.ToString();
             if (target.Length == 0)
@@ -89,25 +95,29 @@ internal static class ShortcutResolver
                 return fileName;
             }
 
-            // A UNC target would make File.Exists authenticate against the remote host, handing it
-            // the user's NetNTLM hash, and device paths (\\.\, \\?\) can block. Such a shortcut
-            // opens as a regular file instead.
-            if (target.StartsWith(@"\\", StringComparison.Ordinal))
+            // A relative target sits next to the shortcut, not in the current working directory.
+            var shortcutDirectory = Path.GetDirectoryName(Path.GetFullPath(fileName))!;
+
+            // The target string comes straight from the .lnk bytes, so it can be a UNC or device
+            // path in disguise (//host/share, \\?\UNC\...). Only a plain local drive path is
+            // followed, because probing anything else would authenticate against a remote host,
+            // handing it the user's NetNTLM hash.
+            var fullTarget = SanitizeLocalTarget(target, shortcutDirectory);
+            if (fullTarget is null)
             {
-                _logger.Debug("Shortcut target {Target} is not a local path, keeping {Shortcut}", target, fileName);
+                _logger.Debug("Shortcut target {Target} is not a local drive path, keeping {Shortcut}", target, fileName);
                 return fileName;
             }
 
-            if (!File.Exists(target))
+            if (!File.Exists(fullTarget))
             {
                 _logger.Debug("Shortcut target {Target} does not exist, keeping {Shortcut}", target, fileName);
                 return fileName;
             }
 
-            return target;
+            return fullTarget;
         }
-        catch (Exception ex) when (ex is COMException
-                                       or ExternalException
+        catch (Exception ex) when (ex is ExternalException
                                        or IOException
                                        or UnauthorizedAccessException
                                        or ArgumentException
@@ -120,41 +130,34 @@ internal static class ShortcutResolver
 
     #endregion
 
-    #region COM declarations
-
-    /// <summary>The shell link CoClass (<c>CLSID_ShellLink</c>).</summary>
-    [ComImport]
-    [Guid("00021401-0000-0000-C000-000000000046")]
-    private class ShellLinkClass
-    {
-    }
+    #region Internal methods
 
     /// <summary>
-    /// <c>IShellLinkW</c>, declared with only its first method (<c>GetPath</c>). The interface's
-    /// remaining methods are never called, so they are left out.
+    /// Turns a raw shortcut target into the full path to follow — but only when it lands on a
+    /// plain local drive (<c>X:\</c>). Environment variables are expanded and relative targets are
+    /// resolved against the shortcut's directory; anything else (UNC, device paths like
+    /// <c>\\?\</c> or <c>\\.\</c>, malformed strings) yields <see langword="null"/>, because
+    /// probing such a path would authenticate against a remote host and leak the user's NetNTLM
+    /// hash. Pure string handling: no file system access.
     /// </summary>
-    [ComImport]
-    [Guid("000214F9-0000-0000-C000-000000000046")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    private interface IShellLink
+    /// <param name="target">The raw target string from the .lnk.</param>
+    /// <param name="shortcutDirectory">Directory the shortcut lives in; the base for relative targets.</param>
+    internal static string? SanitizeLocalTarget (string target, string shortcutDirectory)
     {
-        void GetPath ([MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pszFile, int cchMaxPath, IntPtr pFindData, uint fFlags);
-    }
+        try
+        {
+            var expanded = Environment.ExpandEnvironmentVariables(target);
+            var fullTarget = Path.GetFullPath(expanded, shortcutDirectory);
 
-    /// <summary><c>IPersistFile</c>, used to load the shortcut file into the shell link object.</summary>
-    [ComImport]
-    [Guid("0000010B-0000-0000-C000-000000000046")]
-    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    private interface IPersistFile
-    {
-        // From IPersist, which IPersistFile extends.
-        void GetClassID (out Guid pClassID);
-
-        // IsDirty precedes Load in the vtable and has to be declared to keep the slot order.
-        [PreserveSig]
-        int IsDirty ();
-
-        void Load ([MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
+            var root = Path.GetPathRoot(fullTarget);
+            return root is not null && root.Length == 3 && root[1] == ':' ? fullTarget : null;
+        }
+        catch (Exception ex) when (ex is ArgumentException
+                                       or IOException
+                                       or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     #endregion

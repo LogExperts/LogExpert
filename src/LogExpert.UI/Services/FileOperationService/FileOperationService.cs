@@ -68,9 +68,6 @@ internal sealed class FileOperationService (
 
     public LogWindow AddFileTab (FileTabRequest request)
     {
-        // A shortcut resolves to its target here, so everything downstream — settings file
-        // indirection, .lxp handling, title, history — works on the target file. The request is
-        // only replaced when the name actually changed, keeping the caller's instance otherwise.
         var resolvedFile = ShortcutResolver.Resolve(request.FileName);
         if (!string.Equals(resolvedFile, request.FileName, StringComparison.Ordinal))
         {
@@ -213,7 +210,6 @@ internal sealed class FileOperationService (
             return null;
         }
 
-        // Resolve shortcuts first: a .lnk to a session file must not end up as a raw log line.
         fileNames = fileNames.Select(ShortcutResolver.Resolve).ToArray();
 
         // Session files (.lxj) aren't logs — dispatch them to the project loader and
@@ -278,20 +274,23 @@ internal sealed class FileOperationService (
     }
     public MultiFileDecision LoadFilesWithOption (string[] fileNames, bool invertLogic)
     {
+        // Resolve before sorting so multi-file order follows the targets, not the shortcut names.
+        for (var i = 0; i < fileNames.Length; i++)
+        {
+            fileNames[i] = ShortcutResolver.Resolve(fileNames[i]);
+        }
+
         Array.Sort(fileNames, StringComparer.OrdinalIgnoreCase);
 
         if (fileNames.Length == 1)
         {
-            // Resolve first: a shortcut to a session file must not be opened as a raw log.
-            var fileName = ShortcutResolver.Resolve(fileNames[0]);
-
-            if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+            var logFile = ResolveLogFile(fileNames[0], true);
+            if (logFile == null)
             {
-                _loadSessionCallback(fileName, true);
                 return MultiFileDecision.Cancel; // Already handled
             }
 
-            _ = AddFileTab(new FileTabRequest { FileName = fileName });
+            _ = AddFileTab(new FileTabRequest { FileName = logFile });
             return MultiFileDecision.SingleFiles;
         }
 
@@ -325,23 +324,36 @@ internal sealed class FileOperationService (
         {
             try
             {
-                // Resolve first: a shortcut to a session file must not be opened as a raw log.
-                var resolved = ShortcutResolver.Resolve(fileName);
+                var logFile = ResolveLogFile(fileName, false);
+                if (logFile == null)
+                {
+                    continue;
+                }
 
-                if (resolved.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
-                {
-                    _loadSessionCallback(resolved, false);
-                }
-                else
-                {
-                    _ = AddFileTab(new FileTabRequest { FileName = resolved, TargetLine = targetLine });
-                }
+                _ = AddFileTab(new FileTabRequest { FileName = logFile, TargetLine = targetLine });
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or LogFileException)
             {
                 _logger.Warn(ex, "Could not open selected file: {0}", fileName);
             }
         }
+    }
+
+    /// <summary>
+    /// Resolves a possible shortcut and dispatches a resolved session file (<c>.lxj</c>) to the
+    /// session loader. Returns the name to open as a log, or <see langword="null"/> when the file
+    /// was a session and has been handled.
+    /// </summary>
+    private string? ResolveLogFile (string fileName, bool asFirstFile)
+    {
+        var resolved = ShortcutResolver.Resolve(fileName);
+        if (resolved.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+        {
+            _loadSessionCallback(resolved, asFirstFile);
+            return null;
+        }
+
+        return resolved;
     }
 
     public LogWindow? PasteFromClipboard ()

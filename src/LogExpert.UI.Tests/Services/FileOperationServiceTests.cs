@@ -709,7 +709,7 @@ internal class FileOperationServiceTests : IDisposable
             File.WriteAllText(log, "line1");
 
             var shortcut = Path.Join(directory, "actual.lnk");
-            CreateShortcut(shortcut, log);
+            TestShortcuts.Create(shortcut, log);
 
             _sut.AddFileTab(new FileTabRequest { FileName = shortcut });
 
@@ -1303,24 +1303,9 @@ internal class FileOperationServiceTests : IDisposable
         File.WriteAllText(session, "<Project></Project>");
 
         var shortcut = Path.Join(directory, "session.lnk");
-        CreateShortcut(shortcut, session);
+        TestShortcuts.Create(shortcut, session);
 
         return (directory, shortcut, session);
-    }
-
-    /// <summary>
-    /// Creates a real shortcut through the shell's WScript.Shell automation object, so the tests
-    /// exercise the same files Explorer writes.
-    /// </summary>
-    private static void CreateShortcut (string shortcutPath, string targetPath)
-    {
-        var shellType = Type.GetTypeFromProgID("WScript.Shell");
-        Assert.That(shellType, Is.Not.Null, "WScript.Shell should be available on Windows test machines");
-
-        dynamic shell = Activator.CreateInstance(shellType)!;
-        dynamic shortcut = shell.CreateShortcut(shortcutPath);
-        shortcut.TargetPath = targetPath;
-        shortcut.Save();
     }
 
     /// <summary>
