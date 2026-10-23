@@ -404,11 +404,14 @@ public partial class HighlightEntryDialog : Form
             ? Resources.HighlightEntryEditDialog_UI_Preview_Placeholder
             : text;
 
-        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, Color.Black);
+        var darkMode = Application.IsDarkModeEnabled;
 
+        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, darkMode ? Color.FromArgb(220, 220, 220) : Color.Black);
+
+        var defaultBackColor = darkMode ? Color.FromArgb(32, 32, 32) : SystemColors.Window;
         _previewLabel.BackColor = _checkBoxNoBackground != null && _checkBoxNoBackground.Checked
-            ? SystemColors.Window
-            : GetSelectedColor(_colorBoxBackground, SystemColors.Window);
+            ? defaultBackColor
+            : GetSelectedColor(_colorBoxBackground, defaultBackColor);
 
         var bold = _checkBoxBold != null && _checkBoxBold.Checked;
         var baseFont = Font;

@@ -93,6 +93,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         InitializeComponent();
 
         ConfigureDockPanel();
+        ApplyDarkImages();
 
         _tabController = new TabController(dockPanel);
         InitializeTabControllerEvents();
@@ -382,6 +383,28 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
         dockPanel.ActiveAutoHideContent = null;
         dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
+    }
+
+    private void ApplyDarkImages ()
+    {
+        var dark = Application.IsDarkModeEnabled;
+
+        openToolStripMenuItem.Image = ThemedImages.Get("File_open", dark);
+        closeFileToolStripMenuItem.Image = ThemedImages.Get("Close", dark);
+        reloadToolStripMenuItem.Image = ThemedImages.Get("Restart_alt", dark);
+        exitToolStripMenuItem.Image = ThemedImages.Get("Exit", dark);
+        filterToolStripMenuItem.Image = ThemedImages.Get("Filter", dark);
+        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get("Bookmark_add", dark);
+        jumpToNextToolStripMenuItem.Image = ThemedImages.Get("ArrowDown", dark);
+        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get("ArrowUp", dark);
+        settingsToolStripMenuItem.Image = ThemedImages.Get("Settings", dark);
+        toolStripButtonOpen.Image = ThemedImages.Get("File_open", dark);
+        toolStripButtonSearch.Image = ThemedImages.Get("Search", dark);
+        toolStripButtonFilter.Image = ThemedImages.Get("Filter", dark);
+        toolStripButtonBookmark.Image = ThemedImages.Get("Bookmark_add", dark);
+        toolStripButtonUp.Image = ThemedImages.Get("ArrowUp", dark);
+        toolStripButtonDown.Image = ThemedImages.Get("ArrowDown", dark);
+        toolStripButtonBubbles.Image = ThemedImages.Get("bookmark_bubbles", dark);
     }
 
     private void ApplyTextResources ()
