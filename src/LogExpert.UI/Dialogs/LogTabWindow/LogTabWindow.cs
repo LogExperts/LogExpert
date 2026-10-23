@@ -21,6 +21,7 @@ using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
+using LogExpert.UI.Services.DetachModeService;
 using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
@@ -80,6 +81,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private bool _wasMaximized;
 
+    /// <summary>
+    /// Owns detach mode: F11 hides the main window and turns the active log window's float into a
+    /// stand-alone viewer window; F11 or ESC brings everything back.
+    /// </summary>
+    private readonly DetachModeController _detachModeController;
+
     #endregion
 
     #region cTor
@@ -106,6 +113,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ConfigManager = configManager;
 
         _toolWindowCoordinator = new ToolWindowCoordinator(configManager);
+
+        _detachModeController = new DetachModeController(this, dockPanel, _tabController);
 
         _ledService = new LedIndicatorService();
         _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
@@ -461,6 +470,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        logOnlyViewToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem;
 
         //Options menu
         optionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem;
@@ -517,6 +527,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         saveSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
         timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
         copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        logOnlyViewToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem;
         columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
         cellSelectModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem;
         lockInstanceToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem;
@@ -836,6 +847,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (!doNotAddToPanel)
         {
             logWindow.Visible = true;
+
+            if (_detachModeController.IsActive)
+            {
+                // While detached the main window is hidden, so the newly opened window is the one
+                // the user expects to see: it replaces the detached one.
+                _detachModeController.OnWindowAdded(logWindow);
+            }
         }
     }
 
@@ -1475,6 +1493,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadSession (string sessionFileName, bool restoreLayout)
     {
+        // Leave detach mode first: the loaded layout must describe the normal window, and the
+        // windows a session replaces must not be referenced by the mode.
+        _detachModeController.Exit();
+
         var outcome = _sessionHandler.LoadSession(sessionFileName);
         bool openedTabs = false;
 
@@ -1751,6 +1773,18 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
+        // Leave detach mode first: the saved window position and layout must describe the normal
+        // window. Guarded on purpose — the panel is already tearing down here, so a failure must not
+        // abort the shutdown sequence below.
+        try
+        {
+            _detachModeController.Exit();
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Leaving detach mode while closing failed");
+        }
+
         CancelPendingDrop();
         try
         {
@@ -1793,6 +1827,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         RemoveLogWindow(logWindow);
 
         logWindow.Tag = null;
+
+        // Closing the detached window through its X button hands the detached float to the next
+        // window, or ends the mode when it was the last one.
+        _detachModeController.OnWindowDisposed(logWindow);
     }
 
     private void OnExitToolStripMenuItemClick (object sender, EventArgs e)
@@ -2061,6 +2099,58 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnFollowTailCheckBoxClick (object sender, EventArgs e)
     {
         CurrentLogWindow?.FollowTailChanged(checkBoxFollowTail.Checked, false);
+    }
+
+    /// <summary>
+    /// Takes F11 for detach mode before the key reaches the log window. While detached the main
+    /// window is hidden and its key handling is served by <see cref="DetachModeController"/>'s
+    /// message filter instead; the mode is left from there. The View menu offers the same toggle
+    /// as "Log Only View"; it only displays F11 as a hint, the key itself is taken here so there
+    /// is a single code path.
+    /// </summary>
+    protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.F11)
+        {
+            // Only the key-down of the first press counts: Windows repeats WM_KEYDOWN while F11 is
+            // held down (lParam bit 30), and honouring those repeats would flip the mode back and
+            // forth. A second press after release leaves the mode again.
+            if (!IsAutoRepeat(msg))
+            {
+                ToggleDetachMode();
+            }
+
+            return true;
+        }
+
+        return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    /// <summary>
+    /// Tells the repeated WM_KEYDOWN messages Windows sends while a key is held down (lParam bit 30)
+    /// from the single message of an actual press.
+    /// </summary>
+    private static bool IsAutoRepeat (Message msg)
+    {
+        const int WM_KEYDOWN = 0x0100;
+
+        return msg.Msg == WM_KEYDOWN && ((long)msg.LParam & (1L << 30)) != 0;
+    }
+
+    [SupportedOSPlatform("windows")]
+    private void ToggleDetachMode ()
+    {
+        if (!_detachModeController.IsActive && WindowState == FormWindowState.Minimized)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        _detachModeController.Enter();
+    }
+
+    private void OnLogOnlyViewToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        ToggleDetachMode();
     }
 
     private void OnLogTabWindowKeyDown (object sender, KeyEventArgs e)
@@ -2372,14 +2462,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnCloseOtherTabsToolStripMenuItemClick (object sender, EventArgs e)
     {
         var activeWindow = _tabController.GetActiveWindow();
-        var closeList = _tabController.GetAllWindowsFromDockPanel()
-                .Where(window => window != activeWindow)
-                .ToList();
 
-        foreach (var logWindow in closeList)
+        // Nothing to keep: without an active window there is no "other" tab to close.
+        if (activeWindow == null)
         {
-            logWindow.Close();
+            return;
         }
+
+        _tabController.CloseAllExcept(activeWindow);
     }
 
     [SupportedOSPlatform("windows")]
