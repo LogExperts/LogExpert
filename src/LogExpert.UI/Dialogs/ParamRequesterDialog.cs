@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.Versioning;
 
 namespace LogExpert.Dialogs;
@@ -37,11 +38,10 @@ internal partial class ParamRequesterDialog : Form
         buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
         buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
 
-        //Fallback
-        if (string.IsNullOrEmpty(_paramName))
-        {
-            labelValueForParameter.Text = Resources.ParamRequesterDialog_UI_Label_ValueForParameter;
-        }
+        // The tool argument syntax (?"Name?"(a,b)) may carry a parameter name; show it when present.
+        labelValueForParameter.Text = string.IsNullOrEmpty(_paramName)
+            ? Resources.ParamRequesterDialog_UI_Label_ValueForParameter
+            : string.Format(CultureInfo.CurrentCulture, Resources.ParamRequesterDialog_UI_Label_ValueForParameterNamed, _paramName);
     }
 
     #endregion

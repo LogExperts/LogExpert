@@ -142,10 +142,10 @@
     <value>取消</value>
   </data>
   <data name="RegexColumnizer_Description" xml:space="preserve">
-    <value>列由具名捕获组的正则表达式填充</value>
+    <value>列由正则表达式中的具名捕获组填充。</value>
   </data>
   <data name="RegexColumnizer_Error_Message_SnapshotUnavailable" xml:space="preserve">
-    <value>无法为列分隔器 '{0}' 创建解析状态快照。</value>
+    <value>无法为列分隔器“{0}”创建解析状态快照。</value>
   </data>
   <data name="RegexColumnizer_Configuration_DirectoryCannotBeNullOrEmpty" xml:space="preserve">
     <value>配置目录不能为空</value>
@@ -175,18 +175,18 @@
     <value>创建配置目录失败：{0}</value>
   </data>
   <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathSeparatorsWhichAreNotAllowed" xml:space="preserve">
-    <value>列分隔器名称 '{0}' 包含不允许的路径分隔符</value>
+    <value>列分隔器名称“{0}”包含不允许的路径分隔符</value>
   </data>
   <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsInvalidFilenameCharacters" xml:space="preserve">
-    <value>列分隔器名称 '{0}' 包含无效的文件名字符</value>
+    <value>列分隔器名称“{0}”包含无效的文件名字符</value>
   </data>
   <data name="RegexColumnizer_Error_Message_ColumnizerNameNameContainsPathTraversalPatternsWhichAreNotAllowed" xml:space="preserve">
-    <value>列分隔器名称 '{0}' 包含不允许的路径遍历模式</value>
+    <value>列分隔器名称“{0}”包含不允许的路径遍历模式</value>
   </data>
   <data name="RegexColumnizerConfigDialog_UI_Error_Title" xml:space="preserve">
     <value>正则表达式列分隔器配置</value>
   </data>
   <data name="RegexColumnizer_ConfigDialog_Error_Message_InvalidRegex" xml:space="preserve">
-    <value>无效的正则表达式 !{0}{1}</value>
+    <value>无效的正则表达式！{0}{1}</value>
   </data>
 </root>

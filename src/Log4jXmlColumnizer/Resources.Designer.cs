@@ -115,6 +115,15 @@ namespace Log4jXmlColumnizer {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Max chars to display (cut from left).
+        /// </summary>
+        public static string Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_ToolTipMaxLen {
+            get {
+                return ResourceManager.GetString("Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_ToolTipMaxLen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to .
         /// </summary>
         public static string Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_Visible {

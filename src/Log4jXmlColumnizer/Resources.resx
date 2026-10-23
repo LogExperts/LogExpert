@@ -69,4 +69,7 @@
   <data name="Log4jXmlColumnizer_UI_Title_Deserialize" xml:space="preserve">
     <value>Deserialize</value>
   </data>
+  <data name="Log4jXmlColumnizerConfigDlg_UI_ColumnHeader_ToolTipMaxLen" xml:space="preserve">
+    <value>Max chars to display (cut from left)</value>
+  </data>
 </root>

@@ -120,6 +120,11 @@ public static partial class PluginValidator
                         _trustedPluginConfig = CreateDefaultConfiguration();
                         SaveTrustedPluginConfiguration();
                     }
+                    else if (RefreshBuiltInPlugins(_trustedPluginConfig))
+                    {
+                        _logger.Info("Refreshed built-in plugin hashes from the running build");
+                        SaveTrustedPluginConfiguration();
+                    }
                 }
                 catch (Exception ex) when (ex is IOException or
                                                  UnauthorizedAccessException or
@@ -158,6 +163,35 @@ public static partial class PluginValidator
             HashAlgorithm = "SHA256",
             LastUpdated = DateTime.UtcNow
         };
+    }
+
+    /// <summary>
+    /// Makes the running build's built-in names and hashes authoritative in a loaded configuration,
+    /// so an upgrade does not reject the new built-in plugins against hashes persisted by an older build.
+    /// </summary>
+    /// <returns>True if the configuration was changed</returns>
+    private static bool RefreshBuiltInPlugins (TrustedPluginConfig config)
+    {
+        var changed = false;
+
+        foreach (var name in _trustedPluginNames.Where(n => !config.PluginNames.Contains(n, StringComparer.OrdinalIgnoreCase)))
+        {
+            config.PluginNames.Add(name);
+            changed = true;
+        }
+
+        foreach (var (name, hash) in GetBuiltInPluginHashes().Where(e => !config.PluginHashes.TryGetValue(e.Key, out var persistedHash) || !string.Equals(persistedHash, e.Value, StringComparison.OrdinalIgnoreCase)))
+        {
+            config.PluginHashes[name] = hash;
+            changed = true;
+        }
+
+        if (changed)
+        {
+            config.LastUpdated = DateTime.UtcNow;
+        }
+
+        return changed;
     }
 
     /// <summary>
