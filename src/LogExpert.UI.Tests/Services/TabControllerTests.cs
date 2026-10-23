@@ -236,6 +236,49 @@ internal class TabControllerTests : IDisposable
 
     #endregion
 
+    #region GetPlacedWindows Tests
+
+    [Test]
+    public void GetPlacedWindows_ExcludesWindowsThatWereNeverPlaced ()
+    {
+        // Arrange
+        using var placed = CreateLogWindow("placed.log");
+        using var deferred = CreateLogWindow("deferred.log");
+
+        _tabController.AddWindow(placed, "placed.log");
+        _tabController.AddWindow(deferred, "deferred.log", doNotAddToDockPanel: true);
+
+        // Act
+        var result = _tabController.GetPlacedWindows();
+
+        // Assert — a window a session layout restore has not placed yet cannot be saved or closed
+        Assert.That(result, Is.EqualTo([placed]));
+    }
+
+    [Test]
+    public void GetPlacedWindows_IncludesHiddenWindowsThatTheDockPanelNoLongerDisplays ()
+    {
+        // Arrange
+        using var first = CreateLogWindow("first.log");
+        using var second = CreateLogWindow("second.log");
+
+        _tabController.AddWindow(first, "first.log");
+        _tabController.AddWindow(second, "second.log");
+
+        second.Hide();
+
+        // Act
+        var placed = _tabController.GetPlacedWindows();
+        var displayed = _tabController.GetAllWindowsFromDockPanel();
+
+        // Assert — this is why a session save and "close other tabs" cannot use the DockPanel query
+        // when windows are hidden
+        Assert.That(placed, Is.EqualTo([first, second]));
+        Assert.That(displayed, Is.EqualTo([first]));
+    }
+
+    #endregion
+
     #region GetWindowCount Tests
 
     [Test]
@@ -413,6 +456,75 @@ internal class TabControllerTests : IDisposable
 
     #endregion
 
+    #region GetNextWindow / GetPreviousWindow Tests
+
+    [Test]
+    public void GetNextWindow_FromAnyWindow_MovesForwardAndWrapsAround ()
+    {
+        // Arrange
+        using var first = CreateLogWindow("first.log");
+        using var second = CreateLogWindow("second.log");
+        using var third = CreateLogWindow("third.log");
+
+        _tabController.AddWindow(first, "first.log");
+        _tabController.AddWindow(second, "second.log");
+        _tabController.AddWindow(third, "third.log");
+
+        // Act & Assert
+        Assert.That(_tabController.GetNextWindow(first), Is.EqualTo(second));
+        Assert.That(_tabController.GetNextWindow(second), Is.EqualTo(third));
+        Assert.That(_tabController.GetNextWindow(third), Is.EqualTo(first));
+    }
+
+    [Test]
+    public void GetPreviousWindow_FromAnyWindow_MovesBackwardAndWrapsAround ()
+    {
+        // Arrange
+        using var first = CreateLogWindow("first.log");
+        using var second = CreateLogWindow("second.log");
+        using var third = CreateLogWindow("third.log");
+
+        _tabController.AddWindow(first, "first.log");
+        _tabController.AddWindow(second, "second.log");
+        _tabController.AddWindow(third, "third.log");
+
+        // Act & Assert
+        Assert.That(_tabController.GetPreviousWindow(first), Is.EqualTo(third));
+        Assert.That(_tabController.GetPreviousWindow(second), Is.EqualTo(first));
+        Assert.That(_tabController.GetPreviousWindow(third), Is.EqualTo(second));
+    }
+
+    [Test]
+    public void GetNextWindow_WhenEmpty_ReturnsNull ()
+    {
+        // Act & Assert
+        Assert.That(_tabController.GetNextWindow(null), Is.Null);
+        Assert.That(_tabController.GetPreviousWindow(null), Is.Null);
+    }
+
+    #endregion
+
+    #region CloseAllExcept Tests
+
+    [Test]
+    public void CloseAllExcept_WithNullWindow_LeavesEveryWindowOpen ()
+    {
+        // Arrange
+        using var first = CreateLogWindow("first.log");
+        using var second = CreateLogWindow("second.log");
+
+        _tabController.AddWindow(first, "first.log");
+        _tabController.AddWindow(second, "second.log");
+
+        // Act
+        _tabController.CloseAllExcept(null);
+
+        // Assert
+        Assert.That(_tabController.GetWindowCount(), Is.EqualTo(2));
+    }
+
+    #endregion
+
     #region SwitchToNextWindow Tests
 
     [Test]
@@ -449,6 +561,11 @@ internal class TabControllerTests : IDisposable
 
         var configManagerMock = new Mock<IConfigManager>();
         _ = configManagerMock.SetupGet(configManager => configManager.Settings).Returns(new Settings());
+
+        // Without these stubs the mock returns null and LogWindow's session save on Dispose
+        // throws ArgumentNullException — surfaced as a modal MessageBox that blocks the test host.
+        _ = configManagerMock.SetupGet(configManager => configManager.ActiveSessionDir).Returns(Path.Combine(Path.GetTempPath(), "LogExpert_TabControllerTests"));
+        _ = configManagerMock.SetupGet(configManager => configManager.ActiveConfigDir).Returns(Path.Combine(Path.GetTempPath(), "LogExpert_TabControllerTests"));
 
         var pluginRegistryMock = new Mock<IPluginRegistry>();
         _ = pluginRegistryMock.SetupGet(pluginRegistry => pluginRegistry.RegisteredColumnizers).Returns([new DefaultLogfileColumnizer()]);

@@ -66,6 +66,26 @@ internal interface ITabController : IDisposable
     void SwitchToPreviousWindow ();
 
     /// <summary>
+    /// Resolves the LogWindow that follows <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move on from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The next LogWindow, or <c>null</c> when no window is tracked.</returns>
+    LogWindow GetNextWindow (LogWindow current = null);
+
+    /// <summary>
+    /// Resolves the LogWindow that precedes <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move back from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The previous LogWindow, or <c>null</c> when no window is tracked.</returns>
+    LogWindow GetPreviousWindow (LogWindow current = null);
+
+    /// <summary>
     /// Finds a LogWindow by its associated file name.
     /// </summary>
     /// <param name="fileName">The file name to search for.</param>
@@ -79,23 +99,28 @@ internal interface ITabController : IDisposable
     IReadOnlyList<LogWindow> GetAllWindows ();
 
     /// <summary>
+    /// Gets all tracked LogWindows that are (or were) placed in the dock panel, in tracking order.
+    /// Windows a session layout restore has not placed yet (<see cref="DockState.Unknown"/>) are
+    /// excluded. Hidden windows are included.
+    /// </summary>
+    /// <remarks>
+    /// This is the query for operations that must cover every window an ongoing session should
+    /// keep — saving a session, closing every other tab — even when a window is currently hidden.
+    /// </remarks>
+    /// <returns>A read-only list of the placed LogWindows.</returns>
+    IReadOnlyList<LogWindow> GetPlacedWindows ();
+
+    /// <summary>
     /// Gets all LogWindow instances from the DockPanel's Contents collection.
     /// This returns windows that are currently displayed in the DockPanel,
     /// which may include windows not explicitly tracked by TabController
     /// (e.g., windows restored from layout serialization).
     /// </summary>
     /// <remarks>
-    /// Use this method when you need to iterate over all visible LogWindows,
-    /// particularly for operations like:
-    /// - Saving project/session data
-    /// - Saving last open files list
-    /// - Closing all tabs
-    /// - Applying settings to all windows
-    ///
-    /// For most other operations, prefer <see cref="GetAllWindows"/> which
-    /// returns only explicitly tracked windows.
+    /// Only displayed windows are returned: a window hidden with <see cref="Control.Hide"/> drops
+    /// out of the result. Use <see cref="GetPlacedWindows"/> when hidden windows must be included.
     /// </remarks>
-    /// <returns>Read-only list of all LogWindows in the DockPanel.</returns>
+    /// <returns>Read-only list of all displayed LogWindows in the DockPanel.</returns>
     IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ();
 
     /// <summary>

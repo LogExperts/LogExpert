@@ -2807,6 +2807,15 @@ namespace LogExpert {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_loadProjectToolStripMenuItem", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Log Only View.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Lock instance.
@@ -3104,6 +3113,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Shows the active log alone in its own window and hides the main window.
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem", resourceCulture);
             }
         }
         
