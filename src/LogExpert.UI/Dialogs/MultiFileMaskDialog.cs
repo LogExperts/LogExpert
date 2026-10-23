@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.Versioning;
 
+using LogExpert.Core.Entities;
+
 namespace LogExpert.UI.Dialogs;
 
 [SupportedOSPlatform("windows")]
@@ -33,7 +35,9 @@ internal partial class MultiFileMaskDialog : Form
         Text = Resources.MultiFileMaskDialog_UI_Title;
         labelMultiSettingsFor.Text = Resources.MultiFileMaskDialog_UI_Label_SettingsFor;
         labelFileNamePattern.Text = Resources.MultiFileMaskDialog_UI_Label_FileNamePattern;
-        labelMaxDays.Text = Resources.MultiFileMaskDialog_UI_Label_MaxDays;
+        labelMaxDayGap.Text = Resources.MultiFileMaskDialog_UI_Label_MaxDayGap;
+        labelMaxFileAgeDays.Text = Resources.MultiFileMaskDialog_UI_Label_MaxFileAgeDays;
+        labelMaxFileAgeDaysHint.Text = Resources.MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint;
         syntaxHelpLabel.Text = Resources.MultiFileMaskDialog_UI_Label_SyntaxHelp;
         buttonOk.Text = Resources.LogExpert_Common_UI_Button_OK;
         buttonCancel.Text = Resources.LogExpert_Common_UI_Button_Cancel;
@@ -47,7 +51,10 @@ internal partial class MultiFileMaskDialog : Form
     public string FileNamePattern { get; set; }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public int MaxDays { get; set; }
+    public int MaxDayGap { get; set; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+    public int MaxFileAgeDays { get; set; }
 
     #endregion
 
@@ -56,13 +63,15 @@ internal partial class MultiFileMaskDialog : Form
     private void OnButtonOKClick (object sender, EventArgs e)
     {
         FileNamePattern = fileNamePatternTextBox.Text;
-        MaxDays = (int)upDownMaxDays.Value;
+        MaxDayGap = (int)upDownMaxDayGap.Value;
+        MaxFileAgeDays = (int)upDownMaxFileAgeDays.Value;
     }
 
     private void OnMultiFileMaskDialogLoad (object sender, EventArgs e)
     {
         fileNamePatternTextBox.Text = FileNamePattern;
-        upDownMaxDays.Value = MaxDays;
+        upDownMaxDayGap.Value = MaxDayGap;
+        upDownMaxFileAgeDays.Value = Math.Clamp(MaxFileAgeDays, 0, MultiFileOptions.MAX_FILE_AGE_DAYS);
     }
 
     #endregion

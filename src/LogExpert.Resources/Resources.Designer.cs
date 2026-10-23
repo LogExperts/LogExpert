@@ -4435,11 +4435,29 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Max days:.
+        ///   Looks up a localized string similar to Max day gap:.
         /// </summary>
-        public static string MultiFileMaskDialog_UI_Label_MaxDays {
+        public static string MultiFileMaskDialog_UI_Label_MaxDayGap {
             get {
-                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDays", resourceCulture);
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDayGap", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Max file age (days):.
+        /// </summary>
+        public static string MultiFileMaskDialog_UI_Label_MaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxFileAgeDays", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 0 = Off.
+        /// </summary>
+        public static string MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint {
+            get {
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint", resourceCulture);
             }
         }
         
@@ -6193,11 +6211,47 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Max days:.
+        ///   Looks up a localized string similar to Max day gap:.
         /// </summary>
-        public static string SettingsDialog_UI_Label_labelMaxDays {
+        public static string SettingsDialog_UI_Label_labelMaxDayGap {
             get {
-                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDays", resourceCulture);
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDayGap", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Max file age (days):.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelMaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxFileAgeDays", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to 0 = Off.
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelMaxFileAgeDaysHint {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxFileAgeDaysHint", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to For $D patterns: how many consecutive days without a log file to skip before giving up..
+        /// </summary>
+        public static string SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum age of rollover files to load, in days. Set to 0 to disable the age limit..
+        /// </summary>
+        public static string SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays", resourceCulture);
             }
         }
         

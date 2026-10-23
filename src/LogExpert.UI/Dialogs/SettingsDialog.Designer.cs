@@ -131,9 +131,12 @@ partial class SettingsDialog
         checkBoxControlCharsCopyDisplayedForm = new CheckBox();
         tabPageMultiFile = new TabPage();
         groupBoxDefaultFileNamePattern = new GroupBox();
-        labelMaxDays = new Label();
+        labelMaxDayGap = new Label();
+        labelMaxFileAgeDays = new Label();
+        labelMaxFileAgeDaysHint = new Label();
         labelPattern = new Label();
         upDownMultifileDays = new NumericUpDown();
+        upDownMultifileMaxFileAgeDays = new NumericUpDown();
         textBoxMultifilePattern = new TextBox();
         labelHintMultiFile = new Label();
         labelNoteMultiFile = new Label();
@@ -210,6 +213,7 @@ partial class SettingsDialog
         tabPageMultiFile.SuspendLayout();
         groupBoxDefaultFileNamePattern.SuspendLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMultifileDays).BeginInit();
+        ((System.ComponentModel.ISupportInitialize)upDownMultifileMaxFileAgeDays).BeginInit();
         groupBoxWhenOpeningMultiFile.SuspendLayout();
         tabPagePlugins.SuspendLayout();
         groupBoxPlugins.SuspendLayout();
@@ -1534,9 +1538,12 @@ partial class SettingsDialog
         // 
         // groupBoxDefaultFileNamePattern
         // 
-        groupBoxDefaultFileNamePattern.Controls.Add(labelMaxDays);
+        groupBoxDefaultFileNamePattern.Controls.Add(labelMaxDayGap);
+        groupBoxDefaultFileNamePattern.Controls.Add(labelMaxFileAgeDays);
+        groupBoxDefaultFileNamePattern.Controls.Add(labelMaxFileAgeDaysHint);
         groupBoxDefaultFileNamePattern.Controls.Add(labelPattern);
         groupBoxDefaultFileNamePattern.Controls.Add(upDownMultifileDays);
+        groupBoxDefaultFileNamePattern.Controls.Add(upDownMultifileMaxFileAgeDays);
         groupBoxDefaultFileNamePattern.Controls.Add(textBoxMultifilePattern);
         groupBoxDefaultFileNamePattern.Location = new Point(364, 28);
         groupBoxDefaultFileNamePattern.Margin = new Padding(4, 5, 4, 5);
@@ -1547,15 +1554,35 @@ partial class SettingsDialog
         groupBoxDefaultFileNamePattern.TabStop = false;
         groupBoxDefaultFileNamePattern.Text = "Default filename pattern";
         // 
-        // labelMaxDays
+        // labelMaxDayGap
         // 
-        labelMaxDays.AutoSize = true;
-        labelMaxDays.Location = new Point(10, 75);
-        labelMaxDays.Margin = new Padding(4, 0, 4, 0);
-        labelMaxDays.Name = "labelMaxDays";
-        labelMaxDays.Size = new Size(59, 15);
-        labelMaxDays.TabIndex = 3;
-        labelMaxDays.Text = "Max days:";
+        labelMaxDayGap.AutoSize = true;
+        labelMaxDayGap.Location = new Point(10, 75);
+        labelMaxDayGap.Margin = new Padding(4, 0, 4, 0);
+        labelMaxDayGap.Name = "labelMaxDayGap";
+        labelMaxDayGap.Size = new Size(78, 15);
+        labelMaxDayGap.TabIndex = 3;
+        labelMaxDayGap.Text = "Max day gap:";
+        // 
+        // labelMaxFileAgeDays
+        // 
+        labelMaxFileAgeDays.AutoSize = true;
+        labelMaxFileAgeDays.Location = new Point(10, 115);
+        labelMaxFileAgeDays.Margin = new Padding(4, 0, 4, 0);
+        labelMaxFileAgeDays.Name = "labelMaxFileAgeDays";
+        labelMaxFileAgeDays.Size = new Size(102, 15);
+        labelMaxFileAgeDays.TabIndex = 6;
+        labelMaxFileAgeDays.Text = "Max file age (days):";
+        // 
+        // labelMaxFileAgeDaysHint
+        // 
+        labelMaxFileAgeDaysHint.AutoSize = true;
+        labelMaxFileAgeDaysHint.Location = new Point(272, 115);
+        labelMaxFileAgeDaysHint.Margin = new Padding(4, 0, 4, 0);
+        labelMaxFileAgeDaysHint.Name = "labelMaxFileAgeDaysHint";
+        labelMaxFileAgeDaysHint.Size = new Size(43, 15);
+        labelMaxFileAgeDaysHint.TabIndex = 7;
+        labelMaxFileAgeDaysHint.Text = "0 = Off";
         // 
         // labelPattern
         // 
@@ -1569,7 +1596,7 @@ partial class SettingsDialog
         // 
         // upDownMultifileDays
         // 
-        upDownMultifileDays.Location = new Point(102, 72);
+        upDownMultifileDays.Location = new Point(170, 72);
         upDownMultifileDays.Margin = new Padding(4, 5, 4, 5);
         upDownMultifileDays.Maximum = new decimal(new int[] { 40, 0, 0, 0 });
         upDownMultifileDays.Name = "upDownMultifileDays";
@@ -1578,12 +1605,22 @@ partial class SettingsDialog
         upDownMultifileDays.TabIndex = 1;
         upDownMultifileDays.Value = new decimal(new int[] { 1, 0, 0, 0 });
         // 
+        // upDownMultifileMaxFileAgeDays
+        // 
+        upDownMultifileMaxFileAgeDays.Location = new Point(170, 112);
+        upDownMultifileMaxFileAgeDays.Margin = new Padding(4, 5, 4, 5);
+        upDownMultifileMaxFileAgeDays.Maximum = new decimal(new int[] { 3650, 0, 0, 0 });
+        upDownMultifileMaxFileAgeDays.Name = "upDownMultifileMaxFileAgeDays";
+        helpProvider.SetShowHelp(upDownMultifileMaxFileAgeDays, false);
+        upDownMultifileMaxFileAgeDays.Size = new Size(92, 23);
+        upDownMultifileMaxFileAgeDays.TabIndex = 2;
+        // 
         // textBoxMultifilePattern
         // 
-        textBoxMultifilePattern.Location = new Point(102, 32);
+        textBoxMultifilePattern.Location = new Point(170, 32);
         textBoxMultifilePattern.Margin = new Padding(4, 5, 4, 5);
         textBoxMultifilePattern.Name = "textBoxMultifilePattern";
-        textBoxMultifilePattern.Size = new Size(278, 23);
+        textBoxMultifilePattern.Size = new Size(210, 23);
         textBoxMultifilePattern.TabIndex = 0;
         textBoxMultifilePattern.TextChanged += OnMultiFilePatternTextChanged;
         // 
@@ -2148,6 +2185,7 @@ partial class SettingsDialog
         groupBoxDefaultFileNamePattern.ResumeLayout(false);
         groupBoxDefaultFileNamePattern.PerformLayout();
         ((System.ComponentModel.ISupportInitialize)upDownMultifileDays).EndInit();
+        ((System.ComponentModel.ISupportInitialize)upDownMultifileMaxFileAgeDays).EndInit();
         groupBoxWhenOpeningMultiFile.ResumeLayout(false);
         groupBoxWhenOpeningMultiFile.PerformLayout();
         tabPagePlugins.ResumeLayout(false);
@@ -2273,9 +2311,12 @@ partial class SettingsDialog
     private System.Windows.Forms.Button buttonWorkingDir;
     private System.Windows.Forms.TextBox textBoxWorkingDir;
     private System.Windows.Forms.GroupBox groupBoxDefaultFileNamePattern;
-    private System.Windows.Forms.Label labelMaxDays;
+    private System.Windows.Forms.Label labelMaxDayGap;
+    private System.Windows.Forms.Label labelMaxFileAgeDays;
+    private System.Windows.Forms.Label labelMaxFileAgeDaysHint;
     private System.Windows.Forms.Label labelPattern;
     private System.Windows.Forms.NumericUpDown upDownMultifileDays;
+    private System.Windows.Forms.NumericUpDown upDownMultifileMaxFileAgeDays;
     private System.Windows.Forms.TextBox textBoxMultifilePattern;
     private System.Windows.Forms.Label labelDefaultEncoding;
     private System.Windows.Forms.ComboBox comboBoxEncoding;

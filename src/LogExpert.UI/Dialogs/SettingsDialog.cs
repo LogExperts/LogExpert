@@ -382,6 +382,7 @@ internal partial class SettingsDialog : Form
 
         Preferences.MultiFileOptions.FormatPattern = textBoxMultifilePattern.Text;
         Preferences.MultiFileOptions.MaxDayTry = (int)upDownMultifileDays.Value;
+        Preferences.MultiFileOptions.MaxFileAgeDays = (int)upDownMultifileMaxFileAgeDays.Value;
     }
 
     private void FillColumnizerForToolsList ()
@@ -647,6 +648,8 @@ internal partial class SettingsDialog : Form
 
         textBoxMultifilePattern.Text = Preferences.MultiFileOptions.FormatPattern;
         upDownMultifileDays.Value = Preferences.MultiFileOptions.MaxDayTry;
+        upDownMultifileMaxFileAgeDays.Value = Math.Clamp(Preferences.MultiFileOptions.MaxFileAgeDays, 0,
+            MultiFileOptions.MAX_FILE_AGE_DAYS);
     }
 
     private void GetToolListBoxData ()
@@ -1398,7 +1401,9 @@ internal partial class SettingsDialog : Form
             { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
             { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
             { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
-            { comboBoxReaderType, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp }
+            { comboBoxReaderType, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp },
+            { upDownMultifileDays, Resources.SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays },
+            { upDownMultifileMaxFileAgeDays, Resources.SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays }
         };
     }
 

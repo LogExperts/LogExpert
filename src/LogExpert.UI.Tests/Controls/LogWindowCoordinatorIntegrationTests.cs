@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.Versioning;
 
 using LogExpert.Core.Config;
@@ -113,6 +114,39 @@ public class LogWindowCoordinatorIntegrationTests : IDisposable
 
         // Assert — Preferences comes from ConfigManager, not coordinator
         Assert.That(preferences, Is.SameAs(_settings.Preferences));
+    }
+
+    [Test]
+    public void SetDefaultsFromPrefs_SeedsNewWindowWithGlobalMultiFileOptions ()
+    {
+        _settings.Preferences.MultiFileOptions = new MultiFileOptions
+        {
+            FormatPattern = "*$J(.).log",
+            MaxDayTry = 4,
+            MaxFileAgeDays = 30
+        };
+        var setDefaults = typeof(LogWindow).GetMethod("SetDefaultsFromPrefs",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        var optionsField = typeof(LogWindow).GetField("_multiFileOptions",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(setDefaults, Is.Not.Null);
+            Assert.That(optionsField, Is.Not.Null);
+        });
+
+        _ = _logWindow.Handle;
+        _ = setDefaults!.Invoke(_logWindow, null);
+        var windowOptions = (MultiFileOptions)optionsField!.GetValue(_logWindow)!;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(windowOptions, Is.Not.SameAs(_settings.Preferences.MultiFileOptions));
+            Assert.That(windowOptions.FormatPattern, Is.EqualTo("*$J(.).log"));
+            Assert.That(windowOptions.MaxDayTry, Is.EqualTo(4));
+            Assert.That(windowOptions.MaxFileAgeDays, Is.EqualTo(30));
+        });
     }
 
     [Test]

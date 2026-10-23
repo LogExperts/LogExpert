@@ -172,6 +172,7 @@ public class SessionFileComposerTests
             FilterSaveListVisible = true,
             MultiFile = true,
             MultiFileMaxDays = 7,
+            MultiFileMaxFileAgeDays = 5,
             MultiFilePattern = "app*.log",
             TabName = "My Tab",
             HighlightGroupName = "Errors",
@@ -247,6 +248,7 @@ public class SessionFileComposerTests
             FilterSaveListVisible = true,
             MultiFile = true,
             MultiFileMaxDays = 7,
+            MultiFileMaxFileAgeDays = 5,
             MultiFilePattern = "app*.log",
             TabName = "My Tab",
             HighlightGroupName = "Errors",
@@ -422,6 +424,28 @@ public class SessionFileComposerTests
         Assert.That(SerializeForComparison(roundTripped), Is.EqualTo(SerializeForComparison(snapshot)));
     }
 
+    [Test]
+    public void Decompose_LegacyJsonWithoutMaxFileAgeDays_DefaultsToOff ()
+    {
+        var sessionFileName = Path.Join(_testDirectory, "legacy-json.lxp");
+        File.WriteAllText(sessionFileName, """
+            {
+              "MultiFile": true,
+              "MultiFileMaxDays": 7,
+              "MultiFilePattern": "*$J(.)"
+            }
+            """);
+
+        var loaded = Core.Classes.Persister.Persister.Load(sessionFileName);
+        var snapshot = SessionFileComposer.Decompose(loaded);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(loaded.MultiFileMaxFileAgeDays, Is.Zero);
+            Assert.That(snapshot.MultiFileMaxFileAgeDays, Is.Zero);
+        });
+    }
+
     #endregion
 
     #region Window filter (issue #666)
@@ -490,6 +514,8 @@ public class SessionFileComposerTests
         Assert.That(snapshot.FilterParams.SearchText, Is.EqualTo("the first global filter"));
         Assert.That(snapshot.FilterParams.SpreadBefore, Is.EqualTo(1),
             "the restored entry must be the first one, whole — the second carries SpreadBefore 2");
+        Assert.That(snapshot.MultiFileMaxFileAgeDays, Is.Zero,
+            "legacy XML Session Files without the new field must keep age filtering disabled");
         Assert.That(snapshot.FilterParams.Color, Is.EqualTo(Color.Black),
             "Color is the field the legacy payload writes as \"Black\" — losing it means the entry was not really read");
     }

@@ -52,6 +52,12 @@ public interface ILogFileInfo
     bool FileExists { get; }
 
     /// <summary>
+    /// Gets the time when the file was last written, in UTC, or <see langword="null"/> when the file system plugin
+    /// cannot provide it.
+    /// </summary>
+    DateTime? LastWriteTimeUtc => null;
+
+    /// <summary>
     /// The interval (in ms) LogExpert should check for file changes. The property is checked by LogExpert repeatedly in the loop which
     /// checks for file changes. So you can adjust the poll interval as needed. E.g. you can lower the interval when many changes occur and
     /// raise the interval when the file has not been changed for a certain amount of time.

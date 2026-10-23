@@ -722,8 +722,20 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="SettingsDialog_UI_Label_labelArguments" xml:space="preserve">
         <value>Arguments:</value>
     </data>
-  <data name="SettingsDialog_UI_Label_labelMaxDays" xml:space="preserve">
-        <value>Max days:</value>
+  <data name="SettingsDialog_UI_Label_labelMaxDayGap" xml:space="preserve">
+        <value>Max day gap:</value>
+    </data>
+  <data name="SettingsDialog_UI_Label_labelMaxFileAgeDays" xml:space="preserve">
+        <value>Max file age (days):</value>
+    </data>
+  <data name="SettingsDialog_UI_Label_labelMaxFileAgeDaysHint" xml:space="preserve">
+        <value>0 = Off</value>
+    </data>
+  <data name="SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays" xml:space="preserve">
+        <value>For $D patterns: how many consecutive days without a log file to skip before giving up.</value>
+    </data>
+  <data name="SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays" xml:space="preserve">
+        <value>Maximum age of rollover files to load, in days. Set to 0 to disable the age limit.</value>
     </data>
   <data name="SettingsDialog_UI_Label_labelPattern" xml:space="preserve">
         <value>Pattern:</value>
@@ -1742,8 +1754,14 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="MultiFileMaskDialog_UI_Label_FileNamePattern" xml:space="preserve">
         <value>File name pattern:</value>
     </data>
-  <data name="MultiFileMaskDialog_UI_Label_MaxDays" xml:space="preserve">
-        <value>Max days:</value>
+  <data name="MultiFileMaskDialog_UI_Label_MaxDayGap" xml:space="preserve">
+        <value>Max day gap:</value>
+    </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxFileAgeDays" xml:space="preserve">
+        <value>Max file age (days):</value>
+    </data>
+  <data name="MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint" xml:space="preserve">
+        <value>0 = Off</value>
     </data>
   <data name="MultiFileMaskDialog_UI_Label_SyntaxHelp" xml:space="preserve">
         <value>Pattern syntax:
@@ -1762,7 +1780,11 @@ Examples:
 DD = day
 MM = month
 YY[YY] = year
-all other chars will be used as given</value>
+all other chars will be used as given
+
+MultiFile limits:
+Max day gap = For $D patterns, consecutive days without a log file to skip before giving up
+Max file age (days) = Oldest rollover files to load; 0 disables the age limit</value>
     </data>
   <data name="FilterColumnChooser_UI_Title" xml:space="preserve">
         <value>Columns</value>
