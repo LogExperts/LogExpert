@@ -532,8 +532,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void ApplyResourceImages ()
     {
         pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
-        btnFilterDown.BackgroundImage = Resources.ArrowDown;
-        btnFilterUp.BackgroundImage = Resources.ArrowUp;
+        btnFilterDown.BackgroundImage = ThemedImages.Get("ArrowDown", Application.IsDarkModeEnabled);
+        btnFilterUp.BackgroundImage = ThemedImages.Get("ArrowUp", Application.IsDarkModeEnabled);
         btnToggleHighlightPanel.Image = ThemedImages.Get("Arrow_menu_open", Application.IsDarkModeEnabled);
     }
 
