@@ -658,6 +658,71 @@ internal class FileOperationServiceTests : IDisposable
     }
 
     [Test]
+    public void LoadFilesWithOption_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        // The .lxj check has to run on the resolved name, or the shortcut gets opened as a raw log.
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            var decision = _sut.LoadFilesWithOption(new[] { shortcut }, false);
+
+            Assert.That(decision, Is.EqualTo(MultiFileDecision.Cancel));
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTabs_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            _sut.AddFileTabs(new[] { shortcut });
+
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTab_ShortcutToLogFile_OpensTarget ()
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertTests", "ShortcutLog", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+
+        try
+        {
+            var log = Path.Join(directory, "actual.log");
+            File.WriteAllText(log, "line1");
+
+            var shortcut = Path.Join(directory, "actual.lnk");
+            CreateShortcut(shortcut, log);
+
+            _sut.AddFileTab(new FileTabRequest { FileName = shortcut });
+
+            Assert.That(_factoryCalls, Has.Count.EqualTo(1));
+            Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo(log), "the target file is opened, not the shortcut");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
     public void LoadFilesWithOption_SingleLxjFile_CallsProjectCallback ()
     {
         // Arrange
@@ -1223,6 +1288,39 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls, Has.Count.EqualTo(2));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("a.log"));
         Assert.That(_factoryCalls[1].Request.FileName, Is.EqualTo("b.log"));
+    }
+
+    /// <summary>
+    /// Creates a temporary directory holding a session file and a shortcut to it, and returns the
+    /// three paths. The caller owns the directory and deletes it.
+    /// </summary>
+    private static (string Directory, string Shortcut, string Session) CreateShortcutToSession ()
+    {
+        var directory = Path.Join(Path.GetTempPath(), "LogExpertTests", "ShortcutSession", Guid.NewGuid().ToString());
+        _ = Directory.CreateDirectory(directory);
+
+        var session = Path.Join(directory, "project.lxj");
+        File.WriteAllText(session, "<Project></Project>");
+
+        var shortcut = Path.Join(directory, "session.lnk");
+        CreateShortcut(shortcut, session);
+
+        return (directory, shortcut, session);
+    }
+
+    /// <summary>
+    /// Creates a real shortcut through the shell's WScript.Shell automation object, so the tests
+    /// exercise the same files Explorer writes.
+    /// </summary>
+    private static void CreateShortcut (string shortcutPath, string targetPath)
+    {
+        var shellType = Type.GetTypeFromProgID("WScript.Shell");
+        Assert.That(shellType, Is.Not.Null, "WScript.Shell should be available on Windows test machines");
+
+        dynamic shell = Activator.CreateInstance(shellType)!;
+        dynamic shortcut = shell.CreateShortcut(shortcutPath);
+        shortcut.TargetPath = targetPath;
+        shortcut.Save();
     }
 
     /// <summary>

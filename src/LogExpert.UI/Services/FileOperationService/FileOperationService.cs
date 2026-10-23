@@ -68,6 +68,15 @@ internal sealed class FileOperationService (
 
     public LogWindow AddFileTab (FileTabRequest request)
     {
+        // A shortcut resolves to its target here, so everything downstream — settings file
+        // indirection, .lxp handling, title, history — works on the target file. The request is
+        // only replaced when the name actually changed, keeping the caller's instance otherwise.
+        var resolvedFile = ShortcutResolver.Resolve(request.FileName);
+        if (!string.Equals(resolvedFile, request.FileName, StringComparison.Ordinal))
+        {
+            request = request with { FileName = resolvedFile };
+        }
+
         var logFileName = PersisterHelpers.FindFilenameForSettings(request.FileName, _pluginRegistry);
         var normalizedPath = Path.GetFullPath(logFileName);
 
@@ -204,6 +213,9 @@ internal sealed class FileOperationService (
             return null;
         }
 
+        // Resolve shortcuts first: a .lnk to a session file must not end up as a raw log line.
+        fileNames = fileNames.Select(ShortcutResolver.Resolve).ToArray();
+
         // Session files (.lxj) aren't logs — dispatch them to the project loader and
         // continue with only the log files. Without this, the .lxj would be treated as
         // a raw log line in the multi-file tab.
@@ -270,13 +282,16 @@ internal sealed class FileOperationService (
 
         if (fileNames.Length == 1)
         {
-            if (fileNames[0].EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+            // Resolve first: a shortcut to a session file must not be opened as a raw log.
+            var fileName = ShortcutResolver.Resolve(fileNames[0]);
+
+            if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
             {
-                _loadSessionCallback(fileNames[0], true);
+                _loadSessionCallback(fileName, true);
                 return MultiFileDecision.Cancel; // Already handled
             }
 
-            _ = AddFileTab(new FileTabRequest { FileName = fileNames[0] });
+            _ = AddFileTab(new FileTabRequest { FileName = fileName });
             return MultiFileDecision.SingleFiles;
         }
 
@@ -310,13 +325,16 @@ internal sealed class FileOperationService (
         {
             try
             {
-                if (fileName.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
+                // Resolve first: a shortcut to a session file must not be opened as a raw log.
+                var resolved = ShortcutResolver.Resolve(fileName);
+
+                if (resolved.EndsWith(".lxj", StringComparison.OrdinalIgnoreCase))
                 {
-                    _loadSessionCallback(fileName, false);
+                    _loadSessionCallback(resolved, false);
                 }
                 else
                 {
-                    _ = AddFileTab(new FileTabRequest { FileName = fileName, TargetLine = targetLine });
+                    _ = AddFileTab(new FileTabRequest { FileName = resolved, TargetLine = targetLine });
                 }
             }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or LogFileException)
