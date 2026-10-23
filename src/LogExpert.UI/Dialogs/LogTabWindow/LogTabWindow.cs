@@ -93,7 +93,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         InitializeComponent();
 
         ConfigureDockPanel();
-        ApplyDarkImages();
+        ApplyThemedImages();
 
         _tabController = new TabController(dockPanel);
         InitializeTabControllerEvents();
@@ -385,7 +385,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
     }
 
-    private void ApplyDarkImages ()
+    private void ApplyThemedImages ()
     {
         var dark = Application.IsDarkModeEnabled;
 

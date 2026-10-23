@@ -107,14 +107,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Add {
-            get {
-                object obj = ResourceManager.GetObject("Add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Show this message only once?.
         /// </summary>
@@ -165,24 +157,8 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap ArrowLeft {
-            get {
-                object obj = ResourceManager.GetObject("ArrowLeft", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap ArrowRight {
-            get {
-                object obj = ResourceManager.GetObject("ArrowRight", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -205,14 +181,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmark_added {
-            get {
-                object obj = ResourceManager.GetObject("Bookmark_added", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -225,24 +193,8 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmark_manager {
-            get {
-                object obj = ResourceManager.GetObject("Bookmark_manager", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmark_remove {
-            get {
-                object obj = ResourceManager.GetObject("Bookmark_remove", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Bookmark comment.
         /// </summary>
@@ -254,14 +206,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmarks {
-            get {
-                object obj = ResourceManager.GetObject("Bookmarks", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Show comment column.
         /// </summary>
@@ -363,14 +307,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Check_circle {
-            get {
-                object obj = ResourceManager.GetObject("Check_circle", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Icon file....
         /// </summary>
@@ -455,24 +391,8 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Deceased {
-            get {
-                object obj = ResourceManager.GetObject("Deceased", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Delete {
-            get {
-                object obj = ResourceManager.GetObject("Delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Cannot parse Java stack trace line.
         /// </summary>
@@ -584,14 +504,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Favorite {
-            get {
-                object obj = ResourceManager.GetObject("Favorite", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -785,14 +697,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Folder_open {
-            get {
-                object obj = ResourceManager.GetObject("Folder_open", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
@@ -6681,14 +6585,6 @@ namespace LogExpert {
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        public static System.Drawing.Bitmap Star {
-            get {
-                object obj = ResourceManager.GetObject("Star", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to TabController is already initialized with a DockPanel.
         /// </summary>

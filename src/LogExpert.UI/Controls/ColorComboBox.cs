@@ -68,7 +68,7 @@ internal class ColorComboBox : ComboBox
         if (e.Index >= 0)
         {
             var darkMode = Application.IsDarkModeEnabled;
-            var textBrush = darkMode ? Brushes.White : Brushes.Black;
+            using var textBrush = new SolidBrush(e.ForeColor);
             var borderPen = darkMode ? Pens.White : Pens.Black;
 
             Rectangle rectangle = new(4, e.Bounds.Top + 2, 30, e.Bounds.Height - 4);

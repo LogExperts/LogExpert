@@ -109,7 +109,7 @@ internal static class PaintHelper
 
     public static Color BookmarkMarkerTextColor =>
         Application.IsDarkModeEnabled
-            ? Color.FromArgb(255, 220, 130, 20)  // brighter orange on dark
+            ? Color.FromArgb(255, 90, 45, 0)     // dark brown-orange, readable on the light bookmark fills used in dark mode
             : Color.FromArgb(255, 190, 100, 0); // DarkOrange baseline
 
     [SupportedOSPlatform("windows")]

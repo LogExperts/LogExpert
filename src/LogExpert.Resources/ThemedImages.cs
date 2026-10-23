@@ -14,6 +14,7 @@ public static class ThemedImages
             }
         }
 
-        return (Bitmap)Resources.ResourceManager.GetObject(name);
+        return (Bitmap)(Resources.ResourceManager.GetObject(name)
+            ?? throw new InvalidOperationException($"Themed image resource '{name}' (or '{name}_dark') was not found."));
     }
 }

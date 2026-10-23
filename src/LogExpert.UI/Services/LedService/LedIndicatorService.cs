@@ -2,7 +2,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Runtime.Versioning;
-using System.Windows.Forms;
 
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
@@ -269,9 +268,9 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
         _tailLedBrush[1] = new SolidBrush(darkMode ? Color.FromArgb(175, 175, 175) : Color.FromArgb(160, 160, 160)); // Tail off
         _tailLedBrush[2] = new SolidBrush(Color.FromArgb(220, 220, 0));  // Tail trigger
 
-        _offLedBrush   = new SolidBrush(darkMode ? Color.FromArgb(170, 170, 170) : Color.FromArgb(100, 100, 100));
+        _offLedBrush = new SolidBrush(darkMode ? Color.FromArgb(110, 110, 110) : Color.FromArgb(100, 100, 100));
         _dirtyLedBrush = new SolidBrush(Color.FromArgb(220, 0, 220));  // Magenta for dirty
-        _syncLedBrush  = new SolidBrush(Color.FromArgb(0, 100, 220));  // Blue for synced
+        _syncLedBrush = new SolidBrush(Color.FromArgb(0, 100, 220));   // Blue for synced
     }
 
     /// <summary>
@@ -392,7 +391,6 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
         IntPtr hIcon = bmp.GetHicon();
         try
         {
-            //using var bmp = Resources.Deceased;
             _deadIcon = (Icon)Icon.FromHandle(hIcon).Clone();
         }
         finally

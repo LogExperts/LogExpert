@@ -118,31 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-    <comment>Add</comment>
-  </data>
-  <data name="Add_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ArrowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\ArrowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
     <comment>ArrowDown</comment>
   </data>
   <data name="ArrowDown_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\ArrowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ArrowLeft" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\ArrowLeft.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ArrowLeft_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\ArrowLeft.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ArrowRight" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\ArrowRight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ArrowRight_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\ArrowRight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ArrowUp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\ArrowUp.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -164,23 +145,11 @@
   <data name="Arrow_menu_open_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Arrow_menu_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Bookmarks" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Bookmarks.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmarks_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Bookmarks.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Bookmark_add" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Bookmark_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Bookmark_add_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Bookmark_add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmark_added" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmark_added_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Bookmark_added.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SettingsDialog_UI_Label_labelMaxDisplayLength" xml:space="preserve">
         <value>Maximum Display Length (restart required)</value>
@@ -191,53 +160,17 @@
   <data name="bookmark_bubbles_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\bookmark_bubbles.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Bookmark_manager" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Bookmark_manager.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmark_manager_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Bookmark_manager.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmark_remove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Bookmark_remove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Bookmark_remove_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Bookmark_remove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Check_circle" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Check_circle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Check_circle_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Check_circle.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Close" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Close_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Close.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Deceased" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Deceased.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Deceased_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Deceased.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Delete_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="Exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\Exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Exit_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Favorite" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Favorite.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Favorite_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Favorite.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="File_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48\File_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -250,12 +183,6 @@
   </data>
   <data name="Filter_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Filter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Folder_open" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Folder_open_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Folder_open.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="LogExpert_Common_UI_Message_ClipboardInUse" xml:space="preserve">
     <value>Could not copy to the clipboard. It is in use by another application. Please try again.</value>
@@ -296,12 +223,6 @@
   </data>
   <data name="Settings_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>images\png\48_dark\Settings.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Star" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Star_dark" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>images\png\48_dark\Star.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="LogExpert_Common_UI_Title_Error" xml:space="preserve">
         <value>LogExpert Error</value>

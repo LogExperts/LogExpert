@@ -9,6 +9,7 @@ using LogExpert.Core.Classes.Highlight;
 using LogExpert.Core.Helpers;
 using LogExpert.Dialogs;
 using LogExpert.UI.Controls;
+using LogExpert.UI.Entities;
 
 namespace LogExpert.UI.Dialogs.Highlight;
 
@@ -406,12 +407,11 @@ public partial class HighlightEntryDialog : Form
 
         var darkMode = Application.IsDarkModeEnabled;
 
-        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, darkMode ? Color.FromArgb(220, 220, 220) : Color.Black);
+        _previewLabel.ForeColor = GetSelectedColor(_colorBoxForeground, PaintHelper.GetForeColorFromHighlightEntry(null, darkMode));
 
-        var defaultBackColor = darkMode ? Color.FromArgb(32, 32, 32) : SystemColors.Window;
         _previewLabel.BackColor = _checkBoxNoBackground != null && _checkBoxNoBackground.Checked
-            ? defaultBackColor
-            : GetSelectedColor(_colorBoxBackground, defaultBackColor);
+            ? SystemColors.Window
+            : GetSelectedColor(_colorBoxBackground, SystemColors.Window);
 
         var bold = _checkBoxBold != null && _checkBoxBold.Checked;
         var baseFont = Font;
