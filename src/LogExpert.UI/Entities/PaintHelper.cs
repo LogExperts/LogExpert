@@ -75,7 +75,7 @@ internal static class PaintHelper
 
                     if (bookmark.Text.Length > 0)
                     {
-                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //DarkOrange
+                        using var brush2 = new SolidBrush(BookmarkMarkerTextColor);
                         using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
@@ -90,6 +90,8 @@ internal static class PaintHelper
     // Matches what SystemColors.Window resolves to under Application.SetColorMode(Dark).
     private static readonly Color _darkModeWindowBackColor = Color.FromArgb(32, 32, 32);
 
+    private static readonly Color _darkModeForeColor = Color.FromArgb(220, 220, 220);
+
     public static Color GetBackColorFromHighlightEntry (HighlightEntry? entry, bool darkMode)
     {
         return entry?.BackgroundColor ?? (darkMode ? _darkModeWindowBackColor : Color.White);
@@ -102,8 +104,13 @@ internal static class PaintHelper
             return entry.ForegroundColor;
         }
 
-        return darkMode ? Color.White : Color.Black;
+        return darkMode ? _darkModeForeColor : Color.Black;
     }
+
+    public static Color BookmarkMarkerTextColor =>
+        Application.IsDarkModeEnabled
+            ? Color.FromArgb(255, 220, 130, 20)  // brighter orange on dark
+            : Color.FromArgb(255, 190, 100, 0); // DarkOrange baseline
 
     [SupportedOSPlatform("windows")]
     public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)
@@ -250,7 +257,7 @@ internal static class PaintHelper
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
             Font = new Font("Courier New", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0),
-            ForeColor = darkMode ? Color.White : Color.Black,
+            ForeColor = darkMode ? _darkModeForeColor : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
@@ -265,7 +272,7 @@ internal static class PaintHelper
         {
             Alignment = DataGridViewContentAlignment.MiddleLeft,
             BackColor = SystemColors.Window,
-            ForeColor = darkMode ? Color.White : Color.Black,
+            ForeColor = darkMode ? _darkModeForeColor : Color.Black,
             SelectionBackColor = SystemColors.Highlight,
             SelectionForeColor = GetForeColorBasedOnBackColor(SystemColors.Highlight),
             WrapMode = DataGridViewTriState.False
