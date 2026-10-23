@@ -206,4 +206,90 @@ public class ToolWindowCoordinatorTests : IDisposable
         // Act & Assert
         Assert.DoesNotThrow(() => _coordinator.SetLineColumnVisible(true));
     }
+
+    [Test]
+    public void HideForCompactMode_HidesBookmarkWindow_AndRestoreShowsItInItsDockState ()
+    {
+        // Arrange
+        using var form = CreateHostForm(out var dockPanel);
+
+        _coordinator.Initialize();
+        var bookmarkWindow = (DockContent)_coordinator.GetDockContent("BookmarkWindow");
+        bookmarkWindow.Show(dockPanel, DockState.DockBottom);
+
+        Assert.That(bookmarkWindow.Visible, Is.True);
+        Assert.That(bookmarkWindow.DockState, Is.EqualTo(DockState.DockBottom));
+
+        // Act
+        _coordinator.HideForCompactMode();
+
+        // Assert
+        Assert.That(bookmarkWindow.Visible, Is.False);
+
+        // Act
+        _coordinator.RestoreAfterCompactMode(dockPanel);
+
+        // Assert
+        Assert.That(bookmarkWindow.Visible, Is.True);
+        Assert.That(bookmarkWindow.DockState, Is.EqualTo(DockState.DockBottom));
+    }
+
+    [Test]
+    public void RestoreAfterCompactMode_AfterBookmarkWindowWasRecreated_LeavesItHidden ()
+    {
+        // Arrange — a session load destroys and recreates the bookmark window while the mode is on
+        using var form = CreateHostForm(out var dockPanel);
+
+        _coordinator.Initialize();
+        var originalWindow = (DockContent)_coordinator.GetDockContent("BookmarkWindow");
+        originalWindow.Show(dockPanel, DockState.DockBottom);
+        _coordinator.HideForCompactMode();
+
+        _coordinator.Destroy();
+        _coordinator.Initialize();
+
+        var recreatedWindow = (DockContent)_coordinator.GetDockContent("BookmarkWindow");
+
+        // Act — the new window was never hidden by the mode, so there is nothing to restore
+        _coordinator.RestoreAfterCompactMode(dockPanel);
+
+        // Assert
+        Assert.That(recreatedWindow.Visible, Is.False);
+    }
+
+    [Test]
+    public void RestoreAfterCompactMode_WhenBookmarkWindowWasNotVisible_DoesNothing ()
+    {
+        // Arrange
+        using var form = CreateHostForm(out var dockPanel);
+
+        _coordinator.Initialize();
+        var bookmarkWindow = (DockContent)_coordinator.GetDockContent("BookmarkWindow");
+        bookmarkWindow.Show(dockPanel, DockState.DockBottom);
+        bookmarkWindow.Hide();
+
+        // Act
+        _coordinator.HideForCompactMode();
+        _coordinator.RestoreAfterCompactMode(dockPanel);
+
+        // Assert — leaving the mode must not resurface a window the user had closed
+        Assert.That(bookmarkWindow.Visible, Is.False);
+    }
+
+    private static Form CreateHostForm (out DockPanel dockPanel)
+    {
+        var form = new Form();
+
+        dockPanel = new DockPanel
+        {
+            Dock = DockStyle.Fill,
+            DocumentStyle = DocumentStyle.DockingWindow,
+            Theme = new VS2015LightTheme()
+        };
+
+        form.Controls.Add(dockPanel);
+        form.Show();
+
+        return form;
+    }
 }

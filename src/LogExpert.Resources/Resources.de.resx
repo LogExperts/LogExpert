@@ -1173,6 +1173,12 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
 		<value>Optionen</value>
 	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_compactModeToolStripMenuItem" xml:space="preserve">
+		<value>Kompaktmodus</value>
+	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_compactModeToolStripMenuItem" xml:space="preserve">
+		<value>Blendet Menü, Symbolleiste, Registerkarten und Statusleiste aus. Mit ESC beenden</value>
+	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
 		<value>Zu Tab kopieren</value>
 	</data>

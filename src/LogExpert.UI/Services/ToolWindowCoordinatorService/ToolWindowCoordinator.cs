@@ -8,6 +8,7 @@ using LogExpert.Core.Interfaces;
 using LogExpert.Dialogs;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
+using LogExpert.UI.Services.CompactModeService;
 
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -37,6 +38,11 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         _bookmarkWindow.PreferencesChanged(prefs.Font, prefs.SetLastColumnWidth, prefs.LastColumnWidth, SettingsFlags.All);
         _bookmarkWindow.VisibleChanged += OnBookmarkWindowVisibleChanged;
         _firstBookmarkWindowShow = true;
+
+        // A new window is not hidden by compact mode, whatever the previous one was doing: a session
+        // load destroys and recreates it, and the flag must not survive that.
+        _bookmarkWindowHiddenForCompactMode = false;
+        _bookmarkWindowDockState = DockState.DockBottom;
     }
 
     [SupportedOSPlatform("windows")]
@@ -49,6 +55,10 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
             _bookmarkWindow.Close();
             _bookmarkWindow = null;
         }
+
+        // The window the next Initialize() creates has not been hidden by compact mode yet.
+        _bookmarkWindowHiddenForCompactMode = false;
+        _bookmarkWindowDockState = DockState.DockBottom;
     }
 
     public void Connect (LogWindow logWindow)
@@ -142,10 +152,9 @@ internal sealed class ToolWindowCoordinator (IConfigManager configManager) : ITo
         _bookmarkWindowHiddenForCompactMode = false;
 
         // Show(dockPanel) would only activate a hidden content (DockContentHandler.Show), so the
-        // remembered dock state has to be passed explicitly.
-        var state = _bookmarkWindowDockState is DockState.Hidden or DockState.Unknown
-            ? DockState.DockBottom
-            : _bookmarkWindowDockState;
+        // remembered dock state has to be passed explicitly. A tool window has no document area to
+        // fall back to, so an unusable state becomes the default bottom dock.
+        var state = CompactDockStates.ToRestored(_bookmarkWindowDockState, DockState.DockBottom);
 
         _bookmarkWindow.Show(dockPanel, state);
     }

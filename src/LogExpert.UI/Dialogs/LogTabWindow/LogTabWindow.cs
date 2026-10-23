@@ -21,6 +21,7 @@ using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
+using LogExpert.UI.Services.CompactModeService;
 using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
@@ -80,22 +81,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private bool _wasMaximized;
 
-    private bool _compactMode;
-
-    private bool _compactRestoreStatusStripVisible;
-
     /// <summary>
-    /// State of the top tool strip panel before compact mode, restored on leave. Recorded instead of
-    /// assuming <c>true</c>: a future layout may start with the panel hidden.
+    /// Owns compact mode: the chrome it hides, the log window it keeps on screen, and the layout it
+    /// gives back when the mode ends.
     /// </summary>
-    private bool _compactRestoreTopToolStripPanelVisible;
-
-    /// <summary>
-    /// Document style before compact mode, restored on leave. Recorded for the same reason as
-    /// <see cref="_compactRestoreTopToolStripPanelVisible"/>: hard-coding the value would silently
-    /// drop any style other than <see cref="DocumentStyle.DockingWindow"/>.
-    /// </summary>
-    private DocumentStyle _compactRestoreDocumentStyle;
+    private readonly CompactModeController _compactModeController;
 
     /// <summary>
     /// Last GUI state received from the active log window, replayed when compact mode ends.
@@ -109,11 +99,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// is never applied to the toolbar.
     /// </summary>
     private LogWindow.LogWindow _lastGuiStateSource;
-
-    /// <summary>
-    /// Log windows hidden for the duration of compact mode, with the dock state they were shown in.
-    /// </summary>
-    private readonly List<(LogWindow.LogWindow Window, DockState State)> _compactHiddenWindows = [];
 
     #endregion
 
@@ -141,6 +126,16 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ConfigManager = configManager;
 
         _toolWindowCoordinator = new ToolWindowCoordinator(configManager);
+
+        _compactModeController = new CompactModeController(
+            this,
+            dockPanel,
+            statusStrip,
+            toolStripContainer,
+            dragControlDateTime,
+            _tabController,
+            _toolWindowCoordinator);
+        _compactModeController.CompactModeChanged += OnCompactModeChanged;
 
         _ledService = new LedIndicatorService();
         _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
@@ -604,9 +599,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     public void SwitchTab (bool shiftPressed)
     {
-        if (_compactMode)
+        if (_compactModeController.IsActive)
         {
-            SwitchCompactModeTab(shiftPressed);
+            _compactModeController.SwitchTab(shiftPressed);
             return;
         }
 
@@ -776,271 +771,45 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     #region Compact mode
 
     /// <summary>
-    /// Hides the menu strip, toolbars, document tabs and status bar. The window keeps its title bar,
-    /// size and position, so it stays movable, resizable and closable like any normal window.
+    /// Toggles compact mode. A minimised window is restored first: the mode has to leave a window
+    /// the user can actually see.
     /// </summary>
-    [SupportedOSPlatform("windows")]
-    private void EnterCompactMode ()
+    private void ToggleCompactMode ()
     {
-        if (_compactMode)
-        {
-            return;
-        }
-
-        if (WindowState == FormWindowState.Minimized)
+        if (!_compactModeController.IsActive && WindowState == FormWindowState.Minimized)
         {
             WindowState = FormWindowState.Normal;
         }
 
-        _compactMode = true;
-
-        _compactRestoreStatusStripVisible = statusStrip.Visible;
-        _compactRestoreTopToolStripPanelVisible = toolStripContainer.TopToolStripPanelVisible;
-        _compactRestoreDocumentStyle = dockPanel.DocumentStyle;
-
-        // The bookmark window docks below the documents and would take the space back.
-        _toolWindowCoordinator.HideForCompactMode();
-
-        // DockPanelSuite offers no switch for hiding the document tab strip: the strip disappears only
-        // for a document pane that holds a single content while in SDI style
-        // (DockPane.TabStripRectangle_Document). The other log windows are therefore hidden for as
-        // long as compact mode lasts and come back when it ends.
-        // Laid out once: every hidden window would otherwise re-layout the panes on its own.
-        dockPanel.SuspendLayout();
-
-        try
-        {
-            HideInactiveWindowsForCompactMode();
-
-            dockPanel.DocumentStyle = DocumentStyle.DockingSdi;
-        }
-        finally
-        {
-            dockPanel.ResumeLayout(true, true);
-        }
-
-        toolStripContainer.TopToolStripPanelVisible = false;
-        statusStrip.Visible = false;
-        dragControlDateTime.Visible = false;
-
-        compactModeToolStripMenuItem.Checked = true;
+        _compactModeController.Toggle();
     }
 
-    [SupportedOSPlatform("windows")]
-    private void ExitCompactMode ()
+    /// <summary>
+    /// Keeps the menu check mark in step with the mode, and refreshes the toolbar on leaving: while
+    /// the mode was active, GUI state updates ran with the timestamp control forced off, so the
+    /// toolbar would otherwise keep showing that forced state.
+    /// </summary>
+    private void OnCompactModeChanged (object sender, EventArgs e)
     {
-        if (!_compactMode)
+        compactModeToolStripMenuItem.Checked = _compactModeController.IsActive;
+
+        if (_compactModeController.IsActive)
         {
             return;
         }
 
-        _compactMode = false;
-
-        dockPanel.SuspendLayout();
-
-        try
-        {
-            dockPanel.DocumentStyle = _compactRestoreDocumentStyle;
-            RestoreWindowsHiddenForCompactMode();
-        }
-        finally
-        {
-            dockPanel.ResumeLayout(true, true);
-        }
-
-        toolStripContainer.TopToolStripPanelVisible = _compactRestoreTopToolStripPanelVisible;
-        statusStrip.Visible = _compactRestoreStatusStripVisible;
-
-        _toolWindowCoordinator.RestoreAfterCompactMode(dockPanel);
-
-        compactModeToolStripMenuItem.Checked = false;
-
-        // Replays the GUI state of the active window instead of restoring a remembered flag: the
-        // timestamp control must not come back for a window that no longer supports it. The state is
-        // only replayed while the window it came from is still the active one.
-        if (_lastGuiState != null && (_lastGuiStateSource == null || _lastGuiStateSource == CurrentLogWindow))
+        // Replays the GUI state of the window it came from instead of restoring a remembered flag:
+        // the timestamp control must not come back for a window that no longer supports it. Only a
+        // state from the window that is still active describes the toolbar; otherwise the current
+        // window is asked to publish its state again.
+        if (_lastGuiState != null && _lastGuiStateSource == CurrentLogWindow)
         {
             _menuToolbarController.UpdateGuiState(_lastGuiState, Preferences.TimestampControl);
         }
-    }
-
-    private void ToggleCompactMode ()
-    {
-        if (_compactMode)
-        {
-            ExitCompactMode();
-        }
         else
         {
-            EnterCompactMode();
+            CurrentLogWindow?.LogWindowActivated();
         }
-    }
-
-    /// <summary>
-    /// Hides every log window but the active one, remembering the dock state each was shown in.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    private void HideInactiveWindowsForCompactMode ()
-    {
-        _compactHiddenWindows.Clear();
-
-        // The DockPanel's own active content is what is really on screen; CurrentLogWindow can lag
-        // a step behind it during activation.
-        var active = dockPanel.ActiveContent as LogWindow.LogWindow ?? CurrentLogWindow;
-
-        // Nothing is on screen, so there is nothing to keep and nothing to hide. Hiding everything in
-        // this state would leave an empty pane behind.
-        if (active == null)
-        {
-            return;
-        }
-
-        // Materialised on purpose: hiding a window removes it from the panes being enumerated.
-        foreach (var window in _tabController.GetAllWindowsFromDockPanel())
-        {
-            if (window == active || window.IsDisposed)
-            {
-                continue;
-            }
-
-            RememberAndHideForCompactMode(window);
-        }
-    }
-
-    /// <summary>
-    /// Leaves <paramref name="target"/> as the only visible log window. Used when a document is added
-    /// while compact mode is active: the DockPanel has already activated it, and a second visible
-    /// document would bring the tab strip back.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    private void HideOtherWindowsForCompactMode (LogWindow.LogWindow target)
-    {
-        foreach (var window in _tabController.GetAllWindowsFromDockPanel())
-        {
-            if (window != target && !window.IsDisposed && window.Visible)
-            {
-                RememberAndHideForCompactMode(window);
-            }
-        }
-
-        if (!target.Visible)
-        {
-            target.Show(dockPanel, DockState.Document);
-        }
-
-        target.Activate();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void RememberAndHideForCompactMode (LogWindow.LogWindow window)
-    {
-        var state = window.DockState;
-
-        _compactHiddenWindows.Add((window, state));
-        window.Hide();
-    }
-
-    [SupportedOSPlatform("windows")]
-    private void RestoreWindowsHiddenForCompactMode ()
-    {
-        if (_compactHiddenWindows.Count == 0)
-        {
-            return;
-        }
-
-        var active = CurrentLogWindow;
-        var hidden = _compactHiddenWindows.ToArray();
-
-        _compactHiddenWindows.Clear();
-
-        foreach (var (window, state) in hidden)
-        {
-            if (window.IsDisposed)
-            {
-                continue;
-            }
-
-            window.Show(dockPanel, state == DockState.Hidden ? DockState.Document : state);
-        }
-
-        active?.Activate();
-    }
-
-    /// <summary>
-    /// Brings <paramref name="target"/> into the single visible document slot, hiding whichever window
-    /// held that slot.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    private void ShowCompactModeWindow (LogWindow.LogWindow target)
-    {
-        if (target == null || target.IsDisposed || target == CurrentLogWindow)
-        {
-            return;
-        }
-
-        var current = CurrentLogWindow;
-
-        dockPanel.SuspendLayout();
-
-        try
-        {
-            if (current != null && current != target && !current.IsDisposed && current.Visible)
-            {
-                RememberAndHideForCompactMode(current);
-            }
-
-            var index = _compactHiddenWindows.FindIndex(entry => entry.Window == target);
-            var state = DockState.Document;
-
-            if (index >= 0)
-            {
-                state = _compactHiddenWindows[index].State;
-                _compactHiddenWindows.RemoveAt(index);
-            }
-
-            // Hidden (the state Hide() leaves behind) and Float are both mapped to Document: compact
-            // mode shows exactly one document, and a float would come back as a separate window with
-            // its own caption, which is what this mode hides.
-            target.Show(dockPanel, state is DockState.Hidden or DockState.Float ? DockState.Document : state);
-        }
-        finally
-        {
-            dockPanel.ResumeLayout(true, true);
-        }
-
-        target.Activate();
-    }
-
-    /// <summary>
-    /// Ctrl+Tab inside compact mode: the tab strip is gone, so switching means swapping which window
-    /// is the visible one.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
-    private void SwitchCompactModeTab (bool shiftPressed)
-    {
-        var windows = _tabController.GetAllWindows();
-
-        if (windows.Count < 2)
-        {
-            return;
-        }
-
-        var index = -1;
-
-        for (var i = 0; i < windows.Count; i++)
-        {
-            if (windows[i] == CurrentLogWindow)
-            {
-                index = i;
-                break;
-            }
-        }
-
-        var nextIndex = shiftPressed
-            ? (index <= 0 ? windows.Count - 1 : index - 1)
-            : (index + 1) % windows.Count;
-
-        ShowCompactModeWindow(windows[nextIndex]);
     }
 
     #endregion
@@ -1152,11 +921,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         {
             logWindow.Visible = true;
 
-            if (_compactMode)
+            if (_compactModeController.IsActive)
             {
                 // Compact mode shows exactly one document. The window just opened has already been
                 // activated by the DockPanel, so it is the one to keep — hide the rest.
-                HideOtherWindowsForCompactMode(logWindow);
+                _compactModeController.OnWindowAdded(logWindow);
             }
         }
     }
@@ -1470,7 +1239,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _lastGuiStateSource = source;
 
         _skipEvents = true;
-        _menuToolbarController.UpdateGuiState(e, ConfigManager.Settings.Preferences.TimestampControl && !_compactMode);
+        _menuToolbarController.UpdateGuiState(e, ConfigManager.Settings.Preferences.TimestampControl && !_compactModeController.IsActive);
         _skipEvents = false;
     }
 
@@ -1800,6 +1569,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadSession (string sessionFileName, bool restoreLayout)
     {
+        // Leave compact mode first: restoring a layout while the mode hides every window but one
+        // would show the loaded documents again with the mode still on, and the mode's snapshot of
+        // hidden windows would no longer describe what is on screen.
+        _compactModeController.Exit();
+
         var outcome = _sessionHandler.LoadSession(sessionFileName);
         bool openedTabs = false;
 
@@ -2082,11 +1856,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         // saved).
         try
         {
-            ExitCompactMode();
+            _compactModeController.Exit();
         }
         catch (Exception ex)
         {
-            _logger.Error("Leaving compact mode while closing failed: " + ex.Message, ex);
+            _logger.Error(ex, "Leaving compact mode while closing failed");
         }
 
         CancelPendingDrop();
@@ -2132,35 +1906,15 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         logWindow.Tag = null;
 
-        if (_compactMode)
+        // A closed window must not stay referenced: the next replay would compare against it and
+        // skip a state that is still valid for the window now on screen.
+        if (_lastGuiStateSource == logWindow)
         {
-            _compactHiddenWindows.RemoveAll(entry => entry.Window == logWindow);
-
-            // Closing the only visible document while the others are hidden would leave an empty pane,
-            // so the next hidden one takes its place.
-            if (CurrentLogWindow == null && _compactHiddenWindows.Count > 0 && IsHandleCreated)
-            {
-                var next = _compactHiddenWindows[0].Window;
-
-                // The DockPanel is still tearing the closed window down here; switching now would
-                // re-enter that teardown.
-                try
-                {
-                    BeginInvoke(new Action(() =>
-                    {
-                        if (_compactMode && !next.IsDisposed)
-                        {
-                            ShowCompactModeWindow(next);
-                        }
-                    }));
-                }
-                catch (InvalidOperationException)
-                {
-                    // The window lost its handle while closing (ObjectDisposedException derives from
-                    // this as well); there is nothing left to switch to.
-                }
-            }
+            _lastGuiStateSource = null;
+            _lastGuiState = null;
         }
+
+        _compactModeController.OnWindowDisposed(logWindow);
     }
 
     private void OnExitToolStripMenuItemClick (object sender, EventArgs e)
@@ -2450,9 +2204,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return true;
         }
 
-        if (keyData == Keys.Escape && _compactMode)
+        if (keyData == Keys.Escape && _compactModeController.IsActive)
         {
-            ExitCompactMode();
+            _compactModeController.Exit();
             return true;
         }
 
@@ -2785,18 +2539,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         var activeWindow = _tabController.GetActiveWindow();
 
-        // Every tracked window that is (or was) placed in the dock panel — compact mode hides all
-        // but one document, and closing the others must not depend on which one is visible. Windows
-        // still waiting to be placed by a session layout restore (DockState.Unknown) are skipped:
-        // closing those would abort the restore.
-        var closeList = _tabController.GetAllWindows()
-                .Where(window => window != activeWindow && window.DockState != DockState.Unknown)
-                .ToList();
-
-        foreach (var logWindow in closeList)
+        // Nothing to keep: without an active window there is no "other" tab to close.
+        if (activeWindow == null)
         {
-            logWindow.Close();
+            return;
         }
+
+        _tabController.CloseAllExcept(activeWindow);
     }
 
     [SupportedOSPlatform("windows")]
@@ -2870,15 +2619,19 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
+            // Leave compact mode first: the layout written below has to describe the normal window.
+            // Saved from inside the mode, the hidden log windows and the bookmark window would be
+            // recorded as DockState.Hidden and come back hidden the next time the session is loaded.
+            _compactModeController.Exit();
+
             var fileName = dlg.FileName;
             List<string> fileNames = [];
 
-            // Every tracked window that is (or was) placed in the dock panel — compact mode hides
-            // all but one document, and saving a session must not drop the hidden ones. Windows
-            // still waiting to be placed by a session layout restore (DockState.Unknown) are
-            // skipped: the layout written below cannot place them, so the session would reference
-            // files that are gone the moment it is loaded again.
-            foreach (var logWin in _tabController.GetAllWindows().Where(window => window.DockState != DockState.Unknown))
+            // GetPlacedWindows also returns the windows compact mode hid, so saving a session never
+            // drops them. Windows still waiting to be placed by a session layout restore
+            // (DockState.Unknown) are skipped: the layout written below cannot place them, so the
+            // session would reference files that are gone the moment it is loaded again.
+            foreach (var logWin in _tabController.GetPlacedWindows())
             {
                 var persistenceFileName = logWin?.SavePersistenceDataAndReturnFileName(true);
                 if (persistenceFileName != null)

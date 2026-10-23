@@ -485,7 +485,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             compactModeToolStripMenuItem.ShortcutKeys = Keys.F11;
             compactModeToolStripMenuItem.Size = new Size(177, 22);
             compactModeToolStripMenuItem.Text = "Compact mode";
-            compactModeToolStripMenuItem.ToolTipText = "Hides the menu, toolbar, tabs and status bar. Leave with ESC.";
+            compactModeToolStripMenuItem.ToolTipText = "Hides the menu, toolbar, tabs and status bar. Leave with ESC";
             compactModeToolStripMenuItem.Click += OnCompactModeToolStripMenuItemClick;
             // 
             // optionToolStripMenuItem
