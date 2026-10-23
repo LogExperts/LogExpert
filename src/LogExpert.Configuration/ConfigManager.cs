@@ -315,17 +315,9 @@ public class ConfigManager : IConfigManager
         Save(SettingsFlags.FileHistory);
     }
 
-    public void RemoveFromFileHistory (string fileName)
+    public void ClearFileHistory ()
     {
-        bool findName (string s) => s.ToUpperInvariant().Equals(fileName.ToUpperInvariant(), StringComparison.Ordinal);
-
-        var index = Instance.Settings.FileHistoryList.FindIndex(findName);
-
-        if (index != -1)
-        {
-            Instance.Settings.FileHistoryList.RemoveAt(index);
-        }
-
+        Instance.Settings.FileHistoryList.Clear();
         Save(SettingsFlags.FileHistory);
     }
 
