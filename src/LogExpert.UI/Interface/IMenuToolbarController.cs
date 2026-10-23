@@ -45,13 +45,15 @@ internal interface IMenuToolbarController : IDisposable
     void UpdateHighlightGroups (IEnumerable<string> groups, string selectedGroup);
 
     /// <summary>
-    /// Populates file history menu with recent files.
-    /// Includes right-click removal support.
+    /// Populates the file history menu with recent files, followed by a
+    /// separator and a "clear recently used" row that raises
+    /// <see cref="FileHistoryClearRequested"/> when clicked.
+    /// The clear row is disabled when the history is empty.
     /// </summary>
     void PopulateFileHistory (IEnumerable<string> fileHistory);
 
     // Events
     event EventHandler<HistoryItemClickedEventArgs> HistoryItemClicked;
-    event EventHandler HistoryClearRequested;
+    event EventHandler FileHistoryClearRequested;
     event EventHandler<HighlightGroupSelectedEventArgs> HighlightGroupSelected;
 }

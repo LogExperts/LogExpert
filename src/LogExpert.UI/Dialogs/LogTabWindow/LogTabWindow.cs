@@ -235,7 +235,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void InitializeMenuToolbarControllerEvents ()
     {
         _menuToolbarController.HistoryItemClicked += OnMenuControllerHistoryItemClicked;
-        _menuToolbarController.HistoryClearRequested += OnMenuControllerHistoryClearRequested;
+        _menuToolbarController.FileHistoryClearRequested += OnMenuControllerFileHistoryClearRequested;
         _menuToolbarController.HighlightGroupSelected += OnMenuControllerHighlightGroupSelected;
     }
 
@@ -244,10 +244,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         CurrentLogWindow?.SetCurrentHighlightGroup(e.GroupName);
     }
 
-    private void OnMenuControllerHistoryClearRequested (object? sender, EventArgs e)
+    private void OnMenuControllerFileHistoryClearRequested (object? sender, EventArgs e)
     {
+        // ClearFileHistory persists via Save, whose ConfigChanged event reaches
+        // ApplySettings and rebuilds the history menu from there.
         ConfigManager.ClearFileHistory();
-        FillHistoryMenu();
     }
 
     private void OnMenuControllerHistoryItemClicked (object? sender, HistoryItemClickedEventArgs e)

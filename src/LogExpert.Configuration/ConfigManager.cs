@@ -317,7 +317,11 @@ public class ConfigManager : IConfigManager
 
     public void ClearFileHistory ()
     {
-        Instance.Settings.FileHistoryList.Clear();
+        lock (_loadSaveLock)
+        {
+            Instance.Settings.FileHistoryList.Clear();
+        }
+
         Save(SettingsFlags.FileHistory);
     }
 

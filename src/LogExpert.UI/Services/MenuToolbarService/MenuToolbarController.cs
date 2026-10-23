@@ -49,8 +49,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     // History menu
     private ToolStripMenuItem _lastUsedMenuItem;
 
-    // The "clear recently used" row of the history dropdown
-    private ToolStripMenuItem _clearHistoryItem;
+    private ToolStripMenuItem _clearFileHistoryItem;
 
     private readonly SynchronizationContext _uiContext;
     private readonly int _uiThreadId = Environment.CurrentManagedThreadId;
@@ -58,7 +57,7 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     private bool _suppressEvents;
 
     public event EventHandler<HistoryItemClickedEventArgs> HistoryItemClicked;
-    public event EventHandler HistoryClearRequested;
+    public event EventHandler FileHistoryClearRequested;
     public event EventHandler<HighlightGroupSelectedEventArgs> HighlightGroupSelected;
 
     public MenuToolbarController ()
@@ -282,13 +281,13 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             _ = strip.Items.Add(new ToolStripSeparator());
         }
 
-        _clearHistoryItem = new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
+        _clearFileHistoryItem = new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
         {
             Name = "clearFileHistoryToolStripMenuItem",
             Enabled = strip.Items.Count > 0
         };
 
-        _ = strip.Items.Add(_clearHistoryItem);
+        _ = strip.Items.Add(_clearFileHistoryItem);
 
         strip.ItemClicked += OnHistoryMenuItemClicked;
         _lastUsedMenuItem.DropDown = strip;
@@ -316,9 +315,9 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     private void OnHistoryMenuItemClicked (object sender, ToolStripItemClickedEventArgs e)
     {
-        if (ReferenceEquals(e.ClickedItem, _clearHistoryItem))
+        if (ReferenceEquals(e.ClickedItem, _clearFileHistoryItem))
         {
-            HistoryClearRequested?.Invoke(this, EventArgs.Empty);
+            FileHistoryClearRequested?.Invoke(this, EventArgs.Empty);
             return;
         }
 

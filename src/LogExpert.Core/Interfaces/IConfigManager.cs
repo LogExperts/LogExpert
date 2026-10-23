@@ -175,7 +175,7 @@ public interface IConfigManager
     /// This method is supported only on Windows platforms.</remarks>
     /// <param name="fileName">The name of the file to add to the file history list. Comparison is case-insensitive.</param>
     void AddToFileHistory (string fileName);
-
+    
     /// <summary>
     /// Removes all entries from the file history list.
     /// </summary>

@@ -287,11 +287,11 @@ internal class MenuToolbarControllerTests : IDisposable
     }
 
     [Test]
-    public void ClearHistoryItem_RaisesHistoryClearRequested_AndNotFileClicked ()
+    public void ClearHistoryItem_RaisesFileHistoryClearRequested_AndNotFileClicked ()
     {
         var clearRequested = 0;
         string clickedFile = null;
-        _controller.HistoryClearRequested += (_, _) => clearRequested++;
+        _controller.FileHistoryClearRequested += (_, _) => clearRequested++;
         _controller.HistoryItemClicked += (_, e) => clickedFile = e.FileName;
 
         _controller.PopulateFileHistory(["test.log"]);

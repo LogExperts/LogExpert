@@ -1,5 +1,3 @@
-using System.Reflection;
-
 using LogExpert.Core.Config;
 
 using Newtonsoft.Json;
@@ -21,14 +19,14 @@ public class ClearFileHistoryTests
     public void SetUp ()
     {
         _configManager = Configuration.ConfigManager.Instance;
-        _originalIsInitialized = GetPrivateField("_isInitialized") is true;
-        _originalSettings = GetPrivateField("_settings");
+        _originalIsInitialized = ConfigManagerTestReflection.GetPrivateField(_configManager, "_isInitialized") is true;
+        _originalSettings = ConfigManagerTestReflection.GetPrivateField(_configManager, "_settings");
         _originalConfigDir = _configManager.ConfigDir;
 
         _testDir = Path.Join(Path.GetTempPath(), "LogExpert_ClearHistoryTest_" + Guid.NewGuid().ToString("N"));
         _ = Directory.CreateDirectory(_testDir);
 
-        ResetConfigManagerInitialization();
+        ConfigManagerTestReflection.ResetConfigManagerInitialization(_configManager);
         _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
         _configManager.ConfigDir = _testDir;
     }
@@ -36,8 +34,8 @@ public class ClearFileHistoryTests
     [TearDown]
     public void TearDown ()
     {
-        SetPrivateField("_isInitialized", _originalIsInitialized);
-        SetPrivateField("_settings", _originalSettings);
+        ConfigManagerTestReflection.SetPrivateField(_configManager, "_isInitialized", _originalIsInitialized);
+        ConfigManagerTestReflection.SetPrivateField(_configManager, "_settings", _originalSettings);
         _configManager.ConfigDir = _originalConfigDir;
 
         try
@@ -111,30 +109,5 @@ public class ClearFileHistoryTests
             Assert.That(_configManager.Settings.RegexHistory.TesttextHistoryList, Has.Count.EqualTo(1));
             Assert.That(_configManager.Settings.ColumnizerHistoryList, Has.Count.EqualTo(1));
         });
-    }
-
-    /// <summary>
-    /// Resets the singleton so each test loads its settings from its own temp directory.
-    /// </summary>
-    private void ResetConfigManagerInitialization ()
-    {
-        SetPrivateField("_isInitialized", false);
-        SetPrivateField("_settings", null);
-    }
-
-    private object? GetPrivateField (string fieldName)
-    {
-        return Field(fieldName).GetValue(_configManager);
-    }
-
-    private void SetPrivateField (string fieldName, object? value)
-    {
-        Field(fieldName).SetValue(_configManager, value);
-    }
-
-    private static FieldInfo Field (string fieldName)
-    {
-        return typeof(Configuration.ConfigManager).GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance)
-            ?? throw new InvalidOperationException($"ConfigManager.{fieldName} is gone; update this fixture's reset.");
     }
 }
