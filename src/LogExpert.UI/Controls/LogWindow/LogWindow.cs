@@ -58,6 +58,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const string FONT_VERDANA = "Verdana";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+    private static readonly Color _bookmarkColor = Color.FromArgb(165, 200, 225);
+    private static readonly Color _autoBookmarkColor = Color.FromArgb(180, 210, 180);
+    private static readonly Color _bookmarkColorDark = Color.FromArgb(140, 195, 240);
+    private static readonly Color _autoBookmarkColorDark = Color.FromArgb(150, 215, 150);
+
     private readonly Image _advancedButtonImage;
 
     private readonly BookmarkDataProvider _bookmarkProvider = new();
@@ -267,8 +272,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         dataGridView.EditModeMenuStrip = editModeContextMenuStrip;
         markEditModeToolStripMenuItem.Enabled = true;
 
-        _panelOpenButtonImage = Resources.Arrow_menu_open;
-        _panelCloseButtonImage = Resources.Arrow_menu_close;
+        var darkImages = Application.IsDarkModeEnabled;
+        _panelOpenButtonImage = ThemedImages.Get("Arrow_menu_open", darkImages);
+        _panelCloseButtonImage = ThemedImages.Get("Arrow_menu_close", darkImages);
 
         var settings = configManager.Settings;
 
@@ -352,14 +358,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region Properties
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public Color BookmarkColor { get; set; } = Color.FromArgb(165, 200, 225);
+    public Color BookmarkColor { get; set; } = _bookmarkColor;
 
     /// <summary>
     /// Color used to paint the bookmark marker in column 0 for auto-generated (highlight-triggered) bookmarks. Uses a
     /// lighter/more desaturated shade to distinguish from manual bookmarks.
     /// </summary>
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-    public Color AutoBookmarkColor { get; set; } = Color.FromArgb(180, 210, 180);
+    public Color AutoBookmarkColor { get; set; } = _autoBookmarkColor;
 
     public ILogLineMemoryColumnizer CurrentColumnizer
     {
@@ -525,10 +531,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ApplyResourceImages ()
     {
+        var darkImages = Application.IsDarkModeEnabled;
         pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
-        btnFilterDown.BackgroundImage = Resources.ArrowDown;
-        btnFilterUp.BackgroundImage = Resources.ArrowUp;
-        btnToggleHighlightPanel.Image = Resources.Arrow_menu_open;
+        btnFilterDown.BackgroundImage = ThemedImages.Get("ArrowDown", darkImages);
+        btnFilterUp.BackgroundImage = ThemedImages.Get("ArrowUp", darkImages);
+        btnToggleHighlightPanel.Image = ThemedImages.Get("Arrow_menu_open", darkImages);
     }
 
     private void ApplyCheckBoxResources ()
@@ -2741,6 +2748,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterGridView.RowsDefaultCellStyle = PaintHelper.GetDataGridDefaultRowStyle(darkMode);
         PaintHelper.ApplyGridViewTheme(dataGridView, darkMode);
         PaintHelper.ApplyGridViewTheme(filterGridView, darkMode);
+
+        BookmarkColor = darkMode ? _bookmarkColorDark : _bookmarkColor;
+        AutoBookmarkColor = darkMode ? _autoBookmarkColorDark : _autoBookmarkColor;
     }
 
     [SupportedOSPlatform("windows")]
@@ -6635,7 +6645,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
-                        using var brush2 = new SolidBrush(Color.FromArgb(255, 190, 100, 0)); //dark orange
+                        using var brush2 = new SolidBrush(PaintHelper.GetBookmarkMarkerTextColor(Application.IsDarkModeEnabled));
                         using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }
