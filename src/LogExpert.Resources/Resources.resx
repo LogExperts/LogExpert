@@ -1218,6 +1218,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
         <value>Copy to Tab</value>
     </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
+        <value>Detach Mode</value>
+    </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
         <value>Options</value>
     </data>
@@ -1382,6 +1385,9 @@ Checked tools will appear in the icon bar. All other tools are available in the 
     </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
         <value>Copies all selected lines into a new tab page</value>
+    </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem" xml:space="preserve">
+        <value>Shows the active log alone in its own window and hides the main window</value>
     </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem" xml:space="preserve">
         <value>Splits various kinds of logfiles into fixed columns</value>

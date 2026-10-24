@@ -1176,6 +1176,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
 		<value>Zu Tab kopieren</value>
 	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
+		<value>Detach-Modus</value>
+	</data>
   <data name="TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView" xml:space="preserve">
 		<value>Berechne Zeitstreuungsanzeige...</value>
 	</data>
@@ -1371,6 +1374,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
 		<value>Kopiert alle selektierten Zeilen in einen neuen Tab</value>
+	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem" xml:space="preserve">
+		<value>Zeigt das aktive Protokoll allein in einem eigenen Fenster an und blendet das Hauptfenster aus</value>
 	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem" xml:space="preserve">
 		<value>Splittet diverse Logdateien in fixierte Spalten</value>

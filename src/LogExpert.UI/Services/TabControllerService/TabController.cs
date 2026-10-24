@@ -264,22 +264,11 @@ internal class TabController : ITabController
     /// </summary>
     public void SwitchToNextWindow ()
     {
-        lock (_windowsLock)
+        var next = GetNextWindow();
+
+        if (next != null)
         {
-            if (_windows.Count == 0)
-            {
-                return;
-            }
-
-            var windows = _windows.Keys.ToList();
-            var currentIndex = _activeWindow != null
-                ? windows.IndexOf(_activeWindow)
-                : -1;
-
-            // Move forward, wrap around to beginning if at end
-            var nextIndex = (currentIndex + 1) % windows.Count;
-
-            windows[nextIndex].Activate();
+            next.Activate();
         }
     }
 
@@ -288,16 +277,69 @@ internal class TabController : ITabController
     /// </summary>
     public void SwitchToPreviousWindow ()
     {
+        var previous = GetPreviousWindow();
+
+        if (previous != null)
+        {
+            previous.Activate();
+        }
+    }
+
+    /// <summary>
+    /// Resolves the window that follows <paramref name="current"/> in the tracking order, without
+    /// activating it. Callers that display windows differently from the DockPanel need the target
+    /// window rather than an <c>Activate()</c>.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move on from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The next window, or <c>null</c> when no window is tracked.</returns>
+    public LogWindow GetNextWindow (LogWindow current = null)
+    {
         lock (_windowsLock)
         {
             if (_windows.Count == 0)
             {
-                return;
+                return null;
             }
 
             var windows = _windows.Keys.ToList();
-            var currentIndex = _activeWindow != null
-                ? windows.IndexOf(_activeWindow)
+            var anchor = current ?? _activeWindow;
+            var currentIndex = anchor != null
+                ? windows.IndexOf(anchor)
+                : -1;
+
+            // Move forward, wrap around to beginning if at end
+            var nextIndex = (currentIndex + 1) % windows.Count;
+
+            return windows[nextIndex];
+        }
+    }
+
+    /// <summary>
+    /// Resolves the window that precedes <paramref name="current"/> in the tracking order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move back from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The previous window, or <c>null</c> when no window is tracked.</returns>
+    public LogWindow GetPreviousWindow (LogWindow current = null)
+    {
+        lock (_windowsLock)
+        {
+            if (_windows.Count == 0)
+            {
+                return null;
+            }
+
+            var windows = _windows.Keys.ToList();
+            var anchor = current ?? _activeWindow;
+
+            // Without an anchor the walk starts at the first window, so "previous" wraps to the last
+            // one ("next" without an anchor lands on the first one the same way).
+            var currentIndex = anchor != null
+                ? windows.IndexOf(anchor)
                 : 0;
 
             // Move backward, wrap around to end if at beginning
@@ -307,7 +349,7 @@ internal class TabController : ITabController
                 previousIndex = windows.Count - 1;
             }
 
-            windows[previousIndex].Activate();
+            return windows[previousIndex];
         }
     }
 
@@ -458,6 +500,10 @@ internal class TabController : ITabController
     /// Gets all LogWindow instances currently held by the DockPanel's panes, in the order their tab strips display
     /// them. Panes of every dock state are enumerated, so floating windows are included.
     /// </summary>
+    /// <remarks>
+    /// Only windows whose pane currently displays them are returned: a window hidden with
+    /// <see cref="Control.Hide"/> drops out of the enumeration even though its pane still exists.
+    /// </remarks>
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
     public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
     {

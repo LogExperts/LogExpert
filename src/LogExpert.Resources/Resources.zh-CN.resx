@@ -1088,6 +1088,9 @@
   <data name="LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
     <value>复制到标签页</value>
   </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
+    <value>分离模式</value>
+  </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
     <value>选项</value>
   </data>
@@ -1249,6 +1252,9 @@
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem" xml:space="preserve">
     <value>将所有选中行复制到新标签页</value>
+  </data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_logOnlyViewToolStripMenuItem" xml:space="preserve">
+    <value>在独立窗口中仅显示当前日志，并隐藏主窗口</value>
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem" xml:space="preserve">
     <value>将各类日志文件拆分为固定列</value>

@@ -66,6 +66,26 @@ internal interface ITabController : IDisposable
     void SwitchToPreviousWindow ();
 
     /// <summary>
+    /// Resolves the LogWindow that follows <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move on from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The next LogWindow, or <c>null</c> when no window is tracked.</returns>
+    LogWindow GetNextWindow (LogWindow current = null);
+
+    /// <summary>
+    /// Resolves the LogWindow that precedes <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move back from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The previous LogWindow, or <c>null</c> when no window is tracked.</returns>
+    LogWindow GetPreviousWindow (LogWindow current = null);
+
+    /// <summary>
     /// Finds a LogWindow by its associated file name.
     /// </summary>
     /// <param name="fileName">The file name to search for.</param>
