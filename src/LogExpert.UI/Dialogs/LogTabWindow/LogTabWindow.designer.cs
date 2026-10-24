@@ -473,20 +473,20 @@ namespace LogExpert.UI.Controls.LogTabWindow
             copyMarkedLinesIntoNewTabToolStripMenuItem.Text = "Copy to Tab";
             copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = "Copies all selected lines into a new tab page";
             copyMarkedLinesIntoNewTabToolStripMenuItem.Click += OnCopyMarkedLinesIntoNewTabToolStripMenuItemClick;
-            //
+            // 
             // ToolStripSeparator12
-            //
+            // 
             ToolStripSeparator12.Name = "ToolStripSeparator12";
             ToolStripSeparator12.Size = new Size(174, 6);
-            //
+            // 
             // logOnlyViewToolStripMenuItem
-            //
+            // 
             logOnlyViewToolStripMenuItem.Name = "logOnlyViewToolStripMenuItem";
             logOnlyViewToolStripMenuItem.ShortcutKeyDisplayString = "F11";
             logOnlyViewToolStripMenuItem.Size = new Size(177, 22);
-            logOnlyViewToolStripMenuItem.Text = "Log Only View";
+            logOnlyViewToolStripMenuItem.Text = "Detach Mode";
             logOnlyViewToolStripMenuItem.ToolTipText = "Shows the active log alone in its own window and hides the main window";
-            logOnlyViewToolStripMenuItem.Click += OnLogOnlyViewToolStripMenuItemClick;
+            logOnlyViewToolStripMenuItem.Click += OnDetachModeToolStripMenuItemClick;
             // 
             // optionToolStripMenuItem
             // 

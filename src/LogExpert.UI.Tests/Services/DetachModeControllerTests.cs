@@ -24,6 +24,7 @@ namespace LogExpert.UI.Tests.Services;
 [TestFixture]
 [SupportedOSPlatform("windows")]
 [Apartment(ApartmentState.STA)]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "NUnit disposes the fields in TearDown.")]
 internal class DetachModeControllerTests
 {
     private Form _form;
@@ -226,7 +227,7 @@ internal class DetachModeControllerTests
     }
 
     [Test]
-    public void OnWindowDisposed_WithOtherWindows_DetachesTheNextOne ()
+    public void OnWindowDisposed_WithOtherWindows_EndsTheModeAndRestoresMainForm ()
     {
         // Arrange
         var windows = AddWindows("first.log", "second.log");
@@ -241,14 +242,15 @@ internal class DetachModeControllerTests
         _controller.OnWindowDisposed(active);
         Application.DoEvents();
 
-        // Assert — the surviving window takes the detached float over
+        // Assert — closing the detached window ends detach mode and brings back the main form.
+        // Other log windows remain where they were.
         var other = windows.Single(window => window != active);
 
         Assert.Multiple(() =>
         {
-            Assert.That(_controller.IsActive, Is.True);
-            Assert.That(other.DockState, Is.EqualTo(DockState.Float));
-            Assert.That(_form.Visible, Is.False);
+            Assert.That(_controller.IsActive, Is.False);
+            Assert.That(_form.Visible, Is.True);
+            Assert.That(other.DockState, Is.EqualTo(DockState.Document));
         });
     }
 
@@ -349,13 +351,12 @@ internal class DetachModeControllerTests
     }
 
     [Test]
-    public void PreFilterMessage_EscWithTextInputFocused_PassesThroughAndStaysInMode ()
+    public void PreFilterMessage_Esc_PassesThroughAndStaysInMode ()
     {
-        // Arrange — the log window's search box owns the focus
+        // Arrange — ESC is not handled by the filter at all; the grid or text input handles it
         AddWindows("first.log");
         _controller.Enter();
         var filter = CreateFilter();
-        filter._isTextInputFocused = () => true;
 
         var msg = new Message
         {
@@ -367,7 +368,7 @@ internal class DetachModeControllerTests
         // Act
         var swallowed = filter.PreFilterMessage(ref msg);
 
-        // Assert — ESC belongs to the text input, e.g. canceling a search
+        // Assert — ESC passes through untouched
         Assert.Multiple(() =>
         {
             Assert.That(swallowed, Is.False);
@@ -376,18 +377,17 @@ internal class DetachModeControllerTests
     }
 
     [Test]
-    public void PreFilterMessage_EscWithoutTextInput_LeavesTheMode ()
+    public void PreFilterMessage_F11WhileAnotherFormIsActive_DoesNotLeaveTheMode ()
     {
-        // Arrange — no text input holds the focus
+        // Arrange — a modal dialog or any other window holds the focus
         AddWindows("first.log");
         _controller.Enter();
-        var filter = CreateFilter();
-        filter._isTextInputFocused = () => false;
+        var filter = CreateFilter(activeFormGetter: () => _form);
 
         var msg = new Message
         {
             Msg = 0x0100,
-            WParam = (IntPtr)0x1B, // VK_ESCAPE
+            WParam = (IntPtr)0x7A, // VK_F11
             LParam = 0
         };
 
@@ -397,9 +397,9 @@ internal class DetachModeControllerTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(swallowed, Is.True);
-            Assert.That(_controller.IsActive, Is.False);
-            Assert.That(_form.Visible, Is.True);
+            Assert.That(swallowed, Is.False);
+            Assert.That(_controller.IsActive, Is.True, "the key belongs to the form in front");
+            Assert.That(_form.Visible, Is.False);
         });
     }
 
@@ -409,8 +409,7 @@ internal class DetachModeControllerTests
         // Arrange
         var windows = AddWindows("first.log", "second.log");
         _controller.Enter(); // detaches the active window, the last added one
-        var filter = CreateFilter();
-        filter._modifierKeys = () => Keys.Control;
+        var filter = CreateFilter(() => Keys.Control);
 
         var msg = new Message
         {
@@ -438,8 +437,7 @@ internal class DetachModeControllerTests
         // Arrange
         var windows = AddWindows("first.log", "second.log", "third.log");
         _controller.Enter(); // detaches the active window, the last added one
-        var filter = CreateFilter();
-        filter._modifierKeys = () => Keys.Control | Keys.Shift;
+        var filter = CreateFilter(() => Keys.Control | Keys.Shift);
 
         var msg = new Message
         {
@@ -490,7 +488,8 @@ internal class DetachModeControllerTests
     /// A fresh filter wired to the controller, so <c>PreFilterMessage</c> can be driven without a
     /// running message pump.
     /// </summary>
-    private DetachMessageFilter CreateFilter () => new(_controller);
+    private DetachMessageFilter CreateFilter (Func<Keys>? modifierKeysGetter = null, Func<Form>? activeFormGetter = null)
+        => new(_controller, modifierKeysGetter, activeFormGetter ?? (() => _controller.DetachedFloat));
 
     private FloatWindow FloatWindowOf (LogWindow content)
     {

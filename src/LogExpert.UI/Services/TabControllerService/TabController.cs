@@ -208,18 +208,12 @@ internal class TabController : ITabController
     }
 
     /// <summary>
-    /// Closes every placed window except the specified one. Windows that are not placed in the
-    /// dock panel yet (see <see cref="GetPlacedWindows"/>) are left alone.
+    /// Closes all windows except the specified one
     /// </summary>
     /// <param name="window">Window to keep open</param>
     public void CloseAllExcept (LogWindow window)
     {
-        if (window == null)
-        {
-            return;
-        }
-
-        var windowsToClose = GetPlacedWindows()
+        var windowsToClose = GetAllWindows()
             .Where(w => w != window)
             .ToList();
 
@@ -415,28 +409,6 @@ internal class TabController : ITabController
     }
 
     /// <summary>
-    /// Gets all tracked windows that are (or were) placed in the dock panel, in tracking order.
-    /// A window that a session layout restore has not placed yet reports
-    /// <see cref="DockState.Unknown"/> and is skipped: it cannot be written to a layout, and closing
-    /// it would abort the restore.
-    /// </summary>
-    /// <remarks>
-    /// Unlike <see cref="GetAllWindowsFromDockPanel"/> this also returns windows that are currently
-    /// hidden, which is what a session save and "close other tabs" need when any window is hidden.
-    /// </remarks>
-    /// <returns>Read-only list of the placed LogWindows.</returns>
-    public IReadOnlyList<LogWindow> GetPlacedWindows ()
-    {
-        lock (_windowsLock)
-        {
-            return _windows.Keys
-                .Where(window => window.DockState != DockState.Unknown)
-                .ToList()
-                .AsReadOnly();
-        }
-    }
-
-    /// <summary>
     /// Gets the count of tracked windows
     /// </summary>
     /// <returns>Number of tracked windows</returns>
@@ -531,8 +503,6 @@ internal class TabController : ITabController
     /// <remarks>
     /// Only windows whose pane currently displays them are returned: a window hidden with
     /// <see cref="Control.Hide"/> drops out of the enumeration even though its pane still exists.
-    /// Use <see cref="GetPlacedWindows"/> when hidden windows have to be included, as in a session
-    /// save or "close other tabs".
     /// </remarks>
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
     public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()

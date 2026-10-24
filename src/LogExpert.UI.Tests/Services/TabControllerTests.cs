@@ -236,49 +236,6 @@ internal class TabControllerTests : IDisposable
 
     #endregion
 
-    #region GetPlacedWindows Tests
-
-    [Test]
-    public void GetPlacedWindows_ExcludesWindowsThatWereNeverPlaced ()
-    {
-        // Arrange
-        using var placed = CreateLogWindow("placed.log");
-        using var deferred = CreateLogWindow("deferred.log");
-
-        _tabController.AddWindow(placed, "placed.log");
-        _tabController.AddWindow(deferred, "deferred.log", doNotAddToDockPanel: true);
-
-        // Act
-        var result = _tabController.GetPlacedWindows();
-
-        // Assert — a window a session layout restore has not placed yet cannot be saved or closed
-        Assert.That(result, Is.EqualTo([placed]));
-    }
-
-    [Test]
-    public void GetPlacedWindows_IncludesHiddenWindowsThatTheDockPanelNoLongerDisplays ()
-    {
-        // Arrange
-        using var first = CreateLogWindow("first.log");
-        using var second = CreateLogWindow("second.log");
-
-        _tabController.AddWindow(first, "first.log");
-        _tabController.AddWindow(second, "second.log");
-
-        second.Hide();
-
-        // Act
-        var placed = _tabController.GetPlacedWindows();
-        var displayed = _tabController.GetAllWindowsFromDockPanel();
-
-        // Assert — this is why a session save and "close other tabs" cannot use the DockPanel query
-        // when windows are hidden
-        Assert.That(placed, Is.EqualTo([first, second]));
-        Assert.That(displayed, Is.EqualTo([first]));
-    }
-
-    #endregion
-
     #region GetWindowCount Tests
 
     [Test]
@@ -500,27 +457,6 @@ internal class TabControllerTests : IDisposable
         // Act & Assert
         Assert.That(_tabController.GetNextWindow(null), Is.Null);
         Assert.That(_tabController.GetPreviousWindow(null), Is.Null);
-    }
-
-    #endregion
-
-    #region CloseAllExcept Tests
-
-    [Test]
-    public void CloseAllExcept_WithNullWindow_LeavesEveryWindowOpen ()
-    {
-        // Arrange
-        using var first = CreateLogWindow("first.log");
-        using var second = CreateLogWindow("second.log");
-
-        _tabController.AddWindow(first, "first.log");
-        _tabController.AddWindow(second, "second.log");
-
-        // Act
-        _tabController.CloseAllExcept(null);
-
-        // Assert
-        Assert.That(_tabController.GetWindowCount(), Is.EqualTo(2));
     }
 
     #endregion
