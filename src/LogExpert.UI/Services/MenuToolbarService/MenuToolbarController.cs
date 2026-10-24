@@ -49,13 +49,15 @@ internal sealed class MenuToolbarController : IMenuToolbarController
     // History menu
     private ToolStripMenuItem _lastUsedMenuItem;
 
+    private ToolStripMenuItem _clearFileHistoryItem;
+
     private readonly SynchronizationContext _uiContext;
     private readonly int _uiThreadId = Environment.CurrentManagedThreadId;
     private bool _disposed;
     private bool _suppressEvents;
 
     public event EventHandler<HistoryItemClickedEventArgs> HistoryItemClicked;
-    public event EventHandler<HistoryItemClickedEventArgs> HistoryItemRemoveRequested;
+    public event EventHandler FileHistoryClearRequested;
     public event EventHandler<HighlightGroupSelectedEventArgs> HighlightGroupSelected;
 
     public MenuToolbarController ()
@@ -265,7 +267,6 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         if (_lastUsedMenuItem.DropDown != null)
         {
             _lastUsedMenuItem.DropDown.ItemClicked -= OnHistoryMenuItemClicked;
-            _lastUsedMenuItem.DropDown.MouseUp -= OnHistoryStripMouseUp;
         }
 
         var strip = new ToolStripDropDownMenu();
@@ -275,8 +276,20 @@ internal sealed class MenuToolbarController : IMenuToolbarController
             _ = strip.Items.Add(new ToolStripMenuItem(file));
         }
 
+        if (strip.Items.Count > 0)
+        {
+            _ = strip.Items.Add(new ToolStripSeparator());
+        }
+
+        _clearFileHistoryItem = new ToolStripMenuItem(Resources.LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem)
+        {
+            Name = "clearFileHistoryToolStripMenuItem",
+            Enabled = strip.Items.Count > 0
+        };
+
+        _ = strip.Items.Add(_clearFileHistoryItem);
+
         strip.ItemClicked += OnHistoryMenuItemClicked;
-        strip.MouseUp += OnHistoryStripMouseUp;
         _lastUsedMenuItem.DropDown = strip;
     }
 
@@ -302,28 +315,16 @@ internal sealed class MenuToolbarController : IMenuToolbarController
 
     private void OnHistoryMenuItemClicked (object sender, ToolStripItemClickedEventArgs e)
     {
+        if (ReferenceEquals(e.ClickedItem, _clearFileHistoryItem))
+        {
+            FileHistoryClearRequested?.Invoke(this, EventArgs.Empty);
+            return;
+        }
+
         var fileName = e.ClickedItem?.Text;
         if (!string.IsNullOrEmpty(fileName))
         {
             HistoryItemClicked?.Invoke(this, new HistoryItemClickedEventArgs(fileName));
-        }
-    }
-
-    private void OnHistoryStripMouseUp (object sender, MouseEventArgs e)
-    {
-        // Right-click to remove from history (preserves existing LogTabWindow behavior)
-        if (e.Button != MouseButtons.Right)
-        {
-            return;
-        }
-
-        if (sender is ToolStripDropDownMenu strip)
-        {
-            var item = strip.GetItemAt(e.Location);
-            if (item != null && !string.IsNullOrEmpty(item.Text))
-            {
-                HistoryItemRemoveRequested?.Invoke(this, new HistoryItemClickedEventArgs(item.Text));
-            }
         }
     }
 
@@ -415,7 +416,6 @@ internal sealed class MenuToolbarController : IMenuToolbarController
         if (_lastUsedMenuItem?.DropDown != null)
         {
             _lastUsedMenuItem.DropDown.ItemClicked -= OnHistoryMenuItemClicked;
-            _lastUsedMenuItem.DropDown.MouseUp -= OnHistoryStripMouseUp;
         }
 
         _disposed = true;
