@@ -26,7 +26,7 @@ public class ConfigManagerPortableModeTests
         _configManager = Configuration.ConfigManager.Instance;
 
         // Reset the singleton's initialization state using reflection
-        ResetConfigManagerInitialization();
+        ConfigManagerTestReflection.ResetConfigManagerInitialization(_configManager);
 
         _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
     }
@@ -63,19 +63,6 @@ public class ConfigManagerPortableModeTests
     }
 
     #region Helper Methods
-
-    /// <summary>
-    /// Resets ConfigManager singleton initialization state via reflection.
-    /// </summary>
-    private void ResetConfigManagerInitialization ()
-    {
-        var isInitializedField = typeof(Configuration.ConfigManager).GetField("_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
-        isInitializedField?.SetValue(_configManager, false);
-
-        // Reset settings so they reload from the new path
-        var settingsField = typeof(Configuration.ConfigManager).GetField("_settings", BindingFlags.NonPublic | BindingFlags.Instance);
-        settingsField?.SetValue(_configManager, null);
-    }
 
     /// <summary>
     /// Invokes a private instance method using reflection.
@@ -758,7 +745,7 @@ public class ConfigManagerPortableModeTests
         CreateSettingsFile(_configManager.PortableConfigDir);
 
         // Reset settings to force reload
-        ResetConfigManagerInitialization();
+        ConfigManagerTestReflection.ResetConfigManagerInitialization(_configManager);
         _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
 
         // Act - Access Settings to trigger Load()
@@ -783,7 +770,7 @@ public class ConfigManagerPortableModeTests
             """{ "Preferences": { "FontName": "OldLayout" }, "FilterList": [] }""");
 
         // Reset settings to force reload
-        ResetConfigManagerInitialization();
+        ConfigManagerTestReflection.ResetConfigManagerInitialization(_configManager);
         _configManager.Initialize(_testDir, new Rectangle(0, 0, 1920, 1080));
 
         // Act - Access Settings to trigger Load() which should migrate
