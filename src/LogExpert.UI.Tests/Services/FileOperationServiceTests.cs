@@ -205,7 +205,7 @@ internal class FileOperationServiceTests : IDisposable
         // Assert
         Assert.That(receivedArgs, Is.Not.Null);
         Assert.That(receivedArgs!.LogWindow, Is.SameAs(_stubLogWindow));
-        Assert.That(receivedArgs.Request, Is.SameAs(request));
+        Assert.That(receivedArgs.Request, Is.EqualTo(request));
         Assert.That(receivedArgs.ResolvedFileName, Is.Not.Null.And.Not.Empty);
         Assert.That(receivedArgs.EncodingOptions, Is.Not.Null);
     }

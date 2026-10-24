@@ -6,14 +6,6 @@ using NUnit.Framework;
 
 namespace LogExpert.UI.Tests.Services;
 
-/// <summary>
-/// Tests the guard rails of <see cref="ShortcutResolver"/>: end to end via
-/// <see cref="ShortcutResolver.Resolve"/> for whole-file behaviour (real shortcuts, oversized
-/// files, plain UNC targets), and directly on <see cref="ShortcutResolver.SanitizeLocalTarget"/>
-/// for disguised target forms — the shell parser cannot be fed strings like
-/// <c>//host/share</c> through any API a test could use, but the guard must reject them, so it is
-/// written as a pure function and tested as one.
-/// </summary>
 [TestFixture]
 [SupportedOSPlatform("windows")]
 internal class ShortcutResolverTests
@@ -76,33 +68,79 @@ internal class ShortcutResolverTests
         }
     }
 
+    // The shell resolves .lnk targets when saving, so a real chain cannot be produced with
+    // WScript.Shell; the follower is exercised with injected hops instead.
+    [Test]
+    public void FollowChain_ShortcutToShortcut_ReturnsFinalTarget ()
+    {
+        var targets = new Dictionary<string, string>
+        {
+            [@"C:\logs\first.lnk"] = @"C:\logs\second.lnk",
+            [@"C:\logs\second.lnk"] = @"C:\logs\actual.log"
+        };
+
+        Assert.That(ShortcutResolver.FollowChain(@"C:\logs\first.lnk", path => targets.GetValueOrDefault(path)),
+            Is.EqualTo(@"C:\logs\actual.log"));
+    }
+
+    [Test]
+    public void FollowChain_ChainAtLimit_ReturnsFinalTarget ()
+    {
+        var targets = CreateChain(ShortcutResolver.MAX_SHORTCUT_HOPS);
+
+        Assert.That(ShortcutResolver.FollowChain(@"C:\logs\link1.lnk", path => targets.GetValueOrDefault(path)),
+            Is.EqualTo(@"C:\logs\actual.log"));
+    }
+
+    [Test]
+    public void FollowChain_ChainBeyondLimit_StopsAfterMaxHops ()
+    {
+        var targets = CreateChain(ShortcutResolver.MAX_SHORTCUT_HOPS + 1);
+
+        Assert.That(ShortcutResolver.FollowChain(@"C:\logs\link1.lnk", path => targets.GetValueOrDefault(path)),
+            Is.EqualTo(@"C:\logs\link1.lnk"));
+    }
+
+    [Test]
+    public void FollowChain_CyclicChain_StopsAfterMaxHops ()
+    {
+        var targets = new Dictionary<string, string>
+        {
+            [@"C:\logs\first.lnk"] = @"C:\logs\second.lnk",
+            [@"C:\logs\second.lnk"] = @"C:\logs\first.lnk"
+        };
+
+        Assert.That(ShortcutResolver.FollowChain(@"C:\logs\first.lnk", path => targets.GetValueOrDefault(path)),
+            Is.EqualTo(@"C:\logs\first.lnk"));
+    }
+
     [TestCase("//nonexistent-host/share/actual.log")]
     [TestCase(@"\\?\UNC\nonexistent-host\share\actual.log")]
     [TestCase(@"\\?\C:\Windows\system32\drivers\etc\hosts")]
     [TestCase(@"\\.\C:\nonexistent\actual.log")]
     [TestCase(@"\??\UNC\nonexistent-host\share\actual.log")]
-    public void Sanitize_DisguisedNonLocalTarget_IsRejected (string target)
+    public void SanitizeLocalTarget_DisguisedNonLocalTarget_IsRejected (string target)
     {
         Assert.That(ShortcutResolver.SanitizeLocalTarget(target, @"C:\logs"), Is.Null,
             $"'{target}' must not be followed: probing it could reach the network");
     }
 
     [Test]
-    public void Sanitize_PlainLocalTarget_ReturnsFullPath ()
+    public void SanitizeLocalTarget_PlainLocalTarget_ReturnsFullPath ()
     {
         Assert.That(ShortcutResolver.SanitizeLocalTarget(@"C:\logs\actual.log", @"D:\other"),
             Is.EqualTo(@"C:\logs\actual.log"));
     }
 
     [Test]
-    public void Sanitize_RelativeTarget_ResolvesAgainstShortcutDirectory ()
+    public void SanitizeLocalTarget_RelativeTarget_ResolvesAgainstShortcutDirectory ()
     {
         Assert.That(ShortcutResolver.SanitizeLocalTarget(@"sub\actual.log", @"C:\logs"),
             Is.EqualTo(@"C:\logs\sub\actual.log"));
     }
 
     [Test]
-    public void Sanitize_EnvironmentVariableTarget_IsExpanded ()
+    public void SanitizeLocalTarget_EnvironmentVariableTarget_IsExpanded ()
     {
         Environment.SetEnvironmentVariable("LOGEXPERT_TEST_VAR", @"C:\logs", EnvironmentVariableTarget.Process);
 
@@ -115,6 +153,20 @@ internal class ShortcutResolverTests
         {
             Environment.SetEnvironmentVariable("LOGEXPERT_TEST_VAR", null, EnvironmentVariableTarget.Process);
         }
+    }
+
+    private static Dictionary<string, string> CreateChain (int linkCount)
+    {
+        var targets = new Dictionary<string, string>();
+
+        for (var i = 1; i <= linkCount; i++)
+        {
+            targets[$@"C:\logs\link{i}.lnk"] = i == linkCount
+                ? @"C:\logs\actual.log"
+                : $@"C:\logs\link{i + 1}.lnk";
+        }
+
+        return targets;
     }
 
     private static string CreateTempDirectory (string name)

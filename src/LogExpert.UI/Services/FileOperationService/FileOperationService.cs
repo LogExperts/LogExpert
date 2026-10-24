@@ -68,11 +68,7 @@ internal sealed class FileOperationService (
 
     public LogWindow AddFileTab (FileTabRequest request)
     {
-        var resolvedFile = ShortcutResolver.Resolve(request.FileName);
-        if (!string.Equals(resolvedFile, request.FileName, StringComparison.Ordinal))
-        {
-            request = request with { FileName = resolvedFile };
-        }
+        request = request with { FileName = ShortcutResolver.Resolve(request.FileName) };
 
         var logFileName = PersisterHelpers.FindFilenameForSettings(request.FileName, _pluginRegistry);
         var normalizedPath = Path.GetFullPath(logFileName);
