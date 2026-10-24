@@ -1177,7 +1177,7 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
 		<value>Zu Tab kopieren</value>
 	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
-		<value>Nur Log-Ansicht</value>
+		<value>Detach-Modus</value>
 	</data>
   <data name="TimeSpreadingControl_UI_GFX_OnTimeSpreadCalcStartCalc_CalculatingTimeSpreadView" xml:space="preserve">
 		<value>Berechne Zeitstreuungsanzeige...</value>

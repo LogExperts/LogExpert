@@ -1219,7 +1219,7 @@ Checked tools will appear in the icon bar. All other tools are available in the 
         <value>Copy to Tab</value>
     </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
-        <value>Log Only View</value>
+        <value>Detach Mode</value>
     </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
         <value>Options</value>

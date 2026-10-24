@@ -1,24 +1,21 @@
 using System.Runtime.Versioning;
 
+using Vanara.PInvoke;
+
 namespace LogExpert.UI.Services.DetachModeService;
 
 /// <summary>
-/// Win32 subclass for a detached <see cref="WeifenLuo.WinFormsUI.Docking.FloatWindow"/>. The DockPanel
-/// suite handles a caption double click by docking the window back into the panel (and its public
-/// <c>DoubleClickTitleBarToDock</c> switch does not disable that), so the message has to be caught
-/// before it reaches the suite: this hook turns a caption double click into a maximize/restore
-/// toggle instead.
+/// Win32 subclass for a detached <see cref="WeifenLuo.WinFormsUI.Docking.FloatWindow"/>: it turns a
+/// caption double click into a maximize/restore toggle, because the suite docks the window back on
+/// that message.
 /// </summary>
 /// <remarks>
-/// Subclassing replaces the window procedure, so every message the hook does not intercept is
-/// forwarded to the procedure captured before <see cref="NativeWindow.AssignHandle"/> - that is the
-/// WinForms procedure which finally reaches the suite's <c>FloatWindow.WndProc</c>. Messages
-/// swallowed here never arrive in the suite.
+/// Messages the hook does not intercept are forwarded to the procedure captured before
+/// <see cref="NativeWindow.AssignHandle"/>.
 /// </remarks>
 [SupportedOSPlatform("windows")]
 internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
 {
-    private const int GWL_WNDPROC = -4;
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
 
     private readonly WeifenLuo.WinFormsUI.Docking.FloatWindow _floatWindow;
@@ -38,10 +35,10 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
     }
 
     /// <summary>
-    /// Starts watching the caption of <paramref name="floatWindow"/>. Call this only after every
-    /// style-changing property (border style, taskbar flag) has been applied: those recreate the
-    /// window handle, and the hook would be detached by the recreation.
+    /// Starts watching the caption of <paramref name="floatWindow"/>. Call this after every
+    /// style-changing property: those recreate the handle and would detach the hook.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Internal invariant message, not user-facing.")]
     public static DetachFloatWindowHook Attach (WeifenLuo.WinFormsUI.Docking.FloatWindow floatWindow)
     {
         ArgumentNullException.ThrowIfNull(floatWindow);
@@ -61,13 +58,12 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
     {
         if (m.Msg == WM_NCLBUTTONDBLCLK)
         {
-            // Swallowed on purpose: both the suite (dock back) and plain DefWindowProc (maximize)
-            // have a fixed idea of what a caption double click means. The controller decides.
+            // Swallowed on purpose: both the suite and DefWindowProc act on a caption double click.
             CaptionDoubleClicked?.Invoke(this, EventArgs.Empty);
             return;
         }
 
-        m.Result = CallWindowProc(_originalProc, m.HWnd, (uint)m.Msg, m.WParam, m.LParam);
+        m.Result = User32.CallWindowProc(_originalProc, m.HWnd, (uint)m.Msg, m.WParam, m.LParam);
     }
 
     public void Dispose ()
@@ -90,17 +86,6 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
 
     private static IntPtr GetWindowProc (IntPtr handle)
     {
-        return IntPtr.Size == 8
-            ? GetWindowLongPtr64(handle, GWL_WNDPROC)
-            : new IntPtr(GetWindowLong32(handle, GWL_WNDPROC));
+        return User32.GetWindowLongPtr(handle, User32.WindowLongFlags.GWL_WNDPROC);
     }
-
-    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
-    private static extern IntPtr GetWindowLongPtr64 (IntPtr hWnd, int nIndex);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll", EntryPoint = "GetWindowLongW")]
-    private static extern int GetWindowLong32 (IntPtr hWnd, int nIndex);
-
-    [System.Runtime.InteropServices.DllImport("user32.dll")]
-    private static extern IntPtr CallWindowProc (IntPtr lpPrevWndFunc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 }

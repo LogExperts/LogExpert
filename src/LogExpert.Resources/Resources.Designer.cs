@@ -2663,7 +2663,7 @@ namespace LogExpert {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Log Only View.
+        ///   Looks up a localized string similar to Detach Mode.
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem {
             get {

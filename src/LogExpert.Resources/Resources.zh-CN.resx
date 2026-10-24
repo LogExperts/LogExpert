@@ -1089,7 +1089,7 @@
     <value>复制到标签页</value>
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_logOnlyViewToolStripMenuItem" xml:space="preserve">
-    <value>仅日志视图</value>
+    <value>分离模式</value>
   </data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem" xml:space="preserve">
     <value>选项</value>

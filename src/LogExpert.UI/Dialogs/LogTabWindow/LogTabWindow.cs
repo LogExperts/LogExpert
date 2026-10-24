@@ -82,8 +82,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private bool _wasMaximized;
 
     /// <summary>
-    /// Owns detach mode: F11 hides the main window and turns the active log window's float into a
-    /// stand-alone viewer window; F11 or ESC brings everything back.
+    /// Owns detach mode: F11 hides the main window and keeps the active log window floating;
+    /// F11 leaves the mode again.
     /// </summary>
     private readonly DetachModeController _detachModeController;
 
@@ -768,6 +768,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             _tabStringFormat?.Dispose();
             _menuToolbarController?.Dispose();
             _toolWindowCoordinator?.Dispose();
+            _detachModeController?.Dispose();
             // Dispose TabController after FileOperationService is no longer reachable.
             // FileOperationService holds a reference to _tabController but does not own it;
             // after Dispose(), no caller invokes the service, so stale references are harmless.
@@ -1494,8 +1495,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadSession (string sessionFileName, bool restoreLayout)
     {
-        // Leave detach mode first: the loaded layout must describe the normal window, and the
-        // windows a session replaces must not be referenced by the mode.
+        // Leave detach mode first so the loaded layout describes the normal window.
         _detachModeController.Exit();
 
         var outcome = _sessionHandler.LoadSession(sessionFileName);
@@ -1772,11 +1772,10 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Shutdown must continue even when detach mode cannot be restored.")]
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
-        // Leave detach mode first: the saved window position and layout must describe the normal
-        // window. Guarded on purpose — the panel is already tearing down here, so a failure must not
-        // abort the shutdown sequence below.
+        // Leave detach mode first so the saved layout describes the normal main window.
         try
         {
             _detachModeController.Exit();
@@ -1829,8 +1828,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
         logWindow.Tag = null;
 
-        // Closing the detached window through its X button hands the detached float to the next
-        // window, or ends the mode when it was the last one.
+        // Closing the detached window ends detach mode and brings the main window back.
         _detachModeController.OnWindowDisposed(logWindow);
     }
 
@@ -2104,10 +2102,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     /// <summary>
     /// Takes F11 for detach mode before the key reaches the log window. While detached the main
-    /// window is hidden and its key handling is served by <see cref="DetachModeController"/>'s
-    /// message filter instead; the mode is left from there. The View menu offers the same toggle
-    /// as "Log Only View"; it only displays F11 as a hint, the key itself is taken here so there
-    /// is a single code path.
+    /// window is hidden and <see cref="DetachModeController"/>'s message filter serves the key.
     /// </summary>
     protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
     {
@@ -2118,7 +2113,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             // forth. A second press after release leaves the mode again.
             if (!IsAutoRepeat(msg))
             {
-                ToggleDetachMode();
+                EnterDetachMode();
             }
 
             return true;
@@ -2128,18 +2123,17 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     }
 
     /// <summary>
-    /// Tells the repeated WM_KEYDOWN messages Windows sends while a key is held down (lParam bit 30)
-    /// from the single message of an actual press.
+    /// Tells the repeated WM_KEYDOWN messages Windows sends while a key is held down from the
+    /// single message of an actual press.
     /// </summary>
     private static bool IsAutoRepeat (Message msg)
     {
-        const int WM_KEYDOWN = 0x0100;
-
-        return msg.Msg == WM_KEYDOWN && ((long)msg.LParam & (1L << 30)) != 0;
+        return msg.Msg == LogExpert.UI.Extensions.NativeMethods.WM_KEYDOWN
+            && ((long)msg.LParam & LogExpert.UI.Extensions.NativeMethods.KEYDOWN_AUTOREPEAT_FLAG) != 0;
     }
 
     [SupportedOSPlatform("windows")]
-    private void ToggleDetachMode ()
+    private void EnterDetachMode ()
     {
         if (!_detachModeController.IsActive && WindowState == FormWindowState.Minimized)
         {
@@ -2149,9 +2143,9 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         _detachModeController.Enter();
     }
 
-    private void OnLogOnlyViewToolStripMenuItemClick (object sender, EventArgs e)
+    private void OnDetachModeToolStripMenuItemClick (object sender, EventArgs e)
     {
-        ToggleDetachMode();
+        EnterDetachMode();
     }
 
     private void OnLogTabWindowKeyDown (object sender, KeyEventArgs e)
@@ -2463,14 +2457,14 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnCloseOtherTabsToolStripMenuItemClick (object sender, EventArgs e)
     {
         var activeWindow = _tabController.GetActiveWindow();
+        var closeList = _tabController.GetAllWindowsFromDockPanel()
+            .Where(window => window != activeWindow)
+            .ToList();
 
-        // Nothing to keep: without an active window there is no "other" tab to close.
-        if (activeWindow == null)
+        foreach (var logWindow in closeList)
         {
-            return;
+            logWindow.Close();
         }
-
-        _tabController.CloseAllExcept(activeWindow);
     }
 
     [SupportedOSPlatform("windows")]
