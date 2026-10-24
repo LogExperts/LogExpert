@@ -227,6 +227,31 @@ internal class DetachModeControllerTests
     }
 
     [Test]
+    public void OnWindowDisposed_LastWindow_LeavesNoDocumentInThePanel ()
+    {
+        // Arrange
+        AddWindows("only.log");
+        var active = _dockPanel.ActiveContent as LogWindow;
+
+        Assert.That(active, Is.Not.Null, "the dock panel should have an active document");
+
+        _controller.Enter();
+
+        // Act
+        active.Dispose();
+        _controller.OnWindowDisposed(active);
+        Application.DoEvents();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_controller.IsActive, Is.False);
+            Assert.That(_form.Visible, Is.True);
+            Assert.That(_dockPanel.Contents.Count, Is.EqualTo(0), "closing the float must not leave an empty document tab");
+        });
+    }
+
+    [Test]
     public void OnWindowDisposed_WithOtherWindows_EndsTheModeAndRestoresMainForm ()
     {
         // Arrange
@@ -513,6 +538,7 @@ internal class DetachModeControllerTests
 
         foreach (var (window, fileName) in windows.Zip(fileNames))
         {
+            window.CloseButton = true;
             _tabController.AddWindow(window, fileName);
         }
 
