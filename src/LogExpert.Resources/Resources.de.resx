@@ -1200,6 +1200,9 @@ Ein ausgewähltes Tool erscheint in der Iconbar. Alle anderen verfügbaren Tools
   <data name="LogTabWindow_UI_ToolStripMenuItem_lastUsedToolStripMenuItem" xml:space="preserve">
 		<value>Zuletzt benutzt</value>
 	</data>
+  <data name="LogTabWindow_UI_ToolStripMenuItem_clearFileHistoryToolStripMenuItem" xml:space="preserve">
+		<value>Zuletzt benutzte löschen</value>
+	</data>
   <data name="LogTabWindow_UI_ToolStripMenuItem_exitToolStripMenuItem" xml:space="preserve">
 		<value>Exit</value>
 	</data>
