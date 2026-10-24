@@ -390,6 +390,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         var dark = Application.IsDarkModeEnabled;
 
+        if (!dark)
+        {
+            return;
+        }
+
         openToolStripMenuItem.Image = ThemedImages.Get("File_open", dark);
         closeFileToolStripMenuItem.Image = ThemedImages.Get("Close", dark);
         reloadToolStripMenuItem.Image = ThemedImages.Get("Restart_alt", dark);

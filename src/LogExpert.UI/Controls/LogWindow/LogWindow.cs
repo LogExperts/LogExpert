@@ -531,10 +531,11 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
     private void ApplyResourceImages ()
     {
+        var darkImages = Application.IsDarkModeEnabled;
         pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
-        btnFilterDown.BackgroundImage = ThemedImages.Get("ArrowDown", Application.IsDarkModeEnabled);
-        btnFilterUp.BackgroundImage = ThemedImages.Get("ArrowUp", Application.IsDarkModeEnabled);
-        btnToggleHighlightPanel.Image = ThemedImages.Get("Arrow_menu_open", Application.IsDarkModeEnabled);
+        btnFilterDown.BackgroundImage = ThemedImages.Get("ArrowDown", darkImages);
+        btnFilterUp.BackgroundImage = ThemedImages.Get("ArrowUp", darkImages);
+        btnToggleHighlightPanel.Image = ThemedImages.Get("Arrow_menu_open", darkImages);
     }
 
     private void ApplyCheckBoxResources ()
@@ -6644,7 +6645,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
                         var fontName = isFilteredGridView ? FONT_VERDANA : FONT_COURIER_NEW;
                         var stringToDraw = isFilteredGridView ? "!" : "i";
 
-                        using var brush2 = new SolidBrush(PaintHelper.BookmarkMarkerTextColor);
+                        using var brush2 = new SolidBrush(PaintHelper.GetBookmarkMarkerTextColor(Application.IsDarkModeEnabled));
                         using var font = new Font(fontName, Preferences.Font.Size, FontStyle.Bold);
                         e.Graphics.DrawString(stringToDraw, font, brush2, new RectangleF(rect.Left, rect.Top, rect.Width, rect.Height), _format);
                     }

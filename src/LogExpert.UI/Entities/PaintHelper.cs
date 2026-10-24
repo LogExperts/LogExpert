@@ -75,7 +75,7 @@ internal static class PaintHelper
 
                     if (bookmark.Text.Length > 0)
                     {
-                        using var brush2 = new SolidBrush(BookmarkMarkerTextColor);
+                        using var brush2 = new SolidBrush(GetBookmarkMarkerTextColor(Application.IsDarkModeEnabled));
                         using var font = logPaintCtx.MonospacedFont;
                         e.Graphics.DrawString("i", font, brush2, new RectangleF(r.Left, r.Top, r.Width, r.Height), _format);
                     }
@@ -107,10 +107,12 @@ internal static class PaintHelper
         return darkMode ? _darkModeForeColor : Color.Black;
     }
 
-    public static Color BookmarkMarkerTextColor =>
-        Application.IsDarkModeEnabled
+    public static Color GetBookmarkMarkerTextColor (bool darkMode)
+    {
+        return darkMode
             ? Color.FromArgb(255, 90, 45, 0)     // dark brown-orange, readable on the light bookmark fills used in dark mode
             : Color.FromArgb(255, 190, 100, 0); // DarkOrange baseline
+    }
 
     [SupportedOSPlatform("windows")]
     public static Brush GetBrushForFocusedControl (bool focused, Color selectionColor, bool darkMode)
