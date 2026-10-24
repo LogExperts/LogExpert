@@ -82,7 +82,27 @@ internal sealed class DetachModeController : IDisposable
         UninstallFilter();
 
         RestoreWindow(window);
+        ClearOriginalPlacement();
         RestoreMainForm();
+    }
+
+    private void ClearOriginalPlacement ()
+    {
+        _originalDockState = DockState.Unknown;
+        _originalPane = null;
+        _originalContentIndex = -1;
+    }
+
+    private void RestoreMainFormLater ()
+    {
+        try
+        {
+            _mainForm.BeginInvoke(new Action(RestoreMainForm));
+        }
+        catch (InvalidOperationException)
+        {
+            RestoreMainForm();
+        }
     }
 
     public void SwitchWindow (bool shiftPressed)
@@ -123,7 +143,11 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
-        Exit();
+        _detachedWindow = null;
+        ReleaseFloatWindow(restoreChrome: false);
+        UninstallFilter();
+        ClearOriginalPlacement();
+        RestoreMainFormLater();
     }
 
     private void Detach (LogWindow window)
@@ -156,6 +180,7 @@ internal sealed class DetachModeController : IDisposable
         _captionHook.CaptionDoubleClicked += ToggleMaximize;
         _detachedWindow = window;
         window.Activate();
+        RepaintCaptionLater(floatWindow);
     }
 
     private void RestoreWindow (LogWindow window)
@@ -205,10 +230,7 @@ internal sealed class DetachModeController : IDisposable
         floatWindow.AllowEndUserDocking = false;
 
         // The style changes above recreated the handle, so the dark title bar flag has to be set again.
-        if (Application.IsDarkModeEnabled && floatWindow.IsHandleCreated)
-        {
-            SetImmersiveDarkTitleBar(floatWindow.Handle, dark: true);
-        }
+        ApplyDarkTitleBar(floatWindow);
     }
 
     private static ChromeSnapshot CaptureChrome (FloatWindow floatWindow)
@@ -230,6 +252,55 @@ internal sealed class DetachModeController : IDisposable
         floatWindow.MinimizeBox = chrome.MinimizeBox;
         floatWindow.ShowInTaskbar = chrome.ShowInTaskbar;
         floatWindow.AllowEndUserDocking = chrome.AllowEndUserDocking;
+
+        ApplyDarkTitleBar(floatWindow);
+    }
+
+    private static void RepaintCaptionLater (FloatWindow floatWindow)
+    {
+        if (floatWindow.IsDisposed)
+        {
+            return;
+        }
+
+        try
+        {
+            floatWindow.BeginInvoke(new Action(() => RepaintCaption(floatWindow)));
+        }
+        catch (InvalidOperationException)
+        {
+        }
+    }
+
+    private static void RepaintCaption (FloatWindow floatWindow)
+    {
+        if (floatWindow.IsDisposed)
+        {
+            return;
+        }
+
+        ApplyDarkTitleBar(floatWindow);
+
+        if (floatWindow.WindowState != FormWindowState.Normal)
+        {
+            return;
+        }
+
+        var bounds = floatWindow.Bounds;
+
+        floatWindow.SetBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height + 1);
+        floatWindow.SetBounds(bounds.X, bounds.Y, bounds.Width, bounds.Height);
+    }
+
+    private static void ApplyDarkTitleBar (FloatWindow floatWindow)
+    {
+        if (!Application.IsDarkModeEnabled || floatWindow is not { IsHandleCreated: true, IsDisposed: false })
+        {
+            return;
+        }
+
+        int value = 1;
+        _ = NativeMethods.DwmSetWindowAttribute(floatWindow.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
     }
 
     private void ToggleMaximize (object sender, EventArgs e)
@@ -244,7 +315,7 @@ internal sealed class DetachModeController : IDisposable
             : FormWindowState.Maximized;
     }
 
-    private void ReleaseFloatWindow ()
+    private void ReleaseFloatWindow (bool restoreChrome = true)
     {
         if (_captionHook == null)
         {
@@ -257,9 +328,9 @@ internal sealed class DetachModeController : IDisposable
         _captionHook.Dispose();
         _captionHook = null;
 
-        // Restore the suite's tool-window chrome (owned border, no taskbar button, end-user docking).
-        if (floatWindow is { IsDisposed: false })
+        if (restoreChrome && floatWindow is { IsDisposed: false })
         {
+            // Restore the suite's tool-window chrome (owned border, no taskbar button, end-user docking).
             RestoreChrome(floatWindow, _originalChrome);
         }
     }
@@ -314,12 +385,6 @@ internal sealed class DetachModeController : IDisposable
     }
 
     private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
-
-    private static void SetImmersiveDarkTitleBar (IntPtr handle, bool dark)
-    {
-        int value = dark ? 1 : 0;
-        _ = NativeMethods.DwmSetWindowAttribute(handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
-    }
 
     public void Dispose ()
     {
