@@ -273,8 +273,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         markEditModeToolStripMenuItem.Enabled = true;
 
         var darkImages = Application.IsDarkModeEnabled;
-        _panelOpenButtonImage = ThemedImages.Get("Arrow_menu_open", darkImages);
-        _panelCloseButtonImage = ThemedImages.Get("Arrow_menu_close", darkImages);
+        _panelOpenButtonImage = ThemedImages.Get(nameof(Resources.Arrow_menu_open), darkImages);
+        _panelCloseButtonImage = ThemedImages.Get(nameof(Resources.Arrow_menu_close), darkImages);
 
         var settings = configManager.Settings;
 
@@ -533,9 +533,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     {
         var darkImages = Application.IsDarkModeEnabled;
         pnlProFilterLabel.BackgroundImage = Resources.Pro_Filter;
-        btnFilterDown.BackgroundImage = ThemedImages.Get("ArrowDown", darkImages);
-        btnFilterUp.BackgroundImage = ThemedImages.Get("ArrowUp", darkImages);
-        btnToggleHighlightPanel.Image = ThemedImages.Get("Arrow_menu_open", darkImages);
+        btnFilterDown.BackgroundImage = ThemedImages.Get(nameof(Resources.ArrowDown), darkImages);
+        btnFilterUp.BackgroundImage = ThemedImages.Get(nameof(Resources.ArrowUp), darkImages);
+        btnToggleHighlightPanel.Image = ThemedImages.Get(nameof(Resources.Arrow_menu_open), darkImages);
     }
 
     private void ApplyCheckBoxResources ()

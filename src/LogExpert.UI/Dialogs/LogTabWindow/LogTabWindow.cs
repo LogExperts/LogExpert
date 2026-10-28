@@ -460,22 +460,22 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             return;
         }
 
-        openToolStripMenuItem.Image = ThemedImages.Get("File_open", dark);
-        closeFileToolStripMenuItem.Image = ThemedImages.Get("Close", dark);
-        reloadToolStripMenuItem.Image = ThemedImages.Get("Restart_alt", dark);
-        exitToolStripMenuItem.Image = ThemedImages.Get("Exit", dark);
-        filterToolStripMenuItem.Image = ThemedImages.Get("Filter", dark);
-        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get("Bookmark_add", dark);
-        jumpToNextToolStripMenuItem.Image = ThemedImages.Get("ArrowDown", dark);
-        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get("ArrowUp", dark);
-        settingsToolStripMenuItem.Image = ThemedImages.Get("Settings", dark);
-        toolStripButtonOpen.Image = ThemedImages.Get("File_open", dark);
-        toolStripButtonSearch.Image = ThemedImages.Get("Search", dark);
-        toolStripButtonFilter.Image = ThemedImages.Get("Filter", dark);
-        toolStripButtonBookmark.Image = ThemedImages.Get("Bookmark_add", dark);
-        toolStripButtonUp.Image = ThemedImages.Get("ArrowUp", dark);
-        toolStripButtonDown.Image = ThemedImages.Get("ArrowDown", dark);
-        toolStripButtonBubbles.Image = ThemedImages.Get("bookmark_bubbles", dark);
+        openToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.File_open), dark);
+        closeFileToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Close), dark);
+        reloadToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Restart_alt), dark);
+        exitToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Exit), dark);
+        filterToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Filter), dark);
+        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), dark);
+        jumpToNextToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowDown), dark);
+        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowUp), dark);
+        settingsToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Settings), dark);
+        toolStripButtonOpen.Image = ThemedImages.Get(nameof(Resources.File_open), dark);
+        toolStripButtonSearch.Image = ThemedImages.Get(nameof(Resources.Search), dark);
+        toolStripButtonFilter.Image = ThemedImages.Get(nameof(Resources.Filter), dark);
+        toolStripButtonBookmark.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), dark);
+        toolStripButtonUp.Image = ThemedImages.Get(nameof(Resources.ArrowUp), dark);
+        toolStripButtonDown.Image = ThemedImages.Get(nameof(Resources.ArrowDown), dark);
+        toolStripButtonBubbles.Image = ThemedImages.Get(nameof(Resources.bookmark_bubbles), dark);
     }
 
     private void ApplyTextResources ()

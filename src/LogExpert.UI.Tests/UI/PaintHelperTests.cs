@@ -182,6 +182,22 @@ public class PaintHelperTests
     }
 
     [Test]
+    public void GetBookmarkMarkerTextColor_DarkMode_UsesDarkBrownOrange ()
+    {
+        var color = PaintHelper.GetBookmarkMarkerTextColor(darkMode: true);
+
+        Assert.That(color, Is.EqualTo(Color.FromArgb(255, 90, 45, 0)));
+    }
+
+    [Test]
+    public void GetBookmarkMarkerTextColor_LightMode_UsesDarkOrange ()
+    {
+        var color = PaintHelper.GetBookmarkMarkerTextColor(darkMode: false);
+
+        Assert.That(color, Is.EqualTo(Color.FromArgb(255, 190, 100, 0)));
+    }
+
+    [Test]
     public void ApplyTabControlTheme_DarkMode_DisablesVisualStyleBackColorOnAllPages ()
     {
         // With UseVisualStyleBackColor = true the tab page body is painted by the
