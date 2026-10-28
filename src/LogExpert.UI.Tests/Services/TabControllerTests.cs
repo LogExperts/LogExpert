@@ -452,6 +452,29 @@ internal class TabControllerTests : IDisposable
     }
 
     [Test]
+    public void GetNextWindow_FollowsTheTabStripOrderNotTheAddOrder ()
+    {
+        // Arrange
+        using var first = CreateLogWindow("first.log");
+        using var second = CreateLogWindow("second.log");
+        using var third = CreateLogWindow("third.log");
+
+        _tabController.AddWindow(first, "first.log");
+        _tabController.AddWindow(second, "second.log");
+        _tabController.AddWindow(third, "third.log");
+
+        // Tab strip is now second, first, third.
+        second.DockHandler.Pane.SetContentIndex(second, 0);
+
+        // Act & Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_tabController.GetNextWindow(second), Is.EqualTo(first));
+            Assert.That(_tabController.GetPreviousWindow(second), Is.EqualTo(third));
+        });
+    }
+
+    [Test]
     public void GetNextWindow_WhenEmpty_ReturnsNull ()
     {
         // Act & Assert

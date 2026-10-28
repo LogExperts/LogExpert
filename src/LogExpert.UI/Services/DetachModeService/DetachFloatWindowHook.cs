@@ -1,7 +1,5 @@
 using System.Runtime.Versioning;
 
-using Vanara.PInvoke;
-
 namespace LogExpert.UI.Services.DetachModeService;
 
 /// <summary>
@@ -9,17 +7,12 @@ namespace LogExpert.UI.Services.DetachModeService;
 /// caption double click into a maximize/restore toggle, because the suite docks the window back on
 /// that message.
 /// </summary>
-/// <remarks>
-/// Messages the hook does not intercept are forwarded to the procedure captured before
-/// <see cref="NativeWindow.AssignHandle"/>.
-/// </remarks>
 [SupportedOSPlatform("windows")]
 internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
 {
     private const int WM_NCLBUTTONDBLCLK = 0x00A3;
 
     private readonly WeifenLuo.WinFormsUI.Docking.FloatWindow _floatWindow;
-    private readonly IntPtr _originalProc;
     private bool _disposed;
 
     /// <summary>Raised when the user double clicks the caption of the hooked window.</summary>
@@ -28,9 +21,6 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
     private DetachFloatWindowHook (WeifenLuo.WinFormsUI.Docking.FloatWindow floatWindow)
     {
         _floatWindow = floatWindow;
-
-        // Must be captured before AssignHandle replaces the procedure with this hook.
-        _originalProc = GetWindowProc(floatWindow.Handle);
         AssignHandle(floatWindow.Handle);
     }
 
@@ -63,7 +53,7 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
             return;
         }
 
-        m.Result = User32.CallWindowProc(_originalProc, m.HWnd, (uint)m.Msg, m.WParam, m.LParam);
+        base.WndProc(ref m);
     }
 
     public void Dispose ()
@@ -82,10 +72,5 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
         }
 
         CaptionDoubleClicked = null;
-    }
-
-    private static IntPtr GetWindowProc (IntPtr handle)
-    {
-        return User32.GetWindowLongPtr(handle, User32.WindowLongFlags.GWL_WNDPROC);
     }
 }

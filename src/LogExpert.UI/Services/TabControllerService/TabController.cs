@@ -286,7 +286,7 @@ internal class TabController : ITabController
     }
 
     /// <summary>
-    /// Resolves the window that follows <paramref name="current"/> in the tracking order, without
+    /// Resolves the window that follows <paramref name="current"/> in the tab order, without
     /// activating it. Callers that display windows differently from the DockPanel need the target
     /// window rather than an <c>Activate()</c>.
     /// </summary>
@@ -296,28 +296,25 @@ internal class TabController : ITabController
     /// <returns>The next window, or <c>null</c> when no window is tracked.</returns>
     public LogWindow GetNextWindow (LogWindow current = null)
     {
-        lock (_windowsLock)
+        var windows = GetWindowsInTabOrder();
+
+        if (windows.Count == 0)
         {
-            if (_windows.Count == 0)
-            {
-                return null;
-            }
-
-            var windows = _windows.Keys.ToList();
-            var anchor = current ?? _activeWindow;
-            var currentIndex = anchor != null
-                ? windows.IndexOf(anchor)
-                : -1;
-
-            // Move forward, wrap around to beginning if at end
-            var nextIndex = (currentIndex + 1) % windows.Count;
-
-            return windows[nextIndex];
+            return null;
         }
+
+        var anchor = current ?? _activeWindow;
+        var currentIndex = anchor != null
+            ? windows.IndexOf(anchor)
+            : -1;
+
+        var nextIndex = (currentIndex + 1) % windows.Count;
+
+        return windows[nextIndex];
     }
 
     /// <summary>
-    /// Resolves the window that precedes <paramref name="current"/> in the tracking order, without
+    /// Resolves the window that precedes <paramref name="current"/> in the tab order, without
     /// activating it.
     /// </summary>
     /// <param name="current">
@@ -326,31 +323,48 @@ internal class TabController : ITabController
     /// <returns>The previous window, or <c>null</c> when no window is tracked.</returns>
     public LogWindow GetPreviousWindow (LogWindow current = null)
     {
+        var windows = GetWindowsInTabOrder();
+
+        if (windows.Count == 0)
+        {
+            return null;
+        }
+
+        var anchor = current ?? _activeWindow;
+
+        // Without an anchor the walk starts at the first window, so "previous" wraps to the last
+        // one ("next" without an anchor lands on the first one the same way).
+        var currentIndex = anchor != null
+            ? windows.IndexOf(anchor)
+            : 0;
+
+        var previousIndex = currentIndex - 1;
+
+        if (previousIndex < 0)
+        {
+            previousIndex = windows.Count - 1;
+        }
+
+        return windows[previousIndex];
+    }
+
+    private List<LogWindow> GetWindowsInTabOrder ()
+    {
+        var windows = GetAllWindowsFromDockPanel().ToList();
+
+        // Tracked windows the panel is not displaying right now stay reachable at the end.
         lock (_windowsLock)
         {
-            if (_windows.Count == 0)
+            foreach (var window in _windows.Keys)
             {
-                return null;
+                if (!windows.Contains(window))
+                {
+                    windows.Add(window);
+                }
             }
-
-            var windows = _windows.Keys.ToList();
-            var anchor = current ?? _activeWindow;
-
-            // Without an anchor the walk starts at the first window, so "previous" wraps to the last
-            // one ("next" without an anchor lands on the first one the same way).
-            var currentIndex = anchor != null
-                ? windows.IndexOf(anchor)
-                : 0;
-
-            // Move backward, wrap around to end if at beginning
-            var previousIndex = currentIndex - 1;
-            if (previousIndex < 0)
-            {
-                previousIndex = windows.Count - 1;
-            }
-
-            return windows[previousIndex];
         }
+
+        return windows;
     }
 
     /// <summary>
@@ -500,10 +514,6 @@ internal class TabController : ITabController
     /// Gets all LogWindow instances currently held by the DockPanel's panes, in the order their tab strips display
     /// them. Panes of every dock state are enumerated, so floating windows are included.
     /// </summary>
-    /// <remarks>
-    /// Only windows whose pane currently displays them are returned: a window hidden with
-    /// <see cref="Control.Hide"/> drops out of the enumeration even though its pane still exists.
-    /// </remarks>
     /// <returns>Read-only list of all LogWindows in the DockPanel</returns>
     public IReadOnlyList<LogWindow> GetAllWindowsFromDockPanel ()
     {

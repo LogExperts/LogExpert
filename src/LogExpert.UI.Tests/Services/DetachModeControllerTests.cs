@@ -24,13 +24,13 @@ namespace LogExpert.UI.Tests.Services;
 [TestFixture]
 [SupportedOSPlatform("windows")]
 [Apartment(ApartmentState.STA)]
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "NUnit disposes the fields in TearDown.")]
-internal class DetachModeControllerTests
+internal class DetachModeControllerTests : IDisposable
 {
     private Form _form;
     private DockPanel _dockPanel;
     private TabController _tabController;
     private DetachModeController _controller;
+    private bool _disposed;
 
     [SetUp]
     public void Setup ()
@@ -58,6 +58,33 @@ internal class DetachModeControllerTests
         _form?.Close();
         _form?.Dispose();
     }
+
+    #region IDisposable Implementation
+
+    public void Dispose ()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose (bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _controller?.Dispose();
+            _tabController?.Dispose();
+            _form?.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    #endregion
 
     [Test]
     public void Enter_DetachesTheActiveWindowAsAWindowLikeFloat ()
@@ -93,9 +120,7 @@ internal class DetachModeControllerTests
     [Test]
     public void Enter_GivesTheFloatItsOwnIconInsteadOfTheLogWindowSharedOne ()
     {
-        // Arrange — the suite's SetText() assigns the log window's icon object to the float, but
-        // the shell disposes and replaces that object on every tail refresh, which would leave the
-        // float holding a disposed icon and crash the next handle recreation.
+        // Arrange
         var windows = AddWindows("first.log");
         windows[0].Icon = SystemIcons.Information;
         var active = _dockPanel.ActiveContent as LogWindow;
@@ -118,7 +143,7 @@ internal class DetachModeControllerTests
     [Test]
     public void Enter_DoesNothingWhenNoWindowIsOpen ()
     {
-        // Arrange — no log windows at all
+        // Arrange
 
         // Act
         var entered = _controller.Enter();
@@ -138,17 +163,25 @@ internal class DetachModeControllerTests
         // Arrange
         var windows = AddWindows("first.log", "second.log");
         var active = _dockPanel.ActiveContent as LogWindow;
+
+        Assert.That(active, Is.Not.Null);
+
+        var originalPane = active.DockHandler.Pane;
+        var originalIndex = originalPane.Contents.IndexOf(active);
+
         _controller.Enter();
 
         // Act
         _controller.Exit();
 
-        // Assert — the window is back in the document pane, the others were never touched
+        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(_controller.IsActive, Is.False);
             Assert.That(_form.Visible, Is.True);
             Assert.That(active.DockState, Is.EqualTo(DockState.Document));
+            Assert.That(active.DockHandler.Pane, Is.EqualTo(originalPane));
+            Assert.That(originalPane.Contents.IndexOf(active), Is.EqualTo(originalIndex));
             Assert.That(windows.Count(window => window.DockState == DockState.Document), Is.EqualTo(windows.Count));
         });
     }
@@ -161,15 +194,52 @@ internal class DetachModeControllerTests
         var floating = windows[1];
 
         floating.Show(_dockPanel, DockState.Float);
-        Assert.That(_dockPanel.ActiveContent as LogWindow, Is.EqualTo(floating), "the float should be the active document");
+        Assert.That(_dockPanel.ActiveContent as LogWindow, Is.EqualTo(floating));
+
+        var floatWindow = FloatWindowOf(floating);
+
+        Assert.That(floatWindow, Is.Not.Null);
+
+        var originalOwner = floatWindow.Owner;
+        var originalShowInTaskbar = floatWindow.ShowInTaskbar;
+        var originalBorderStyle = floatWindow.FormBorderStyle;
 
         _controller.Enter();
 
         // Act
         _controller.Exit();
 
-        // Assert — it came from a float, so it goes back to one
-        Assert.That(floating.DockState, Is.EqualTo(DockState.Float));
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(floating.DockState, Is.EqualTo(DockState.Float));
+            Assert.That(floatWindow.Owner, Is.EqualTo(originalOwner));
+            Assert.That(floatWindow.ShowInTaskbar, Is.EqualTo(originalShowInTaskbar));
+            Assert.That(floatWindow.FormBorderStyle, Is.EqualTo(originalBorderStyle));
+        });
+    }
+
+    [Test]
+    public void Exit_RestoresTheWindowStateChangedWhileDetached ()
+    {
+        // Arrange
+        var windows = AddWindows("first.log", "floating.log");
+        var floating = windows[1];
+
+        floating.Show(_dockPanel, DockState.Float);
+
+        var floatWindow = FloatWindowOf(floating);
+
+        Assert.That(floatWindow, Is.Not.Null);
+
+        _controller.Enter();
+        floatWindow.WindowState = FormWindowState.Maximized;
+
+        // Act
+        _controller.Exit();
+
+        // Assert
+        Assert.That(floatWindow.WindowState, Is.EqualTo(FormWindowState.Normal));
     }
 
     [Test]
@@ -183,7 +253,7 @@ internal class DetachModeControllerTests
 
         _controller.Enter();
 
-        // Act & Assert — each switch detaches the next window and puts the previous one back
+        // Act & Assert
         var visited = new List<LogWindow>();
 
         for (var turn = 0; turn < windows.Count; turn++)
@@ -213,7 +283,7 @@ internal class DetachModeControllerTests
         var active = _dockPanel.ActiveContent as LogWindow;
         _controller.Enter();
 
-        // Act — closing the detached window is deferred through BeginInvoke
+        // Act
         active.Dispose();
         _controller.OnWindowDisposed(active);
         Application.DoEvents();
@@ -267,8 +337,7 @@ internal class DetachModeControllerTests
         _controller.OnWindowDisposed(active);
         Application.DoEvents();
 
-        // Assert — closing the detached window ends detach mode and brings back the main form.
-        // Other log windows remain where they were.
+        // Assert
         var other = windows.Single(window => window != active);
 
         Assert.Multiple(() =>
@@ -335,7 +404,7 @@ internal class DetachModeControllerTests
     [Test]
     public void PreFilterMessage_WhileNotDetached_PassesEveryKeyThrough ()
     {
-        // Arrange — mode is off
+        // Arrange
         var msg = new Message
         {
             Msg = 0x0100,
@@ -378,7 +447,7 @@ internal class DetachModeControllerTests
     [Test]
     public void PreFilterMessage_Esc_PassesThroughAndStaysInMode ()
     {
-        // Arrange — ESC is not handled by the filter at all; the grid or text input handles it
+        // Arrange
         AddWindows("first.log");
         _controller.Enter();
         var filter = CreateFilter();
@@ -393,7 +462,7 @@ internal class DetachModeControllerTests
         // Act
         var swallowed = filter.PreFilterMessage(ref msg);
 
-        // Assert — ESC passes through untouched
+        // Assert
         Assert.Multiple(() =>
         {
             Assert.That(swallowed, Is.False);
@@ -404,7 +473,7 @@ internal class DetachModeControllerTests
     [Test]
     public void PreFilterMessage_F11WhileAnotherFormIsActive_DoesNotLeaveTheMode ()
     {
-        // Arrange — a modal dialog or any other window holds the focus
+        // Arrange
         AddWindows("first.log");
         _controller.Enter();
         var filter = CreateFilter(activeFormGetter: () => _form);
@@ -494,7 +563,7 @@ internal class DetachModeControllerTests
         var msg = new Message
         {
             Msg = 0x0100,
-            WParam = (IntPtr)0x41, // 'A' — not one of the detach mode keys
+            WParam = (IntPtr)0x41, // 'A'
             LParam = 0
         };
 

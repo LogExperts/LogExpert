@@ -26,10 +26,7 @@ internal sealed class DetachModeController : IDisposable
 
     private LogWindow _detachedWindow;
 
-    private DockState _originalDockState = DockState.Unknown;
-    private DockPane _originalPane;
-    private int _originalContentIndex;
-
+    private PlacementSnapshot _originalPlacement;
     private ChromeSnapshot _originalChrome;
 
     public DetachModeController (Form mainForm, DockPanel dockPanel, ITabController tabController)
@@ -62,7 +59,12 @@ internal sealed class DetachModeController : IDisposable
             return false;
         }
 
-        Detach(active);
+        if (!Detach(active))
+        {
+            // Hiding the main form without a float would leave no window to press F11 in.
+            return false;
+        }
+
         InstallFilter();
         _mainForm.Hide();
         return true;
@@ -78,19 +80,32 @@ internal sealed class DetachModeController : IDisposable
         var window = _detachedWindow;
 
         _detachedWindow = null;
-        ReleaseFloatWindow();
         UninstallFilter();
 
+        // Show the owner first: assigning it to a hidden main form would hide the float before its
+        // content is docked back.
+        RestoreMainForm();
+
+        ReleaseFloatWindow();
         RestoreWindow(window);
         ClearOriginalPlacement();
-        RestoreMainForm();
     }
 
     private void ClearOriginalPlacement ()
     {
-        _originalDockState = DockState.Unknown;
-        _originalPane = null;
-        _originalContentIndex = -1;
+        _originalPlacement = default;
+    }
+
+    /// <summary>
+    /// Ends the mode without a detached float, for the case where the suite cannot float a window:
+    /// the main form has to come back even though no window can carry F11.
+    /// </summary>
+    private void LeaveDetachedState ()
+    {
+        _detachedWindow = null;
+        UninstallFilter();
+        ClearOriginalPlacement();
+        RestoreMainForm();
     }
 
     private void RestoreMainFormLater ()
@@ -112,17 +127,19 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
+        // Re-dock first: the floating window is not part of the tab strip, so the walk needs the
+        // full order to stay stable.
+        ReleaseFloatWindow();
+        RestoreWindow(_detachedWindow);
+
         var target = shiftPressed
             ? _tabController.GetPreviousWindow(_detachedWindow)
             : _tabController.GetNextWindow(_detachedWindow);
 
-        if (target == null || target == _detachedWindow)
+        if (!Detach(target ?? _detachedWindow))
         {
-            return;
+            LeaveDetachedState();
         }
-
-        RestoreWindow(_detachedWindow);
-        Detach(target);
     }
 
     public void OnWindowAdded (LogWindow window)
@@ -132,8 +149,13 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
+        ReleaseFloatWindow();
         RestoreWindow(_detachedWindow);
-        Detach(window);
+
+        if (!Detach(window))
+        {
+            LeaveDetachedState();
+        }
     }
 
     public void OnWindowDisposed (LogWindow window)
@@ -150,14 +172,11 @@ internal sealed class DetachModeController : IDisposable
         RestoreMainFormLater();
     }
 
-    private void Detach (LogWindow window)
+    private bool Detach (LogWindow window)
     {
-        ReleaseFloatWindow();
-
         // Snapshot before Show(): the window reports Float afterwards.
-        _originalDockState = window.DockState;
-        _originalPane = window.DockHandler.Pane;
-        _originalContentIndex = _originalPane?.Contents.IndexOf(window) ?? -1;
+        var pane = window.DockHandler.Pane;
+        _originalPlacement = new PlacementSnapshot(window.DockState, pane, pane?.Contents.IndexOf(window) ?? -1);
 
         if (window.DockState != DockState.Float)
         {
@@ -169,9 +188,8 @@ internal sealed class DetachModeController : IDisposable
         if (floatWindow == null)
         {
             // The suite refused to float the window; stay out of the mode instead of half-entering it.
-            _originalDockState = DockState.Unknown;
-            _originalPane = null;
-            return;
+            ClearOriginalPlacement();
+            return false;
         }
 
         _originalChrome = CaptureChrome(floatWindow);
@@ -181,6 +199,7 @@ internal sealed class DetachModeController : IDisposable
         _detachedWindow = window;
         window.Activate();
         RepaintCaptionLater(floatWindow);
+        return true;
     }
 
     private void RestoreWindow (LogWindow window)
@@ -190,27 +209,27 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
-        if (_originalDockState == DockState.Float)
+        if (_originalPlacement.DockState == DockState.Float)
         {
             // Was already floating; only the chrome was patched.
             return;
         }
 
-        if (_originalPane != null && !_originalPane.IsDisposed && _originalPane.DockState == _originalDockState)
+        if (_originalPlacement.Pane is { IsDisposed: false } pane && pane.DockState == _originalPlacement.DockState)
         {
             // Put it back into its original pane and tab index so split panes and tab order survive.
-            window.Show(_originalPane, null);
+            window.Show(pane, null);
 
-            if (_originalContentIndex >= 0 && _originalContentIndex < _originalPane.Contents.Count)
+            if (_originalPlacement.ContentIndex >= 0 && _originalPlacement.ContentIndex < pane.Contents.Count)
             {
-                _originalPane.SetContentIndex(window, _originalContentIndex);
+                pane.SetContentIndex(window, _originalPlacement.ContentIndex);
             }
 
             return;
         }
 
         // Pane disappeared (split closed, session load): fall back to dock-state-only placement.
-        window.Show(_dockPanel, ToRestorable(_originalDockState));
+        window.Show(_dockPanel, ToRestorable(_originalPlacement.DockState));
     }
 
     private void PatchFloatWindow (FloatWindow floatWindow)
@@ -238,6 +257,7 @@ internal sealed class DetachModeController : IDisposable
         return new ChromeSnapshot(
             floatWindow.Owner,
             floatWindow.FormBorderStyle,
+            floatWindow.WindowState,
             floatWindow.MaximizeBox,
             floatWindow.MinimizeBox,
             floatWindow.ShowInTaskbar,
@@ -253,7 +273,13 @@ internal sealed class DetachModeController : IDisposable
         floatWindow.ShowInTaskbar = chrome.ShowInTaskbar;
         floatWindow.AllowEndUserDocking = chrome.AllowEndUserDocking;
 
+        // WinForms normalizes a maximized window as soon as the maximize box goes away, so the
+        // state is applied last to bring back exactly what the suite had.
+        floatWindow.WindowState = chrome.WindowState;
+
+        // Restoring the styles recreated the handle: reapply the dark flag, then force a repaint.
         ApplyDarkTitleBar(floatWindow);
+        RepaintCaptionLater(floatWindow);
     }
 
     private static void RepaintCaptionLater (FloatWindow floatWindow)
@@ -411,9 +437,15 @@ internal sealed class DetachModeController : IDisposable
         UninstallFilter();
     }
 
+    private readonly record struct PlacementSnapshot (
+        DockState DockState,
+        DockPane Pane,
+        int ContentIndex);
+
     private readonly record struct ChromeSnapshot (
         Form Owner,
         FormBorderStyle FormBorderStyle,
+        FormWindowState WindowState,
         bool MaximizeBox,
         bool MinimizeBox,
         bool ShowInTaskbar,

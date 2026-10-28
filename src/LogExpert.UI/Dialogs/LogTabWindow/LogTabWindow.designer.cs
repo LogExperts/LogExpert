@@ -47,7 +47,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             lastUsedToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             viewNavigateToolStripMenuItem = new ToolStripMenuItem();
-            logOnlyViewToolStripMenuItem = new ToolStripMenuItem();
+            detachModeToolStripMenuItem = new ToolStripMenuItem();
             ToolStripSeparator12 = new ToolStripSeparator();
             goToLineToolStripMenuItem = new ToolStripMenuItem();
             searchToolStripMenuItem = new ToolStripMenuItem();
@@ -335,7 +335,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // 
             // viewNavigateToolStripMenuItem
             // 
-            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem, ToolStripSeparator12, logOnlyViewToolStripMenuItem });
+            viewNavigateToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { goToLineToolStripMenuItem, searchToolStripMenuItem, filterToolStripMenuItem, bookmarksToolStripMenuItem, columnFinderToolStripMenuItem, ToolStripSeparator5, encodingToolStripMenuItem, ToolStripSeparator6, timeshiftToolStripMenuItem, timeshiftToolStripTextBox, ToolStripSeparator4, copyMarkedLinesIntoNewTabToolStripMenuItem, ToolStripSeparator12, detachModeToolStripMenuItem });
             viewNavigateToolStripMenuItem.Name = "viewNavigateToolStripMenuItem";
             viewNavigateToolStripMenuItem.Size = new Size(96, 19);
             viewNavigateToolStripMenuItem.Text = "View/Navigate";
@@ -479,14 +479,14 @@ namespace LogExpert.UI.Controls.LogTabWindow
             ToolStripSeparator12.Name = "ToolStripSeparator12";
             ToolStripSeparator12.Size = new Size(174, 6);
             // 
-            // logOnlyViewToolStripMenuItem
+            // detachModeToolStripMenuItem
             // 
-            logOnlyViewToolStripMenuItem.Name = "logOnlyViewToolStripMenuItem";
-            logOnlyViewToolStripMenuItem.ShortcutKeyDisplayString = "F11";
-            logOnlyViewToolStripMenuItem.Size = new Size(177, 22);
-            logOnlyViewToolStripMenuItem.Text = "Detach Mode";
-            logOnlyViewToolStripMenuItem.ToolTipText = "Shows the active log alone in its own window and hides the main window";
-            logOnlyViewToolStripMenuItem.Click += OnDetachModeToolStripMenuItemClick;
+            detachModeToolStripMenuItem.Name = "detachModeToolStripMenuItem";
+            detachModeToolStripMenuItem.ShortcutKeyDisplayString = "F11";
+            detachModeToolStripMenuItem.Size = new Size(177, 22);
+            detachModeToolStripMenuItem.Text = "Detach Mode";
+            detachModeToolStripMenuItem.ToolTipText = "Shows the active log alone in its own window and hides the main window";
+            detachModeToolStripMenuItem.Click += OnDetachModeToolStripMenuItemClick;
             // 
             // optionToolStripMenuItem
             // 
@@ -1158,7 +1158,7 @@ namespace LogExpert.UI.Controls.LogTabWindow
         private ToolStripMenuItem columnFinderToolStripMenuItem;
         private DockPanel dockPanel;
         private ToolStripMenuItem tabRenameToolStripMenuItem;
-        private ToolStripMenuItem logOnlyViewToolStripMenuItem;
+        private ToolStripMenuItem detachModeToolStripMenuItem;
         private ToolStripSeparator ToolStripSeparator12;
         private ToolStripSeparator lineToolStripSeparatorExtension1;
         private ToolStripSeparator lineToolStripSeparatorExtension2;
