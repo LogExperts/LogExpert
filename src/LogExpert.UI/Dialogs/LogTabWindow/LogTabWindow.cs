@@ -453,29 +453,28 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private void ApplyThemedImages ()
     {
-        var dark = Application.IsDarkModeEnabled;
-
-        if (!dark)
+        // Light mode keeps the images embedded by the designer, so everything below is dark-only.
+        if (!Application.IsDarkModeEnabled)
         {
             return;
         }
 
-        openToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.File_open), dark);
-        closeFileToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Close), dark);
-        reloadToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Restart_alt), dark);
-        exitToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Exit), dark);
-        filterToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Filter), dark);
-        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), dark);
-        jumpToNextToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowDown), dark);
-        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowUp), dark);
-        settingsToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Settings), dark);
-        toolStripButtonOpen.Image = ThemedImages.Get(nameof(Resources.File_open), dark);
-        toolStripButtonSearch.Image = ThemedImages.Get(nameof(Resources.Search), dark);
-        toolStripButtonFilter.Image = ThemedImages.Get(nameof(Resources.Filter), dark);
-        toolStripButtonBookmark.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), dark);
-        toolStripButtonUp.Image = ThemedImages.Get(nameof(Resources.ArrowUp), dark);
-        toolStripButtonDown.Image = ThemedImages.Get(nameof(Resources.ArrowDown), dark);
-        toolStripButtonBubbles.Image = ThemedImages.Get(nameof(Resources.bookmark_bubbles), dark);
+        openToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.File_open), darkMode: true);
+        closeFileToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Close), darkMode: true);
+        reloadToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Restart_alt), darkMode: true);
+        exitToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Exit), darkMode: true);
+        filterToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Filter), darkMode: true);
+        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), darkMode: true);
+        jumpToNextToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowDown), darkMode: true);
+        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowUp), darkMode: true);
+        settingsToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Settings), darkMode: true);
+        toolStripButtonOpen.Image = ThemedImages.Get(nameof(Resources.File_open), darkMode: true);
+        toolStripButtonSearch.Image = ThemedImages.Get(nameof(Resources.Search), darkMode: true);
+        toolStripButtonFilter.Image = ThemedImages.Get(nameof(Resources.Filter), darkMode: true);
+        toolStripButtonBookmark.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), darkMode: true);
+        toolStripButtonUp.Image = ThemedImages.Get(nameof(Resources.ArrowUp), darkMode: true);
+        toolStripButtonDown.Image = ThemedImages.Get(nameof(Resources.ArrowDown), darkMode: true);
+        toolStripButtonBubbles.Image = ThemedImages.Get(nameof(Resources.bookmark_bubbles), darkMode: true);
     }
 
     private void ApplyTextResources ()
