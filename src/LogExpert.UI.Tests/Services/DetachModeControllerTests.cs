@@ -4,6 +4,7 @@ using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
+using LogExpert.UI.Extensions;
 using LogExpert.UI.Interface;
 using LogExpert.UI.Services.DetachModeService;
 using LogExpert.UI.Services.TabControllerService;
@@ -12,15 +13,12 @@ using Moq;
 
 using NUnit.Framework;
 
+using Vanara.PInvoke;
+
 using WeifenLuo.WinFormsUI.Docking;
 
 namespace LogExpert.UI.Tests.Services;
 
-/// <summary>
-/// Unit tests for DetachModeController. Every test drives a real DockPanel holding real LogWindows,
-/// because the behaviour under test is the dock-state bookkeeping and the float-window chrome the
-/// DockPanel suite performs.
-/// </summary>
 [TestFixture]
 [SupportedOSPlatform("windows")]
 [Apartment(ApartmentState.STA)]
@@ -276,6 +274,52 @@ internal class DetachModeControllerTests : IDisposable
     }
 
     [Test]
+    public void SwitchWindow_WhenTheTargetCannotBeFloated_FallsBackToAVisibleWindow ()
+    {
+        // Arrange
+        AddWindows("first.log", "second.log");
+
+        var previous = _dockPanel.ActiveContent as LogWindow;
+
+        var broken = CreateLogWindow("broken.log");
+        broken.Dispose();
+
+        var tabControllerMock = new Mock<ITabController>();
+        _ = tabControllerMock.Setup(c => c.GetNextWindow(It.IsAny<LogWindow>())).Returns(broken);
+
+        using var controller = new DetachModeController(_form, _dockPanel, tabControllerMock.Object);
+        _ = controller.Enter();
+
+        Assert.That(controller.IsActive, Is.True, "the mode should be entered on the real dock panel");
+        Assert.That(_form.Visible, Is.False);
+
+        // Act
+        controller.SwitchWindow(shiftPressed: false);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(controller.IsActive, Is.False, "a failed detach must not leave the mode on without a float");
+            Assert.That(_form.Visible, Is.True, "the main window has to come back when the switch fails");
+            Assert.That(previous?.DockState, Is.EqualTo(DockState.Document), "the window the switch moved off is docked back");
+        });
+    }
+
+    [Test]
+    public void DetachModeKeys_MatchTheWin32Values ()
+    {
+        // The message filter and the caption hook used to carry local ints; these keep the Vanara
+        // enums they were replaced with honest.
+        Assert.Multiple(() =>
+        {
+            Assert.That((int)User32.VK.VK_F11, Is.EqualTo(0x7A));
+            Assert.That((int)User32.VK.VK_TAB, Is.EqualTo(0x09));
+            Assert.That((int)User32.WindowMessage.WM_NCLBUTTONDBLCLK, Is.EqualTo(0x00A3));
+            Assert.That(NativeMethods.WM_KEYDOWN, Is.EqualTo((int)User32.WindowMessage.WM_KEYDOWN));
+        });
+    }
+
+    [Test]
     public void OnWindowDisposed_LastWindow_EndsTheModeAndShowsTheMainForm ()
     {
         // Arrange
@@ -384,7 +428,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100, // WM_KEYDOWN
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x7A, // VK_F11
             LParam = 0 // first press, no auto-repeat bit
         };
@@ -407,7 +451,7 @@ internal class DetachModeControllerTests : IDisposable
         // Arrange
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x7A, // VK_F11
             LParam = 0
         };
@@ -428,7 +472,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x7A, // VK_F11
             LParam = (IntPtr)(1L << 30) // auto-repeat bit set by Windows while the key is held
         };
@@ -454,7 +498,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x1B, // VK_ESCAPE
             LParam = 0
         };
@@ -480,7 +524,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x7A, // VK_F11
             LParam = 0
         };
@@ -507,7 +551,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x09, // VK_TAB
             LParam = 0
         };
@@ -535,7 +579,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x09, // VK_TAB
             LParam = 0
         };
@@ -562,7 +606,7 @@ internal class DetachModeControllerTests : IDisposable
 
         var msg = new Message
         {
-            Msg = 0x0100,
+            Msg = NativeMethods.WM_KEYDOWN,
             WParam = (IntPtr)0x41, // 'A'
             LParam = 0
         };

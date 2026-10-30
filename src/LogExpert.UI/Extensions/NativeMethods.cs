@@ -41,16 +41,17 @@ internal static partial class NativeMethods
 
     #region Win32 constants shared by keyboard handling
 
-    /// <summary>Posted to the window with the keyboard focus when a non-system key is pressed.</summary>
     public const int WM_KEYDOWN = 0x0100;
 
-    /// <summary>The lParam bit Windows sets on every <see cref="WM_KEYDOWN"/> but the first while a key is held.</summary>
     public const long KEYDOWN_AUTOREPEAT_FLAG = 1L << 30;
 
     #endregion
 
     #region P/Invoke
 
+    // DwmApi is the one place that does not go through Vanara: the generated P/Invoke there carries
+    // no DefaultDllImportSearchPaths, and dwmapi.dll is not a KnownDLL, so dropping the System32
+    // restriction would reopen a search-order hijack.
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
     [System.Runtime.InteropServices.DefaultDllImportSearchPaths(System.Runtime.InteropServices.DllImportSearchPath.System32)]
     public static extern int DwmSetWindowAttribute (IntPtr hwnd, int attribute, ref int value, int size);
@@ -58,6 +59,13 @@ internal static partial class NativeMethods
     #endregion
 
     #region Helper methods
+
+    // Tells the repeated WM_KEYDOWN messages Windows sends while a key is held down from the single
+    // message of an actual press.
+    public static bool IsAutoRepeat (Message msg)
+    {
+        return msg.Msg == WM_KEYDOWN && (msg.LParam.ToInt64() & KEYDOWN_AUTOREPEAT_FLAG) != 0;
+    }
 
     public static Icon LoadIconFromExe (string fileName, int index)
     {

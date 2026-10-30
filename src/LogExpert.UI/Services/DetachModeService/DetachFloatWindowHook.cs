@@ -1,5 +1,7 @@
 using System.Runtime.Versioning;
 
+using Vanara.PInvoke;
+
 namespace LogExpert.UI.Services.DetachModeService;
 
 /// <summary>
@@ -10,8 +12,6 @@ namespace LogExpert.UI.Services.DetachModeService;
 [SupportedOSPlatform("windows")]
 internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
 {
-    private const int WM_NCLBUTTONDBLCLK = 0x00A3;
-
     private readonly WeifenLuo.WinFormsUI.Docking.FloatWindow _floatWindow;
     private bool _disposed;
 
@@ -46,7 +46,7 @@ internal sealed class DetachFloatWindowHook : NativeWindow, IDisposable
 
     protected override void WndProc (ref Message m)
     {
-        if (m.Msg == WM_NCLBUTTONDBLCLK)
+        if (m.Msg == (int)User32.WindowMessage.WM_NCLBUTTONDBLCLK)
         {
             // Swallowed on purpose: both the suite and DefWindowProc act on a caption double click.
             CaptionDoubleClicked?.Invoke(this, EventArgs.Empty);

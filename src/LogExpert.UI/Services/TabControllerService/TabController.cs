@@ -287,8 +287,7 @@ internal class TabController : ITabController
 
     /// <summary>
     /// Resolves the window that follows <paramref name="current"/> in the tab order, without
-    /// activating it. Callers that display windows differently from the DockPanel need the target
-    /// window rather than an <c>Activate()</c>.
+    /// activating it.
     /// </summary>
     /// <param name="current">
     /// The window to move on from. Pass <c>null</c> to use the active window.

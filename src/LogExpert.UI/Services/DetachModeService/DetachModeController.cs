@@ -20,7 +20,7 @@ internal sealed class DetachModeController : IDisposable
     private readonly ITabController _tabController;
     private readonly DetachMessageFilter _messageFilter;
 
-    private DetachFloatWindowHook _captionHook;
+    private DetachFloatWindowHook? _captionHook;
     private bool _filterInstalled;
     private bool _disposed;
 
@@ -43,7 +43,7 @@ internal sealed class DetachModeController : IDisposable
 
     public bool IsActive => _detachedWindow != null;
 
-    public FloatWindow DetachedFloat => _captionHook?.FloatWindow;
+    public FloatWindow? DetachedFloat => _captionHook?.FloatWindow;
 
     public bool Enter ()
     {
@@ -59,14 +59,25 @@ internal sealed class DetachModeController : IDisposable
             return false;
         }
 
-        if (!Detach(active))
+        if (!TryDetach(active))
         {
             // Hiding the main form without a float would leave no window to press F11 in.
             return false;
         }
 
-        InstallFilter();
-        _mainForm.Hide();
+        try
+        {
+            InstallFilter();
+            _mainForm.Hide();
+        }
+        catch (Exception ex) when (ex is ObjectDisposedException or InvalidOperationException)
+        {
+            // A main form that stayed visible with the mode still on could not be left with F11:
+            // ProcessCmdKey would just re-enter the mode.
+            Exit();
+            return false;
+        }
+
         return true;
     }
 
@@ -96,10 +107,6 @@ internal sealed class DetachModeController : IDisposable
         _originalPlacement = default;
     }
 
-    /// <summary>
-    /// Ends the mode without a detached float, for the case where the suite cannot float a window:
-    /// the main form has to come back even though no window can carry F11.
-    /// </summary>
     private void LeaveDetachedState ()
     {
         _detachedWindow = null;
@@ -120,6 +127,7 @@ internal sealed class DetachModeController : IDisposable
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The main form is hidden here, so nothing may escape without bringing it back.")]
     public void SwitchWindow (bool shiftPressed)
     {
         if (!IsActive)
@@ -127,21 +135,29 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
-        // Re-dock first: the floating window is not part of the tab strip, so the walk needs the
-        // full order to stay stable.
-        ReleaseFloatWindow();
-        RestoreWindow(_detachedWindow);
+        var previous = _detachedWindow;
 
-        var target = shiftPressed
-            ? _tabController.GetPreviousWindow(_detachedWindow)
-            : _tabController.GetNextWindow(_detachedWindow);
-
-        if (!Detach(target ?? _detachedWindow))
+        try
         {
+            ReleaseAndRestore(previous);
+
+            var target = shiftPressed
+                ? _tabController.GetPreviousWindow(previous)
+                : _tabController.GetNextWindow(previous);
+
+            if (!TryDetach(target ?? previous))
+            {
+                LeaveDetachedState();
+            }
+        }
+        catch (Exception)
+        {
+            // The main form is hidden here, so nothing may escape without bringing it back.
             LeaveDetachedState();
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The main form is hidden here, so nothing may escape without bringing it back.")]
     public void OnWindowAdded (LogWindow window)
     {
         if (!IsActive || window == null || window.IsDisposed)
@@ -149,12 +165,82 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
-        ReleaseFloatWindow();
-        RestoreWindow(_detachedWindow);
+        try
+        {
+            ReleaseAndRestore(_detachedWindow);
 
-        if (!Detach(window))
+            if (!TryDetach(window))
+            {
+                LeaveDetachedState();
+            }
+        }
+        catch (Exception)
         {
             LeaveDetachedState();
+        }
+    }
+
+    // Puts the floating window back into the tab strip before the next one is detached: the float
+    // is not part of the strip, so the walk needs the full order to stay stable.
+    private void ReleaseAndRestore (LogWindow window)
+    {
+        ReleaseFloatWindow();
+        RestoreWindow(window);
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A failed detach must fall back to a visible window instead of propagating.")]
+    private bool TryDetach (LogWindow window)
+    {
+        // Detach() takes a fresh snapshot. Clearing first keeps a throw before that point from
+        // rolling this window back to the place the previous one held.
+        ClearOriginalPlacement();
+
+        try
+        {
+            return Detach(window);
+        }
+        catch (Exception)
+        {
+            // SwitchWindow/OnWindowAdded run with the main form already hidden, so a throw must not
+            // escape here; the caller brings the main form back once this returns false.
+            RollBackFailedDetach(window);
+            return false;
+        }
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The fallback must not throw while the main form is hidden.")]
+    private void RollBackFailedDetach (LogWindow window)
+    {
+        // Detach() assigns this before Activate(), which can throw on a torn-down window. Leaving it
+        // set would keep IsActive true with no float, and Enter() would then ignore every F11.
+        _detachedWindow = null;
+
+        try
+        {
+            ReleaseFloatWindow();
+        }
+        catch (Exception)
+        {
+            // The float is already being torn down; dropping the dead hook keeps the next detach
+            // from reusing it.
+            _captionHook = null;
+        }
+
+        try
+        {
+            // Detach() may have floated the window before it threw; the snapshot says where it belongs.
+            if (_originalPlacement.DockState != DockState.Unknown)
+            {
+                RestoreWindow(window);
+            }
+        }
+        catch (Exception)
+        {
+            // A window that cannot be docked back stays where it is; the main form still returns.
+        }
+        finally
+        {
+            ClearOriginalPlacement();
         }
     }
 
@@ -385,6 +471,13 @@ internal sealed class DetachModeController : IDisposable
 
     private void RestoreMainForm ()
     {
+        // Dispose() leaves the mode through Exit(); showing the form on that path would run while
+        // the form is being torn down.
+        if (_disposed || _mainForm.IsDisposed)
+        {
+            return;
+        }
+
         _mainForm.Show();
         _mainForm.Activate();
     }

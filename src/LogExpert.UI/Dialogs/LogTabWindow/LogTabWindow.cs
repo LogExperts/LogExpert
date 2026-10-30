@@ -2163,10 +2163,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     {
         if (keyData == Keys.F11)
         {
-            // Only the key-down of the first press counts: Windows repeats WM_KEYDOWN while F11 is
-            // held down (lParam bit 30), and honouring those repeats would flip the mode back and
-            // forth. A second press after release leaves the mode again.
-            if (!IsAutoRepeat(msg))
+            if (!NativeMethods.IsAutoRepeat(msg))
             {
                 EnterDetachMode();
             }
@@ -2175,16 +2172,6 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         }
 
         return base.ProcessCmdKey(ref msg, keyData);
-    }
-
-    /// <summary>
-    /// Tells the repeated WM_KEYDOWN messages Windows sends while a key is held down from the
-    /// single message of an actual press.
-    /// </summary>
-    private static bool IsAutoRepeat (Message msg)
-    {
-        return msg.Msg == LogExpert.UI.Extensions.NativeMethods.WM_KEYDOWN
-            && ((long)msg.LParam & LogExpert.UI.Extensions.NativeMethods.KEYDOWN_AUTOREPEAT_FLAG) != 0;
     }
 
     [SupportedOSPlatform("windows")]

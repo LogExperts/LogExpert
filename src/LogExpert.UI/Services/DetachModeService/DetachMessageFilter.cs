@@ -2,6 +2,8 @@ using System.Runtime.Versioning;
 
 using LogExpert.UI.Extensions;
 
+using Vanara.PInvoke;
+
 namespace LogExpert.UI.Services.DetachModeService;
 
 /// <summary>
@@ -13,9 +15,6 @@ namespace LogExpert.UI.Services.DetachModeService;
 [SupportedOSPlatform("windows")]
 internal sealed class DetachMessageFilter : IMessageFilter
 {
-    private const int VK_F11 = 0x7A;
-    private const int VK_TAB = 0x09;
-
     private readonly DetachModeController _controller;
     private readonly Func<Keys> _modifierKeysGetter;
     private readonly Func<Form> _activeFormGetter;
@@ -45,18 +44,18 @@ internal sealed class DetachMessageFilter : IMessageFilter
             return false;
         }
 
-        switch (m.WParam.ToInt32())
+        switch ((User32.VK)m.WParam.ToInt32())
         {
-            case VK_F11:
+            case User32.VK.VK_F11:
                 // Block the whole burst: acting on auto-repeat would flip the mode on every repeat.
-                if ((m.LParam.ToInt64() & NativeMethods.KEYDOWN_AUTOREPEAT_FLAG) == 0)
+                if (!NativeMethods.IsAutoRepeat(m))
                 {
                     _controller.Exit();
                 }
 
                 return true;
 
-            case VK_TAB when _modifierKeysGetter().HasFlag(Keys.Control):
+            case User32.VK.VK_TAB when _modifierKeysGetter().HasFlag(Keys.Control):
                 _controller.SwitchWindow(_modifierKeysGetter().HasFlag(Keys.Shift));
                 return true;
 
