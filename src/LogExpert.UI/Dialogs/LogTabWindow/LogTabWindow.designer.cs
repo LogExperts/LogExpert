@@ -890,7 +890,6 @@ namespace LogExpert.UI.Controls.LogTabWindow
             // toolStripButtonTail
             // 
             toolStripButtonTail.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButtonTail.Image = (Image)resources.GetObject("toolStripButtonTail.Image");
             toolStripButtonTail.ImageTransparentColor = Color.Magenta;
             toolStripButtonTail.Name = "toolStripButtonTail";
             toolStripButtonTail.Size = new Size(27, 19);
