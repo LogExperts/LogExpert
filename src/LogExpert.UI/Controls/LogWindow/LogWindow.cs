@@ -664,14 +664,16 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         MultiFileMaskDialog dlg = new(FileName)
         {
             Owner = this,
-            MaxDays = _multiFileOptions.MaxDayTry,
+            MaxDayGap = _multiFileOptions.MaxDayTry,
+            MaxFileAgeDays = _multiFileOptions.MaxFileAgeDays,
             FileNamePattern = _multiFileOptions.FormatPattern
         };
 
         if (dlg.ShowDialog() == DialogResult.OK)
         {
             _multiFileOptions.FormatPattern = dlg.FileNamePattern;
-            _multiFileOptions.MaxDayTry = dlg.MaxDays;
+            _multiFileOptions.MaxDayTry = dlg.MaxDayGap;
+            _multiFileOptions.MaxFileAgeDays = dlg.MaxFileAgeDays;
             if (IsMultiFile)
             {
                 Reload();
@@ -2840,7 +2842,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             _multiFileOptions = new MultiFileOptions
             {
                 FormatPattern = snapshot.MultiFilePattern,
-                MaxDayTry = snapshot.MultiFileMaxDays
+                MaxDayTry = snapshot.MultiFileMaxDays,
+                MaxFileAgeDays = snapshot.MultiFileMaxFileAgeDays
             };
 
             if (string.IsNullOrEmpty(_multiFileOptions.FormatPattern))
@@ -6211,6 +6214,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             MultiFile = IsMultiFile,
             MultiFilePattern = _multiFileOptions.FormatPattern,
             MultiFileMaxDays = _multiFileOptions.MaxDayTry,
+            MultiFileMaxFileAgeDays = _multiFileOptions.MaxFileAgeDays,
             CurrentLine = CurrentLineNum,
             FirstDisplayedLine = RowToLine(dataGridView.FirstDisplayedScrollingRowIndex),
             FilterVisible = !splitContainerLogWindow.Panel2Collapsed,

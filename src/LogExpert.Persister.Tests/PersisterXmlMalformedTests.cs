@@ -44,6 +44,7 @@ public class PersisterXmlMalformedTests
             Assert.That(data.MultiFile, Is.False);
             Assert.That(data.MultiFilePattern, Is.Null);
             Assert.That(data.MultiFileMaxDays, Is.Zero);
+            Assert.That(data.MultiFileMaxFileAgeDays, Is.Zero);
             Assert.That(data.FilterVisible, Is.False);
 
             // A missing <options> means "nothing was persisted", so every option keeps its

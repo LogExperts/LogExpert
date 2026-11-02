@@ -43,6 +43,8 @@ public class SessionSnapshot
 
     public int MultiFileMaxDays { get; set; }
 
+    public int MultiFileMaxFileAgeDays { get; set; }
+
     public string MultiFilePattern { get; set; }
 
     public string TabName { get; set; }

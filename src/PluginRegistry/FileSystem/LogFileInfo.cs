@@ -88,6 +88,15 @@ public class LogFileInfo : ILogFileInfo
         }
     }
 
+    public DateTime? LastWriteTimeUtc
+    {
+        get
+        {
+            fInfo.Refresh();
+            return fInfo.Exists ? fInfo.LastWriteTimeUtc : null;
+        }
+    }
+
     //TODO this should be set from outside once
     public int PollInterval => PluginRegistry.PollingInterval;
 

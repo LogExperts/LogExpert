@@ -71,6 +71,8 @@ public class PersistenceData
 
     public int MultiFileMaxDays { get; set; }
 
+    public int MultiFileMaxFileAgeDays { get; set; }
+
     public List<string> MultiFileNames { get; set; } = [];
 
     public string MultiFilePattern { get; set; }
