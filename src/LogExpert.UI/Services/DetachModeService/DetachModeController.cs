@@ -19,17 +19,22 @@ internal sealed class DetachModeController : IDisposable
     private readonly DockPanel _dockPanel;
     private readonly ITabController _tabController;
     private readonly DetachMessageFilter _messageFilter;
+    private readonly Func<FloatWindow, DetachFloatWindowHook> _attachCaptionHook;
 
     private DetachFloatWindowHook? _captionHook;
     private bool _filterInstalled;
     private bool _disposed;
 
-    private LogWindow _detachedWindow;
+    private LogWindow? _detachedWindow;
 
     private PlacementSnapshot _originalPlacement;
-    private ChromeSnapshot _originalChrome;
+    private ChromeSnapshot? _originalChrome;
 
-    public DetachModeController (Form mainForm, DockPanel dockPanel, ITabController tabController)
+    public DetachModeController (
+        Form mainForm,
+        DockPanel dockPanel,
+        ITabController tabController,
+        Func<FloatWindow, DetachFloatWindowHook>? attachCaptionHook = null)
     {
         ArgumentNullException.ThrowIfNull(mainForm);
         ArgumentNullException.ThrowIfNull(dockPanel);
@@ -39,12 +44,16 @@ internal sealed class DetachModeController : IDisposable
         _dockPanel = dockPanel;
         _tabController = tabController;
         _messageFilter = new DetachMessageFilter(this);
+
+        // Overridable so a test can fail the attach after the chrome has already been patched.
+        _attachCaptionHook = attachCaptionHook ?? DetachFloatWindowHook.Attach;
     }
 
     public bool IsActive => _detachedWindow != null;
 
     public FloatWindow? DetachedFloat => _captionHook?.FloatWindow;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A mode that could not be entered has to be left again, whatever went wrong.")]
     public bool Enter ()
     {
         if (IsActive)
@@ -52,67 +61,135 @@ internal sealed class DetachModeController : IDisposable
             return true;
         }
 
-        var active = _dockPanel.ActiveContent as LogWindow ?? _tabController.GetActiveWindow();
-
-        if (active == null || active.IsDisposed)
-        {
-            return false;
-        }
-
-        if (!TryDetach(active))
-        {
-            // Hiding the main form without a float would leave no window to press F11 in.
-            return false;
-        }
-
         try
         {
+            var active = _dockPanel.ActiveContent as LogWindow ?? _tabController.GetActiveWindow();
+
+            if (active == null || active.IsDisposed)
+            {
+                return false;
+            }
+
+            if (!TryDetach(active))
+            {
+                // Hiding the main form without a float would leave no window to press F11 in.
+                return false;
+            }
+
             InstallFilter();
             _mainForm.Hide();
+            return true;
         }
-        catch (Exception ex) when (ex is ObjectDisposedException or InvalidOperationException)
+        catch (Exception)
         {
             // A main form that stayed visible with the mode still on could not be left with F11:
             // ProcessCmdKey would just re-enter the mode.
             Exit();
             return false;
         }
-
-        return true;
     }
 
-    public void Exit ()
+    /// <summary>
+    /// Leaves the mode: releases the float, restores the window and brings the main form back.
+    /// </summary>
+    /// <param name="restoreMainForm">
+    /// Pass <c>false</c> when the caller is closing the main form: showing it again would make it
+    /// flash during shutdown.
+    /// </param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exit() runs from the message filter, from session load, from Enter()'s failure path and from Dispose().")]
+    public void Exit (bool restoreMainForm = true)
     {
-        if (!IsActive)
-        {
-            return;
-        }
-
         var window = _detachedWindow;
 
         _detachedWindow = null;
-        UninstallFilter();
 
-        // Show the owner first: assigning it to a hidden main form would hide the float before its
-        // content is docked back.
-        RestoreMainForm();
+        try
+        {
+            if (window != null && restoreMainForm)
+            {
+                // Show the owner first: assigning it to a hidden main form would hide the float
+                // before its content is docked back.
+                RestoreMainForm();
+            }
 
-        ReleaseFloatWindow();
-        RestoreWindow(window);
-        ClearOriginalPlacement();
+            // Also releases a hook a half-entered mode left behind without a detached window.
+            try
+            {
+                ReleaseFloatWindow();
+            }
+            catch (Exception)
+            {
+                // A hook that cannot be released must not keep the window floating as well.
+            }
+
+            RestoreWindow(window);
+        }
+        catch (Exception)
+        {
+            // The form was already brought back before the throw; the finally only has to clean up.
+        }
+        finally
+        {
+            try
+            {
+                UninstallFilter();
+            }
+            catch (Exception)
+            {
+                // A filter that cannot be removed is inert once the mode is off.
+            }
+
+            ClearSnapshots();
+        }
     }
 
-    private void ClearOriginalPlacement ()
+    private void ClearSnapshots ()
     {
         _originalPlacement = default;
+        _originalChrome = null;
     }
 
-    private void LeaveDetachedState ()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This only runs while a failure is already being handled.")]
+    private void LeaveDetachedState (LogWindow? window)
     {
         _detachedWindow = null;
-        UninstallFilter();
-        ClearOriginalPlacement();
+
+        // Show the form before the float takes its owner back, or the restored chrome hides it.
         RestoreMainForm();
+
+        try
+        {
+            UninstallFilter();
+        }
+        catch (Exception)
+        {
+            // Best effort: the caller is already ending the mode.
+        }
+
+        try
+        {
+            ReleaseFloatWindow();
+        }
+        catch (Exception)
+        {
+            // The hook is dropped as the release starts, so a failed dispose cannot revive it.
+        }
+
+        // Only with a live snapshot: after a rollback the window is already back, and showing it
+        // through the fallback would move a window that was originally floating or docked.
+        if (_originalPlacement.DockState != DockState.Unknown)
+        {
+            try
+            {
+                RestoreWindow(window);
+            }
+            catch (Exception)
+            {
+                // A window that cannot be docked back stays where it is; the main form still returns.
+            }
+        }
+
+        ClearSnapshots();
     }
 
     private void RestoreMainFormLater ()
@@ -127,73 +204,68 @@ internal sealed class DetachModeController : IDisposable
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The main form is hidden here, so nothing may escape without bringing it back.")]
     public void SwitchWindow (bool shiftPressed)
     {
-        if (!IsActive)
+        if (_detachedWindow is not { } previous)
         {
             return;
         }
 
-        var previous = _detachedWindow;
+        SwitchTo(previous, () => shiftPressed
+            ? _tabController.GetPreviousWindow(previous)
+            : _tabController.GetNextWindow(previous));
+    }
 
+    public void OnWindowAdded (LogWindow window)
+    {
+        if (_detachedWindow is not { } previous || window.IsDisposed)
+        {
+            return;
+        }
+
+        SwitchTo(previous, () => window);
+    }
+
+    /// <summary>
+    /// Swaps the detached window for another one. The current float is released before
+    /// <paramref name="resolveNext"/> runs, because the next/previous walk needs it back in the tab
+    /// strip.
+    /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A failed switch must end in a visible window rather than an exception.")]
+    private void SwitchTo (LogWindow previous, Func<LogWindow?> resolveNext)
+    {
         try
         {
             ReleaseAndRestore(previous);
 
-            var target = shiftPressed
-                ? _tabController.GetPreviousWindow(previous)
-                : _tabController.GetNextWindow(previous);
-
-            if (!TryDetach(target ?? previous))
+            if (!TryDetach(resolveNext() ?? previous))
             {
-                LeaveDetachedState();
+                LeaveDetachedState(previous);
             }
         }
         catch (Exception)
         {
-            // The main form is hidden here, so nothing may escape without bringing it back.
-            LeaveDetachedState();
-        }
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The main form is hidden here, so nothing may escape without bringing it back.")]
-    public void OnWindowAdded (LogWindow window)
-    {
-        if (!IsActive || window == null || window.IsDisposed)
-        {
-            return;
-        }
-
-        try
-        {
-            ReleaseAndRestore(_detachedWindow);
-
-            if (!TryDetach(window))
-            {
-                LeaveDetachedState();
-            }
-        }
-        catch (Exception)
-        {
-            LeaveDetachedState();
+            // Nothing may escape while the main form is hidden.
+            LeaveDetachedState(previous);
         }
     }
 
     // Puts the floating window back into the tab strip before the next one is detached: the float
     // is not part of the strip, so the walk needs the full order to stay stable.
-    private void ReleaseAndRestore (LogWindow window)
+    private void ReleaseAndRestore (LogWindow? window)
     {
         ReleaseFloatWindow();
         RestoreWindow(window);
+
+        // The old placement is consumed: a later failure must not move the window a second time.
+        ClearSnapshots();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A failed detach must fall back to a visible window instead of propagating.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "A failed detach falls back to a visible window instead of propagating.")]
     private bool TryDetach (LogWindow window)
     {
-        // Detach() takes a fresh snapshot. Clearing first keeps a throw before that point from
-        // rolling this window back to the place the previous one held.
-        ClearOriginalPlacement();
+        // Detach() snapshots afresh, so a throw before that point must not roll back to the old place.
+        ClearSnapshots();
 
         try
         {
@@ -201,19 +273,19 @@ internal sealed class DetachModeController : IDisposable
         }
         catch (Exception)
         {
-            // SwitchWindow/OnWindowAdded run with the main form already hidden, so a throw must not
-            // escape here; the caller brings the main form back once this returns false.
+            // The caller ends the mode when this returns false.
             RollBackFailedDetach(window);
             return false;
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The fallback must not throw while the main form is hidden.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The rollback runs while the main form is hidden and must not throw in turn.")]
     private void RollBackFailedDetach (LogWindow window)
     {
-        // Detach() assigns this before Activate(), which can throw on a torn-down window. Leaving it
-        // set would keep IsActive true with no float, and Enter() would then ignore every F11.
+        // Detach() assigns this before Activate(), which can throw on a torn-down window.
         _detachedWindow = null;
+
+        var floatWindow = _captionHook?.FloatWindow ?? FindFloatWindow(window);
 
         try
         {
@@ -221,29 +293,36 @@ internal sealed class DetachModeController : IDisposable
         }
         catch (Exception)
         {
-            // The float is already being torn down; dropping the dead hook keeps the next detach
-            // from reusing it.
-            _captionHook = null;
+            // The hook is dropped as the release starts, so a failed dispose cannot revive it.
         }
 
+        // Kept apart from the placement restore so a chrome failure cannot keep the window floating.
         try
         {
-            // Detach() may have floated the window before it threw; the snapshot says where it belongs.
-            if (_originalPlacement.DockState != DockState.Unknown)
-            {
-                RestoreWindow(window);
-            }
+            // PatchFloatWindow() can run without a hook to release it, so nothing else would restore the chrome.
+            RestorePatchedChrome(floatWindow);
         }
         catch (Exception)
         {
-            // A window that cannot be docked back stays where it is; the main form still returns.
+            // The chrome is cosmetic; docking the window back matters more.
         }
-        finally
+
+        if (_originalPlacement.DockState != DockState.Unknown)
         {
-            ClearOriginalPlacement();
+            try
+            {
+                RestoreWindow(window);
+            }
+            catch (Exception)
+            {
+                // A window that cannot be docked back stays where it is; the main form still returns.
+            }
         }
+
+        ClearSnapshots();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "The detached window is already gone; nothing may escape into its dispose path.")]
     public void OnWindowDisposed (LogWindow window)
     {
         if (!IsActive || window != _detachedWindow)
@@ -252,9 +331,28 @@ internal sealed class DetachModeController : IDisposable
         }
 
         _detachedWindow = null;
-        ReleaseFloatWindow(restoreChrome: false);
-        UninstallFilter();
-        ClearOriginalPlacement();
+
+        // Uninstall first and on its own: a filter left behind keeps this controller alive, and it
+        // can never fire again once the mode is off.
+        try
+        {
+            UninstallFilter();
+        }
+        catch (Exception)
+        {
+            // A filter that cannot be removed is inert while the mode is off.
+        }
+
+        try
+        {
+            ReleaseFloatWindow(restoreChrome: false);
+        }
+        catch (Exception)
+        {
+            // The float is being torn down with its content.
+        }
+
+        ClearSnapshots();
         RestoreMainFormLater();
     }
 
@@ -273,22 +371,27 @@ internal sealed class DetachModeController : IDisposable
 
         if (floatWindow == null)
         {
-            // The suite refused to float the window; stay out of the mode instead of half-entering it.
-            ClearOriginalPlacement();
+            // The suite refused to float the window; put it back instead of half-entering the mode.
+            RollBackFailedDetach(window);
             return false;
         }
 
+        // The snapshot has to exist before the first style change: everything after it can throw,
+        // and only the snapshot can put the suite's chrome back.
         _originalChrome = CaptureChrome(floatWindow);
         PatchFloatWindow(floatWindow);
-        _captionHook = DetachFloatWindowHook.Attach(floatWindow);
-        _captionHook.CaptionDoubleClicked += ToggleMaximize;
+
+        var hook = _attachCaptionHook(floatWindow);
+        hook.CaptionDoubleClicked += ToggleMaximize;
+        _captionHook = hook;
         _detachedWindow = window;
+
         window.Activate();
         RepaintCaptionLater(floatWindow);
         return true;
     }
 
-    private void RestoreWindow (LogWindow window)
+    private void RestoreWindow (LogWindow? window)
     {
         if (window == null || window.IsDisposed)
         {
@@ -297,7 +400,7 @@ internal sealed class DetachModeController : IDisposable
 
         if (_originalPlacement.DockState == DockState.Float)
         {
-            // Was already floating; only the chrome was patched.
+            // Was already floating; only the chrome was patched, and that is restored separately.
             return;
         }
 
@@ -368,6 +471,26 @@ internal sealed class DetachModeController : IDisposable
         RepaintCaptionLater(floatWindow);
     }
 
+    private void RestorePatchedChrome (FloatWindow? floatWindow)
+    {
+        if (_originalChrome is not { } chrome)
+        {
+            return;
+        }
+
+        if (floatWindow is not { IsDisposed: false })
+        {
+            // The float is gone; there is nothing left to restore the chrome on.
+            _originalChrome = null;
+            return;
+        }
+
+        RestoreChrome(floatWindow, chrome);
+
+        // Cleared only after the restore succeeded, so a throw leaves the snapshot in place.
+        _originalChrome = null;
+    }
+
     private static void RepaintCaptionLater (FloatWindow floatWindow)
     {
         if (floatWindow.IsDisposed)
@@ -415,7 +538,7 @@ internal sealed class DetachModeController : IDisposable
         _ = NativeMethods.DwmSetWindowAttribute(floatWindow.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, sizeof(int));
     }
 
-    private void ToggleMaximize (object sender, EventArgs e)
+    private void ToggleMaximize (object? sender, EventArgs e)
     {
         if (_captionHook == null || _captionHook.FloatWindow.IsDisposed)
         {
@@ -429,21 +552,25 @@ internal sealed class DetachModeController : IDisposable
 
     private void ReleaseFloatWindow (bool restoreChrome = true)
     {
-        if (_captionHook == null)
+        if (_captionHook is not { } hook)
         {
             return;
         }
 
-        var floatWindow = _captionHook.FloatWindow;
-
-        _captionHook.CaptionDoubleClicked -= ToggleMaximize;
-        _captionHook.Dispose();
         _captionHook = null;
 
-        if (restoreChrome && floatWindow is { IsDisposed: false })
+        try
         {
-            // Restore the suite's tool-window chrome (owned border, no taskbar button, end-user docking).
-            RestoreChrome(floatWindow, _originalChrome);
+            hook.CaptionDoubleClicked -= ToggleMaximize;
+            hook.Dispose();
+        }
+        finally
+        {
+            // A hook that fails to dispose must not leave the patched chrome behind.
+            if (restoreChrome)
+            {
+                RestorePatchedChrome(hook.FloatWindow);
+            }
         }
     }
 
@@ -469,6 +596,7 @@ internal sealed class DetachModeController : IDisposable
         _filterInstalled = false;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is the last-resort path back to a visible window.")]
     private void RestoreMainForm ()
     {
         // Dispose() leaves the mode through Exit(); showing the form on that path would run while
@@ -478,11 +606,18 @@ internal sealed class DetachModeController : IDisposable
             return;
         }
 
-        _mainForm.Show();
-        _mainForm.Activate();
+        try
+        {
+            _mainForm.Show();
+            _mainForm.Activate();
+        }
+        catch (Exception)
+        {
+            // Nothing else can bring the form back; the caller is already on its fallback path.
+        }
     }
 
-    private FloatWindow FindFloatWindow (LogWindow content)
+    private FloatWindow? FindFloatWindow (LogWindow content)
     {
         foreach (FloatWindow floatWindow in _dockPanel.FloatWindows)
         {
@@ -514,29 +649,18 @@ internal sealed class DetachModeController : IDisposable
 
         _disposed = true;
 
-        if (IsActive)
-        {
-            try
-            {
-                Exit();
-            }
-            catch (ObjectDisposedException)
-            {
-                // Shutdown races: the panel or the window is already gone, nothing left to restore.
-            }
-        }
-
-        ReleaseFloatWindow();
-        UninstallFilter();
+        // Exit() is the single way out: it releases the float, uninstalls the filter and brings the
+        // main form back.
+        Exit();
     }
 
     private readonly record struct PlacementSnapshot (
         DockState DockState,
-        DockPane Pane,
+        DockPane? Pane,
         int ContentIndex);
 
     private readonly record struct ChromeSnapshot (
-        Form Owner,
+        Form? Owner,
         FormBorderStyle FormBorderStyle,
         FormWindowState WindowState,
         bool MaximizeBox,
