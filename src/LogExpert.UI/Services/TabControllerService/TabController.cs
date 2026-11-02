@@ -264,22 +264,11 @@ internal class TabController : ITabController
     /// </summary>
     public void SwitchToNextWindow ()
     {
-        lock (_windowsLock)
+        var next = GetNextWindow();
+
+        if (next != null)
         {
-            if (_windows.Count == 0)
-            {
-                return;
-            }
-
-            var windows = _windows.Keys.ToList();
-            var currentIndex = _activeWindow != null
-                ? windows.IndexOf(_activeWindow)
-                : -1;
-
-            // Move forward, wrap around to beginning if at end
-            var nextIndex = (currentIndex + 1) % windows.Count;
-
-            windows[nextIndex].Activate();
+            next.Activate();
         }
     }
 
@@ -288,27 +277,93 @@ internal class TabController : ITabController
     /// </summary>
     public void SwitchToPreviousWindow ()
     {
+        var previous = GetPreviousWindow();
+
+        if (previous != null)
+        {
+            previous.Activate();
+        }
+    }
+
+    /// <summary>
+    /// Resolves the window that follows <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move on from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The next window, or <c>null</c> when no window is tracked.</returns>
+    public LogWindow? GetNextWindow (LogWindow? current = null)
+    {
+        var windows = GetWindowsInTabOrder();
+
+        if (windows.Count == 0)
+        {
+            return null;
+        }
+
+        var anchor = current ?? _activeWindow;
+        var currentIndex = anchor != null
+            ? windows.IndexOf(anchor)
+            : -1;
+
+        var nextIndex = (currentIndex + 1) % windows.Count;
+
+        return windows[nextIndex];
+    }
+
+    /// <summary>
+    /// Resolves the window that precedes <paramref name="current"/> in the tab order, without
+    /// activating it.
+    /// </summary>
+    /// <param name="current">
+    /// The window to move back from. Pass <c>null</c> to use the active window.
+    /// </param>
+    /// <returns>The previous window, or <c>null</c> when no window is tracked.</returns>
+    public LogWindow? GetPreviousWindow (LogWindow? current = null)
+    {
+        var windows = GetWindowsInTabOrder();
+
+        if (windows.Count == 0)
+        {
+            return null;
+        }
+
+        var anchor = current ?? _activeWindow;
+
+        // Without an anchor the walk starts at the first window, so "previous" wraps to the last
+        // one ("next" without an anchor lands on the first one the same way).
+        var currentIndex = anchor != null
+            ? windows.IndexOf(anchor)
+            : 0;
+
+        var previousIndex = currentIndex - 1;
+
+        if (previousIndex < 0)
+        {
+            previousIndex = windows.Count - 1;
+        }
+
+        return windows[previousIndex];
+    }
+
+    private List<LogWindow> GetWindowsInTabOrder ()
+    {
+        var windows = GetAllWindowsFromDockPanel().ToList();
+
+        // Tracked windows the panel is not displaying right now stay reachable at the end.
         lock (_windowsLock)
         {
-            if (_windows.Count == 0)
+            foreach (var window in _windows.Keys)
             {
-                return;
+                if (!windows.Contains(window))
+                {
+                    windows.Add(window);
+                }
             }
-
-            var windows = _windows.Keys.ToList();
-            var currentIndex = _activeWindow != null
-                ? windows.IndexOf(_activeWindow)
-                : 0;
-
-            // Move backward, wrap around to end if at beginning
-            var previousIndex = currentIndex - 1;
-            if (previousIndex < 0)
-            {
-                previousIndex = windows.Count - 1;
-            }
-
-            windows[previousIndex].Activate();
         }
+
+        return windows;
     }
 
     /// <summary>
