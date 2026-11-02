@@ -1830,17 +1830,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Shutdown must continue even when detach mode cannot be restored.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Shutdown must continue even when the session cannot be saved.")]
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
-        try
-        {
-            _detachModeController.Exit();
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex, "Leaving detach mode while closing failed");
-        }
+        // The form is going away: showing it again would make it flash during shutdown. Exit() does
+        // not throw, so this needs no guard of its own.
+        _detachModeController.Exit(restoreMainForm: false);
 
         CancelPendingDrop();
         try
@@ -2161,28 +2156,50 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     /// </summary>
     protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
     {
-        if (keyData == Keys.F11)
+        // A failed enter leaves the key alone instead of swallowing it without any effect.
+        if (keyData == Keys.F11 && !NativeMethods.IsAutoRepeat(msg) && EnterDetachMode())
         {
-            if (!NativeMethods.IsAutoRepeat(msg))
-            {
-                EnterDetachMode();
-            }
-
             return true;
         }
 
         return base.ProcessCmdKey(ref msg, keyData);
     }
 
+    /// <summary>
+    /// Enters detach mode, restoring a minimized window first so the float gets sane bounds.
+    /// </summary>
+    /// <returns><c>true</c> when the mode is active afterwards; <c>false</c> when it could not be entered.</returns>
     [SupportedOSPlatform("windows")]
-    private void EnterDetachMode ()
+    private bool EnterDetachMode ()
     {
-        if (!_detachModeController.IsActive && WindowState == FormWindowState.Minimized)
+        if (_detachModeController.IsActive)
+        {
+            return true;
+        }
+
+        var wasMinimized = WindowState == FormWindowState.Minimized;
+        var wasMaximized = _wasMaximized;
+
+        if (wasMinimized)
         {
             WindowState = FormWindowState.Normal;
         }
 
-        _detachModeController.Enter();
+        if (_detachModeController.Enter())
+        {
+            return true;
+        }
+
+        // Nothing was detached, so leave the window exactly as it was found. Going through Normal
+        // let OnLogTabWindowSizeChanged overwrite the flag SetForeground() restores with.
+        if (wasMinimized)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        _wasMaximized = wasMaximized;
+
+        return false;
     }
 
     private void OnDetachModeToolStripMenuItemClick (object sender, EventArgs e)

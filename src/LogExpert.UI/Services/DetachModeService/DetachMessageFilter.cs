@@ -17,12 +17,12 @@ internal sealed class DetachMessageFilter : IMessageFilter
 {
     private readonly DetachModeController _controller;
     private readonly Func<Keys> _modifierKeysGetter;
-    private readonly Func<Form> _activeFormGetter;
+    private readonly Func<Form?> _activeFormGetter;
 
     public DetachMessageFilter (
         DetachModeController controller,
         Func<Keys>? modifierKeysGetter = null,
-        Func<Form>? activeFormGetter = null)
+        Func<Form?>? activeFormGetter = null)
     {
         ArgumentNullException.ThrowIfNull(controller);
         _controller = controller;
@@ -38,8 +38,10 @@ internal sealed class DetachMessageFilter : IMessageFilter
         }
 
         // Only the detached float owns these keys; a modal dialog on top of it must keep F11 and
-        // Ctrl+Tab for itself.
-        if (_activeFormGetter() != _controller.DetachedFloat)
+        // Ctrl+Tab for itself. The float has to exist first: between releasing the hook and
+        // detaching the next window both it and ActiveForm are null, and comparing them would let
+        // the keys through to a controller that is mid-switch.
+        if (_controller.DetachedFloat is not { } floatWindow || _activeFormGetter() != floatWindow)
         {
             return false;
         }
@@ -55,9 +57,19 @@ internal sealed class DetachMessageFilter : IMessageFilter
 
                 return true;
 
-            case User32.VK.VK_TAB when _modifierKeysGetter().HasFlag(Keys.Control):
-                _controller.SwitchWindow(_modifierKeysGetter().HasFlag(Keys.Shift));
-                return true;
+            case User32.VK.VK_TAB:
+                {
+                    // Read once: both flags must come from the same snapshot of the key state.
+                    var modifiers = _modifierKeysGetter();
+
+                    if (!modifiers.HasFlag(Keys.Control))
+                    {
+                        return false;
+                    }
+
+                    _controller.SwitchWindow(modifiers.HasFlag(Keys.Shift));
+                    return true;
+                }
 
             default:
                 return false;

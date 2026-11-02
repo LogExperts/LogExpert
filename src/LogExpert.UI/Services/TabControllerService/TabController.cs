@@ -293,7 +293,7 @@ internal class TabController : ITabController
     /// The window to move on from. Pass <c>null</c> to use the active window.
     /// </param>
     /// <returns>The next window, or <c>null</c> when no window is tracked.</returns>
-    public LogWindow GetNextWindow (LogWindow current = null)
+    public LogWindow? GetNextWindow (LogWindow? current = null)
     {
         var windows = GetWindowsInTabOrder();
 
@@ -320,7 +320,7 @@ internal class TabController : ITabController
     /// The window to move back from. Pass <c>null</c> to use the active window.
     /// </param>
     /// <returns>The previous window, or <c>null</c> when no window is tracked.</returns>
-    public LogWindow GetPreviousWindow (LogWindow current = null)
+    public LogWindow? GetPreviousWindow (LogWindow? current = null)
     {
         var windows = GetWindowsInTabOrder();
 

@@ -185,6 +185,31 @@ internal class DetachModeControllerTests : IDisposable
     }
 
     [Test]
+    public void Exit_WithoutRestoringTheMainForm_DocksTheWindowBackAndLeavesTheFormHidden ()
+    {
+        // Arrange
+        AddWindows("first.log", "second.log");
+        var active = _dockPanel.ActiveContent as LogWindow;
+
+        Assert.That(active, Is.Not.Null);
+
+        _controller.Enter();
+
+        Assert.That(_form.Visible, Is.False);
+
+        // Act
+        _controller.Exit(restoreMainForm: false);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(_controller.IsActive, Is.False);
+            Assert.That(_form.Visible, Is.False, "a main form that is closing must not be shown again");
+            Assert.That(active.DockState, Is.EqualTo(DockState.Document), "the window is still docked back");
+        });
+    }
+
+    [Test]
     public void Exit_KeepsAnAlreadyFloatingWindowFloating ()
     {
         // Arrange
@@ -274,24 +299,19 @@ internal class DetachModeControllerTests : IDisposable
     }
 
     [Test]
-    public void SwitchWindow_WhenTheTargetCannotBeFloated_FallsBackToAVisibleWindow ()
+    public void SwitchWindow_WhenTheNextWindowCannotBeDetached_DocksItBackAndShowsTheMainForm ()
     {
         // Arrange
-        AddWindows("first.log", "second.log");
-
+        var windows = AddWindows("first.log", "second.log");
         var previous = _dockPanel.ActiveContent as LogWindow;
 
-        var broken = CreateLogWindow("broken.log");
-        broken.Dispose();
+        Assert.That(previous, Is.Not.Null);
 
-        var tabControllerMock = new Mock<ITabController>();
-        _ = tabControllerMock.Setup(c => c.GetNextWindow(It.IsAny<LogWindow>())).Returns(broken);
+        // The first attach (Enter) succeeds, the one for the next window fails after the chrome patch.
+        using var controller = CreateControllerFailingToHookAfter(1);
+        Assert.That(controller.Enter(), Is.True);
 
-        using var controller = new DetachModeController(_form, _dockPanel, tabControllerMock.Object);
-        _ = controller.Enter();
-
-        Assert.That(controller.IsActive, Is.True, "the mode should be entered on the real dock panel");
-        Assert.That(_form.Visible, Is.False);
+        var target = windows.Single(window => window != previous);
 
         // Act
         controller.SwitchWindow(shiftPressed: false);
@@ -301,21 +321,77 @@ internal class DetachModeControllerTests : IDisposable
         {
             Assert.That(controller.IsActive, Is.False, "a failed detach must not leave the mode on without a float");
             Assert.That(_form.Visible, Is.True, "the main window has to come back when the switch fails");
-            Assert.That(previous?.DockState, Is.EqualTo(DockState.Document), "the window the switch moved off is docked back");
+            Assert.That(previous.DockState, Is.EqualTo(DockState.Document), "the window the switch moved off is docked back");
+            Assert.That(target.DockState, Is.EqualTo(DockState.Document), "the half-detached target is docked back");
         });
     }
 
     [Test]
-    public void DetachModeKeys_MatchTheWin32Values ()
+    public void OnWindowAdded_WhenTheNewWindowCannotBeDetached_DocksItBackAndShowsTheMainForm ()
     {
-        // The message filter and the caption hook used to carry local ints; these keep the Vanara
-        // enums they were replaced with honest.
+        // Arrange
+        var windows = AddWindows("first.log");
+        var detached = windows[0];
+
+        // The first attach (Enter) succeeds, the one for the added window fails after the chrome patch.
+        using var controller = CreateControllerFailingToHookAfter(1);
+        Assert.That(controller.Enter(), Is.True);
+
+        using var added = CreateLogWindow("added.log");
+        _tabController.AddWindow(added, "added.log");
+
+        // Act
+        controller.OnWindowAdded(added);
+
+        // Assert
         Assert.Multiple(() =>
         {
-            Assert.That((int)User32.VK.VK_F11, Is.EqualTo(0x7A));
-            Assert.That((int)User32.VK.VK_TAB, Is.EqualTo(0x09));
-            Assert.That((int)User32.WindowMessage.WM_NCLBUTTONDBLCLK, Is.EqualTo(0x00A3));
-            Assert.That(NativeMethods.WM_KEYDOWN, Is.EqualTo((int)User32.WindowMessage.WM_KEYDOWN));
+            Assert.That(controller.IsActive, Is.False);
+            Assert.That(_form.Visible, Is.True, "the main window has to come back when the detach fails");
+            Assert.That(detached.DockState, Is.EqualTo(DockState.Document), "the window the mode moved off is docked back");
+            Assert.That(added.DockState, Is.EqualTo(DockState.Document), "the half-detached new window is docked back");
+        });
+    }
+
+    [Test]
+    public void Enter_WhenTheFloatCannotBeHooked_RestoresTheChromeOfAnAlreadyFloatingWindow ()
+    {
+        // Arrange
+        var windows = AddWindows("first.log", "floating.log");
+        var floating = windows[1];
+
+        floating.Show(_dockPanel, DockState.Float);
+
+        Assert.That(_dockPanel.ActiveContent as LogWindow, Is.EqualTo(floating));
+
+        var floatWindow = FloatWindowOf(floating);
+
+        Assert.That(floatWindow, Is.Not.Null);
+
+        var originalOwner = floatWindow.Owner;
+        var originalBorderStyle = floatWindow.FormBorderStyle;
+        var originalShowInTaskbar = floatWindow.ShowInTaskbar;
+        var originalAllowEndUserDocking = floatWindow.AllowEndUserDocking;
+
+        // The window is already floating, so the rollback cannot dock it back: only the chrome can
+        // show that the patch was undone.
+        using var controller = CreateControllerFailingToHookAfter(0);
+
+        // Act
+        var entered = controller.Enter();
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(entered, Is.False, "a float without a caption hook must not start the mode");
+            Assert.That(controller.IsActive, Is.False);
+            Assert.That(_form.Visible, Is.True);
+            Assert.That(floating.DockState, Is.EqualTo(DockState.Float), "the window was floating before the mode");
+
+            Assert.That(floatWindow.Owner, Is.EqualTo(originalOwner), "the patched chrome has to be rolled back");
+            Assert.That(floatWindow.FormBorderStyle, Is.EqualTo(originalBorderStyle));
+            Assert.That(floatWindow.ShowInTaskbar, Is.EqualTo(originalShowInTaskbar));
+            Assert.That(floatWindow.AllowEndUserDocking, Is.EqualTo(originalAllowEndUserDocking));
         });
     }
 
@@ -429,7 +505,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x7A, // VK_F11
+            WParam = Key(User32.VK.VK_F11),
             LParam = 0 // first press, no auto-repeat bit
         };
 
@@ -452,7 +528,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x7A, // VK_F11
+            WParam = Key(User32.VK.VK_F11),
             LParam = 0
         };
 
@@ -473,7 +549,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x7A, // VK_F11
+            WParam = Key(User32.VK.VK_F11),
             LParam = (IntPtr)(1L << 30) // auto-repeat bit set by Windows while the key is held
         };
 
@@ -499,7 +575,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x1B, // VK_ESCAPE
+            WParam = Key(User32.VK.VK_ESCAPE),
             LParam = 0
         };
 
@@ -525,7 +601,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x7A, // VK_F11
+            WParam = Key(User32.VK.VK_F11),
             LParam = 0
         };
 
@@ -552,7 +628,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x09, // VK_TAB
+            WParam = Key(User32.VK.VK_TAB),
             LParam = 0
         };
 
@@ -580,7 +656,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x09, // VK_TAB
+            WParam = Key(User32.VK.VK_TAB),
             LParam = 0
         };
 
@@ -607,7 +683,7 @@ internal class DetachModeControllerTests : IDisposable
         var msg = new Message
         {
             Msg = NativeMethods.WM_KEYDOWN,
-            WParam = (IntPtr)0x41, // 'A'
+            WParam = Key(User32.VK.VK_A),
             LParam = 0
         };
 
@@ -626,8 +702,27 @@ internal class DetachModeControllerTests : IDisposable
     /// A fresh filter wired to the controller, so <c>PreFilterMessage</c> can be driven without a
     /// running message pump.
     /// </summary>
-    private DetachMessageFilter CreateFilter (Func<Keys>? modifierKeysGetter = null, Func<Form>? activeFormGetter = null)
+    private DetachMessageFilter CreateFilter (Func<Keys>? modifierKeysGetter = null, Func<Form?>? activeFormGetter = null)
         => new(_controller, modifierKeysGetter, activeFormGetter ?? (() => _controller.DetachedFloat));
+
+    /// <summary>
+    /// A controller whose caption hook fails, so a detach can be failed at the one point that is
+    /// otherwise out of reach: after the float chrome was already patched.
+    /// </summary>
+    private DetachModeController CreateControllerFailingToHookAfter (int successfulAttaches)
+    {
+        var remaining = successfulAttaches;
+
+        return new DetachModeController(
+            _form,
+            _dockPanel,
+            _tabController,
+            floatWindow => remaining-- > 0
+                ? DetachFloatWindowHook.Attach(floatWindow)
+                : throw new InvalidOperationException("caption hook failed"));
+    }
+
+    private static IntPtr Key (User32.VK virtualKey) => (IntPtr)(int)virtualKey;
 
     private FloatWindow FloatWindowOf (LogWindow content)
     {
