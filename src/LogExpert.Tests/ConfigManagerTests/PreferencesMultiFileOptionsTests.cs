@@ -1,7 +1,11 @@
+using System.Reflection;
+
+using LogExpert.Configuration;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 using NUnit.Framework;
 
@@ -47,15 +51,20 @@ public class PreferencesMultiFileOptionsTests
     }
 
     [Test]
-    public void Serialize_DoesNotWriteComputedMaxFileAgeDays ()
+    public void Serialize_ContainsOnlyPersistedMultiFileOptions ()
     {
         var preferences = new Preferences
         {
             MultiFileOptions = new MultiFileOptions { MaxFileAgeDays = 14 }
         };
 
-        var json = JsonConvert.SerializeObject(preferences);
+        var settingsField = typeof(ConfigManager).GetField("_jsonSettings", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.That(settingsField, Is.Not.Null);
+        var serializerSettings = (JsonSerializerSettings)settingsField!.GetValue(null)!;
 
-        Assert.That(json, Does.Not.Contain("ClampedMaxFileAgeDays"));
+        var json = JsonConvert.SerializeObject(preferences.MultiFileOptions, serializerSettings);
+        var propertyNames = JObject.Parse(json).Properties().Select(property => property.Name);
+
+        Assert.That(propertyNames, Is.EquivalentTo(["$id", "FormatPattern", "MaxDayTry", "MaxFileAgeDays"]));
     }
 }

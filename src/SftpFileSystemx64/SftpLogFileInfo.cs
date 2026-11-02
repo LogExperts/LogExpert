@@ -1,6 +1,6 @@
-using ColumnizerLib;
-
 using System.Diagnostics.CodeAnalysis;
+
+using ColumnizerLib;
 
 using Renci.SshNet;
 using Renci.SshNet.Common;
@@ -209,7 +209,7 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            if (!TryGetFile(out var file, catchSshException: true, catchArgumentNullException: true))
+            if (!TryGetFile(out var file, catchConnectionExceptions: true))
             {
                 return false;
             }
@@ -240,7 +240,7 @@ public class SftpLogFileInfo : ILogFileInfo
                 return _lastWriteTimeUtc;
             }
 
-            if (TryGetFile(out var file, catchSshException: true, catchArgumentNullException: true))
+            if (TryGetFile(out var file, catchConnectionExceptions: true))
             {
                 _lastWriteTimeUtc = file.Attributes.LastWriteTimeUtc;
             }
@@ -253,7 +253,7 @@ public class SftpLogFileInfo : ILogFileInfo
     {
         get
         {
-            return TryGetFile(out var file, catchSshException: false, catchArgumentNullException: false)
+            return TryGetFile(out var file, catchConnectionExceptions: false)
                 ? file.Attributes.Size
                 : -1;
         }
@@ -312,18 +312,16 @@ public class SftpLogFileInfo : ILogFileInfo
 
     private bool TryGetFile (
         [NotNullWhen(true)] out SftpFile? file,
-        bool catchSshException,
-        bool catchArgumentNullException)
+        bool catchConnectionExceptions)
     {
         try
         {
             file = (SftpFile)_sftp.Get(_remoteFileName);
             return true;
         }
-        catch (Exception e) when ((catchSshException && e is SshException) ||
+        catch (Exception e) when ((catchConnectionExceptions && e is SshException or ArgumentNullException) ||
                                    e is SftpPathNotFoundException ||
-                                   e is SftpPermissionDeniedException ||
-                                   (catchArgumentNullException && e is ArgumentNullException))
+                                    e is SftpPermissionDeniedException)
         {
             _logger.LogError(e.Message);
             _lastWriteTimeUtc = null;
