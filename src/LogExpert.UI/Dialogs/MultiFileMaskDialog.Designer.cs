@@ -84,7 +84,7 @@
         0});
         this.upDownMaxDayGap.Name = "upDownMaxDayGap";
         this.upDownMaxDayGap.Size = new System.Drawing.Size(49, 26);
-        this.upDownMaxDayGap.TabIndex = 3;
+        this.upDownMaxDayGap.TabIndex = 4;
         this.upDownMaxDayGap.Value = new decimal(new int[] {
         1,
         0,
@@ -117,7 +117,7 @@
         this.fileNamePatternTextBox.Location = new System.Drawing.Point(149, 25);
         this.fileNamePatternTextBox.Name = "fileNamePatternTextBox";
         this.fileNamePatternTextBox.Size = new System.Drawing.Size(247, 26);
-        this.fileNamePatternTextBox.TabIndex = 4;
+        this.fileNamePatternTextBox.TabIndex = 3;
         // 
         // labelMaxDayGap
         // 

@@ -18,11 +18,6 @@ public class MultiFileOptions
     /// </summary>
     public int MaxFileAgeDays { get; set; }
 
-    /// <summary>
-    /// Gets the maximum file age constrained to the range supported by the UI and rollover reader.
-    /// </summary>
-    public int ClampedMaxFileAgeDays => ClampMaxFileAgeDays(MaxFileAgeDays);
-
     public static int ClampMaxFileAgeDays (int value)
     {
         return Math.Clamp(value, 0, MAX_FILE_AGE_DAYS);

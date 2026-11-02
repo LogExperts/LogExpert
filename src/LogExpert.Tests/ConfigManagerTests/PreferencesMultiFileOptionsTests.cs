@@ -45,4 +45,17 @@ public class PreferencesMultiFileOptionsTests
         Assert.That(restored, Is.Not.Null);
         Assert.That(restored!.MultiFileOptions.MaxFileAgeDays, Is.EqualTo(14));
     }
+
+    [Test]
+    public void Serialize_DoesNotWriteComputedMaxFileAgeDays ()
+    {
+        var preferences = new Preferences
+        {
+            MultiFileOptions = new MultiFileOptions { MaxFileAgeDays = 14 }
+        };
+
+        var json = JsonConvert.SerializeObject(preferences);
+
+        Assert.That(json, Does.Not.Contain("ClampedMaxFileAgeDays"));
+    }
 }
