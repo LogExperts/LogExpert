@@ -205,7 +205,7 @@ internal class FileOperationServiceTests : IDisposable
         // Assert
         Assert.That(receivedArgs, Is.Not.Null);
         Assert.That(receivedArgs!.LogWindow, Is.SameAs(_stubLogWindow));
-        Assert.That(receivedArgs.Request, Is.SameAs(request));
+        Assert.That(receivedArgs.Request, Is.EqualTo(request));
         Assert.That(receivedArgs.ResolvedFileName, Is.Not.Null.And.Not.Empty);
         Assert.That(receivedArgs.EncodingOptions, Is.Not.Null);
     }
@@ -658,6 +658,136 @@ internal class FileOperationServiceTests : IDisposable
     }
 
     [Test]
+    public void LoadFilesWithOption_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        // Arrange — the .lxj check has to run on the resolved name, or the shortcut gets opened as a raw log.
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            // Act
+            var decision = _sut.LoadFilesWithOption(new[] { shortcut }, false);
+
+            // Assert
+            Assert.That(decision, Is.EqualTo(MultiFileDecision.Cancel));
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTabs_ShortcutToLxjFile_CallsProjectCallback ()
+    {
+        // Arrange
+        var (directory, shortcut, session) = CreateShortcutToSession();
+
+        try
+        {
+            // Act
+            _sut.AddFileTabs(new[] { shortcut });
+
+            // Assert
+            Assert.That(_projectCallbackCalls, Has.Count.EqualTo(1));
+            Assert.That(_projectCallbackCalls[0].FileName, Is.EqualTo(session));
+            Assert.That(_factoryCalls, Is.Empty, "Should not open the shortcut as a log");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTab_ShortcutToLogFile_OpensTarget ()
+    {
+        // Arrange
+        var directory = TestShortcuts.CreateTempDirectory("ShortcutLog");
+
+        try
+        {
+            var log = Path.Join(directory, "actual.log");
+            File.WriteAllText(log, "line1");
+
+            var shortcut = Path.Join(directory, "actual.lnk");
+            TestShortcuts.Create(shortcut, log);
+
+            // Act
+            _sut.AddFileTab(new FileTabRequest { FileName = shortcut });
+
+            // Assert
+            Assert.That(_factoryCalls, Has.Count.EqualTo(1));
+            Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo(log), "the target file is opened, not the shortcut");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTab_UnresolvableShortcut_ReportsItInFileOpened ()
+    {
+        // Arrange
+        var directory = TestShortcuts.CreateTempDirectory("ShortcutBroken");
+
+        try
+        {
+            var shortcut = Path.Join(directory, "broken.lnk");
+            TestShortcuts.Create(shortcut, Path.Join(directory, "missing.log"));
+
+            FileOpenedEventArgs? receivedArgs = null;
+            _sut.FileOpened += (_, args) => receivedArgs = args;
+
+            // Act
+            _sut.AddFileTab(new FileTabRequest { FileName = shortcut });
+
+            // Assert
+            Assert.That(receivedArgs, Is.Not.Null);
+            Assert.That(receivedArgs!.UnresolvedShortcuts, Is.EqualTo(new[] { shortcut }),
+                "the user has to be told why the shortcut opens as binary data");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
+    public void AddFileTab_ResolvedShortcut_DoesNotReportUnresolvedShortcut ()
+    {
+        // Arrange
+        var directory = TestShortcuts.CreateTempDirectory("ShortcutResolved");
+
+        try
+        {
+            var log = Path.Join(directory, "actual.log");
+            File.WriteAllText(log, "line1");
+
+            var shortcut = Path.Join(directory, "actual.lnk");
+            TestShortcuts.Create(shortcut, log);
+
+            FileOpenedEventArgs? receivedArgs = null;
+            _sut.FileOpened += (_, args) => receivedArgs = args;
+
+            // Act
+            _sut.AddFileTab(new FileTabRequest { FileName = shortcut });
+
+            // Assert
+            Assert.That(receivedArgs, Is.Not.Null);
+            Assert.That(receivedArgs!.UnresolvedShortcuts, Is.Null);
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
+    }
+
+    [Test]
     public void LoadFilesWithOption_SingleLxjFile_CallsProjectCallback ()
     {
         // Arrange
@@ -809,6 +939,41 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(receivedArgs, Is.Not.Null);
         Assert.That(receivedArgs!.MultiFileNames, Is.EqualTo(fileNames));
         Assert.That(receivedArgs.EncodingOptions, Is.Not.Null);
+    }
+
+    [Test]
+    public void AddMultiFileTab_Shortcuts_SortsByResolvedTargetName ()
+    {
+        // Arrange
+        var directory = TestShortcuts.CreateTempDirectory("ShortcutSort");
+
+        try
+        {
+            var firstTarget = Path.Join(directory, "a.log");
+            var secondTarget = Path.Join(directory, "b.log");
+            File.WriteAllText(firstTarget, "first");
+            File.WriteAllText(secondTarget, "second");
+
+            // The shortcut names sort in the opposite order of their targets.
+            var zShortcut = Path.Join(directory, "z.lnk");
+            var aShortcut = Path.Join(directory, "a.lnk");
+            TestShortcuts.Create(zShortcut, firstTarget);
+            TestShortcuts.Create(aShortcut, secondTarget);
+
+            string[]? multiFileNames = null;
+            _sut.FileOpened += (_, e) => multiFileNames = e.MultiFileNames;
+
+            // Act
+            _ = _sut.AddMultiFileTab([zShortcut, aShortcut]);
+
+            // Assert
+            Assert.That(multiFileNames, Is.EqualTo(new[] { firstTarget, secondTarget }),
+                "multi-file order must follow the resolved target names, not the shortcut names");
+        }
+        finally
+        {
+            Directory.Delete(directory, true);
+        }
     }
 
     [Test]
@@ -1223,6 +1388,23 @@ internal class FileOperationServiceTests : IDisposable
         Assert.That(_factoryCalls, Has.Count.EqualTo(2));
         Assert.That(_factoryCalls[0].Request.FileName, Is.EqualTo("a.log"));
         Assert.That(_factoryCalls[1].Request.FileName, Is.EqualTo("b.log"));
+    }
+
+    /// <summary>
+    /// Creates a temporary directory holding a session file and a shortcut to it, and returns the
+    /// three paths. The caller owns the directory and deletes it.
+    /// </summary>
+    private static (string Directory, string Shortcut, string Session) CreateShortcutToSession ()
+    {
+        var directory = TestShortcuts.CreateTempDirectory("ShortcutSession");
+
+        var session = Path.Join(directory, "project.lxj");
+        File.WriteAllText(session, "<Project></Project>");
+
+        var shortcut = Path.Join(directory, "session.lnk");
+        TestShortcuts.Create(shortcut, session);
+
+        return (directory, shortcut, session);
     }
 
     /// <summary>

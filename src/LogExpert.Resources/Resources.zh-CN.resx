@@ -1929,6 +1929,14 @@ YY[YY] = 年
 
 是否重启 LogExpert 以应用更改？</value>
   </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Single" xml:space="preserve">
+    <value>无法跟随该快捷方式，已按文件打开：
+{0}</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Multiple" xml:space="preserve">
+    <value>无法跟随以下快捷方式，已按文件打开：
+{0}</value>
+  </data>
   <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
     <value>建议重启</value>
   </data>

@@ -80,6 +80,12 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 
     private bool _wasMaximized;
 
+    // Unfollowable shortcuts are reported once per batch and once per shortcut, so dropping a
+    // folder of broken links does not stack message boxes.
+    private readonly HashSet<string> _reportedUnresolvedShortcuts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<string> _pendingUnresolvedShortcuts = [];
+    private bool _unresolvedShortcutMessageQueued;
+
     #endregion
 
     #region cTor
@@ -230,6 +236,65 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             multiFileEnabledStripMenuItem.Checked = true;
             _ = BeginInvoke(e.LogWindow.LoadFilesAsMulti, e.MultiFileNames, e.EncodingOptions);
         }
+
+        if (e.UnresolvedShortcuts is { Length: > 0 })
+        {
+            QueueUnresolvedShortcutMessage(e.UnresolvedShortcuts);
+        }
+    }
+
+    private void QueueUnresolvedShortcutMessage (string[] shortcuts)
+    {
+        foreach (var shortcut in shortcuts)
+        {
+            if (!_reportedUnresolvedShortcuts.Contains(shortcut)
+                && !_pendingUnresolvedShortcuts.Contains(shortcut, StringComparer.OrdinalIgnoreCase))
+            {
+                _pendingUnresolvedShortcuts.Add(shortcut);
+            }
+        }
+
+        if (_pendingUnresolvedShortcuts.Count == 0 || _unresolvedShortcutMessageQueued || _disposed)
+        {
+            return;
+        }
+
+        _unresolvedShortcutMessageQueued = true;
+
+        if (IsHandleCreated)
+        {
+            _ = BeginInvoke(new MethodInvoker(ShowUnresolvedShortcutMessage));
+        }
+        else
+        {
+            ShowUnresolvedShortcutMessage();
+        }
+    }
+
+    private void ShowUnresolvedShortcutMessage ()
+    {
+        _unresolvedShortcutMessageQueued = false;
+
+        var shortcuts = _pendingUnresolvedShortcuts.ToArray();
+        _pendingUnresolvedShortcuts.Clear();
+
+        if (shortcuts.Length == 0 || _disposed)
+        {
+            return;
+        }
+
+        foreach (var shortcut in shortcuts)
+        {
+            _reportedUnresolvedShortcuts.Add(shortcut);
+        }
+
+        var list = string.Join(Environment.NewLine, shortcuts.Select(shortcut => $"  • {shortcut}"));
+        var format = shortcuts.Length == 1
+            ? Resources.LogTabWindow_UI_Message_UnresolvedShortcut_Single
+            : Resources.LogTabWindow_UI_Message_UnresolvedShortcut_Multiple;
+
+        _ = MessageBox.Show(this, string.Format(CultureInfo.CurrentCulture, format, list),
+            Resources.LogExpert_Common_UI_Title_LogExpert, MessageBoxButtons.OK, MessageBoxIcon.Warning);
     }
 
     private void InitializeMenuToolbarControllerEvents ()

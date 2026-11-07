@@ -2117,6 +2117,14 @@ Continue?</value>
 
 Restart LogExpert to apply changes?</value>
   </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Single" xml:space="preserve">
+    <value>Couldn't follow the shortcut, so it was opened as a file:
+{0}</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Multiple" xml:space="preserve">
+    <value>Couldn't follow these shortcuts, so they were opened as files:
+{0}</value>
+  </data>
   <data name="LogTabWindow_UI_Title_RestartRecommended" xml:space="preserve">
     <value>Restart Recommended</value>
   </data>

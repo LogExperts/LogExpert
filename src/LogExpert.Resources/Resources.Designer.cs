@@ -2294,6 +2294,26 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Couldn't follow the shortcut, so it was opened as a file:
+        /// {0}.
+        /// </summary>
+        public static string LogTabWindow_UI_Message_UnresolvedShortcut_Single {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_UnresolvedShortcut_Single", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Couldn't follow these shortcuts, so they were opened as files:
+        /// {0}.
+        /// </summary>
+        public static string LogTabWindow_UI_Message_UnresolvedShortcut_Multiple {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_UnresolvedShortcut_Multiple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to LogExpert session {0}.
         /// </summary>
         public static string LogTabWindow_UI_Session_Default_Filter {

@@ -33,4 +33,10 @@ internal sealed class FileOpenedEventArgs : EventArgs
 
     /// <summary>Set when AddMultiFileTab created this tab. LogTabWindow uses this for BeginInvoke(LoadFilesAsMulti).</summary>
     public string[]? MultiFileNames { get; init; }
+
+    /// <summary>
+    /// Shortcuts that could not be followed and are opened as plain files. LogTabWindow tells the
+    /// user, because such a file opens as binary content with only a log line otherwise.
+    /// </summary>
+    public string[]? UnresolvedShortcuts { get; init; }
 }

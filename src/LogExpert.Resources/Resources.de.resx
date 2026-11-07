@@ -2116,6 +2116,14 @@ Fortfahren?</value>
 
 LogExpert neu starten, um die Änderungen zu übernehmen?</value>
   </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Single" xml:space="preserve">
+    <value>Die Verknüpfung konnte nicht aufgelöst werden und wurde als Datei geöffnet:
+{0}</value>
+  </data>
+  <data name="LogTabWindow_UI_Message_UnresolvedShortcut_Multiple" xml:space="preserve">
+    <value>Die folgenden Verknüpfungen konnten nicht aufgelöst werden und wurden als Dateien geöffnet:
+{0}</value>
+  </data>
   <data name="LogExpert_Common_Error_Message_ServiceNotInitialized" xml:space="preserve">
     <value>{0} nicht initialisiert</value>
   </data>
