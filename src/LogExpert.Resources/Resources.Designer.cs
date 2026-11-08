@@ -2274,6 +2274,26 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   查找类似 Couldn&apos;t follow these shortcuts, so they were opened as files:
+        ///{0} 的本地化字符串。
+        /// </summary>
+        public static string LogTabWindow_UI_Message_UnresolvedShortcut_Multiple {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_UnresolvedShortcut_Multiple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Couldn&apos;t follow the shortcut, so it was opened as a file:
+        ///{0} 的本地化字符串。
+        /// </summary>
+        public static string LogTabWindow_UI_Message_UnresolvedShortcut_Single {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_Message_UnresolvedShortcut_Single", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 LogExpert session {0} 的本地化字符串。
         /// </summary>
         public static string LogTabWindow_UI_Session_Default_Filter {
@@ -4550,11 +4570,29 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   查找类似 Max days: 的本地化字符串。
+        ///   查找类似 Max day gap: 的本地化字符串。
         /// </summary>
-        public static string MultiFileMaskDialog_UI_Label_MaxDays {
+        public static string MultiFileMaskDialog_UI_Label_MaxDayGap {
             get {
-                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDays", resourceCulture);
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxDayGap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Max file age (days): 的本地化字符串。
+        /// </summary>
+        public static string MultiFileMaskDialog_UI_Label_MaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxFileAgeDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 0 = Off 的本地化字符串。
+        /// </summary>
+        public static string MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint {
+            get {
+                return ResourceManager.GetString("MultiFileMaskDialog_UI_Label_MaxFileAgeDaysHint", resourceCulture);
             }
         }
         
@@ -4584,7 +4622,11 @@ namespace LogExpert {
         ///DD = day
         ///MM = month
         ///YY[YY] = year
-        ///all other chars will be used as given 的本地化字符串。
+        ///all other chars will be used as given
+        ///
+        ///MultiFile limits:
+        ///Max day gap = For $D patterns, consecutive days without a log file to skip before giving up
+        ///Max file age [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         public static string MultiFileMaskDialog_UI_Label_SyntaxHelp {
             get {
@@ -6342,11 +6384,11 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   查找类似 Max days: 的本地化字符串。
+        ///   查找类似 Max day gap: 的本地化字符串。
         /// </summary>
-        public static string SettingsDialog_UI_Label_labelMaxDays {
+        public static string SettingsDialog_UI_Label_labelMaxDayGap {
             get {
-                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDays", resourceCulture);
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDayGap", resourceCulture);
             }
         }
         
@@ -6356,6 +6398,24 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Label_labelMaxDisplayLength {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxDisplayLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Max file age (days): 的本地化字符串。
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelMaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxFileAgeDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 0 = Off 的本地化字符串。
+        /// </summary>
+        public static string SettingsDialog_UI_Label_labelMaxFileAgeDaysHint {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_Label_labelMaxFileAgeDaysHint", resourceCulture);
             }
         }
         
@@ -6474,6 +6534,24 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Label_labelWorkingDir {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Label_labelWorkingDir", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 For $D patterns: how many consecutive days without a log file to skip before giving up. 的本地化字符串。
+        /// </summary>
+        public static string SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Maximum age of rollover files to load, in days. Set to 0 to disable the age limit. 的本地化字符串。
+        /// </summary>
+        public static string SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays {
+            get {
+                return ResourceManager.GetString("SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays", resourceCulture);
             }
         }
         
