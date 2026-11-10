@@ -254,6 +254,8 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
     /// </summary>
     private void CreateBrushes (Color tailColor)
     {
+        var darkMode = Application.IsDarkModeEnabled;
+
         _ledBrushes = new Brush[5];
         _ledBrushes[0] = new SolidBrush(Color.FromArgb(255, 0, 0));     // Red (highest activity)
         _ledBrushes[1] = new SolidBrush(Color.FromArgb(255, 100, 0));   // Orange
@@ -263,10 +265,10 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
 
         _tailLedBrush = new Brush[3];
         _tailLedBrush[0] = new SolidBrush(tailColor);                    // Tail on
-        _tailLedBrush[1] = new SolidBrush(Color.FromArgb(160, 160, 160)); // Tail off
+        _tailLedBrush[1] = new SolidBrush(darkMode ? Color.FromArgb(175, 175, 175) : Color.FromArgb(160, 160, 160)); // Tail off
         _tailLedBrush[2] = new SolidBrush(Color.FromArgb(220, 220, 0));  // Tail trigger
 
-        _offLedBrush = new SolidBrush(Color.FromArgb(100, 100, 100));
+        _offLedBrush = new SolidBrush(darkMode ? Color.FromArgb(110, 110, 110) : Color.FromArgb(100, 100, 100));
         _dirtyLedBrush = new SolidBrush(Color.FromArgb(220, 0, 220));  // Magenta for dirty
         _syncLedBrush = new SolidBrush(Color.FromArgb(0, 100, 220));   // Blue for synced
     }
@@ -389,7 +391,6 @@ internal sealed class LedIndicatorService : ILedIndicatorService, IDisposable
         IntPtr hIcon = bmp.GetHicon();
         try
         {
-            //using var bmp = Resources.Deceased;
             _deadIcon = (Icon)Icon.FromHandle(hIcon).Clone();
         }
         finally

@@ -99,6 +99,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         InitializeComponent();
 
         ConfigureDockPanel();
+        ApplyThemedImages();
 
         _tabController = new TabController(dockPanel);
         InitializeTabControllerEvents();
@@ -448,6 +449,32 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         dockPanel.Theme.Skin.AutoHideStripSkin = autoHideStripSkin1;
         dockPanel.ActiveAutoHideContent = null;
         dockPanel.DocumentStyle = DocumentStyle.DockingWindow;
+    }
+
+    private void ApplyThemedImages ()
+    {
+        // Light mode keeps the images embedded by the designer, so everything below is dark-only.
+        if (!Application.IsDarkModeEnabled)
+        {
+            return;
+        }
+
+        openToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.File_open), darkMode: true);
+        closeFileToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Close), darkMode: true);
+        reloadToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Restart_alt), darkMode: true);
+        exitToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Exit), darkMode: true);
+        filterToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Filter), darkMode: true);
+        toggleBookmarkToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), darkMode: true);
+        jumpToNextToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowDown), darkMode: true);
+        jumpToPrevToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.ArrowUp), darkMode: true);
+        settingsToolStripMenuItem.Image = ThemedImages.Get(nameof(Resources.Settings), darkMode: true);
+        toolStripButtonOpen.Image = ThemedImages.Get(nameof(Resources.File_open), darkMode: true);
+        toolStripButtonSearch.Image = ThemedImages.Get(nameof(Resources.Search), darkMode: true);
+        toolStripButtonFilter.Image = ThemedImages.Get(nameof(Resources.Filter), darkMode: true);
+        toolStripButtonBookmark.Image = ThemedImages.Get(nameof(Resources.Bookmark_add), darkMode: true);
+        toolStripButtonUp.Image = ThemedImages.Get(nameof(Resources.ArrowUp), darkMode: true);
+        toolStripButtonDown.Image = ThemedImages.Get(nameof(Resources.ArrowDown), darkMode: true);
+        toolStripButtonBubbles.Image = ThemedImages.Get(nameof(Resources.bookmark_bubbles), darkMode: true);
     }
 
     private void ApplyTextResources ()
