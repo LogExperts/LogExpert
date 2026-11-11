@@ -21,6 +21,7 @@ using LogExpert.UI.Dialogs.Helpers;
 using LogExpert.UI.Entities;
 using LogExpert.UI.Extensions;
 using LogExpert.UI.Extensions.LogWindow;
+using LogExpert.UI.Services.DetachModeService;
 using LogExpert.UI.Services.FileOperationService;
 using LogExpert.UI.Services.LedService;
 using LogExpert.UI.Services.LogWindowCoordinatorService;
@@ -86,6 +87,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private readonly List<string> _pendingUnresolvedShortcuts = [];
     private bool _unresolvedShortcutMessageQueued;
 
+    private readonly DetachModeController _detachModeController;
+
     #endregion
 
     #region cTor
@@ -113,6 +116,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         ConfigManager = configManager;
 
         _toolWindowCoordinator = new ToolWindowCoordinator(configManager);
+
+        _detachModeController = new DetachModeController(this, dockPanel, _tabController);
 
         _ledService = new LedIndicatorService();
         _ledService.Initialize(ConfigManager.Settings.Preferences.ShowTailColor);
@@ -554,6 +559,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         timeshiftToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_timeshiftToolStripMenuItem;
         timeshiftToolStripTextBox.Text = Resources.LogTabWindow_UI_ToolStripTextBox_timeshiftToolStripTextBox;
         copyMarkedLinesIntoNewTabToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        detachModeToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_detachModeToolStripMenuItem;
 
         //Options menu
         optionToolStripMenuItem.Text = Resources.LogTabWindow_UI_ToolStripMenuItem_optionToolStripMenuItem;
@@ -610,6 +616,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         saveSessionToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_saveProjectToolStripMenuItem;
         timeshiftToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_timeshiftToolStripMenuItem;
         copyMarkedLinesIntoNewTabToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyMarkedLinesIntoNewTabToolStripMenuItem;
+        detachModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_detachModeToolStripMenuItem;
         columnizerToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_columnizerToolStripMenuItem;
         cellSelectModeToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_cellSelectModeToolStripMenuItem;
         lockInstanceToolStripMenuItem.ToolTipText = Resources.LogTabWindow_UI_ToolStripMenuItem_ToolTip_lockInstanceToolStripMenuItem;
@@ -849,6 +856,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
             _tabStringFormat?.Dispose();
             _menuToolbarController?.Dispose();
             _toolWindowCoordinator?.Dispose();
+            _detachModeController?.Dispose();
             // Dispose TabController after FileOperationService is no longer reachable.
             // FileOperationService holds a reference to _tabController but does not own it;
             // after Dispose(), no caller invokes the service, so stale references are harmless.
@@ -929,6 +937,11 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         if (!doNotAddToPanel)
         {
             logWindow.Visible = true;
+
+            if (_detachModeController.IsActive)
+            {
+                _detachModeController.OnWindowAdded(logWindow);
+            }
         }
     }
 
@@ -1568,6 +1581,8 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0010:Add missing cases", Justification = "no need for the other switch cases")]
     private void LoadSession (string sessionFileName, bool restoreLayout)
     {
+        _detachModeController.Exit();
+
         var outcome = _sessionHandler.LoadSession(sessionFileName);
         bool openedTabs = false;
 
@@ -1842,8 +1857,13 @@ internal partial class LogTabWindow : Form, ILogTabWindow
 #endif
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Shutdown must continue even when the session cannot be saved.")]
     private void OnLogTabWindowFormClosing (object sender, CancelEventArgs e)
     {
+        // The form is going away: showing it again would make it flash during shutdown. Exit() does
+        // not throw, so this needs no guard of its own.
+        _detachModeController.Exit(restoreMainForm: false);
+
         CancelPendingDrop();
         try
         {
@@ -1886,6 +1906,7 @@ internal partial class LogTabWindow : Form, ILogTabWindow
         RemoveLogWindow(logWindow);
 
         logWindow.Tag = null;
+        _detachModeController.OnWindowDisposed(logWindow);
     }
 
     private void OnExitToolStripMenuItemClick (object sender, EventArgs e)
@@ -2154,6 +2175,63 @@ internal partial class LogTabWindow : Form, ILogTabWindow
     private void OnFollowTailCheckBoxClick (object sender, EventArgs e)
     {
         CurrentLogWindow?.FollowTailChanged(checkBoxFollowTail.Checked, false);
+    }
+
+    /// <summary>
+    /// Takes F11 for detach mode before the key reaches the log window. While detached the main
+    /// window is hidden and <see cref="DetachModeController"/>'s message filter serves the key.
+    /// </summary>
+    protected override bool ProcessCmdKey (ref Message msg, Keys keyData)
+    {
+        // A failed enter leaves the key alone instead of swallowing it without any effect.
+        if (keyData == Keys.F11 && !NativeMethods.IsAutoRepeat(msg) && EnterDetachMode())
+        {
+            return true;
+        }
+
+        return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    /// <summary>
+    /// Enters detach mode, restoring a minimized window first so the float gets sane bounds.
+    /// </summary>
+    /// <returns><c>true</c> when the mode is active afterwards; <c>false</c> when it could not be entered.</returns>
+    [SupportedOSPlatform("windows")]
+    private bool EnterDetachMode ()
+    {
+        if (_detachModeController.IsActive)
+        {
+            return true;
+        }
+
+        var wasMinimized = WindowState == FormWindowState.Minimized;
+        var wasMaximized = _wasMaximized;
+
+        if (wasMinimized)
+        {
+            WindowState = FormWindowState.Normal;
+        }
+
+        if (_detachModeController.Enter())
+        {
+            return true;
+        }
+
+        // Nothing was detached, so leave the window exactly as it was found. Going through Normal
+        // let OnLogTabWindowSizeChanged overwrite the flag SetForeground() restores with.
+        if (wasMinimized)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        _wasMaximized = wasMaximized;
+
+        return false;
+    }
+
+    private void OnDetachModeToolStripMenuItemClick (object sender, EventArgs e)
+    {
+        EnterDetachMode();
     }
 
     private void OnLogTabWindowKeyDown (object sender, KeyEventArgs e)

@@ -2618,6 +2618,15 @@ namespace LogExpert {
         }
         
         /// <summary>
+        ///   查找类似 Detach Mode 的本地化字符串。
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_detachModeToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_detachModeToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Disable word highlight mode 的本地化字符串。
         /// </summary>
         public static string LogTabWindow_UI_ToolStripMenuItem_disableWordHighlightModeToolStripMenuItem {
@@ -3057,6 +3066,15 @@ namespace LogExpert {
         public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem {
             get {
                 return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_copyPathToClipboardToolStripMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Shows the active log alone in its own window and hides the main window 的本地化字符串。
+        /// </summary>
+        public static string LogTabWindow_UI_ToolStripMenuItem_ToolTip_detachModeToolStripMenuItem {
+            get {
+                return ResourceManager.GetString("LogTabWindow_UI_ToolStripMenuItem_ToolTip_detachModeToolStripMenuItem", resourceCulture);
             }
         }
         
