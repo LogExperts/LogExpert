@@ -106,16 +106,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Add {
-            get {
-                object obj = ResourceManager.GetObject("Add", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Show this message only once? 的本地化字符串。
         /// </summary>
         public static string AllowOnlyOneInstanceErrorDialog_UI_CheckBox_checkBoxIgnoreMessage {
@@ -146,9 +136,29 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        public static System.Drawing.Bitmap Arrow_menu_close_dark {
+            get {
+                object obj = ResourceManager.GetObject("Arrow_menu_close_dark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         public static System.Drawing.Bitmap Arrow_menu_open {
             get {
                 object obj = ResourceManager.GetObject("Arrow_menu_open", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        public static System.Drawing.Bitmap Arrow_menu_open_dark {
+            get {
+                object obj = ResourceManager.GetObject("Arrow_menu_open_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -166,19 +176,9 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        public static System.Drawing.Bitmap ArrowLeft {
+        public static System.Drawing.Bitmap ArrowDown_dark {
             get {
-                object obj = ResourceManager.GetObject("ArrowLeft", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap ArrowRight {
-            get {
-                object obj = ResourceManager.GetObject("ArrowRight", resourceCulture);
+                object obj = ResourceManager.GetObject("ArrowDown_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -196,6 +196,16 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        public static System.Drawing.Bitmap ArrowUp_dark {
+            get {
+                object obj = ResourceManager.GetObject("ArrowUp_dark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         public static System.Drawing.Bitmap Bookmark_add {
             get {
                 object obj = ResourceManager.GetObject("Bookmark_add", resourceCulture);
@@ -206,9 +216,9 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        public static System.Drawing.Bitmap Bookmark_added {
+        public static System.Drawing.Bitmap Bookmark_add_dark {
             get {
-                object obj = ResourceManager.GetObject("Bookmark_added", resourceCulture);
+                object obj = ResourceManager.GetObject("Bookmark_add_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -226,19 +236,9 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        public static System.Drawing.Bitmap Bookmark_manager {
+        public static System.Drawing.Bitmap bookmark_bubbles_dark {
             get {
-                object obj = ResourceManager.GetObject("Bookmark_manager", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmark_remove {
-            get {
-                object obj = ResourceManager.GetObject("Bookmark_remove", resourceCulture);
+                object obj = ResourceManager.GetObject("bookmark_bubbles_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -249,16 +249,6 @@ namespace LogExpert {
         public static string BookmarkCommentDlg_UI_Title {
             get {
                 return ResourceManager.GetString("BookmarkCommentDlg_UI_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Bookmarks {
-            get {
-                object obj = ResourceManager.GetObject("Bookmarks", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -362,16 +352,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Check_circle {
-            get {
-                object obj = ResourceManager.GetObject("Check_circle", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 Icon file... 的本地化字符串。
         /// </summary>
         public static string ChooseIconDialog_UI_Button_ChooseIconFile {
@@ -395,6 +375,16 @@ namespace LogExpert {
         public static System.Drawing.Bitmap Close {
             get {
                 object obj = ResourceManager.GetObject("Close", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        public static System.Drawing.Bitmap Close_dark {
+            get {
+                object obj = ResourceManager.GetObject("Close_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -450,26 +440,6 @@ namespace LogExpert {
         public static string DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag {
             get {
                 return ResourceManager.GetString("DateTimeDragControl_UI_ToolStripItem_toolStripItemVerticalDrag", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Deceased {
-            get {
-                object obj = ResourceManager.GetObject("Deceased", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Delete {
-            get {
-                object obj = ResourceManager.GetObject("Delete", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -585,9 +555,9 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        public static System.Drawing.Bitmap Favorite {
+        public static System.Drawing.Bitmap Exit_dark {
             get {
-                object obj = ResourceManager.GetObject("Favorite", resourceCulture);
+                object obj = ResourceManager.GetObject("Exit_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -605,9 +575,29 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        public static System.Drawing.Bitmap File_open_dark {
+            get {
+                object obj = ResourceManager.GetObject("File_open_dark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         public static System.Drawing.Bitmap Filter {
             get {
                 object obj = ResourceManager.GetObject("Filter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        public static System.Drawing.Bitmap Filter_dark {
+            get {
+                object obj = ResourceManager.GetObject("Filter_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -780,16 +770,6 @@ namespace LogExpert {
         public static string FilterSelectorForm_UI_Title {
             get {
                 return ResourceManager.GetString("FilterSelectorForm_UI_Title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Folder_open {
-            get {
-                object obj = ResourceManager.GetObject("Folder_open", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -5293,9 +5273,29 @@ namespace LogExpert {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        public static System.Drawing.Bitmap Restart_alt_dark {
+            get {
+                object obj = ResourceManager.GetObject("Restart_alt_dark", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         public static System.Drawing.Bitmap Search {
             get {
                 object obj = ResourceManager.GetObject("Search", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        public static System.Drawing.Bitmap Search_dark {
+            get {
+                object obj = ResourceManager.GetObject("Search_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -5469,6 +5469,16 @@ namespace LogExpert {
         public static System.Drawing.Bitmap Settings {
             get {
                 object obj = ResourceManager.GetObject("Settings", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        public static System.Drawing.Bitmap Settings_dark {
+            get {
+                object obj = ResourceManager.GetObject("Settings_dark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -6911,16 +6921,6 @@ namespace LogExpert {
         public static string SettingsDialog_UI_Title_ExportSettings {
             get {
                 return ResourceManager.GetString("SettingsDialog_UI_Title_ExportSettings", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        public static System.Drawing.Bitmap Star {
-            get {
-                object obj = ResourceManager.GetObject("Star", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
