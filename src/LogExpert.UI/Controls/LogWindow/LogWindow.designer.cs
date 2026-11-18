@@ -429,9 +429,9 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             advancedBackPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             advancedBackPanel.Controls.Add(advancedFilterSplitContainer);
-            advancedBackPanel.Location = new Point(3, 48);
+            advancedBackPanel.Location = new Point(3, 43);
             advancedBackPanel.Name = "advancedBackPanel";
-            advancedBackPanel.Size = new Size(1855, 561);
+            advancedBackPanel.Size = new Size(1855, 566);
             advancedBackPanel.TabIndex = 3;
             // 
             // advancedFilterSplitContainer
@@ -869,7 +869,7 @@ namespace LogExpert.UI.Controls.LogWindow
             pnlFilterInput.Controls.Add(filterSplitContainer);
             pnlFilterInput.Location = new Point(3, 2);
             pnlFilterInput.Name = "pnlFilterInput";
-            pnlFilterInput.Size = new Size(1855, 46);
+            pnlFilterInput.Size = new Size(1855, 41);
             pnlFilterInput.TabIndex = 0;
             // 
             // filterSplitContainer
@@ -894,7 +894,7 @@ namespace LogExpert.UI.Controls.LogWindow
             filterSplitContainer.Panel2.Controls.Add(filterCaseSensitiveCheckBox);
             filterSplitContainer.Panel2.Controls.Add(btnfilterSearch);
             filterSplitContainer.Panel2MinSize = 726;
-            filterSplitContainer.Size = new Size(1855, 46);
+            filterSplitContainer.Size = new Size(1855, 41);
             filterSplitContainer.SplitterDistance = 518;
             filterSplitContainer.TabIndex = 11;
             filterSplitContainer.MouseDoubleClick += OnFilterSplitContainerMouseDoubleClick;

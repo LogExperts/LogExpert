@@ -48,7 +48,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region Fields
 
     private const int PROGRESS_BAR_MODULO = 1000;
-    private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
+    private const int FILTER_ADVANCED_PANEL_BOTTOM_MARGIN = 1;
     private const int FILTER_PANEL2_CONTROL_GAP = 6;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
@@ -257,7 +257,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterTailCheckBox.Checked = _filterParams.IsFilterTail;
 
         splitContainerLogWindow.Panel2Collapsed = true;
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
+        SetAdvancedFilterSplitterDistance();
 
         _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         _tailFollowEngine = new TailFollowEngine(this);
@@ -2404,7 +2404,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnSplitContainerSplitterMoved (object sender, SplitterEventArgs e)
     {
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
+        SetAdvancedFilterSplitterDistance();
     }
 
     [SupportedOSPlatform("windows")]
@@ -5203,8 +5203,14 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         advancedFilterSplitContainer.Panel1Collapsed = !show;
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
+        SetAdvancedFilterSplitterDistance();
         _showAdvanced = show;
+    }
+
+    private void SetAdvancedFilterSplitterDistance ()
+    {
+        var contentBottom = pnlProFilter.Controls.Cast<Control>().Max(control => control.Bottom);
+        advancedFilterSplitContainer.SplitterDistance = pnlProFilter.Top + contentBottom + FILTER_ADVANCED_PANEL_BOTTOM_MARGIN;
     }
 
     [SupportedOSPlatform("windows")]
