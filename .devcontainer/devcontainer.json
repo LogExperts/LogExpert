@@ -20,7 +20,7 @@
 	// }
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "dotnet restore",
+	"postCreateCommand": "git config core.hooksPath .githooks",
 
 	// Configure tool-specific properties.
 	// Configure tool-specific properties.

@@ -771,6 +771,15 @@ Damit die anderen Fenster beim Auswählen einer Zeile (Mausklick oder Pfeiltaste
   <data name="SettingsDialog_UI_RadioButton_radioButtonSessionApplicationStartupDir" xml:space="preserve">
 		<value>Applikationsstartupverzeichnis</value>
 	</data>
+  <data name="SettingsDialog_UI_DataGridView_columnHeaderColumnizerMaskType" xml:space="preserve">
+    <value>Typ</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskType" xml:space="preserve">
+    <value>Glob verwendet die Platzhalter * und ?. Regex verwendet die .NET-Syntax für reguläre Ausdrücke.</value>
+  </data>
+  <data name="SettingsDialog_UI_DataGridView_columnTooltipColumnizerMaskStale" xml:space="preserve">
+    <value>Columnizer '{0}' ist nicht installiert – dieser Eintrag wird übersprungen.</value>
+  </data>
   <data name="SettingsDialog_UI_DataGridViewTextBoxColumn_FileMask" xml:space="preserve">
 		<value>Dateinamenmaske (Regex)</value>
 	</data>
