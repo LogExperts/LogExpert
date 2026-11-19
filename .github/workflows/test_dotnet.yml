@@ -16,10 +16,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2 # PR merge commit plus its parents, for the format check
+    - name: Check resx key parity
+      run: pwsh -NoProfile -File tools/Test-ResxKeyParity.ps1
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 10.0.x
+    - name: Check whitespace formatting of changed C# files
+      if: github.event_name == 'pull_request'
+      shell: pwsh
+      run: |
+        # Scoped to the PR's changed files: the existing code base has ~480 pre-existing whitespace violations.
+        $files = @(git diff --name-only --diff-filter=ACMR HEAD^1 HEAD -- 'src/*.cs')
+        if ($files.Count -eq 0) { Write-Host 'No changed C# files.'; exit 0 }
+        dotnet format whitespace src/LogExpert.sln --verify-no-changes --include $files
     - name: Restore dependencies
       run: dotnet restore
       working-directory: src
