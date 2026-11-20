@@ -107,4 +107,42 @@ public class SquareBracketColumnizerTest
             Assert.That(columns.ColumnValues[^1].FullValue.ToString().Trim(), Is.EqualTo("About to run."));
         });
     }
+
+    // Issue #713: a nonzero time offset must shift only the date and time columns and keep
+    // the bracket fields and the message.
+    [TestCase("2022-03-21 11:34:34.505[INFO][Worker]Message", 0, "2022-03-21", "11:34:34.505")]
+    [TestCase("2022-03-21 11:34:34.505[INFO][Worker]Message", 123, "2022-03-21", "11:34:34.628")]
+    [TestCase("2022-03-21 11:34:34.505[INFO][Worker]Message", -1505, "2022-03-21", "11:34:33.000")]
+    [TestCase("2022-03-21 23:59:59.900[INFO][Worker]Message", 200, "2022-03-22", "00:00:00.100")]
+    [TestCase("2022-03-21 00:00:00.100[INFO][Worker]Message", -200, "2022-03-20", "23:59:59.900")]
+    public void SplitLine_TimeOffset_KeepsBracketFieldsAndMessage (string text, int offset, string expectedDate, string expectedTime)
+    {
+        var line = new LogLine(text, 0);
+        SquareBracketColumnizer squareBracketColumnizer = new();
+        _ = squareBracketColumnizer.GetPriority("square.log", [line]);
+
+        squareBracketColumnizer.SetTimeOffset(offset);
+        var columns = squareBracketColumnizer.SplitLine(null, line).ColumnValues.Select(c => c.FullValue.ToString());
+
+        Assert.That(columns, Is.EqualTo(new[] { expectedDate, expectedTime, "[INFO]", "[Worker]", "Message" }));
+    }
+
+    [Test]
+    public void SplitLine_TimeOffsetResetToZero_RestoresOriginalColumns ()
+    {
+        var line = new LogLine("2022-03-21 11:34:34.505[INFO][Worker]Message", 0);
+        SquareBracketColumnizer squareBracketColumnizer = new();
+        _ = squareBracketColumnizer.GetPriority("square.log", [line]);
+
+        squareBracketColumnizer.SetTimeOffset(123);
+        _ = squareBracketColumnizer.SplitLine(null, line);
+        squareBracketColumnizer.SetTimeOffset(0);
+        var columns = squareBracketColumnizer.SplitLine(null, line).ColumnValues.Select(c => c.FullValue.ToString());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(columns, Is.EqualTo(new[] { "2022-03-21", "11:34:34.505", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(line.FullLine.ToString(), Is.EqualTo("2022-03-21 11:34:34.505[INFO][Worker]Message"));
+        });
+    }
 }
