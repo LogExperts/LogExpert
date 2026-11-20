@@ -40,6 +40,9 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     private bool _eof;
     private bool _lastReadShort;     // the last Read returned less than asked for: the rest of the file is buffered
     private bool _initialized;
+    private bool _truncating;                  // the line in progress is over the cap: its bytes are dropped up to the terminator
+    private ReadOnlyMemory<char> _truncatedLine;
+    private int _truncateAfterBytes;
 
     private int _unitSize;           // bytes per code unit: 1, 2 or 4
     private uint _crUnit;
@@ -106,12 +109,19 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
                 else
                 {
                     // \r is the last unit read so far: refill, then re-scan from the \r to classify it.
+                    if (_truncating)
+                    {
+                        ConsumeBytes(hitIndex);
+                        hitIndex = 0;
+                    }
+
                     _scannedBytes = hitIndex;
                     Refill();
                     continue;
                 }
 
-                lineMemory = DecodeLine(hitIndex);
+                lineMemory = _truncating ? _truncatedLine : DecodeLine(hitIndex);
+                _truncating = false;
                 ConsumeBytes(hitIndex + terminatorBytes);
                 return true;
             }
@@ -119,9 +129,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
             if (_eof)
             {
                 // Emit remaining content as final line (no trailing newline)
-                if (available > 0)
+                if (available > 0 || _truncating)
                 {
-                    lineMemory = DecodeLine(available);
+                    lineMemory = _truncating ? _truncatedLine : DecodeLine(available);
+                    _truncating = false;
                     ConsumeBytes(available);
                     return true;
                 }
@@ -131,7 +142,24 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
             }
 
             // Only whole units are searched; a partial one is completed by the refill.
-            _scannedBytes = available - (available % _unitSize);
+            var searchedBytes = available - (available % _unitSize);
+
+            if (!_truncating && searchedBytes >= _truncateAfterBytes)
+            {
+                _truncatedLine = DecodeLine(_truncateAfterBytes);
+                _truncating = true;
+            }
+
+            if (_truncating)
+            {
+                // Position still counts the dropped bytes, so it stays exact.
+                ConsumeBytes(searchedBytes);
+            }
+            else
+            {
+                _scannedBytes = searchedBytes;
+            }
+
             Refill();
         }
     }
@@ -201,6 +229,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _lfUnit = ReadUnit(lf, _unitSize);
         _asciiCompatible = _unitSize == 1 && DecodesAsciiUnchanged(Encoding);
         _isUtf16LittleEndian = Encoding.CodePage == CODE_PAGE_UTF16_LE;
+
+        // No supported encoding needs more than 4 bytes per char, so this prefix holds the first MaximumLineLength
+        // chars complete; the extra 4 bytes keep a character cut at the end beyond the cap. A multiple of every unit size.
+        _truncateAfterBytes = (int)Math.Min((4L * Math.Max(MaximumLineLength, 0)) + 4, 1 << 29);
     }
 
     // False for encodings like UTF-7 or EBCDIC, whose 0x00–0x7F bytes are not plain ASCII.
@@ -398,6 +430,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _scannedBytes = 0;
         _eof = false;
         _lastReadShort = false;
+        _truncating = false;
         _initialized = false;
 
         base.ResetReader();
