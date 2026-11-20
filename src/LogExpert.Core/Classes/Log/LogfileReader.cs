@@ -1395,9 +1395,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
             using Stream fileStream = openendFileStream;
             {
-                var reader = GetLogStreamReader(fileStream, EncodingOptions);
-
-                using var readerDisposabel = reader;
+                using var reader = GetLogStreamReader(fileStream, EncodingOptions);
                 {
                     var filePos = logBuffer.StartPos;
                     reader.Position = logBuffer.StartPos;
