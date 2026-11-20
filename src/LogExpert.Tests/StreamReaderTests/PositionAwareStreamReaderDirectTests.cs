@@ -326,6 +326,24 @@ public class PositionAwareStreamReaderDirectTests
         Assert.That(blocks2.Count, Is.EqualTo(0));
     }
 
+    [Test]
+    [TestCase(0)]
+    [TestCase(200_000)]
+    public void DetachCharBlocks_ShortTailRead_BlockSizedToRemainingBytes (int precedingBytes)
+    {
+        // A tail poll opens a reader near the end of the file and reads one appended line.
+        const string appended = "one appended line\n";
+        using var stream = CreateStream(new string('x', precedingBytes) + appended);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, 500);
+        reader.Position = precedingBytes;
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.ToString(), Is.EqualTo("one appended line"));
+
+        var blocks = reader.DetachCharBlocks();
+        Assert.That(blocks.Sum(block => block.Length), Is.LessThanOrEqualTo(64));
+    }
+
     #endregion
 
     #region Lines longer than BLOCK_SIZE (32768 chars)

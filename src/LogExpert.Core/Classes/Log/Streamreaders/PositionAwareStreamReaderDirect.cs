@@ -38,6 +38,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     private int _byteEnd;
     private int _scannedBytes;       // bytes after _byteStart already searched without a terminator
     private bool _eof;
+    private bool _lastReadShort;     // the last Read returned less than asked for: the rest of the file is buffered
     private bool _initialized;
 
     private int _unitSize;           // bytes per code unit: 1, 2 or 4
@@ -57,7 +58,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     public PositionAwareStreamReaderDirect (Stream stream, EncodingOptions encodingOptions, int maximumLineLength)
         : base(stream, encodingOptions, maximumLineLength)
     {
-        _readBlock = ArrayPool<char>.Shared.Rent(BLOCK_SIZE);
+        _readBlock = [];
     }
 
     #endregion
@@ -149,7 +150,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         if (_usedChars > 0)
         {
             _completedBlocks.Add(_readBlock);
-            _readBlock = ArrayPool<char>.Shared.Rent(BLOCK_SIZE);
+            _readBlock = [];
             _usedChars = 0;
         }
 
@@ -316,6 +317,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     }
 
     // A block that already holds lines is kept for DetachCharBlocks; lines longer than BLOCK_SIZE get a block of their own.
+    // A block is never larger than the bytes left to read, so a tail poll that reads one line does not pin a full block.
     private void EnsureCharCapacity (int charCount)
     {
         if (_readBlock.Length - _usedChars >= charCount)
@@ -327,15 +329,26 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         {
             _completedBlocks.Add(_readBlock);
         }
-        else
+        else if (_readBlock.Length > 0)
         {
             ArrayPool<char>.Shared.Return(_readBlock);
         }
 
-        var blockSize = BLOCK_SIZE;
-        while (blockSize < charCount)
+        int blockSize;
+        if (charCount > BLOCK_SIZE)
         {
-            blockSize *= 2;
+            blockSize = BLOCK_SIZE;
+            while (blockSize < charCount)
+            {
+                blockSize *= 2;
+            }
+        }
+        else
+        {
+            // After a short read the rest of the file is buffered, and no encoding decodes n bytes to more than n + 1 chars.
+            blockSize = _lastReadShort
+                ? Math.Clamp(_byteEnd - _byteStart + 1, charCount, BLOCK_SIZE)
+                : BLOCK_SIZE;
         }
 
         _readBlock = ArrayPool<char>.Shared.Rent(blockSize);
@@ -365,8 +378,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
             _byteEnd = lineLength;
         }
 
-        var bytesRead = GetByteStream().Read(_byteBuffer, _byteEnd, _byteBuffer.Length - _byteEnd);
+        var requested = _byteBuffer.Length - _byteEnd;
+        var bytesRead = GetByteStream().Read(_byteBuffer, _byteEnd, requested);
         _byteEnd += bytesRead;
+        _lastReadShort = bytesRead < requested;
 
         if (bytesRead == 0)
         {
@@ -382,6 +397,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _byteEnd = 0;
         _scannedBytes = 0;
         _eof = false;
+        _lastReadShort = false;
         _initialized = false;
 
         base.ResetReader();
@@ -392,11 +408,12 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         if (disposing)
         {
             // Return the current (partially filled) block
-            if (_readBlock != null)
+            if (_readBlock is { Length: > 0 })
             {
                 ArrayPool<char>.Shared.Return(_readBlock);
-                _readBlock = null!;
             }
+
+            _readBlock = null!;
 
             if (_byteBuffer != null)
             {

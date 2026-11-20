@@ -85,6 +85,8 @@ public class LogBuffer
 
     public int PrevBuffersDroppedLinesSum { get; set; }
 
+    internal int CharBlockCapacity => _charBlocks?.Sum(block => block.Length) ?? 0;
+
     #endregion
 
     #region Public methods
