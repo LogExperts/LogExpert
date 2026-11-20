@@ -274,6 +274,71 @@ public class PositionAwareStreamReaderDirectTests
 
     #endregion
 
+    #region Allocations
+
+    /// <summary>
+    /// The reader must stay allocation-free per line: lines land in pooled blocks, and only detaching
+    /// blocks allocates (the list handed to the buffer). Measured on the reading thread, so the result
+    /// is deterministic; any per-line allocation (at least 24 bytes) breaks the budget of 0.25 bytes.
+    /// </summary>
+    [Test]
+    public void TryReadLine_ValidText_DoesNotAllocatePerLine ([Values(65001, 1200)] int codePage)
+    {
+        const int lineCount = 200_000;
+        const int linesPerBuffer = 500;
+        var encoding = Encoding.GetEncoding(codePage);
+
+        var sb = new StringBuilder();
+        for (var i = 0; i < lineCount; i++)
+        {
+            _ = sb.Append("2026-04-23 12:00:00.").Append(i % 1000).Append(" [INFO] Thread-7 SomeClass - Log message number ").Append(i).Append("\r\n");
+        }
+
+        var data = encoding.GetBytes(sb.ToString());
+
+        // Warm up the JIT and the array pool, then measure one full read.
+        _ = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+        _ = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        var lines = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lines, Is.EqualTo(lineCount));
+            Assert.That(allocated, Is.LessThan(lineCount / 4), $"Allocated {allocated} bytes for {lines} lines");
+        });
+    }
+
+    private static int ReadAllAndReturnBlocks (byte[] data, Encoding encoding, int linesPerBuffer)
+    {
+        using var stream = new MemoryStream(data, writable: false);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, 20_000);
+
+        var lines = 0;
+        while (reader.TryReadLine(out _))
+        {
+            if (++lines % linesPerBuffer == 0)
+            {
+                ReturnBlocks(reader.DetachCharBlocks());
+            }
+        }
+
+        ReturnBlocks(reader.DetachCharBlocks());
+        return lines;
+
+        static void ReturnBlocks (List<char[]> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                System.Buffers.ArrayPool<char>.Shared.Return(block);
+            }
+        }
+    }
+
+    #endregion
+
     #region DetachCharBlocks
 
     [Test]

@@ -13,6 +13,7 @@ public static class Program
 
             // Run all benchmarks if no arguments are provided
             _ = BenchmarkRunner.Run<StreamReaderBenchmarks>();
+            _ = BenchmarkRunner.Run<DirectReaderBenchmarks>();
             _ = BenchmarkRunner.Run<BufferIndexBenchmarks>();
             _ = BenchmarkRunner.Run<ReadThroughputBenchmarks>();
             _ = BenchmarkRunner.Run<BufferIndexContentionBenchmarks>();
@@ -26,6 +27,7 @@ public static class Program
 
         Console.WriteLine("Replace <benchmarkname> with the name of the benchmark you want to run, e.g. ");
         Console.WriteLine("StreamReaderBenchmarks: Benchmarks for stream readers");
+        Console.WriteLine("DirectReaderBenchmarks: Benchmarks for the default (Direct) reader, the regression gate for reader changes");
         Console.WriteLine("ReadThroughputBenchmarks: Benchmarks for read throughput");
         Console.WriteLine("BufferIndexBenchmarks: Benchmarks for buffer index");
         Console.WriteLine("BufferIndexContentionBenchmarks: Benchmarks for buffer index contention");

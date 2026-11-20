@@ -154,6 +154,16 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         return _reader;
     }
 
+    /// <summary>
+    /// The raw byte stream, positioned where <see cref="Position"/> points (past the preamble), for
+    /// readers that decode bytes themselves instead of going through <see cref="GetStreamReader"/>.
+    /// </summary>
+    protected Stream GetByteStream ()
+    {
+        ObjectDisposedException.ThrowIf(IsDisposed, GetType());
+        return _stream;
+    }
+
     protected void MovePosition (int offset)
     {
         _position += offset;
