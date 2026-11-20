@@ -22,19 +22,18 @@ public readonly record struct LogLine : ILogLineMemory
 
     public ReadOnlyMemory<char> FullLine { get; }
 
-    public ReadOnlyMemory<char> Text { get; }
+    // Not stored: a second copy of the memory would cost 16 bytes on every resident line.
+    public ReadOnlyMemory<char> Text => FullLine;
 
     public LogLine (string fullLine, int lineNumber)
     {
         LineNumber = lineNumber;
         FullLine = fullLine.AsMemory();
-        Text = fullLine.AsMemory();
     }
 
     public LogLine (ReadOnlyMemory<char> fullLine, int lineNumber)
     {
         LineNumber = lineNumber;
         FullLine = fullLine;
-        Text = fullLine;
     }
 }
