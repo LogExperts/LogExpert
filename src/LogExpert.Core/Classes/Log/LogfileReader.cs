@@ -1171,7 +1171,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         try
         {
             using var fileStream = logFileInfo.OpenStream();
-            using var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
+            using var reader = GetLogStreamReader(fileStream, EncodingOptions);
 
             reader.Position = filePos;
             _fileLength = logFileInfo.Length;
@@ -1270,7 +1270,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
                         // Detach char blocks from the reader and attach to the completed buffer.
                         // Must happen before Monitor.Exit so the buffer is still exclusively owned.
-                        logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
+                        AttachReaderBlocks(logBuffer, reader);
 
                         Monitor.Exit(logBuffer);
                         try
@@ -1302,7 +1302,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                 logBuffer.Size = filePos - logBuffer.StartPos;
 
                 // Attach remaining blocks to the final buffer
-                logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
+                AttachReaderBlocks(logBuffer, reader);
             }
             finally
             {
@@ -1395,10 +1395,9 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
 
             using Stream fileStream = openendFileStream;
             {
-                //TODO LogStream Reader has to be changed to ILogStreamReaderMemory
-                var reader = GetLogStreamReader(fileStream, EncodingOptions) as ILogStreamReaderMemory;
+                var reader = GetLogStreamReader(fileStream, EncodingOptions);
 
-                using var readerDisposabel = reader as IDisposable;
+                using var readerDisposabel = reader;
                 {
                     var filePos = logBuffer.StartPos;
                     reader.Position = logBuffer.StartPos;
@@ -1433,7 +1432,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
                     }
 
                     // Attach char blocks from the reader to the re-read buffer
-                    logBuffer.AttachCharBlocks(reader.DetachCharBlocks());
+                    AttachReaderBlocks(logBuffer, reader);
 
                     if (maxLinesCount != logBuffer.LineCount)
                     {
@@ -1777,20 +1776,22 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     /// the line as a string. If the reader supports memory-based access, the memory buffer is populated; otherwise, it
     /// is null.
     /// </returns>
-    private (bool Success, ReadOnlyMemory<char> LineMemory, bool wasDropped) ReadLineMemory (ILogStreamReaderMemory reader, int lineNum, int realLineNum)
+    private (bool Success, ReadOnlyMemory<char> LineMemory, bool wasDropped) ReadLineMemory (ILogStreamReader reader, int lineNum, int realLineNum)
     {
-        if (reader is null)
+        if (reader is not ILogStreamReaderMemory memoryReader)
         {
-            // Fallback to string-based reading if memory reader not available
-            if (ReadLine(reader, lineNum, realLineNum, out var outLine))
+            // String readers (XML mode); a null line after preprocessing means the line was dropped.
+            if (!ReadLine(reader, lineNum, realLineNum, out var outLine))
             {
-                return (true, outLine.AsMemory(), false);
+                return (false, ReadOnlyMemory<char>.Empty, false);
             }
 
-            return (false, ReadOnlyMemory<char>.Empty, false);
+            return outLine is null
+                ? (true, ReadOnlyMemory<char>.Empty, true)
+                : (true, outLine.AsMemory(), false);
         }
 
-        if (!reader.TryReadLine(out var lineMemory))
+        if (!memoryReader.TryReadLine(out var lineMemory))
         {
             return (false, ReadOnlyMemory<char>.Empty, false);
         }
@@ -1809,6 +1810,15 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         }
 
         return (true, lineMemory, false);
+    }
+
+    // Only memory readers hand out pooled char blocks; string readers own no blocks to transfer.
+    private static void AttachReaderBlocks (LogBuffer logBuffer, ILogStreamReader reader)
+    {
+        if (reader is ILogStreamReaderMemory memoryReader)
+        {
+            logBuffer.AttachCharBlocks(memoryReader.DetachCharBlocks());
+        }
     }
 
 #if DEBUG
