@@ -132,4 +132,49 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
             Assert.That(reader.FileSize, Is.EqualTo(new FileInfo(_logFile).Length), "Size read after the growth");
         });
     }
+
+    // Every poll reads the appended line with a new reader; each used to pin a 32,768-char block in the buffer.
+    [Test]
+    public void SingleFileReader_OneLinePerPoll_KeepsCharBlocksSizedToTheText ()
+    {
+        const int appends = 10;
+
+        using var loadingFinished = new ManualResetEventSlim(false);
+        var progressReporterMock = new Mock<ILoadProgressReporter>();
+        _ = progressReporterMock
+            .Setup(reporter => reporter.ReportLoadingFinished())
+            .Callback(() => loadingFinished.Set());
+
+        using var reader = new LogfileReader(
+            _logFile,
+            new EncodingOptions { Encoding = Encoding.UTF8 },
+            multiFile: false,
+            bufferCount: 40,
+            linesPerBuffer: 500,
+            new MultiFileOptions(),
+            PluginRegistry.PluginRegistry.Instance,
+            maximumLineLength: 500,
+            progressReporter: progressReporterMock.Object);
+
+        reader.StartMonitoring();
+        Assert.That(loadingFinished.Wait(TimeSpan.FromSeconds(5)), Is.True, "Initial load did not finish");
+
+        for (var i = 1; i <= appends; i++)
+        {
+            File.AppendAllText(_logFile, $"Appended {i}\n", Encoding.UTF8);
+            var expected = 100 + i;
+            Assert.That(SpinWait.SpinUntil(() => reader.LineCount == expected, TimeSpan.FromSeconds(5)), Is.True, $"Append {i} was not read");
+        }
+
+        Assert.That(reader.LineCount, Is.EqualTo(100 + appends));
+
+        int capacity;
+        using (reader.BufferIndex.AcquireReadLock())
+        {
+            capacity = reader.BufferIndex.EnumerateBuffers().Sum(buffer => buffer.CharBlockCapacity);
+        }
+
+        // The text is about 1,000 chars; one full block per poll would be more than 300,000.
+        Assert.That(capacity, Is.LessThanOrEqualTo(16_384));
+    }
 }
