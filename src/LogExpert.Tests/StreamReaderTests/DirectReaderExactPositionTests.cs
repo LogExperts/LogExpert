@@ -8,19 +8,11 @@ using NUnit.Framework;
 
 namespace LogExpert.Tests.StreamReaderTests;
 
-/// <summary>
-/// Issue #639: the byte <see cref="PositionAwareStreamReaderDirect.Position"/> must equal the raw bytes
-/// consumed, whatever the bytes are. Re-encoding decoded text overcounts invalid sequences (each U+FFFD
-/// re-encodes as 3 UTF-8 bytes), so a file with a binary block looked larger than it was and every
-/// growth was mistaken for a recreated file. The oracle here is the raw byte stream itself: a line ends
-/// at the next <c>\n</c>, <c>\r\n</c> or bare <c>\r</c> unit, and its text is that line's bytes decoded on
-/// their own.
-/// </summary>
+// Issue #639: Position must equal the raw bytes consumed, whatever they are. Re-encoding decoded text
+// counted each U+FFFD as 3 UTF-8 bytes, so a file with a binary block looked larger than it was.
 [TestFixture]
 public class DirectReaderExactPositionTests
 {
-    private const int MAX_LINE_LENGTH = 500_000;
-
     #region Invalid byte sequences
 
     private static IEnumerable<TestCaseData> InvalidUtf8Cases ()
@@ -46,7 +38,7 @@ public class DirectReaderExactPositionTests
     [TestCaseSource(nameof(InvalidUtf8Cases))]
     public void Position_InvalidUtf8_MatchesRawBytes (byte[] data)
     {
-        AssertMatchesOracle(data, Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(data, Encoding.UTF8);
     }
 
     [Test]
@@ -54,7 +46,7 @@ public class DirectReaderExactPositionTests
     {
         byte[] data = [.. "abc"u8, 0x80, .. "def\n"u8];
 
-        var lines = ReadAll(data, Encoding.UTF8);
+        var lines = RawByteLineOracle.ReadAll(data, Encoding.UTF8);
 
         Assert.That(lines.Select(line => line.Content), Is.EqualTo(new[] { "abc�def" }));
     }
@@ -87,7 +79,7 @@ public class DirectReaderExactPositionTests
     {
         byte[] data = [.. Encoding.Unicode.GetBytes("ab"), 0x00, 0xD8, .. Encoding.Unicode.GetBytes("\r\ncd\n"), 0x41];
 
-        AssertMatchesOracle(data, Encoding.Unicode);
+        RawByteLineOracle.AssertMatches(data, Encoding.Unicode);
     }
 
     [Test]
@@ -96,7 +88,7 @@ public class DirectReaderExactPositionTests
     {
         var data = Encoding.Unicode.GetBytes("plain\r\nemoji 🙂 and 𝄞\npair at end 🙂");
 
-        AssertMatchesOracle(data, Encoding.Unicode);
+        RawByteLineOracle.AssertMatches(data, Encoding.Unicode);
     }
 
     [Test]
@@ -104,7 +96,7 @@ public class DirectReaderExactPositionTests
     {
         var data = Encoding.BigEndianUnicode.GetBytes("first\r\nsecond\nthird\rfourth");
 
-        AssertMatchesOracle(data, Encoding.BigEndianUnicode);
+        RawByteLineOracle.AssertMatches(data, Encoding.BigEndianUnicode);
     }
 
     [Test]
@@ -113,18 +105,14 @@ public class DirectReaderExactPositionTests
         var gb2312 = EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312);
         byte[] data = [.. gb2312.GetBytes("错误 "), 0x81, .. "\n"u8, 0xFF, .. gb2312.GetBytes("警告\n")];
 
-        AssertMatchesOracle(data, gb2312);
+        RawByteLineOracle.AssertMatches(data, gb2312);
     }
 
     #endregion
 
     #region Buffer boundaries
 
-    /// <summary>
-    /// A multi-byte character, an invalid sequence or a <c>\r\n</c> pair that straddles the reader's
-    /// internal buffer must not shift the position. The boundaries cover the old 32 K char block and
-    /// common byte buffer sizes, on both short-line and single-long-line layouts.
-    /// </summary>
+    // Boundaries cover the old 32 K char block and common byte buffer sizes.
     [Test]
     public void Position_SequenceStraddlesBufferBoundary_MatchesRawBytes (
         [Values(16_383, 16_384, 32_767, 32_768, 65_535, 65_536, 131_071, 131_072)] int boundary,
@@ -144,7 +132,7 @@ public class DirectReaderExactPositionTests
             var prefix = Filler(boundary - startOffset, shortLines);
             byte[] data = [.. prefix, .. sequence, .. "after\nlast"u8];
 
-            AssertMatchesOracle(data, Encoding.UTF8);
+            RawByteLineOracle.AssertMatches(data, Encoding.UTF8);
         }
 
         static byte[] Filler (int length, bool shortLines)
@@ -170,7 +158,7 @@ public class DirectReaderExactPositionTests
 
         var expected = new List<(long Start, string Content)>();
         using (var stream = new MemoryStream(data))
-        using (var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, MAX_LINE_LENGTH))
+        using (var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, RawByteLineOracle.MAX_LINE_LENGTH))
         {
             var start = reader.Position;
             while (reader.TryReadLine(out var line))
@@ -181,7 +169,7 @@ public class DirectReaderExactPositionTests
         }
 
         using var seekStream = new MemoryStream(data);
-        using var seekReader = new PositionAwareStreamReaderDirect(seekStream, new EncodingOptions { Encoding = Encoding.UTF8 }, MAX_LINE_LENGTH);
+        using var seekReader = new PositionAwareStreamReaderDirect(seekStream, new EncodingOptions { Encoding = Encoding.UTF8 }, RawByteLineOracle.MAX_LINE_LENGTH);
 
         // Walk backwards so every seek moves the stream and discards what the reader had buffered.
         for (var index = expected.Count - 1; index >= 0; index -= 37)
@@ -200,7 +188,7 @@ public class DirectReaderExactPositionTests
     [Test]
     public void Position_TextWithBinaryBlock_MatchesRawBytes ()
     {
-        AssertMatchesOracle(TextWithBinaryBlock(lineCount: 3_000, binaryLength: 33_000, seed: 42), Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(TextWithBinaryBlock(lineCount: 3_000, binaryLength: 33_000, seed: 42), Encoding.UTF8);
     }
 
     [Test]
@@ -220,7 +208,7 @@ public class DirectReaderExactPositionTests
             };
         }
 
-        AssertMatchesOracle(data, Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(data, Encoding.UTF8);
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Unit Tests")]
@@ -243,85 +231,6 @@ public class DirectReaderExactPositionTests
 
         return stream.ToArray();
     }
-
-    #endregion
-
-    #region Oracle
-
-    internal static void AssertMatchesOracle (byte[] data, Encoding encoding)
-    {
-        var expected = ExpectedLines(data, encoding);
-        var actual = ReadAll(data, encoding);
-
-        Assert.That(actual.Count, Is.EqualTo(expected.Count), "Line count");
-        for (var i = 0; i < expected.Count; i++)
-        {
-            if (actual[i] != expected[i])
-            {
-                Assert.Fail($"Line {i}: expected end {expected[i].End} \"{Shorten(expected[i].Content)}\", got end {actual[i].End} \"{Shorten(actual[i].Content)}\"");
-            }
-        }
-    }
-
-    private static List<(string Content, long End)> ReadAll (byte[] data, Encoding encoding)
-    {
-        using var stream = new MemoryStream(data);
-        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, MAX_LINE_LENGTH);
-
-        var lines = new List<(string, long)>();
-        while (reader.TryReadLine(out var line))
-        {
-            lines.Add((line.ToString(), reader.Position));
-        }
-
-        return lines;
-    }
-
-    /// <summary>
-    /// Splits the raw bytes at <c>\n</c>, <c>\r\n</c> and bare <c>\r</c> code units of the encoding and
-    /// decodes each line's bytes on its own. A trailing line without terminator is a line; an empty
-    /// remainder after the last terminator is not.
-    /// </summary>
-    private static List<(string Content, long End)> ExpectedLines (byte[] data, Encoding encoding)
-    {
-        var cr = encoding.GetBytes("\r");
-        var lf = encoding.GetBytes("\n");
-        var unit = lf.Length;
-
-        var lines = new List<(string, long)>();
-        var lineStart = 0;
-        var position = 0;
-
-        while (position + unit <= data.Length)
-        {
-            var span = data.AsSpan(position, unit);
-            if (span.SequenceEqual(lf) || span.SequenceEqual(cr))
-            {
-                var terminatorLength = unit;
-                if (span.SequenceEqual(cr) && position + (2 * unit) <= data.Length && data.AsSpan(position + unit, unit).SequenceEqual(lf))
-                {
-                    terminatorLength = 2 * unit;
-                }
-
-                lines.Add((encoding.GetString(data, lineStart, position - lineStart), position + terminatorLength));
-                position += terminatorLength;
-                lineStart = position;
-            }
-            else
-            {
-                position += unit;
-            }
-        }
-
-        if (lineStart < data.Length)
-        {
-            lines.Add((encoding.GetString(data, lineStart, data.Length - lineStart), data.Length));
-        }
-
-        return lines;
-    }
-
-    private static string Shorten (string text) => text.Length <= 60 ? text : $"{text[..60]}… ({text.Length} chars)";
 
     #endregion
 }

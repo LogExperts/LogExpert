@@ -72,11 +72,7 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
         Assert.That(rolloverReported, Is.False);
     }
 
-    /// <summary>
-    /// Issue #639: a file with a binary block in the middle must grow like any other file. An overcounted
-    /// byte position made the file look smaller than what had been read, so every append was reported as
-    /// a new file and the window reloaded and jumped to the top.
-    /// </summary>
+    // Issue #639: an overcounted position made every append look like a new file, so the window reloaded.
     [Test]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Unit Tests")]
     public void SingleFileReader_GrowingFileWithBinaryBlock_TakesGrowthPathNotNewFile ()

@@ -137,10 +137,7 @@ public class DirectReaderBenchmarks
         return sb.ToString();
     }
 
-    /// <summary>
-    /// CSV-like text with a binary block every 1000 lines: NUL runs, stray continuation bytes and
-    /// truncated multi-byte sequences, the shape of the sample file from issue #639.
-    /// </summary>
+    // CSV-like text with a random binary block every 1000 lines, the shape of the issue #639 sample.
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Benchmark data generation")]
     private static byte[] GenerateInvalidBytes (int lineCount)
     {

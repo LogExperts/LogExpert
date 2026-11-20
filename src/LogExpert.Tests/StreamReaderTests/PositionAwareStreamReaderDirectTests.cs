@@ -167,14 +167,14 @@ public class PositionAwareStreamReaderDirectTests
     [TestCase("Short\nMedium line here\nA much longer line with more content\n")]
     public void Position_MatchesRawBytes_UTF8 (string text)
     {
-        DirectReaderExactPositionTests.AssertMatchesOracle(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
     }
 
     [Test]
     [TestCase("Line 1\nLine 2\nLine 3\n")]
     public void Position_MatchesRawBytes_ASCII (string text)
     {
-        DirectReaderExactPositionTests.AssertMatchesOracle(Encoding.ASCII.GetBytes(text), Encoding.ASCII);
+        RawByteLineOracle.AssertMatches(Encoding.ASCII.GetBytes(text), Encoding.ASCII);
     }
 
     [Test]
@@ -182,7 +182,7 @@ public class PositionAwareStreamReaderDirectTests
     public void Position_MatchesRawBytes_UTF8_MultibyteChars ()
     {
         var text = "Héllo wörld\nCafé résumé\nこんにちは\n";
-        DirectReaderExactPositionTests.AssertMatchesOracle(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
     }
 
     /// <summary>
@@ -197,7 +197,7 @@ public class PositionAwareStreamReaderDirectTests
     {
         var gb2312 = EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312);
         var text = "2026-07-30 错误: 连接失败\nINFO 启动完成\nplain ascii line\n警告\n";
-        DirectReaderExactPositionTests.AssertMatchesOracle(gb2312.GetBytes(text), gb2312);
+        RawByteLineOracle.AssertMatches(gb2312.GetBytes(text), gb2312);
     }
 
     #endregion
@@ -235,22 +235,21 @@ public class PositionAwareStreamReaderDirectTests
 
     #region Allocations
 
-    /// <summary>
-    /// The reader must stay allocation-free per line: lines land in pooled blocks, and only detaching
-    /// blocks allocates (the list handed to the buffer). Measured on the reading thread, so the result
-    /// is deterministic; any per-line allocation (at least 24 bytes) breaks the budget of 0.25 bytes.
-    /// </summary>
+    // Only detaching blocks may allocate (the list handed to the buffer). Measured on the reading thread,
+    // so the result is deterministic; any per-line allocation (at least 24 bytes) breaks 0.25 bytes per line.
     [Test]
-    public void TryReadLine_ValidText_DoesNotAllocatePerLine ([Values(65001, 1200)] int codePage)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_ValidText_DoesNotAllocatePerLine ([Values(65001, 1200)] int codePage, [Values(false, true)] bool nonAscii)
     {
         const int lineCount = 200_000;
         const int linesPerBuffer = 500;
         var encoding = Encoding.GetEncoding(codePage);
+        var message = nonAscii ? " [INFO] Größe 日志 🙂 - Log message number " : " [INFO] Thread-7 SomeClass - Log message number ";
 
         var sb = new StringBuilder();
         for (var i = 0; i < lineCount; i++)
         {
-            _ = sb.Append("2026-04-23 12:00:00.").Append(i % 1000).Append(" [INFO] Thread-7 SomeClass - Log message number ").Append(i).Append("\r\n");
+            _ = sb.Append("2026-04-23 12:00:00.").Append(i % 1000).Append(message).Append(i).Append("\r\n");
         }
 
         var data = encoding.GetBytes(sb.ToString());
@@ -477,7 +476,7 @@ public class PositionAwareStreamReaderDirectTests
             const int lineLength = 50_000;
             var text = $"short\n{new string('Q', lineLength)}\nend\n";
 
-            DirectReaderExactPositionTests.AssertMatchesOracle(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
+            RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
         });
     }
 

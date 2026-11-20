@@ -12,23 +12,18 @@ namespace LogExpert.Core.Classes.Log.Streamreaders;
 /// ReadOnlyMemory&lt;char&gt; slices without allocating per-line strings.
 /// </summary>
 /// <remarks>
-/// The byte <see cref="PositionAwareStreamReaderBase.Position"/> advances by the bytes a line really
-/// occupies, so it stays exact for mixed line endings and for byte sequences that are invalid in the
-/// encoding (issue #639): re-encoding decoded text would count each U+FFFD as the bytes of a replacement
-/// character instead of the bytes it replaced. Line boundaries are searched as code units of the
-/// encoding (one byte, or two or four for UTF-16 and UTF-32); in every encoding LogExpert offers, a
-/// <c>\r</c> or <c>\n</c> unit never occurs inside a multi-byte character.
-/// <see cref="ReadChar"/> still reads through the base <see cref="StreamReader"/>; it and
-/// <see cref="TryReadLine"/> must not be interleaved without setting the position in between.
+/// <see cref="PositionAwareStreamReaderBase.Position"/> advances by the raw bytes of each line, so it
+/// stays exact for any line ending and for bytes that are invalid in the encoding (ADR 0010).
+/// <see cref="ReadChar"/> reads through the base <see cref="StreamReader"/>; do not interleave it with
+/// <see cref="TryReadLine"/> without setting the position in between.
 /// </remarks>
 public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, ILogStreamReaderMemory
 {
     #region Constants
 
     private const int BLOCK_SIZE = 32_768;       // 64 KB (32K chars × 2 bytes), under LOH threshold
-    private const int BYTE_BUFFER_SIZE = 65_536; // raw bytes read from the stream per refill
+    private const int BYTE_BUFFER_SIZE = 65_536;
     private const int CODE_PAGE_UTF16_LE = 1200;
-    private const int CODE_PAGE_UTF16_BE = 1201;
 
     private static readonly SearchValues<char> _surrogates = SearchValues.Create(Enumerable.Range(0xD800, 0x800).Select(code => (char)code).ToArray());
 
@@ -37,19 +32,19 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     #region Fields
 
     private char[] _readBlock;
-    private int _charFill;           // chars of _readBlock already handed out as lines
-    private byte[] _byteBuffer;      // rented on the first read
+    private int _usedChars;          // chars of _readBlock already handed out as lines
+    private byte[] _byteBuffer;
     private int _byteStart;          // first byte of the line in progress
-    private int _byteEnd;            // end of the valid bytes in _byteBuffer
+    private int _byteEnd;
     private int _scannedBytes;       // bytes after _byteStart already searched without a terminator
     private bool _eof;
-    private bool _initialized;       // terminator units resolved for the encoding
+    private bool _initialized;
 
     private int _unitSize;           // bytes per code unit: 1, 2 or 4
     private uint _crUnit;
     private uint _lfUnit;
-    private bool _asciiCompatible;   // bytes 0x00–0x7F decode to the same chars
-    private bool _nativeUtf16;       // UTF-16 in the machine's byte order
+    private bool _asciiCompatible;
+    private bool _isUtf16LittleEndian;
 
     private readonly List<char[]> _completedBlocks = [];
 
@@ -109,8 +104,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
                 }
                 else
                 {
-                    // \r is the last unit read so far but more data follows. Refill so the next unit
-                    // becomes available, then re-scan from the \r to classify it.
+                    // \r is the last unit read so far: refill, then re-scan from the \r to classify it.
                     _scannedBytes = hitIndex;
                     Refill();
                     continue;
@@ -135,7 +129,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
                 return false;
             }
 
-            // Everything read so far is searched; only whole units count, a partial one is completed by the refill.
+            // Only whole units are searched; a partial one is completed by the refill.
             _scannedBytes = available - (available % _unitSize);
             Refill();
         }
@@ -152,11 +146,11 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     /// </summary>
     public List<char[]> DetachCharBlocks ()
     {
-        if (_charFill > 0)
+        if (_usedChars > 0)
         {
             _completedBlocks.Add(_readBlock);
             _readBlock = ArrayPool<char>.Shared.Rent(BLOCK_SIZE);
-            _charFill = 0;
+            _usedChars = 0;
         }
 
         if (_completedBlocks.Count == 0)
@@ -189,10 +183,8 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         }
     }
 
-    /// <summary>
-    /// Reads how <c>\r</c> and <c>\n</c> are encoded: one byte in single-byte and multi-byte code pages
-    /// and UTF-8, a 2-byte or 4-byte unit in UTF-16 and UTF-32 of either byte order.
-    /// </summary>
+    // In every encoding LogExpert offers, \r and \n are single code units (1 byte, or 2/4 for
+    // UTF-16/UTF-32) that never occur inside a multi-byte character, so lines can be split on bytes.
     private void ResolveTerminatorUnits ()
     {
         var cr = Encoding.GetBytes("\r");
@@ -207,13 +199,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _crUnit = ReadUnit(cr, _unitSize);
         _lfUnit = ReadUnit(lf, _unitSize);
         _asciiCompatible = _unitSize == 1 && DecodesAsciiUnchanged(Encoding);
-        _nativeUtf16 = Encoding.CodePage == (BitConverter.IsLittleEndian ? CODE_PAGE_UTF16_LE : CODE_PAGE_UTF16_BE);
+        _isUtf16LittleEndian = Encoding.CodePage == CODE_PAGE_UTF16_LE;
     }
 
-    /// <summary>
-    /// Whether every byte 0x00–0x7F decodes to the same char: true for UTF-8, ASCII, Latin-1, the
-    /// Windows code pages and GB2312; false for UTF-7 or EBCDIC, which take the encoding's decoder.
-    /// </summary>
+    // False for encodings like UTF-7 or EBCDIC, whose 0x00–0x7F bytes are not plain ASCII.
     private static bool DecodesAsciiUnchanged (Encoding encoding)
     {
         Span<byte> ascii = stackalloc byte[128];
@@ -257,10 +246,6 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
             : ReadUnit(_byteBuffer.AsSpan(_byteStart + offset, _unitSize), _unitSize);
     }
 
-    /// <summary>
-    /// Byte offset of the first <c>\r</c> or <c>\n</c> unit in <paramref name="bytes"/>, which starts on a
-    /// unit boundary, or -1. A trailing partial unit is not searched.
-    /// </summary>
     private int FindTerminator (ReadOnlySpan<byte> bytes)
     {
         switch (_unitSize)
@@ -282,11 +267,7 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         }
     }
 
-    /// <summary>
-    /// Decodes the first <paramref name="byteCount"/> bytes of the line in progress into the current
-    /// block and returns the text, capped at the maximum line length. A line is decoded on its own:
-    /// a sequence cut short by the terminator becomes U+FFFD in this line, as a continuous decode does.
-    /// </summary>
+    // A line is decoded on its own: a sequence cut short by the terminator becomes U+FFFD in this line.
     private ReadOnlyMemory<char> DecodeLine (int byteCount)
     {
         var bytes = _byteBuffer.AsSpan(_byteStart, byteCount);
@@ -294,20 +275,19 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         int charCount;
         if (_asciiCompatible)
         {
-            // Most log lines are pure ASCII: widen them directly, which skips the per-call cost of the
-            // encoding's decoder. A line with any other byte is decoded by the encoding instead.
+            // Pure-ASCII lines skip the per-call cost of the encoding's decoder.
             EnsureCharCapacity(byteCount);
-            if (Ascii.ToUtf16(bytes, _readBlock.AsSpan(_charFill), out charCount) != OperationStatus.Done)
+            if (Ascii.ToUtf16(bytes, _readBlock.AsSpan(_usedChars), out charCount) != OperationStatus.Done)
             {
                 charCount = DecodeWithEncoding(bytes);
             }
         }
-        else if (_nativeUtf16 && (byteCount & 1) == 0 && !MemoryMarshal.Cast<byte, char>(bytes).ContainsAny(_surrogates))
+        else if (_isUtf16LittleEndian && (byteCount & 1) == 0 && !MemoryMarshal.Cast<byte, char>(bytes).ContainsAny(_surrogates))
         {
-            // UTF-16 in the machine's byte order without surrogates decodes to its own code units.
+            // UTF-16 LE without surrogates decodes to its own code units.
             var source = MemoryMarshal.Cast<byte, char>(bytes);
             EnsureCharCapacity(source.Length);
-            source.CopyTo(_readBlock.AsSpan(_charFill));
+            source.CopyTo(_readBlock.AsSpan(_usedChars));
             charCount = source.Length;
         }
         else
@@ -317,15 +297,15 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
 
         var cappedLength = Math.Min(charCount, MaximumLineLength);
 
-        var lineMemory = _readBlock.AsMemory(_charFill, cappedLength);
-        _charFill += cappedLength;
+        var lineMemory = _readBlock.AsMemory(_usedChars, cappedLength);
+        _usedChars += cappedLength;
         return lineMemory;
     }
 
     private int DecodeWithEncoding (ReadOnlySpan<byte> bytes)
     {
         EnsureCharCapacity(Encoding.GetMaxCharCount(bytes.Length));
-        return Encoding.GetChars(bytes, _readBlock.AsSpan(_charFill));
+        return Encoding.GetChars(bytes, _readBlock.AsSpan(_usedChars));
     }
 
     private void ConsumeBytes (int byteCount)
@@ -335,19 +315,15 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         _scannedBytes = 0;
     }
 
-    /// <summary>
-    /// Makes room for <paramref name="charCount"/> chars after the lines already in the current block.
-    /// A block that holds lines is kept for <see cref="DetachCharBlocks"/>; an unused one goes back to the pool.
-    /// Lines longer than BLOCK_SIZE (e.g. huge XML payloads) get a block of their own.
-    /// </summary>
+    // A block that already holds lines is kept for DetachCharBlocks; lines longer than BLOCK_SIZE get a block of their own.
     private void EnsureCharCapacity (int charCount)
     {
-        if (_readBlock.Length - _charFill >= charCount)
+        if (_readBlock.Length - _usedChars >= charCount)
         {
             return;
         }
 
-        if (_charFill > 0)
+        if (_usedChars > 0)
         {
             _completedBlocks.Add(_readBlock);
         }
@@ -363,13 +339,10 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         }
 
         _readBlock = ArrayPool<char>.Shared.Rent(blockSize);
-        _charFill = 0;
+        _usedChars = 0;
     }
 
-    /// <summary>
-    /// Reads more bytes after the line in progress. When the buffer is full, the line in progress is
-    /// moved to the front, or the buffer doubles if that line already fills it.
-    /// </summary>
+    // When the buffer is full, the line in progress moves to the front, or the buffer doubles if that line fills it.
     private void Refill ()
     {
         if (_byteEnd == _byteBuffer.Length)
@@ -401,11 +374,8 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
         }
     }
 
-    /// <summary>
-    /// Discards the bytes read ahead so the next read starts at the (just seeked) stream position.
-    /// Only touches value-type fields, which is safe under the base constructor's virtual call to this
-    /// method. Lines already handed out stay valid: their chars are kept until <see cref="DetachCharBlocks"/>.
-    /// </summary>
+    // Only value-type fields: the base constructor calls this before the fields are initialized.
+    // Lines already handed out stay valid until DetachCharBlocks.
     protected override void ResetReader ()
     {
         _byteStart = 0;

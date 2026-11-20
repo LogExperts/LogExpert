@@ -437,11 +437,7 @@ public class ConfigManagerTest
         Assert.That(loadResult.Settings.FilterList[0].SearchText, Is.EqualTo("VALID_FILTER_TEST"));
     }
 
-    /// <summary>
-    /// ADR 0010 removed the reader choice. Settings saved by earlier versions still carry
-    /// <c>"ReaderType"</c>; they must load as they are, with everything else intact, and not fall
-    /// back to the backup or to defaults.
-    /// </summary>
+    // ADR 0010 removed the reader choice; settings saved by earlier versions still carry "ReaderType".
     [Test]
     [Category("DeserializationRecovery")]
     [TestCase("SystemDirect")]
