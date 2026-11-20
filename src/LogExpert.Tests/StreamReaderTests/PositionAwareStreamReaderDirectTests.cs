@@ -328,6 +328,45 @@ public class PositionAwareStreamReaderDirectTests
 
     #endregion
 
+    #region Lines longer than the maximum line length
+
+    [Test]
+    [TestCase("utf-8", 'x', 1_000_000, "\n", "\nnext\n")]
+    [TestCase("utf-8", 'ä', 1_000_000, "\n", "\nnext\n")]
+    [TestCase("utf-8", 'x', 1_000_000, "", "")]
+    [TestCase("utf-8", 'x', 1_000_000, "\r\n", "\r\nnext")]
+    [TestCase("utf-16", 'ä', 1_000_000, "\r\n", "\r\nnext\r\n")]
+    [TestCase("utf-32", 'x', 1_000_000, "\r", "\rnext\r")]
+    // The \r is the last byte of the second 64 KB read, so it is classified after a refill.
+    [TestCase("utf-8", 'x', 131_071, "\r\n", "\r\nnext")]
+    [TestCase("utf-8", 'x', 131_071, "\r", "\rnext")]
+    public void TryReadLine_LineFarOverMaximum_TruncatesWithoutHoldingTheWholeLine (string encodingName, char fill, int length, string terminator, string tail)
+    {
+        const int maximumLineLength = 500;
+        var encoding = Encoding.GetEncoding(encodingName);
+        var longLine = new string(fill, length);
+        var data = encoding.GetBytes(longLine + tail);
+
+        using var stream = new MemoryStream(data, writable: false);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, maximumLineLength);
+
+        Assert.That(reader.TryReadLine(out var first), Is.True);
+        Assert.That(first.ToString(), Is.EqualTo(longLine[..maximumLineLength]));
+        Assert.That(reader.Position, Is.EqualTo(encoding.GetByteCount(longLine + terminator)));
+
+        if (tail.Length > 0)
+        {
+            Assert.That(reader.TryReadLine(out var next), Is.True);
+            Assert.That(next.ToString(), Is.EqualTo("next"));
+        }
+
+        Assert.That(reader.TryReadLine(out _), Is.False);
+        Assert.That(reader.Position, Is.EqualTo(data.Length));
+        Assert.That(reader.DetachCharBlocks().Sum(block => block.Length), Is.LessThanOrEqualTo(65_536));
+    }
+
+    #endregion
+
     #region Lines longer than BLOCK_SIZE (32768 chars)
 
     private const int TEST_TIMEOUT_MS = 5000;
