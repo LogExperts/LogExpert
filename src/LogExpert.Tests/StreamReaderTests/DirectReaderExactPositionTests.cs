@@ -248,7 +248,7 @@ public class DirectReaderExactPositionTests
 
     #region Oracle
 
-    private static void AssertMatchesOracle (byte[] data, Encoding encoding)
+    internal static void AssertMatchesOracle (byte[] data, Encoding encoding)
     {
         var expected = ExpectedLines(data, encoding);
         var actual = ReadAll(data, encoding);

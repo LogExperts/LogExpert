@@ -77,8 +77,7 @@ public class Preferences
     /// </summary>
     /// <remarks>
     /// <para> This property controls line truncation at the I/O reader level before lines are processed by columnizers.
-    /// It is implemented in <see cref="Classes.Log.Streamreaders.PositionAwareStreamReaderSystem"/> and
-    /// <see cref="Classes.Log.Streamreaders.PositionAwareStreamReaderLegacy"/>. </para> <para> Related property:
+    /// It is implemented in <see cref="Classes.Log.Streamreaders.PositionAwareStreamReaderDirect"/>. </para> <para> Related property:
     /// <see cref="MaxDisplayLength"/> controls display-level truncation in UI columns, which must not exceed this
     /// value. Default is 20000 characters. </para>
     /// </remarks>
@@ -133,13 +132,6 @@ public class Preferences
             }
         }
     }
-
-    [Obsolete("This setting is no longer used and will be removed in version 1.50. The 'UseLegacyReader' now works with ReaderType.Legacy")]
-    [System.Text.Json.Serialization.JsonIgnore]
-    [Newtonsoft.Json.JsonIgnore]
-    public bool UseLegacyReader { get; set; }
-
-    public ReaderType ReaderType { get; set; } = ReaderType.SystemDirect;
 
     public List<ToolEntry> ToolEntries { get; set; } = [];
 

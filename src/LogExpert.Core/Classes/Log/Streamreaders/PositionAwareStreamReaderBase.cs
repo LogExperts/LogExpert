@@ -148,15 +148,9 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
         _reader.DiscardBufferedData();
     }
 
-    protected StreamReader GetStreamReader ()
-    {
-        ObjectDisposedException.ThrowIf(IsDisposed, GetType());
-        return _reader;
-    }
-
     /// <summary>
     /// The raw byte stream, positioned where <see cref="Position"/> points (past the preamble), for
-    /// readers that decode bytes themselves instead of going through <see cref="GetStreamReader"/>.
+    /// readers that decode bytes themselves; <see cref="ReadChar"/> reads through the base StreamReader.
     /// </summary>
     protected Stream GetByteStream ()
     {

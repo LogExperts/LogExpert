@@ -2,7 +2,6 @@ using System.Reflection;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
@@ -44,12 +43,12 @@ public class JsonColumnizerTest
         instanceField?.SetValue(null, null);
     }
 
-    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", "time @m level", ReaderType.System)]
-    public void GetColumnNames_HappyFile_ColumnNameMatches (string fileName, string expectedHeaders, ReaderType readerType)
+    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", "time @m level")]
+    public void GetColumnNames_HappyFile_ColumnNameMatches (string fileName, string expectedHeaders)
     {
         var jsonColumnizer = new JsonColumnizer.JsonColumnizer();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var line = reader.GetLogLineMemory(0);

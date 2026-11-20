@@ -5961,15 +5961,6 @@ namespace LogExpert {
         }
         
         /// <summary>
-        ///   查找类似 File Reader  algorithm 的本地化字符串。
-        /// </summary>
-        public static string SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp {
-            get {
-                return ResourceManager.GetString("SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 HeaderName 的本地化字符串。
         /// </summary>
         public static string SettingsDialog_UI_ComboBox_Encoding_ValueMember_HeaderName {

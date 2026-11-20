@@ -286,7 +286,6 @@ internal partial class SettingsDialog : Form
         FillMultifileSettings();
         FillEncodingList();
         FillLanguageList();
-        FillReaderTypeList();
         FillControlCharsTab();
         FillMarkerBarTab();
 
@@ -312,19 +311,6 @@ internal partial class SettingsDialog : Form
         checkBoxColumnFinder.Checked = Preferences.ShowColumnFinder;
 
         checkBoxShowErrorMessageOnlyOneInstance.Checked = Preferences.ShowErrorMessageAllowOnlyOneInstances;
-    }
-
-    private void FillReaderTypeList ()
-    {
-        foreach (var readerType in Enum.GetValues<ReaderType>())
-        {
-            if (!comboBoxReaderType.Items.Contains(readerType))
-            {
-                _ = comboBoxReaderType.Items.Add(readerType);
-            }
-        }
-
-        comboBoxReaderType.SelectedItem = Preferences.ReaderType;
     }
 
     private void FillColorModeList ()
@@ -827,7 +813,6 @@ internal partial class SettingsDialog : Form
         Preferences.DefaultEncoding = comboBoxEncoding.SelectedItem is Encoding selectedEncoding ? selectedEncoding.HeaderName : FallbackEncoding.HeaderName;
         Preferences.DefaultLanguage = comboBoxLanguage.SelectedItem != null ? (comboBoxLanguage.SelectedItem as string) : CultureInfo.GetCultureInfo("en-US").Name;
         Preferences.ShowColumnFinder = checkBoxColumnFinder.Checked;
-        Preferences.ReaderType = comboBoxReaderType.SelectedItem != null ? (ReaderType)comboBoxReaderType.SelectedItem : ReaderType.SystemDirect;
 
         Preferences.MaximumFilterEntries = (int)upDownMaximumFilterEntries.Value;
         Preferences.MaximumFilterEntriesDisplayed = (int)upDownMaximumFilterEntriesDisplayed.Value;
@@ -1400,7 +1385,6 @@ internal partial class SettingsDialog : Form
             { comboBoxEncoding, Resources.SettingsDialog_UI_ComboBox_ToolTip_toolTipEncoding },
             { checkBoxPortableMode, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode },
             { radioButtonSessionApplicationStartupDir, Resources.SettingsDialog_UI_RadioButton_ToolTip_toolTipSessionApplicationStartupDir },
-            { comboBoxReaderType, Resources.SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp },
             { upDownMultifileDays, Resources.SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileDays },
             { upDownMultifileMaxFileAgeDays, Resources.SettingsDialog_UI_NumericUpDown_ToolTip_upDownMultifileMaxFileAgeDays }
         };

@@ -2,7 +2,6 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 
 using Moq;
@@ -57,7 +56,6 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
             bufferCount: 40,
             linesPerBuffer: 50,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: progressReporterMock.Object);
@@ -111,7 +109,6 @@ internal sealed class LogfileReaderSingleFileMonitoringTests
             bufferCount: 40,
             linesPerBuffer: 50,
             new MultiFileOptions(),
-            ReaderType.SystemDirect,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: progressReporterMock.Object);

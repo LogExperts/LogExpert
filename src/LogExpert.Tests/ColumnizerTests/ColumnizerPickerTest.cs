@@ -5,7 +5,6 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using Moq;
 
@@ -105,14 +104,14 @@ public class ColumnizerPickerTest
         Assert.That(result.GetName(), Is.EqualTo(expectedColumnizerName));
     }
 
-    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer.JsonCompactColumnizer), ReaderType.System)]
-    [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", typeof(SquareBracketColumnizer), ReaderType.System)]
-    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (string fileName, Type columnizerType, ReaderType readerType)
+    [TestCase(@".\TestData\JsonColumnizerTest_01.txt", typeof(JsonCompactColumnizer.JsonCompactColumnizer))]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", typeof(SquareBracketColumnizer))]
+    public void FindReplacementForAutoColumnizer_ValidTextFile_ReturnCorrectColumnizer (string fileName, Type columnizerType)
     {
         var pluginRegistry = PluginRegistry.PluginRegistry.Instance;
 
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, pluginRegistry, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), pluginRegistry, 500);
         reader.ReadFiles();
 
         Mock<ILogLineMemoryColumnizer> autoColumnizer = new();

@@ -15,9 +15,7 @@ namespace LogExpert.Core.Interfaces;
 /// <para>
 /// Implementations include:
 /// <list type="bullet">
-/// <item><description><c>PositionAwareStreamReaderDirect</c> - Default. Reads decoded chars into pooled blocks and returns zero-copy slices; fastest, assumes <c>\n</c>/<c>\r\n</c> line endings</description></item>
-/// <item><description><c>PositionAwareStreamReaderSystem</c> - Uses .NET's StreamReader.ReadLine(); also splits bare <c>\r</c> (classic-Mac) line endings</description></item>
-/// <item><description><c>PositionAwareStreamReaderLegacy</c> - Character-by-character reading; exact byte position on mixed/pathological line endings, slowest</description></item>
+/// <item><description><c>PositionAwareStreamReaderDirect</c> - Finds lines in the raw bytes, decodes them into pooled blocks and returns zero-copy slices; exact byte position for any content and line ending (ADR 0010)</description></item>
 /// <item><description><c>XmlLogReader</c> - Decorator for reading structured XML log blocks (e.g., Log4j XML format)</description></item>
 /// </list>
 /// </para>

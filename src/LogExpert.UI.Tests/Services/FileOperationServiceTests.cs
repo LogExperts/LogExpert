@@ -6,7 +6,6 @@ using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Log.ProgressReporters;
 using LogExpert.Core.Config;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 using LogExpert.Core.Interfaces;
 using LogExpert.UI.Controls.LogWindow;
 using LogExpert.UI.Interface;
@@ -527,7 +526,7 @@ internal class FileOperationServiceTests : IDisposable
             // Exercise the same reader endpoint used by LogWindow.LoadFilesAsMulti.
             using var reader = new LogfileReader(e.MultiFileNames,
                 new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
-                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+                PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
             reader.ReadFiles();
             lineCount = reader.GetLogLineMemories(0, 10).Length;
         };
@@ -587,7 +586,7 @@ internal class FileOperationServiceTests : IDisposable
         {
             using var reader = new LogfileReader(e.MultiFileNames!,
                 new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
-                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+                PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
             reader.ReadFiles();
             observed = reader.GetLogLineMemories(0, 10).Select(line => line.FullLine.ToString()).ToArray();
         };
@@ -620,7 +619,7 @@ internal class FileOperationServiceTests : IDisposable
         {
             using var reader = new LogfileReader(e.MultiFileNames!,
                 new EncodingOptions { Encoding = Encoding.UTF8 }, 40, 50, new MultiFileOptions(),
-                ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
+                PluginRegistry.PluginRegistry.Instance, 500, NullProgressReporter.Instance, useExplicitFileList: true);
             reader.ReadFiles();
             File.WriteAllText(second, "short\n");
             _ = reader.ShiftBuffers();

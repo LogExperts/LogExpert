@@ -8,7 +8,6 @@ using LogExpert.Core.Classes.Log.ProgressReporters;
 using LogExpert.Core.Classes.Log.Streamreaders;
 using LogExpert.Core.Classes.xml;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 using LogExpert.Core.EventArguments;
 using LogExpert.Core.Interfaces;
 
@@ -29,7 +28,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     private readonly MultiFileOptions _multiFileOptions;
     private readonly IPluginRegistry _pluginRegistry;
     private readonly CancellationTokenSource _cts = new();
-    private readonly ReaderType _readerType;
     private readonly int _maximumLineLength;
 
     private readonly LogBufferPool _bufferPool;
@@ -67,7 +65,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         int bufferCount,
         int linesPerBuffer,
         MultiFileOptions multiFileOptions,
-        ReaderType readerType,
         IPluginRegistry pluginRegistry,
         int maximumLineLength,
         ILoadProgressReporter? progressReporter = null)
@@ -78,7 +75,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
           bufferCount,
           linesPerBuffer,
           multiFileOptions,
-          readerType,
           pluginRegistry,
           maximumLineLength,
           progressReporter)
@@ -92,7 +88,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         int bufferCount,
         int linesPerBuffer,
         MultiFileOptions multiFileOptions,
-        ReaderType readerType,
         IPluginRegistry pluginRegistry,
         int maximumLineLength,
         ILoadProgressReporter? progressReporter = null,
@@ -104,7 +99,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
               bufferCount,
               linesPerBuffer,
               multiFileOptions,
-              readerType,
               pluginRegistry,
               maximumLineLength,
               progressReporter,
@@ -121,7 +115,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         int bufferCount,
         int linesPerBuffer,
         MultiFileOptions multiFileOptions,
-        ReaderType readerType,
         IPluginRegistry pluginRegistry,
         int maximumLineLength,
         ILoadProgressReporter? progressReporter = null,
@@ -140,7 +133,6 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
         }
 
         _maximumLineLength = maximumLineLength;
-        _readerType = readerType;
         EncodingOptions = encodingOptions;
         _max_buffers = bufferCount;
         _maxLinesPerBuffer = linesPerBuffer;
@@ -1709,14 +1701,7 @@ public partial class LogfileReader : ILogfileReader, IMultiFileNavigation, ILogf
     /// </returns>
     private ILogStreamReader CreateLogStreamReader (Stream stream, EncodingOptions encodingOptions)
     {
-        return _readerType switch
-        {
-            ReaderType.Legacy => new PositionAwareStreamReaderLegacy(stream, encodingOptions, _maximumLineLength),
-            ReaderType.System => new PositionAwareStreamReaderSystem(stream, encodingOptions, _maximumLineLength),
-            ReaderType.SystemDirect => new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength),
-            //Default will be SystemDirect, because it is the best performing reader and should be used if not explicitly overridden by user.
-            _ => new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength),
-        };
+        return new PositionAwareStreamReaderDirect(stream, encodingOptions, _maximumLineLength);
     }
 
     /// <summary>

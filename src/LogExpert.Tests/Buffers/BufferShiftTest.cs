@@ -2,7 +2,6 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 using LogExpert.PluginRegistry.FileSystem;
 
 using NUnit.Framework;
@@ -25,13 +24,11 @@ internal class BufferShiftTest : RolloverHandlerTestBase
     }
 
     [Test]
-    [TestCase(ReaderType.System)]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Test")]
-    //[TestCase(ReaderType.Legacy)] Legacy Reader does not Support this
     //TO Test real life scenario, use the LogRotator tool, in the src/Tools/LogRotator directory,
     //to create files and perform rollovers while watching the files in LogExpert with MultiFile enabled
     //(pattern: *$J(.))
-    public void TestShiftBuffers1 (ReaderType readerType)
+    public void TestShiftBuffers1 ()
     {
         var linesPerFile = 10;
         MultiFileOptions options = new()
@@ -48,7 +45,7 @@ internal class BufferShiftTest : RolloverHandlerTestBase
         };
 
         _ = PluginRegistry.PluginRegistry.Create(TestDirectory.FullName, 500);
-        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, readerType, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(files.Last.Value, encodingOptions, true, 40, 50, options, PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         var lil = reader.GetLogFileInfoList();

@@ -437,6 +437,40 @@ public class ConfigManagerTest
         Assert.That(loadResult.Settings.FilterList[0].SearchText, Is.EqualTo("VALID_FILTER_TEST"));
     }
 
+    /// <summary>
+    /// ADR 0010 removed the reader choice. Settings saved by earlier versions still carry
+    /// <c>"ReaderType"</c>; they must load as they are, with everything else intact, and not fall
+    /// back to the backup or to defaults.
+    /// </summary>
+    [Test]
+    [Category("DeserializationRecovery")]
+    [TestCase("SystemDirect")]
+    [TestCase("System")]
+    [TestCase("Legacy")]
+    public void LoadOrCreateNew_RemovedReaderTypeSetting_LoadsTheRestOfTheSettings (string storedReaderType)
+    {
+        // Arrange
+        Settings settings = CreatePopulatedSettings();
+        settings.FilterList.Clear();
+        settings.FilterList.Add(new FilterParams { SearchText = "KEPT_FILTER" });
+        settings.Preferences.MaxLineLength = 12_345;
+        var json = Newtonsoft.Json.Linq.JObject.Parse(JsonConvert.SerializeObject(settings));
+        json["Preferences"]!["ReaderType"] = storedReaderType;
+        File.WriteAllText(_testSettingsFile.FullName, json.ToString());
+
+        // Act
+        LoadResult loadResult = InvokePrivateInstanceMethod<LoadResult>("LoadOrCreateNew", _testSettingsFile);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(loadResult.CriticalFailure, Is.False);
+            Assert.That(loadResult.LoadedFromBackup, Is.False);
+            Assert.That(loadResult.Settings.FilterList.Select(filter => filter.SearchText), Is.EqualTo(new[] { "KEPT_FILTER" }));
+            Assert.That(loadResult.Settings.Preferences.MaxLineLength, Is.EqualTo(12_345));
+        });
+    }
+
     [Test]
     [Category("DeserializationRecovery")]
     [Description("LoadOrCreateNew should handle missing file by creating new settings")]

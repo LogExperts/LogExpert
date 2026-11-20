@@ -3,7 +3,6 @@ using System.Text;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Log.ProgressReporters;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
@@ -95,7 +94,6 @@ internal sealed class LogfileReaderMultiFileFlagTests
             bufferCount: 40,
             linesPerBuffer: 50,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: NullProgressReporter.Instance);
@@ -118,7 +116,6 @@ internal sealed class LogfileReaderMultiFileFlagTests
             bufferCount: 40,
             linesPerBuffer: 50,
             options ?? new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: NullProgressReporter.Instance);

@@ -919,9 +919,6 @@
   <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipPortableMode" xml:space="preserve">
     <value>如果启用此模式，保存文件将从可执行文件所在位置加载</value>
   </data>
-  <data name="SettingsDialog_UI_CheckBox_ToolTip_toolTipReaderTyp" xml:space="preserve">
-    <value>文件读取算法</value>
-  </data>
   <data name="SettingsDialog_Form_Text" xml:space="preserve">
     <value>设置</value>
   </data>

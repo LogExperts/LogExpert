@@ -5,7 +5,6 @@ using ColumnizerLib;
 using LogExpert.Core.Classes.Columnizer;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
@@ -47,16 +46,16 @@ public class SquareBracketColumnizerTest
         instanceField?.SetValue(null, null);
     }
 
-    [TestCase(@".\TestData\SquareBracketColumnizerTest_01.txt", 5, ReaderType.System)]
-    [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5, ReaderType.System)]
-    [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6, ReaderType.System)]
-    [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3, ReaderType.System)]
-    public void GetPriority_HappyFile_ColumnCountMatches (string fileName, int count, ReaderType readerType)
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_01.txt", 5)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_02.txt", 5)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_03.txt", 6)]
+    [TestCase(@".\TestData\SquareBracketColumnizerTest_05.txt", 3)]
+    public void GetPriority_HappyFile_ColumnCountMatches (string fileName, int count)
     {
         SquareBracketColumnizer squareBracketColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, fileName);
 
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         logFileReader.ReadFiles();
         List<ILogLineMemory> loglines =
         [
@@ -85,7 +84,7 @@ public class SquareBracketColumnizerTest
         SquareBracketColumnizer squareBracketColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\SquareBracketColumnizerTest_06.txt");
 
-        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader logFileReader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         logFileReader.ReadFiles();
 
         List<ILogLineMemory> loglines =
