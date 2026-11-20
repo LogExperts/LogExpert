@@ -107,4 +107,54 @@ public class SquareBracketColumnizerTest
             Assert.That(columns.ColumnValues[^1].FullValue.ToString().Trim(), Is.EqualTo("About to run."));
         });
     }
+
+    [Test]
+    public void SplitLine_TimeOffset_PreservesBracketFieldsAndMessage ()
+    {
+        var line = new LogLine("2022-03-21 11:34:34.505[INFO][Worker]Message", 0);
+        SquareBracketColumnizer columnizer = new();
+        _ = columnizer.GetPriority("square.log", [line]);
+
+        columnizer.SetTimeOffset(0);
+        var zeroColumns = columnizer.SplitLine(null, line).ColumnValues;
+
+        columnizer.SetTimeOffset(123);
+        var positiveColumns = columnizer.SplitLine(null, line).ColumnValues;
+
+        columnizer.SetTimeOffset(-506);
+        var negativeColumns = columnizer.SplitLine(null, line).ColumnValues;
+
+        columnizer.SetTimeOffset(0);
+        var resetColumns = columnizer.SplitLine(null, line).ColumnValues;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(zeroColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-21", "11:34:34.505", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(positiveColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-21", "11:34:34.628", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(negativeColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-21", "11:34:33.999", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(resetColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-21", "11:34:34.505", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(line.FullLine.ToString(), Is.EqualTo("2022-03-21 11:34:34.505[INFO][Worker]Message"));
+        });
+    }
+
+    [Test]
+    public void SplitLine_TimeOffsetCrossesMidnight_ShiftsDateAndPreservesRemainingColumns ()
+    {
+        var forwardLine = new LogLine("2022-03-21 23:59:59.900[INFO][Worker]Message", 0);
+        var backwardLine = new LogLine("2022-03-22 00:00:00.100[INFO][Worker]Message", 0);
+        SquareBracketColumnizer columnizer = new();
+        _ = columnizer.GetPriority("square.log", [forwardLine, backwardLine]);
+
+        columnizer.SetTimeOffset(200);
+        var forwardColumns = columnizer.SplitLine(null, forwardLine).ColumnValues;
+
+        columnizer.SetTimeOffset(-200);
+        var backwardColumns = columnizer.SplitLine(null, backwardLine).ColumnValues;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(forwardColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-22", "00:00:00.100", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(backwardColumns.Select(c => c.FullValue.ToString()), Is.EqualTo(new[] { "2022-03-21", "23:59:59.900", "[INFO]", "[Worker]", "Message" }));
+        });
+    }
 }

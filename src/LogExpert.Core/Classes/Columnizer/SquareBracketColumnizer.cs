@@ -265,8 +265,9 @@ public class SquareBracketColumnizer : ILogLineMemoryColumnizer, IColumnizerPrio
                     var dateTime = DateTime.ParseExact(temp[..endPos].ToString(), formatInfo.DateTimeFormat, formatInfo.CultureInfo);
                     dateTime = dateTime.Add(new TimeSpan(0, 0, 0, 0, _timeOffset));
                     var newDate = dateTime.ToString(formatInfo.DateTimeFormat, formatInfo.CultureInfo);
+                    var shiftedLine = string.Concat(newDate, temp.Span[endPos..]);
 
-                    columns = SquareSplit(newDate.AsMemory(), dateLen, timeLen, endPos, clogLine);
+                    columns = SquareSplit(shiftedLine.AsMemory(), dateLen, timeLen, newDate.Length, clogLine);
                 }
                 else
                 {
