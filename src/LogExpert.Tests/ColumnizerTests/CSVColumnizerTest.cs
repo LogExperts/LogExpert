@@ -6,7 +6,6 @@ using CsvColumnizer;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using Moq;
 
@@ -282,14 +281,14 @@ public class CSVColumnizerTest
         Assert.That(result.ColumnValues[0].FullValue.ToString(), Does.Contain("6774DC1dB00BD11"));
     }
 
-    [TestCase(@".\TestData\organizations-10000.csv", new[] { "Index", "Organization Id", "Name", "Website", "Country", "Description", "Founded", "Industry", "Number of employees" }, ReaderType.System)]
-    [TestCase(@".\TestData\organizations-1000.csv", new[] { "Index", "Organization Id", "Name", "Website", "Country", "Description", "Founded", "Industry", "Number of employees" }, ReaderType.System)]
-    [TestCase(@".\TestData\people-10000.csv", new[] { "Index", "User Id", "First Name", "Last Name", "Sex", "Email", "Phone", "Date of birth", "Job Title" }, ReaderType.System)]
-    public void Instantiat_CSVFile_BuildCorrectColumnizer (string filename, string[] expectedHeaders, ReaderType readerType)
+    [TestCase(@".\TestData\organizations-10000.csv", new[] { "Index", "Organization Id", "Name", "Website", "Country", "Description", "Founded", "Industry", "Number of employees" })]
+    [TestCase(@".\TestData\organizations-1000.csv", new[] { "Index", "Organization Id", "Name", "Website", "Country", "Description", "Founded", "Industry", "Number of employees" })]
+    [TestCase(@".\TestData\people-10000.csv", new[] { "Index", "User Id", "First Name", "Last Name", "Sex", "Email", "Phone", "Date of birth", "Job Title" })]
+    public void Instantiat_CSVFile_BuildCorrectColumnizer (string filename, string[] expectedHeaders)
     {
         CsvColumnizer.CsvColumnizer csvColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, filename);
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), readerType, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
         var line = reader.GetLogLineMemory(0);
         IColumnizedLogLineMemory logline = new ColumnizedLogLine();
@@ -309,7 +308,7 @@ public class CSVColumnizerTest
     {
         // semicolon.csv: CRLF between lines, no trailing newline on last line
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\semicolon.csv");
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         Assert.That(reader.LineCount, Is.EqualTo(2), $"semicolon.csv should have 2 lines, got {reader.LineCount}");
@@ -320,7 +319,7 @@ public class CSVColumnizerTest
     {
         // tab.csv: header + 1 data line, CRLF between lines
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\tab.csv");
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         Assert.That(reader.LineCount, Is.EqualTo(2), $"tab.csv should have 2 lines, got {reader.LineCount}");
@@ -331,7 +330,7 @@ public class CSVColumnizerTest
     {
         // CsvTest_01.csv: CR line endings, no trailing newline on last line
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\CsvTest_01.csv");
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.ReadFiles();
 
         Assert.That(reader.LineCount, Is.EqualTo(31), $"CsvTest_01.csv should have 31 lines (header + 30 data), got {reader.LineCount}");
@@ -343,7 +342,7 @@ public class CSVColumnizerTest
         // With CsvColumnizer as PreProcessColumnizer, header should be dropped, data line should remain
         CsvColumnizer.CsvColumnizer csvColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\semicolon.csv");
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.ReadFiles();
 
@@ -360,7 +359,7 @@ public class CSVColumnizerTest
     {
         CsvColumnizer.CsvColumnizer csvColumnizer = new();
         var path = Path.Join(AppDomain.CurrentDomain.BaseDirectory, @".\TestData\tab.csv");
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.ReadFiles();
 
@@ -382,7 +381,7 @@ public class CSVColumnizerTest
         CsvColumnizer.CsvColumnizer csvColumnizer = new();
 
         // The GUI Reload creates a brand new LogfileReader with PreProcess already set
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.ReadFiles();
 
@@ -416,7 +415,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -450,7 +449,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -483,7 +482,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -505,7 +504,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -550,7 +549,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -595,7 +594,7 @@ public class CSVColumnizerTest
 
         using ManualResetEventSlim loadingDone = new(false);
 
-        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         // NO PreProcessColumnizer set initially
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -609,7 +608,7 @@ public class CSVColumnizerTest
         reader.StopMonitoring();
 
         using ManualResetEventSlim reloadDone = new(false);
-        LogfileReader reader2 = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader2 = new(path, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader2.PreProcessColumnizer = csvColumnizer;
         reader2.LoadingFinished += (_, _) => reloadDone.Set();
         reader2.StartMonitoring();
@@ -658,7 +657,7 @@ public class CSVColumnizerTest
         using ManualResetEventSlim loadingDone = new(false);
 
         // multiFile=FALSE, like the real GUI
-        LogfileReader reader = new(path, new EncodingOptions(), false, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+        LogfileReader reader = new(path, new EncodingOptions(), false, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
         reader.PreProcessColumnizer = csvColumnizer;
         reader.LoadingFinished += (_, _) => loadingDone.Set();
         reader.StartMonitoring();
@@ -695,7 +694,7 @@ public class CSVColumnizerTest
 
             CsvColumnizer.CsvColumnizer csvColumnizer = new();
 
-            LogfileReader reader = new(tempFile, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+            LogfileReader reader = new(tempFile, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
             reader.PreProcessColumnizer = csvColumnizer;
             reader.ReadFiles();
 
@@ -727,7 +726,7 @@ public class CSVColumnizerTest
 
             CsvColumnizer.CsvColumnizer csvColumnizer = new();
 
-            LogfileReader reader = new(tempFile, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), ReaderType.System, PluginRegistry.PluginRegistry.Instance, 500);
+            LogfileReader reader = new(tempFile, new EncodingOptions(), true, 40, 50, new MultiFileOptions(), PluginRegistry.PluginRegistry.Instance, 500);
             reader.PreProcessColumnizer = csvColumnizer;
             reader.ReadFiles();
 

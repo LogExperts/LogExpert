@@ -163,7 +163,6 @@ partial class SettingsDialog
         checkBoxSaveSessions = new CheckBox();
         tabPageMemory = new TabPage();
         groupBoxCPUAndStuff = new GroupBox();
-        comboBoxReaderType = new ComboBox();
         checkBoxMultiThread = new CheckBox();
         labelFilePollingInterval = new Label();
         upDownPollingInterval = new NumericUpDown();
@@ -1917,7 +1916,6 @@ partial class SettingsDialog
         // 
         // groupBoxCPUAndStuff
         // 
-        groupBoxCPUAndStuff.Controls.Add(comboBoxReaderType);
         groupBoxCPUAndStuff.Controls.Add(checkBoxMultiThread);
         groupBoxCPUAndStuff.Controls.Add(labelFilePollingInterval);
         groupBoxCPUAndStuff.Controls.Add(upDownPollingInterval);
@@ -1929,14 +1927,6 @@ partial class SettingsDialog
         groupBoxCPUAndStuff.TabIndex = 8;
         groupBoxCPUAndStuff.TabStop = false;
         groupBoxCPUAndStuff.Text = "CPU and stuff";
-        // 
-        // comboBoxReaderType
-        // 
-        comboBoxReaderType.FormattingEnabled = true;
-        comboBoxReaderType.Location = new Point(14, 76);
-        comboBoxReaderType.Name = "comboBoxReaderType";
-        comboBoxReaderType.Size = new Size(262, 23);
-        comboBoxReaderType.TabIndex = 10;
         // 
         // checkBoxMultiThread
         // 
@@ -2366,7 +2356,6 @@ partial class SettingsDialog
     private System.Windows.Forms.Label labelMaxDisplayLength;
     private Label labelLanguage;
     private ComboBox comboBoxLanguage;
-    private ComboBox comboBoxReaderType;
     private DataGridViewCheckBoxColumn columnControlCharEnabled;
     private DataGridViewTextBoxColumn columnControlCharHex;
     private DataGridViewTextBoxColumn columnControlCharAbbr;

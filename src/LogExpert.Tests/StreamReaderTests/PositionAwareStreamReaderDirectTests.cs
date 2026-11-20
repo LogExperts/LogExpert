@@ -159,117 +159,140 @@ public class PositionAwareStreamReaderDirectTests
 
     #endregion
 
-    #region Position parity with System reader
+    #region Position matches the raw bytes
 
     [Test]
     [TestCase("Line 1\nLine 2\nLine 3\n")]
     [TestCase("Line 1\r\nLine 2\r\nLine 3\r\n")]
     [TestCase("Short\nMedium line here\nA much longer line with more content\n")]
-    public void Position_MatchesSystemReader_UTF8 (string text)
+    public void Position_MatchesRawBytes_UTF8 (string text)
     {
-        ComparePositions(text, Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
     }
 
     [Test]
     [TestCase("Line 1\nLine 2\nLine 3\n")]
-    public void Position_MatchesSystemReader_ASCII (string text)
+    public void Position_MatchesRawBytes_ASCII (string text)
     {
-        ComparePositions(text, Encoding.ASCII);
+        RawByteLineOracle.AssertMatches(Encoding.ASCII.GetBytes(text), Encoding.ASCII);
     }
 
     [Test]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
-    public void Position_MatchesSystemReader_UTF8_MultibyteChars ()
+    public void Position_MatchesRawBytes_UTF8_MultibyteChars ()
     {
         var text = "Héllo wörld\nCafé résumé\nこんにちは\n";
-        ComparePositions(text, Encoding.UTF8);
+        RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
     }
 
     /// <summary>
     /// GB2312 (issue #688) is the first offered encoding that is neither single-byte nor Unicode: two
-    /// bytes per Chinese character, one per ASCII character, mixed within a line. The direct reader
-    /// advances its byte position by <c>Encoding.GetByteCount</c> over the decoded chars, so a wrong
-    /// assumption there would drift the position from the second line on — and every buffer boundary,
+    /// bytes per Chinese character, one per ASCII character, mixed within a line. A wrong assumption
+    /// about the width would drift the position from the second line on — and every buffer boundary,
     /// rollover check and .lxp scroll position is computed from it.
     /// </summary>
     [Test]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
-    public void Position_MatchesSystemReader_Gb2312_MixedAsciiAndChinese ()
+    public void Position_MatchesRawBytes_Gb2312_MixedAsciiAndChinese ()
     {
+        var gb2312 = EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312);
         var text = "2026-07-30 错误: 连接失败\nINFO 启动完成\nplain ascii line\n警告\n";
-        ComparePositions(text, EncodingRegistry.GetEncoding(EncodingRegistry.CODE_PAGE_GB2312));
-    }
-
-    private static void ComparePositions (string text, Encoding encoding)
-    {
-        var bytes = encoding.GetBytes(text);
-
-        using var s1 = new MemoryStream(bytes);
-        using var s2 = new MemoryStream(bytes);
-        using var systemReader = new PositionAwareStreamReaderSystem(s1, new EncodingOptions { Encoding = encoding }, 500);
-        using var directReader = new PositionAwareStreamReaderDirect(s2, new EncodingOptions { Encoding = encoding }, 500);
-
-        var lineNum = 0;
-        while (true)
-        {
-            var systemHasLine = systemReader.TryReadLine(out var systemLine);
-            var directHasLine = directReader.TryReadLine(out var directLine);
-
-            Assert.That(directHasLine, Is.EqualTo(systemHasLine), $"Line {lineNum}: EOF mismatch");
-
-            if (!systemHasLine)
-            {
-                break;
-            }
-
-            Assert.That(directLine.Span.ToString(), Is.EqualTo(systemLine.Span.ToString()),
-                $"Line {lineNum}: content mismatch");
-            Assert.That(directReader.Position, Is.EqualTo(systemReader.Position),
-                $"Line {lineNum}: position mismatch (System={systemReader.Position}, Direct={directReader.Position})");
-
-            lineNum++;
-        }
+        RawByteLineOracle.AssertMatches(gb2312.GetBytes(text), gb2312);
     }
 
     #endregion
 
-    #region Content parity with System reader
+    #region Content of a large file
 
     [Test]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "Unit Tests")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1305:Specify IFormatProvider", Justification = "Unit Tests")]
-    public void ContentParity_LargeFile ()
+    public void TryReadLine_LargeFile_ReturnsEveryLine ()
     {
+        var expected = new List<string>();
         var sb = new StringBuilder();
         var rng = new Random(42);
         for (var i = 0; i < 10_000; i++)
         {
-            _ = sb.Append("2026-04-23 12:00:00.");
-            _ = sb.Append(i % 1000);
-            _ = sb.Append(" [INFO] Thread-");
-            _ = sb.Append(rng.Next(1, 32));
-            _ = sb.Append(" SomeClass - Log message number ");
-            _ = sb.AppendLine(i.ToString());
+            var line = $"2026-04-23 12:00:00.{i % 1000} [INFO] Thread-{rng.Next(1, 32)} SomeClass - Log message number {i}";
+            expected.Add(line);
+            _ = sb.AppendLine(line);
         }
 
-        var text = sb.ToString();
-        var bytes = Encoding.UTF8.GetBytes(text);
+        using var stream = CreateStream(sb.ToString());
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, 500);
 
-        using var s1 = new MemoryStream(bytes);
-        using var s2 = new MemoryStream(bytes);
-        using var systemReader = new PositionAwareStreamReaderSystem(s1, new EncodingOptions { Encoding = Encoding.UTF8 }, 500);
-        using var directReader = new PositionAwareStreamReaderDirect(s2, new EncodingOptions { Encoding = Encoding.UTF8 }, 500);
-
-        var lineNum = 0;
-        while (systemReader.TryReadLine(out var systemLine))
+        var actual = new List<string>();
+        while (reader.TryReadLine(out var line))
         {
-            Assert.That(directReader.TryReadLine(out var directLine), Is.True, $"Direct reader ended early at line {lineNum}");
-            Assert.That(directLine.Span.ToString(), Is.EqualTo(systemLine.Span.ToString()), $"Line {lineNum}: content mismatch");
-            lineNum++;
+            actual.Add(line.Span.ToString());
         }
 
-        Assert.That(directReader.TryReadLine(out _), Is.False, "Direct reader has extra lines");
-        Assert.That(lineNum, Is.EqualTo(10_000));
+        Assert.That(actual, Is.EqualTo(expected));
+    }
+
+    #endregion
+
+    #region Allocations
+
+    // Only detaching blocks may allocate (the list handed to the buffer). Measured on the reading thread,
+    // so the result is deterministic; any per-line allocation (at least 24 bytes) breaks 0.25 bytes per line.
+    [Test]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Unit Tests")]
+    public void TryReadLine_ValidText_DoesNotAllocatePerLine ([Values(65001, 1200)] int codePage, [Values(false, true)] bool nonAscii)
+    {
+        const int lineCount = 200_000;
+        const int linesPerBuffer = 500;
+        var encoding = Encoding.GetEncoding(codePage);
+        var message = nonAscii ? " [INFO] Größe 日志 🙂 - Log message number " : " [INFO] Thread-7 SomeClass - Log message number ";
+
+        var sb = new StringBuilder();
+        for (var i = 0; i < lineCount; i++)
+        {
+            _ = sb.Append("2026-04-23 12:00:00.").Append(i % 1000).Append(message).Append(i).Append("\r\n");
+        }
+
+        var data = encoding.GetBytes(sb.ToString());
+
+        // Warm up the JIT and the array pool, then measure one full read.
+        _ = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+        _ = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        var lines = ReadAllAndReturnBlocks(data, encoding, linesPerBuffer);
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(lines, Is.EqualTo(lineCount));
+            Assert.That(allocated, Is.LessThan(lineCount / 4), $"Allocated {allocated} bytes for {lines} lines");
+        });
+    }
+
+    private static int ReadAllAndReturnBlocks (byte[] data, Encoding encoding, int linesPerBuffer)
+    {
+        using var stream = new MemoryStream(data, writable: false);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, 20_000);
+
+        var lines = 0;
+        while (reader.TryReadLine(out _))
+        {
+            if (++lines % linesPerBuffer == 0)
+            {
+                ReturnBlocks(reader.DetachCharBlocks());
+            }
+        }
+
+        ReturnBlocks(reader.DetachCharBlocks());
+        return lines;
+
+        static void ReturnBlocks (List<char[]> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                System.Buffers.ArrayPool<char>.Shared.Return(block);
+            }
+        }
     }
 
     #endregion
@@ -446,51 +469,14 @@ public class PositionAwareStreamReaderDirectTests
     }
 
     [Test]
-    public void TryReadLine_LineLongerThanBlockSize_PositionParityWithSystemReader ()
+    public void TryReadLine_LineLongerThanBlockSize_PositionMatchesRawBytes ()
     {
         RunWithTimeout(() =>
         {
-            // Verify byte positions match between Direct and System readers for long lines
             const int lineLength = 50_000;
             var text = $"short\n{new string('Q', lineLength)}\nend\n";
-            var bytes = Encoding.UTF8.GetBytes(text);
 
-            using var s1 = new MemoryStream(bytes);
-            using var s2 = new MemoryStream(bytes);
-            // Note: System reader has a pre-existing bug in CharBlockAllocator.ReturnAll() for
-            // oversized lines (allocates with new[] but tries to return to ArrayPool). Suppress
-            // disposal to avoid that unrelated failure.
-            var systemReader = new PositionAwareStreamReaderSystem(s1, new EncodingOptions { Encoding = Encoding.UTF8 }, lineLength + 100);
-            using var directReader = new PositionAwareStreamReaderDirect(s2, new EncodingOptions { Encoding = Encoding.UTF8 }, lineLength + 100);
-
-            try
-            {
-                var lineNum = 0;
-                while (true)
-                {
-                    var systemHasLine = systemReader.TryReadLine(out var systemLine);
-                    var directHasLine = directReader.TryReadLine(out var directLine);
-
-                    Assert.That(directHasLine, Is.EqualTo(systemHasLine), $"Line {lineNum}: EOF mismatch");
-                    if (!systemHasLine)
-                    {
-                        break;
-                    }
-
-                    Assert.That(directLine.Span.ToString(), Is.EqualTo(systemLine.Span.ToString()), $"Line {lineNum}: content mismatch");
-                    Assert.That(directReader.Position, Is.EqualTo(systemReader.Position), $"Line {lineNum}: position mismatch (System={systemReader.Position}, Direct={directReader.Position})");
-
-                    lineNum++;
-                }
-
-                Assert.That(lineNum, Is.EqualTo(3));
-            }
-            finally
-            {
-                // Don't call Dispose on systemReader — CharBlockAllocator has a pre-existing
-                // bug returning oversized (new[]) arrays to ArrayPool.
-                // The GC will reclaim the memory.
-            }
+            RawByteLineOracle.AssertMatches(Encoding.UTF8.GetBytes(text), Encoding.UTF8);
         });
     }
 

@@ -3,7 +3,6 @@ using System.Text;
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Classes.Log.ProgressReporters;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 using LogExpert.Core.Helpers;
 
 using NUnit.Framework;
@@ -156,7 +155,6 @@ public class LogfileReaderEncodingTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.SystemDirect,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: NullProgressReporter.Instance);

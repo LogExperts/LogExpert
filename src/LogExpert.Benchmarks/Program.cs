@@ -12,7 +12,7 @@ public static class Program
             Console.WriteLine("No benchmarks specified. Running all benchmarks...");
 
             // Run all benchmarks if no arguments are provided
-            _ = BenchmarkRunner.Run<StreamReaderBenchmarks>();
+            _ = BenchmarkRunner.Run<DirectReaderBenchmarks>();
             _ = BenchmarkRunner.Run<BufferIndexBenchmarks>();
             _ = BenchmarkRunner.Run<ReadThroughputBenchmarks>();
             _ = BenchmarkRunner.Run<BufferIndexContentionBenchmarks>();
@@ -25,7 +25,7 @@ public static class Program
         }
 
         Console.WriteLine("Replace <benchmarkname> with the name of the benchmark you want to run, e.g. ");
-        Console.WriteLine("StreamReaderBenchmarks: Benchmarks for stream readers");
+        Console.WriteLine("DirectReaderBenchmarks: Benchmarks for the default (Direct) reader, the regression gate for reader changes");
         Console.WriteLine("ReadThroughputBenchmarks: Benchmarks for read throughput");
         Console.WriteLine("BufferIndexBenchmarks: Benchmarks for buffer index");
         Console.WriteLine("BufferIndexContentionBenchmarks: Benchmarks for buffer index contention");
@@ -42,11 +42,11 @@ public static class Program
 /*
  * Comment / Uncommen the benchmark to run, careful some can run longer
  * 1.) a dry run
- * dotnet run -c Release -- --filter "StreamReaderBenchmarks" --job Dry --noOverwrite
+ * dotnet run -c Release -- --filter "DirectReaderBenchmarks" --job Dry --noOverwrite
  * 2.) a short run
- * dotnet run -c Release -- --filter "StreamReaderBenchmarks" --job Short --noOverwrite
+ * dotnet run -c Release -- --filter "DirectReaderBenchmarks" --job Short --noOverwrite
  * 3.) a full baseline run
- * dotnet run -c Release -- --filter "StreamReaderBenchmarks" --noOverwrite
+ * dotnet run -c Release -- --filter "DirectReaderBenchmarks" --noOverwrite
  *
  * The full baseline run generates a MD file
  * BenchmarkDotNet.Artifacts/results/*-report-github.md

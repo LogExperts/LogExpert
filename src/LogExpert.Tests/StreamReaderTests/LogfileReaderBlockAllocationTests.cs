@@ -2,7 +2,6 @@ using System.Text;
 
 using LogExpert.Core.Classes.Log;
 using LogExpert.Core.Entities;
-using LogExpert.Core.Enums;
 
 using NUnit.Framework;
 
@@ -45,7 +44,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -76,7 +74,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.SystemDirect,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -103,7 +100,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -133,7 +129,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -162,7 +157,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -185,7 +179,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 500,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
@@ -213,7 +206,6 @@ public class LogfileReaderBlockAllocationTests
             bufferCount: 100,
             linesPerBuffer: 50,
             new MultiFileOptions(),
-            ReaderType.System,
             PluginRegistry.PluginRegistry.Instance,
             maximumLineLength: 500,
             progressReporter: Core.Classes.Log.ProgressReporters.NullProgressReporter.Instance);
