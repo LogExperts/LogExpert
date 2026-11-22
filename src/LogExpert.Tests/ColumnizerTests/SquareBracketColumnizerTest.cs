@@ -106,4 +106,73 @@ public class SquareBracketColumnizerTest
             Assert.That(columns.ColumnValues[^1].FullValue.ToString().Trim(), Is.EqualTo("About to run."));
         });
     }
+
+    private static IEnumerable<string> GetColumnTexts (IColumnizedLogLineMemory result) =>
+        result.ColumnValues.Select(c => c.FullValue.ToString());
+
+    // Issue #713: applying a time offset must shift only the timestamp and preserve bracket fields and message.
+    [Test]
+    public void SplitLine_TimeOffset_PreservesBracketFieldsAndMessage ()
+    {
+        var line = new LogLine("2022-03-21 11:34:34.505[INFO][Worker]Message", 0);
+        SquareBracketColumnizer columnizer = new();
+        _ = columnizer.GetPriority("square.log", [line]);
+
+        columnizer.SetTimeOffset(0);
+        var zeroColumns = columnizer.SplitLine(null, line);
+
+        columnizer.SetTimeOffset(123);
+        var positiveColumns = columnizer.SplitLine(null, line);
+
+        columnizer.SetTimeOffset(-506);
+        var negativeColumns = columnizer.SplitLine(null, line);
+
+        columnizer.SetTimeOffset(0);
+        var resetColumns = columnizer.SplitLine(null, line);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(GetColumnTexts(zeroColumns), Is.EqualTo(new[] { "2022-03-21", "11:34:34.505", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(GetColumnTexts(positiveColumns), Is.EqualTo(new[] { "2022-03-21", "11:34:34.628", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(GetColumnTexts(negativeColumns), Is.EqualTo(new[] { "2022-03-21", "11:34:33.999", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(GetColumnTexts(resetColumns), Is.EqualTo(new[] { "2022-03-21", "11:34:34.505", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(line.FullLine.ToString(), Is.EqualTo("2022-03-21 11:34:34.505[INFO][Worker]Message"));
+        });
+    }
+
+    // Issue #713: midnight rollover under positive and negative time offsets must shift the date and preserve remaining columns.
+    [Test]
+    public void SplitLine_TimeOffsetCrossesMidnight_ShiftsDateAndPreservesRemainingColumns ()
+    {
+        var forwardLine = new LogLine("2022-03-21 23:59:59.900[INFO][Worker]Message", 0);
+        var backwardLine = new LogLine("2022-03-22 00:00:00.100[INFO][Worker]Message", 0);
+        SquareBracketColumnizer columnizer = new();
+        _ = columnizer.GetPriority("square.log", [forwardLine, backwardLine]);
+
+        columnizer.SetTimeOffset(200);
+        var forwardColumns = columnizer.SplitLine(null, forwardLine);
+
+        columnizer.SetTimeOffset(-200);
+        var backwardColumns = columnizer.SplitLine(null, backwardLine);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(GetColumnTexts(forwardColumns), Is.EqualTo(new[] { "2022-03-22", "00:00:00.100", "[INFO]", "[Worker]", "Message" }));
+            Assert.That(GetColumnTexts(backwardColumns), Is.EqualTo(new[] { "2022-03-21", "23:59:59.900", "[INFO]", "[Worker]", "Message" }));
+        });
+    }
+
+    // Issue #713: nested brackets (Issue #460) must remain a single column when a nonzero time offset is applied.
+    [Test]
+    public void SplitLine_TimeOffsetWithNestedBrackets_KeepsInnerBracketsInOneColumn ()
+    {
+        var line = new LogLine("2022-03-21 11:34:34.505[INFO][ProgramName/MethodName[41]]Message", 0);
+        SquareBracketColumnizer columnizer = new();
+        _ = columnizer.GetPriority("square.log", [line]);
+
+        columnizer.SetTimeOffset(123);
+        var columns = columnizer.SplitLine(null, line);
+
+        Assert.That(GetColumnTexts(columns), Is.EqualTo(new[] { "2022-03-21", "11:34:34.628", "[INFO]", "[ProgramName/MethodName[41]]", "Message" }));
+    }
 }
