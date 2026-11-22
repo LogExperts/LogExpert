@@ -287,9 +287,7 @@ worker thread**).
 
 *Avoid*: "GetTimestampForLine" / "GetTimestampForLineForward" /
 "FindTimestampLineInternal" as concept names — those were the pre-extraction
-Log Window method names (candidate 6 of
-`docs/improve/logwindow-architecture-review.html`); the Core module is the
-**Timestamp Locator**.
+Log Window method names; the Core module is the **Timestamp Locator**.
 
 ## Log Window roles
 

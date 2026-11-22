@@ -623,6 +623,7 @@ temp.txt
 /docs/*
 !/docs/CODING_STANDARDS.md
 !/docs/adr/
+!/docs/agents/
 
 # test project logs should be ignored, this is for rolling logfile tests
 /src/tools/LogRotator/logs/*
