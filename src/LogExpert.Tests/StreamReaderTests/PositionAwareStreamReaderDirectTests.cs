@@ -116,6 +116,38 @@ public class PositionAwareStreamReaderDirectTests
         Assert.That(line2.Span.ToString(), Is.EqualTo("short"));
     }
 
+    // Issue #762: the cap was static, so the last reader constructed set it for every reader.
+    [Test]
+    public void TryReadLine_AnotherReaderWithLargerCap_KeepsOwnCap ()
+    {
+        using var stream = CreateStream(new string('x', 100) + "\n");
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions(), 10);
+        using var otherStream = CreateStream("other\n");
+        using var other = new PositionAwareStreamReaderDirect(otherStream, new EncodingOptions(), 1_000);
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.Length, Is.EqualTo(10));
+    }
+
+    // The line is far over the cap and spans several refills, so it is cut from the truncation prefix.
+    [Test]
+    public void TryReadLine_AnotherReaderCreatedMidRead_KeepsOwnCapForOverLongLine ()
+    {
+        using var stream = CreateStream("first\n" + new string('x', 200_000) + "\nlast\n");
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions(), 10);
+
+        Assert.That(reader.TryReadLine(out var first), Is.True);
+        Assert.That(first.ToString(), Is.EqualTo("first"));
+
+        using var otherStream = CreateStream("other\n");
+        using var other = new PositionAwareStreamReaderDirect(otherStream, new EncodingOptions(), 1_000);
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.ToString(), Is.EqualTo(new string('x', 10)));
+        Assert.That(reader.TryReadLine(out var last), Is.True);
+        Assert.That(last.ToString(), Is.EqualTo("last"));
+    }
+
     #endregion
 
     #region Cross-block boundary
