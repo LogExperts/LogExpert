@@ -301,44 +301,67 @@ public class PositionAwareStreamReaderDirect : PositionAwareStreamReaderBase, IL
     }
 
     // A line is decoded on its own: a sequence cut short by the terminator becomes U+FFFD in this line.
+    // Only the text up to the maximum line length reaches the char block.
     private ReadOnlyMemory<char> DecodeLine (int byteCount)
     {
         var bytes = _byteBuffer.AsSpan(_byteStart, byteCount);
 
-        int charCount;
         if (_asciiCompatible)
         {
-            // Pure-ASCII lines skip the per-call cost of the encoding's decoder.
-            EnsureCharCapacity(byteCount);
-            if (Ascii.ToUtf16(bytes, _readBlock.AsSpan(_usedChars), out charCount) != OperationStatus.Done)
+            // Pure-ASCII text skips the per-call cost of the encoding's decoder. An ASCII byte is one char
+            // whatever follows, so only the bytes up to the cap are converted.
+            var prefix = bytes[..Math.Min(byteCount, MaximumLineLength)];
+            EnsureCharCapacity(prefix.Length);
+            if (Ascii.ToUtf16(prefix, _readBlock.AsSpan(_usedChars), out var asciiCount) == OperationStatus.Done)
             {
-                charCount = DecodeWithEncoding(bytes);
+                return Commit(asciiCount);
             }
         }
-        else if (_isUtf16LittleEndian && (byteCount & 1) == 0 && !MemoryMarshal.Cast<byte, char>(bytes).ContainsAny(_surrogates))
+        else if (_isUtf16LittleEndian)
         {
-            // UTF-16 LE without surrogates decodes to its own code units.
-            var source = MemoryMarshal.Cast<byte, char>(bytes);
-            EnsureCharCapacity(source.Length);
-            source.CopyTo(_readBlock.AsSpan(_usedChars));
-            charCount = source.Length;
-        }
-        else
-        {
-            charCount = DecodeWithEncoding(bytes);
+            // UTF-16 LE without surrogates decodes to its own code units. An odd trailing byte beyond the cap does not matter.
+            var units = MemoryMarshal.Cast<byte, char>(bytes);
+            var prefix = units[..Math.Min(units.Length, MaximumLineLength)];
+            if (((byteCount & 1) == 0 || units.Length >= MaximumLineLength) && !prefix.ContainsAny(_surrogates))
+            {
+                EnsureCharCapacity(prefix.Length);
+                prefix.CopyTo(_readBlock.AsSpan(_usedChars));
+                return Commit(prefix.Length);
+            }
         }
 
-        var cappedLength = Math.Min(charCount, MaximumLineLength);
-
-        var lineMemory = _readBlock.AsMemory(_usedChars, cappedLength);
-        _usedChars += cappedLength;
-        return lineMemory;
+        return DecodeWithEncoding(bytes);
     }
 
-    private int DecodeWithEncoding (ReadOnlySpan<byte> bytes)
+    private ReadOnlyMemory<char> DecodeWithEncoding (ReadOnlySpan<byte> bytes)
     {
-        EnsureCharCapacity(Encoding.GetMaxCharCount(bytes.Length));
-        return Encoding.GetChars(bytes, _readBlock.AsSpan(_usedChars));
+        var maxChars = Encoding.GetMaxCharCount(bytes.Length);
+        if (maxChars <= MaximumLineLength)
+        {
+            EnsureCharCapacity(maxChars);
+            return Commit(Encoding.GetChars(bytes, _readBlock.AsSpan(_usedChars)));
+        }
+
+        // Text that may exceed the cap is decoded into scratch, so the char block holds only the capped text.
+        var scratch = ArrayPool<char>.Shared.Rent(maxChars);
+        try
+        {
+            var cappedLength = Math.Min(Encoding.GetChars(bytes, scratch), MaximumLineLength);
+            EnsureCharCapacity(cappedLength);
+            scratch.AsSpan(0, cappedLength).CopyTo(_readBlock.AsSpan(_usedChars));
+            return Commit(cappedLength);
+        }
+        finally
+        {
+            ArrayPool<char>.Shared.Return(scratch);
+        }
+    }
+
+    private ReadOnlyMemory<char> Commit (int charCount)
+    {
+        var lineMemory = _readBlock.AsMemory(_usedChars, charCount);
+        _usedChars += charCount;
+        return lineMemory;
     }
 
     private void ConsumeBytes (int byteCount)

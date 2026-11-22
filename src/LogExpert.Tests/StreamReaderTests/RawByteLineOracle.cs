@@ -14,10 +14,10 @@ internal static class RawByteLineOracle
 {
     public const int MAX_LINE_LENGTH = 500_000;
 
-    public static void AssertMatches (byte[] data, Encoding encoding)
+    public static void AssertMatches (byte[] data, Encoding encoding, int maxLineLength = MAX_LINE_LENGTH)
     {
-        var expected = ExpectedLines(data, encoding);
-        var actual = ReadAll(data, encoding);
+        var expected = ExpectedLines(data, encoding, maxLineLength);
+        var actual = ReadAll(data, encoding, maxLineLength);
 
         Assert.That(actual.Count, Is.EqualTo(expected.Count), "Line count");
         for (var i = 0; i < expected.Count; i++)
@@ -29,10 +29,10 @@ internal static class RawByteLineOracle
         }
     }
 
-    public static List<(string Content, long End)> ReadAll (byte[] data, Encoding encoding)
+    public static List<(string Content, long End)> ReadAll (byte[] data, Encoding encoding, int maxLineLength = MAX_LINE_LENGTH)
     {
         using var stream = new MemoryStream(data);
-        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, MAX_LINE_LENGTH);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, maxLineLength);
 
         var lines = new List<(string, long)>();
         while (reader.TryReadLine(out var line))
@@ -44,7 +44,8 @@ internal static class RawByteLineOracle
     }
 
     // A trailing line without terminator is a line; an empty remainder after the last terminator is not.
-    private static List<(string Content, long End)> ExpectedLines (byte[] data, Encoding encoding)
+    // Text longer than the maximum is the full line decoded, then truncated.
+    private static List<(string Content, long End)> ExpectedLines (byte[] data, Encoding encoding, int maxLineLength)
     {
         var cr = encoding.GetBytes("\r");
         var lf = encoding.GetBytes("\n");
@@ -65,7 +66,7 @@ internal static class RawByteLineOracle
                     terminatorLength = 2 * unit;
                 }
 
-                lines.Add((encoding.GetString(data, lineStart, position - lineStart), position + terminatorLength));
+                lines.Add((Truncate(encoding.GetString(data, lineStart, position - lineStart), maxLineLength), position + terminatorLength));
                 position += terminatorLength;
                 lineStart = position;
             }
@@ -77,11 +78,13 @@ internal static class RawByteLineOracle
 
         if (lineStart < data.Length)
         {
-            lines.Add((encoding.GetString(data, lineStart, data.Length - lineStart), data.Length));
+            lines.Add((Truncate(encoding.GetString(data, lineStart, data.Length - lineStart), maxLineLength), data.Length));
         }
 
         return lines;
     }
+
+    private static string Truncate (string text, int maxLength) => text.Length <= maxLength ? text : text[..maxLength];
 
     private static string Shorten (string text) => text.Length <= 60 ? text : $"{text[..60]}… ({text.Length} chars)";
 }
