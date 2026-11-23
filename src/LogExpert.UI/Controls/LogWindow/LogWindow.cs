@@ -50,8 +50,9 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private const int PROGRESS_BAR_MODULO = 1000;
     private const int FILTER_ADVANCED_PANEL_BOTTOM_MARGIN = 1;
     private const int FILTER_INPUT_PANEL_BOTTOM_MARGIN = 1;
-    private const int FILTER_PANEL2_CONTROL_GAP = 7;
+    private const int FILTER_CONTROL_GAP = 6;
     private const int MINIMUM_FILTER_TEXT_BOX_WIDTH = 100;
+    private const int FILTER_RANGE_INPUT_WIDTH = 207;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
     private const int COLUMN_FINDER_HEIGHT = 28;
@@ -196,9 +197,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         AutoScaleMode = AutoScaleMode.Dpi;
 
         InitializeComponent();
+        filterComboBox.SizeChanged += OnFilterInputSizeChanged;
+        filterSplitContainer.Panel2.LocationChanged += OnFilterInputSizeChanged;
+        filterCaseSensitiveCheckBox.LocationChanged += OnFilterInputSizeChanged;
+        filterRegexCheckBox.LocationChanged += OnFilterInputSizeChanged;
 
         SetResources();
-        SetFilterInputPanelHeight();
 
         CreateDefaultViewStyle();
 
@@ -725,10 +729,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     protected override void OnDpiChangedAfterParent (EventArgs e)
     {
         base.OnDpiChangedAfterParent(e);
-        LayoutFilterControls();
-        AutoResizeFilterBox();
-        SetFilterInputPanelHeight();
-        SetAdvancedFilterSplitterDistance();
+        RelayoutFilterPanels();
         ApplyMarkerPreferences();
     }
 
@@ -791,6 +792,10 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void AutoResizeFilterBox ()
     {
         var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        // Reserve room before the checkbox column shared with the Advanced options.
+        var advancedColumn = GetFilterControlLeft(pnlProFilter) + GetAdvancedOptionsLeft();
+        desired = Math.Max(desired, advancedColumn - GetFilterControlLeft(filterSplitContainer)
+            - filterSplitContainer.SplitterWidth - GetAdvancedFilterAlignmentControl().Left);
         if (FilterSplitterLayout.TryClampSplitterDistance(desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize, out var distance))
         {
             filterSplitContainer.SplitterDistance = distance;
@@ -882,10 +887,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var lastColumnWidth = Preferences.LastColumnWidth;
 
         PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
-        LayoutFilterControls();
-        AutoResizeFilterBox();
-        SetFilterInputPanelHeight();
-        SetAdvancedFilterSplitterDistance();
+        RelayoutFilterPanels();
     }
 
     [SupportedOSPlatform("windows")]
@@ -5219,7 +5221,21 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void SetAdvancedFilterSplitterDistance ()
     {
         var contentBottom = pnlProFilter.Controls.Cast<Control>().Max(control => control.Bottom);
-        advancedFilterSplitContainer.SplitterDistance = pnlProFilter.Top + contentBottom + FILTER_ADVANCED_PANEL_BOTTOM_MARGIN;
+        var desired = pnlProFilter.Top + contentBottom + FILTER_ADVANCED_PANEL_BOTTOM_MARGIN;
+        if (FilterSplitterLayout.TryClampSplitterDistance(desired, advancedFilterSplitContainer.ClientSize.Height,
+            advancedFilterSplitContainer.SplitterWidth, advancedFilterSplitContainer.Panel1MinSize,
+            advancedFilterSplitContainer.Panel2MinSize, out var distance))
+        {
+            advancedFilterSplitContainer.SplitterDistance = distance;
+        }
+    }
+
+    private void RelayoutFilterPanels ()
+    {
+        LayoutFilterControls();
+        AutoResizeFilterBox();
+        SetFilterInputPanelHeight();
+        SetAdvancedFilterSplitterDistance();
     }
 
     private void SetFilterInputPanelHeight ()
@@ -5228,32 +5244,122 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
             .Concat(filterSplitContainer.Panel2.Controls.Cast<Control>())
             .Max(control => control.Bottom);
         pnlFilterInput.Height = contentBottom + FILTER_INPUT_PANEL_BOTTOM_MARGIN;
-        advancedBackPanel.Top = pnlFilterInput.Bottom;
+        advancedBackPanel.Bounds = FilterSplitterLayout.MoveTopPreservingBottom(advancedBackPanel.Bounds, pnlFilterInput.Bottom);
+    }
+
+    private void OnFilterInputSizeChanged (object sender, EventArgs e)
+    {
+        UpdateRangeInputWidth();
+    }
+
+    private void UpdateRangeInputWidth ()
+    {
+        // Scale the input with its text, but never make it wider than the main filter input.
+        var preferredWidth = (int)Math.Round(FILTER_RANGE_INPUT_WIDTH * DeviceDpi / 96d);
+        filterRangeComboBox.Width = Math.Min(preferredWidth, filterComboBox.Width);
+        LayoutAdvancedFilterControls();
+    }
+
+    private void LayoutAdvancedFilterControls ()
+    {
+        // The logo is a fixed-size bitmap; centering it in a scaled panel shifts it away from the label.
+        pnlProFilterLabel.BackgroundImageLayout = ImageLayout.None;
+        pnlProFilterLabel.Left = GetFilterControlLeft(lblTextFilter) - GetFilterControlLeft(pnlProFilter);
+        filterRangeComboBox.Left = pnlProFilterLabel.Left + (pnlProFilterLabel.BackgroundImage?.Width ?? pnlProFilterLabel.Width) + FILTER_CONTROL_GAP;
+        rangeCheckBox.Left = filterRangeComboBox.Left;
+        var alignedColumn = GetFilterControlLeft(GetAdvancedFilterAlignmentControl()) - GetFilterControlLeft(pnlProFilter);
+        var spreadGroupsWidth = Math.Max(lblBackSpread.Width, knobControlFilterBackSpread.Width)
+            + Math.Max(lblForeSpread.Width, knobControlFilterForeSpread.Width)
+            + Math.Max(lblfuzzy.Width, knobControlFuzzy.Width) + 4 * FILTER_CONTROL_GAP;
+        filterRangeComboBox.Width = FilterSplitterLayout.FitInputWidth(filterRangeComboBox.Width,
+            alignedColumn - filterRangeComboBox.Left - spreadGroupsWidth);
+        // Position groups from their rendered widths, not the designer's DPI-scaled coordinates.
+        var nextLeft = Math.Max(filterRangeComboBox.Right, rangeCheckBox.Right) + FILTER_CONTROL_GAP;
+        foreach (var (label, knob) in new (Control Label, Control Knob)[]
+        {
+            (lblBackSpread, knobControlFilterBackSpread),
+            (lblForeSpread, knobControlFilterForeSpread),
+            (lblfuzzy, knobControlFuzzy)
+        })
+        {
+            var width = Math.Max(label.Width, knob.Width);
+            label.Left = nextLeft + (width - label.Width) / 2;
+            knob.Left = nextLeft + (width - knob.Width) / 2;
+            nextLeft += width + FILTER_CONTROL_GAP;
+        }
+
+        nextLeft = Math.Max(nextLeft, alignedColumn);
+        invertFilterCheckBox.Left = nextLeft;
+        columnRestrictCheckBox.Left = nextLeft;
+        nextLeft += Math.Max(invertFilterCheckBox.Width, columnRestrictCheckBox.Width) + FILTER_CONTROL_GAP;
+        btnFilterToTab.Left = nextLeft;
+        btnColumn.Left = nextLeft;
+        columnNamesLabel.Left = Math.Max(btnFilterToTab.Right, btnColumn.Right) + FILTER_CONTROL_GAP;
+    }
+
+    private Control GetAdvancedFilterAlignmentControl ()
+    {
+        // Use one column at every DPI, leaving room for the range input and spread controls.
+        return filterRegexCheckBox;
+    }
+
+    private int GetFilterControlLeft (Control control)
+    {
+        // Use managed parent coordinates: hidden split panels may not yet have valid screen coordinates.
+        var left = 0;
+        for (var current = control; current != null && current != this; current = current.Parent)
+        {
+            left += current.Left;
+        }
+
+        return left;
+    }
+
+    private int GetAdvancedOptionsLeft ()
+    {
+        var rangeWidth = (int)Math.Round(FILTER_RANGE_INPUT_WIDTH * DeviceDpi / 96d);
+        return filterRangeComboBox.Left + Math.Max(rangeWidth, rangeCheckBox.Width)
+            + Math.Max(lblBackSpread.Width, knobControlFilterBackSpread.Width)
+            + Math.Max(lblForeSpread.Width, knobControlFilterForeSpread.Width)
+            + Math.Max(lblfuzzy.Width, knobControlFuzzy.Width) + 4 * FILTER_CONTROL_GAP;
     }
 
     private void LayoutFilterControls ()
     {
         // Keep gaps in screen pixels so high-DPI scaling enlarges controls, not empty space between them.
-        var gap = FILTER_PANEL2_CONTROL_GAP;
+        var gap = FILTER_CONTROL_GAP;
+        // AutoSize can shrink buttons after DPI scaling; settle their sizes before using their edges.
+        btnfilterSearch.Size = btnfilterSearch.GetPreferredSize(Size.Empty);
+        btnAdvanced.Size = btnAdvanced.GetPreferredSize(Size.Empty);
         var nextLeft = btnfilterSearch.Right + gap;
-        lblTextFilter.AutoSize = true;
         var filterComboBoxRight = filterComboBox.Right;
         filterComboBox.Left = lblTextFilter.Right + gap;
         filterComboBox.Width = filterComboBoxRight - filterComboBox.Left;
-        filterSplitContainer.Panel1MinSize = filterComboBox.Left + MINIMUM_FILTER_TEXT_BOX_WIDTH;
+        UpdateRangeInputWidth();
+        // A 100-screen-pixel input minimum intentionally leaves more room for the buttons at high DPI.
+        var desiredMinimum = filterComboBox.Left + MINIMUM_FILTER_TEXT_BOX_WIDTH;
+        if (FilterSplitterLayout.TryClampSplitterDistance(desiredMinimum, filterSplitContainer.ClientSize.Width,
+            filterSplitContainer.SplitterWidth, 0, filterSplitContainer.Panel2MinSize, out var minimum))
+        {
+            filterSplitContainer.Panel1MinSize = minimum;
+        }
 
         foreach (var checkBox in new[] { filterCaseSensitiveCheckBox, filterRegexCheckBox, filterTailCheckBox, syncFilterCheckBox })
         {
             checkBox.Left = nextLeft;
-            checkBox.Top = btnfilterSearch.Top + (btnfilterSearch.Height - checkBox.Height) / 2;
+            checkBox.Top = FilterSplitterLayout.CenterVertically(btnfilterSearch.Top, btnfilterSearch.Height, checkBox.Height);
             nextLeft = checkBox.Right + gap;
         }
 
-        lblTextFilter.Top = filterCaseSensitiveCheckBox.Top + (filterCaseSensitiveCheckBox.Height - lblTextFilter.Height) / 2;
+        foreach (var control in new Control[] { lblTextFilter, filterComboBox, btnAdvanced })
+        {
+            control.Top = FilterSplitterLayout.CenterVertically(btnfilterSearch.Top, btnfilterSearch.Height, control.Height);
+        }
         btnAdvanced.Left = nextLeft;
 
         // Keep Panel2 wide enough that the rightmost left-anchored control never overlaps the filter-count label.
         filterSplitContainer.Panel2MinSize = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, gap);
+        LayoutAdvancedFilterControls();
     }
 
     [SupportedOSPlatform("windows")]

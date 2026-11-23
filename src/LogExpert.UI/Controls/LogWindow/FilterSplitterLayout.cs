@@ -8,6 +8,21 @@ namespace LogExpert.UI.Controls.LogWindow;
 /// </summary>
 internal static class FilterSplitterLayout
 {
+    public static int FitInputWidth (int desiredWidth, int availableWidth)
+    {
+        return Math.Min(desiredWidth, Math.Max(0, availableWidth));
+    }
+
+    public static int CenterVertically (int rowTop, int rowHeight, int controlHeight)
+    {
+        return rowTop + (rowHeight - controlHeight) / 2;
+    }
+
+    public static System.Drawing.Rectangle MoveTopPreservingBottom (System.Drawing.Rectangle bounds, int top)
+    {
+        return new System.Drawing.Rectangle(bounds.Left, top, bounds.Width, Math.Max(0, bounds.Bottom - top));
+    }
+
     /// <summary>
     /// Clamps a desired splitter distance so that neither panel shrinks below its minimum size.
     /// </summary>

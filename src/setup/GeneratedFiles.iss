@@ -16,6 +16,7 @@ Source: "{#ReleaseFolder}\LogExpert.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.PluginRegistry.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.Resources.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\LogExpert.UI.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\Microsoft.Win32.SystemEvents.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\NAudio.Asio.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\NAudio.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\NAudio.dll"; DestDir: "{app}"; Flags: ignoreversion
@@ -28,7 +29,12 @@ Source: "{#ReleaseFolder}\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignorev
 Source: "{#ReleaseFolder}\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\NuGet.Versioning.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\System.CommandLine.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\System.Drawing.Common.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\System.Formats.Nrbf.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\System.Numerics.Tensors.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\System.Private.Windows.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\System.Private.Windows.GdiPlus.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#ReleaseFolder}\System.Resources.Extensions.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.Core.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.PInvoke.ComCtl32.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#ReleaseFolder}\Vanara.PInvoke.Cryptography.dll"; DestDir: "{app}"; Flags: ignoreversion

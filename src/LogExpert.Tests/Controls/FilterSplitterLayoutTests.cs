@@ -12,6 +12,56 @@ namespace LogExpert.Tests.Controls;
 [TestFixture]
 public class FilterSplitterLayoutTests
 {
+    [TestCase(207, 300, 207)]
+    [TestCase(310, 288, 288)]
+    [TestCase(362, 310, 310)]
+    [TestCase(414, 390, 390)]
+    [TestCase(207, -10, 0)]
+    public void FitInputWidth_ReservesSpaceBeforeAlignedColumn (int desired, int available, int expected)
+    {
+        Assert.That(FilterSplitterLayout.FitInputWidth(desired, available), Is.EqualTo(expected));
+    }
+
+    [TestCase(5, 35, 13, 16)]
+    [TestCase(10, 70, 26, 32)]
+    [TestCase(10, 70, 42, 24)]
+    [TestCase(10, 70, 70, 10)]
+    public void CenterVertically_UsesSharedRowCenter (int top, int rowHeight, int height, int expected)
+    {
+        Assert.That(FilterSplitterLayout.CenterVertically(top, rowHeight, height), Is.EqualTo(expected));
+    }
+
+    [TestCase(41, 566)]
+    [TestCase(51, 556)]
+    [TestCase(700, 0)]
+    public void MoveTopPreservingBottom_ResizesPanel (int top, int expectedHeight)
+    {
+        var bounds = new System.Drawing.Rectangle(3, 46, 1855, 561);
+        var result = FilterSplitterLayout.MoveTopPreservingBottom(bounds, top);
+        Assert.That(result, Is.EqualTo(new System.Drawing.Rectangle(3, top, 1855, expectedHeight)));
+    }
+
+    [TestCase(160, 100, 25, 25, 74)]
+    [TestCase(160, 300, 25, 25, 160)]
+    public void TryClampSplitterDistance_AdvancedPanelFitsShortWindow (int desired, int height, int min1, int min2, int expected)
+    {
+        Assert.That(FilterSplitterLayout.TryClampSplitterDistance(desired, height, 1, min1, min2, out var distance), Is.True);
+        Assert.That(distance, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void TryClampSplitterDistance_AdvancedPanelCannotFit_SkipsAssignment ()
+    {
+        Assert.That(FilterSplitterLayout.TryClampSplitterDistance(160, 40, 1, 25, 25, out _), Is.False);
+    }
+
+    [Test]
+    public void TryClampSplitterDistance_InputMinimumClampedToAvailableWidth ()
+    {
+        Assert.That(FilterSplitterLayout.TryClampSplitterDistance(165, 800, 4, 0, 726, out var minimum), Is.True);
+        Assert.That(minimum, Is.EqualTo(70));
+    }
+
     [Test]
     public void TryClampSplitterDistance_DesiredWithinBounds_ReturnedUnchanged ()
     {
