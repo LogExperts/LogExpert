@@ -5,12 +5,12 @@ If available attach the generated log file (see wiki)
 Important questions
 - LogExpert Version
 - Windows Version
-- Lokal file or Network
+- Local file or Network
 - Used Columnizer
 - Is this version specific or a new problem
 
 Optional questions(depends on the problem):
-- Continous appending log file?
+- Continuous appending log file?
 - Size of the file
 - some specific settings 
 - Screenshot
@@ -21,4 +21,4 @@ One "Issue" per feature! If in doubt create a new one.
 Please provide a rough use case so its possible to get a deeper understanding how the feature would be used.
 
 # General
-Please don't forget, this repository is maintened in free time! The tasks will be tackled as soon as there is time.
+Please don't forget, this repository is maintained in free time! The tasks will be tackled as soon as there is time.
