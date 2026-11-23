@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 using LogExpert.Core.Entities;
 
@@ -90,11 +90,7 @@ public abstract class PositionAwareStreamReaderBase : LogStreamReaderBase
 
     public sealed override bool IsBufferComplete => true;
 
-    protected static int MaximumLineLength
-    {
-        get => field;
-        private set => field = value;
-    }
+    protected int MaximumLineLength { get; }
 
     #endregion
 

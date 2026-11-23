@@ -116,6 +116,38 @@ public class PositionAwareStreamReaderDirectTests
         Assert.That(line2.Span.ToString(), Is.EqualTo("short"));
     }
 
+    // Issue #762: the cap was static, so the last reader constructed set it for every reader.
+    [Test]
+    public void TryReadLine_AnotherReaderWithLargerCap_KeepsOwnCap ()
+    {
+        using var stream = CreateStream(new string('x', 100) + "\n");
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions(), 10);
+        using var otherStream = CreateStream("other\n");
+        using var other = new PositionAwareStreamReaderDirect(otherStream, new EncodingOptions(), 1_000);
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.Length, Is.EqualTo(10));
+    }
+
+    // The line is far over the cap and spans several refills, so it is cut from the truncation prefix.
+    [Test]
+    public void TryReadLine_AnotherReaderCreatedMidRead_KeepsOwnCapForOverLongLine ()
+    {
+        using var stream = CreateStream("first\n" + new string('x', 200_000) + "\nlast\n");
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions(), 10);
+
+        Assert.That(reader.TryReadLine(out var first), Is.True);
+        Assert.That(first.ToString(), Is.EqualTo("first"));
+
+        using var otherStream = CreateStream("other\n");
+        using var other = new PositionAwareStreamReaderDirect(otherStream, new EncodingOptions(), 1_000);
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.ToString(), Is.EqualTo(new string('x', 10)));
+        Assert.That(reader.TryReadLine(out var last), Is.True);
+        Assert.That(last.ToString(), Is.EqualTo("last"));
+    }
+
     #endregion
 
     #region Cross-block boundary
@@ -324,6 +356,63 @@ public class PositionAwareStreamReaderDirectTests
         // Second detach should be empty
         var blocks2 = reader.DetachCharBlocks();
         Assert.That(blocks2.Count, Is.EqualTo(0));
+    }
+
+    [Test]
+    [TestCase(0)]
+    [TestCase(200_000)]
+    public void DetachCharBlocks_ShortTailRead_BlockSizedToRemainingBytes (int precedingBytes)
+    {
+        // A tail poll opens a reader near the end of the file and reads one appended line.
+        const string appended = "one appended line\n";
+        using var stream = CreateStream(new string('x', precedingBytes) + appended);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = Encoding.UTF8 }, 500);
+        reader.Position = precedingBytes;
+
+        Assert.That(reader.TryReadLine(out var line), Is.True);
+        Assert.That(line.ToString(), Is.EqualTo("one appended line"));
+
+        var blocks = reader.DetachCharBlocks();
+        Assert.That(blocks.Sum(block => block.Length), Is.LessThanOrEqualTo(64));
+    }
+
+    #endregion
+
+    #region Lines longer than the maximum line length
+
+    [Test]
+    [TestCase("utf-8", 'x', 1_000_000, "\n", "\nnext\n")]
+    [TestCase("utf-8", 'ä', 1_000_000, "\n", "\nnext\n")]
+    [TestCase("utf-8", 'x', 1_000_000, "", "")]
+    [TestCase("utf-8", 'x', 1_000_000, "\r\n", "\r\nnext")]
+    [TestCase("utf-16", 'ä', 1_000_000, "\r\n", "\r\nnext\r\n")]
+    [TestCase("utf-32", 'x', 1_000_000, "\r", "\rnext\r")]
+    // The \r is the last byte of the second 64 KB read, so it is classified after a refill.
+    [TestCase("utf-8", 'x', 131_071, "\r\n", "\r\nnext")]
+    [TestCase("utf-8", 'x', 131_071, "\r", "\rnext")]
+    public void TryReadLine_LineFarOverMaximum_TruncatesWithoutHoldingTheWholeLine (string encodingName, char fill, int length, string terminator, string tail)
+    {
+        const int maximumLineLength = 500;
+        var encoding = Encoding.GetEncoding(encodingName);
+        var longLine = new string(fill, length);
+        var data = encoding.GetBytes(longLine + tail);
+
+        using var stream = new MemoryStream(data, writable: false);
+        using var reader = new PositionAwareStreamReaderDirect(stream, new EncodingOptions { Encoding = encoding }, maximumLineLength);
+
+        Assert.That(reader.TryReadLine(out var first), Is.True);
+        Assert.That(first.ToString(), Is.EqualTo(longLine[..maximumLineLength]));
+        Assert.That(reader.Position, Is.EqualTo(encoding.GetByteCount(longLine + terminator)));
+
+        if (tail.Length > 0)
+        {
+            Assert.That(reader.TryReadLine(out var next), Is.True);
+            Assert.That(next.ToString(), Is.EqualTo("next"));
+        }
+
+        Assert.That(reader.TryReadLine(out _), Is.False);
+        Assert.That(reader.Position, Is.EqualTo(data.Length));
+        Assert.That(reader.DetachCharBlocks().Sum(block => block.Length), Is.LessThanOrEqualTo(65_536));
     }
 
     #endregion
