@@ -48,8 +48,12 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     #region Fields
 
     private const int PROGRESS_BAR_MODULO = 1000;
-    private const int FILTER_ADVANCED_SPLITTER_DISTANCE = 110;
-    private const int FILTER_PANEL2_CONTROL_GAP = 6;
+    private const int FILTER_ADVANCED_PANEL_BOTTOM_MARGIN = 1;
+    private const int FILTER_INPUT_PANEL_BOTTOM_MARGIN = 1;
+    private const int FILTER_CONTROL_GAP = 6;
+    private const int MINIMUM_FILTER_TEXT_BOX_WIDTH = 100;
+    private const int FILTER_RANGE_INPUT_WIDTH = 207;
+    private bool _isFilterLayoutInProgress;
     private const int WAIT_TIME = 500;
     private const int OVERSCAN = 20;
     private const int COLUMN_FINDER_HEIGHT = 28;
@@ -247,9 +251,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
 
         filterComboBox.DropDownHeight = filterComboBox.ItemHeight * configManager.Settings.Preferences.MaximumFilterEntriesDisplayed;
 
-        // Keep Panel2 wide enough that "Show advanced..." (btnAdvanced, the rightmost left-anchored
-        // control) never overlaps the right-anchored filter-count label when the text filter grows.
-        filterSplitContainer.Panel2MinSize = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, FILTER_PANEL2_CONTROL_GAP);
+        LayoutFilterControls();
         AutoResizeFilterBox();
 
         filterRegexCheckBox.Checked = _filterParams.IsRegex;
@@ -257,7 +259,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         filterTailCheckBox.Checked = _filterParams.IsFilterTail;
 
         splitContainerLogWindow.Panel2Collapsed = true;
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
+        SetAdvancedFilterSplitterDistance();
 
         _timeShiftSyncTask = Task.Factory.StartNew(SyncTimestampDisplayWorker, _cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         _tailFollowEngine = new TailFollowEngine(this);
@@ -304,6 +306,8 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         _bookmarkProvider.AllBookmarksRemoved += OnBookmarkProviderAllBookmarksRemoved;
 
         ResumeLayout();
+        filterSplitContainer.SplitterMoved += OnFilterSplitterLayoutChanged;
+        filterSplitContainer.SizeChanged += OnFilterSplitterLayoutChanged;
     }
 
     #endregion
@@ -724,6 +728,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     protected override void OnDpiChangedAfterParent (EventArgs e)
     {
         base.OnDpiChangedAfterParent(e);
+        RelayoutFilterPanels();
         ApplyMarkerPreferences();
     }
 
@@ -786,6 +791,13 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     private void AutoResizeFilterBox ()
     {
         var desired = filterComboBox.Left + filterComboBox.GetMaxTextWidth();
+        if (_showAdvanced)
+        {
+            // Only widen the input for the Advanced controls while they are visible.
+            var advancedColumn = GetFilterControlLeft(pnlProFilter) + GetAdvancedOptionsLeft();
+            desired = Math.Max(desired, advancedColumn - GetFilterControlLeft(filterSplitContainer)
+                - filterSplitContainer.SplitterWidth - filterRegexCheckBox.Left);
+        }
         if (FilterSplitterLayout.TryClampSplitterDistance(desired, filterSplitContainer.Width, filterSplitContainer.SplitterWidth, filterSplitContainer.Panel1MinSize, filterSplitContainer.Panel2MinSize, out var distance))
         {
             filterSplitContainer.SplitterDistance = distance;
@@ -877,6 +889,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         var lastColumnWidth = Preferences.LastColumnWidth;
 
         PreferencesChanged(Preferences.Font, setLastColumnWidth, lastColumnWidth, true, SettingsFlags.GuiOrColors);
+        RelayoutFilterPanels();
     }
 
     [SupportedOSPlatform("windows")]
@@ -2404,7 +2417,7 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
     [SupportedOSPlatform("windows")]
     private void OnSplitContainerSplitterMoved (object sender, SplitterEventArgs e)
     {
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
+        SetAdvancedFilterSplitterDistance();
     }
 
     [SupportedOSPlatform("windows")]
@@ -5203,8 +5216,169 @@ internal partial class LogWindow : DockContent, ILogPaintContextUI, ILogView, IL
         }
 
         advancedFilterSplitContainer.Panel1Collapsed = !show;
-        advancedFilterSplitContainer.SplitterDistance = FILTER_ADVANCED_SPLITTER_DISTANCE;
         _showAdvanced = show;
+        RelayoutFilterPanels();
+    }
+
+    private void SetAdvancedFilterSplitterDistance ()
+    {
+        var contentBottom = pnlProFilter.Controls.Cast<Control>().Max(control => control.Bottom);
+        var desired = pnlProFilter.Top + contentBottom + FILTER_ADVANCED_PANEL_BOTTOM_MARGIN;
+        if (FilterSplitterLayout.TryClampSplitterDistance(desired, advancedFilterSplitContainer.ClientSize.Height,
+            advancedFilterSplitContainer.SplitterWidth, advancedFilterSplitContainer.Panel1MinSize,
+            advancedFilterSplitContainer.Panel2MinSize, out var distance))
+        {
+            advancedFilterSplitContainer.SplitterDistance = distance;
+        }
+    }
+
+    private void RelayoutFilterPanels (bool resizeFilterBox = true)
+    {
+        if (_isFilterLayoutInProgress)
+        {
+            return;
+        }
+
+        _isFilterLayoutInProgress = true;
+        try
+        {
+            LayoutFilterControls();
+            if (resizeFilterBox)
+            {
+                AutoResizeFilterBox();
+            }
+
+            UpdateRangeInputWidth();
+            SetFilterInputPanelHeight();
+            SetAdvancedFilterSplitterDistance();
+        }
+        finally
+        {
+            _isFilterLayoutInProgress = false;
+        }
+    }
+
+    private void SetFilterInputPanelHeight ()
+    {
+        var contentBottom = filterSplitContainer.Panel1.Controls.Cast<Control>()
+            .Concat(filterSplitContainer.Panel2.Controls.Cast<Control>())
+            .Max(control => control.Bottom);
+        pnlFilterInput.Height = contentBottom + FILTER_INPUT_PANEL_BOTTOM_MARGIN;
+        advancedBackPanel.Bounds = FilterSplitterLayout.MoveTopPreservingBottom(advancedBackPanel.Bounds, pnlFilterInput.Bottom);
+    }
+
+    private void OnFilterSplitterLayoutChanged (object sender, EventArgs e)
+    {
+        // Preserve a user-selected splitter position; only remeasure the controls after it moves.
+        RelayoutFilterPanels(resizeFilterBox: false);
+    }
+
+    private void UpdateRangeInputWidth ()
+    {
+        // Scale the preferred width with DPI, retaining a usable minimum in narrow windows.
+        var preferredWidth = LogicalToDeviceUnits(FILTER_RANGE_INPUT_WIDTH);
+        filterRangeComboBox.Width = FilterSplitterLayout.FitInputWidth(preferredWidth, filterComboBox.Width);
+        LayoutAdvancedFilterControls();
+    }
+
+    private void LayoutAdvancedFilterControls ()
+    {
+        // The logo is a fixed-size bitmap; centering it in a scaled panel shifts it away from the label.
+        pnlProFilterLabel.Left = GetFilterControlLeft(lblTextFilter) - GetFilterControlLeft(pnlProFilter);
+        filterRangeComboBox.Left = pnlProFilterLabel.Left + (pnlProFilterLabel.BackgroundImage?.Width ?? pnlProFilterLabel.Width) + FILTER_CONTROL_GAP;
+        rangeCheckBox.Left = filterRangeComboBox.Left;
+        var alignedColumn = GetFilterControlLeft(filterRegexCheckBox) - GetFilterControlLeft(pnlProFilter);
+        var groups = MeasureSpreadGroups();
+        filterRangeComboBox.Width = FilterSplitterLayout.FitInputWidth(filterRangeComboBox.Width,
+            alignedColumn - filterRangeComboBox.Left - groups.TotalWidth);
+        // Position groups from their rendered widths, not the designer's DPI-scaled coordinates.
+        var nextLeft = Math.Max(filterRangeComboBox.Right, rangeCheckBox.Right) + FILTER_CONTROL_GAP;
+        var groupIndex = 0;
+        foreach (var (label, knob) in new (Control Label, Control Knob)[]
+        {
+            (lblBackSpread, knobControlFilterBackSpread),
+            (lblForeSpread, knobControlFilterForeSpread),
+            (lblfuzzy, knobControlFuzzy)
+        })
+        {
+            var width = groups.Widths[groupIndex++];
+            label.Left = nextLeft + (width - label.Width) / 2;
+            knob.Left = nextLeft + (width - knob.Width) / 2;
+            nextLeft += width + FILTER_CONTROL_GAP;
+        }
+
+        nextLeft = Math.Max(nextLeft, alignedColumn);
+        invertFilterCheckBox.Left = nextLeft;
+        columnRestrictCheckBox.Left = nextLeft;
+        nextLeft += Math.Max(invertFilterCheckBox.Width, columnRestrictCheckBox.Width) + FILTER_CONTROL_GAP;
+        btnFilterToTab.Left = nextLeft;
+        btnColumn.Left = nextLeft;
+        columnNamesLabel.Left = Math.Max(btnFilterToTab.Right, btnColumn.Right) + FILTER_CONTROL_GAP;
+    }
+
+    private (int[] Widths, int TotalWidth) MeasureSpreadGroups ()
+    {
+        return FilterSplitterLayout.MeasureGroups(
+            [(lblBackSpread.Width, knobControlFilterBackSpread.Width),
+             (lblForeSpread.Width, knobControlFilterForeSpread.Width),
+             (lblfuzzy.Width, knobControlFuzzy.Width)], FILTER_CONTROL_GAP);
+    }
+
+    private int GetFilterControlLeft (Control control)
+    {
+        // Use managed parent coordinates: hidden split panels may not yet have valid screen coordinates.
+        var left = 0;
+        for (var current = control; current != null && current != this; current = current.Parent)
+        {
+            left += current.Left;
+        }
+
+        return left;
+    }
+
+    private int GetAdvancedOptionsLeft ()
+    {
+        var rangeWidth = LogicalToDeviceUnits(FILTER_RANGE_INPUT_WIDTH);
+        return filterRangeComboBox.Left + Math.Max(rangeWidth, rangeCheckBox.Width)
+            + MeasureSpreadGroups().TotalWidth;
+    }
+
+    private void LayoutFilterControls ()
+    {
+        // Keep gaps in screen pixels so high-DPI scaling enlarges controls, not empty space between them.
+        var gap = FILTER_CONTROL_GAP;
+        // AutoSize can shrink buttons after DPI scaling; settle their sizes before using their edges.
+        btnfilterSearch.Size = btnfilterSearch.GetPreferredSize(Size.Empty);
+        btnAdvanced.Size = btnAdvanced.GetPreferredSize(Size.Empty);
+        var nextLeft = btnfilterSearch.Right + gap;
+        var filterComboBoxRight = filterComboBox.Right;
+        filterComboBox.Left = lblTextFilter.Right + gap;
+        filterComboBox.Width = filterComboBoxRight - filterComboBox.Left;
+
+        foreach (var checkBox in new[] { filterCaseSensitiveCheckBox, filterRegexCheckBox, filterTailCheckBox, syncFilterCheckBox })
+        {
+            checkBox.Left = nextLeft;
+            checkBox.Top = FilterSplitterLayout.CenterVertically(btnfilterSearch.Top, btnfilterSearch.Height, checkBox.Height);
+            nextLeft = checkBox.Right + gap;
+        }
+
+        foreach (var control in new Control[] { lblTextFilter, filterComboBox, btnAdvanced })
+        {
+            control.Top = FilterSplitterLayout.CenterVertically(btnfilterSearch.Top, btnfilterSearch.Height, control.Height);
+        }
+        btnAdvanced.Left = nextLeft;
+
+        // Keep Panel2 wide enough that the rightmost left-anchored control never overlaps the filter-count label.
+        var desiredPanel2Minimum = FilterSplitterLayout.RequiredPanel2Width(btnAdvanced.Right, lblFilterCount.Width, gap);
+        // Intentionally reserve label + 100 screen pixels rather than the old fixed 200-pixel panel.
+        var minimums = FilterSplitterLayout.FitPanelMinimums(filterComboBox.Left + MINIMUM_FILTER_TEXT_BOX_WIDTH,
+            desiredPanel2Minimum, filterSplitContainer.ClientSize.Width, filterSplitContainer.SplitterWidth);
+        // Remove the old constraints before applying the jointly fitted pair: neither setter may
+        // temporarily combine a new minimum with an incompatible old minimum at high DPI.
+        filterSplitContainer.Panel1MinSize = 0;
+        filterSplitContainer.Panel2MinSize = 0;
+        filterSplitContainer.Panel2MinSize = minimums.Panel2;
+        filterSplitContainer.Panel1MinSize = minimums.Panel1;
     }
 
     [SupportedOSPlatform("windows")]

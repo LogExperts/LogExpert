@@ -8,6 +8,36 @@ namespace LogExpert.UI.Controls.LogWindow;
 /// </summary>
 internal static class FilterSplitterLayout
 {
+    public static int FitInputWidth (int desiredWidth, int availableWidth, int minimumWidth = 60)
+    {
+        return Math.Max(minimumWidth, Math.Min(desiredWidth, availableWidth));
+    }
+
+    public static (int Panel1, int Panel2) FitPanelMinimums (int desiredPanel1Minimum, int desiredPanel2Minimum, int containerWidth, int splitterWidth)
+    {
+        // Preserve the input minimum first. Below that width even the input must shrink;
+        // the remaining space is all that can safely be reserved for the button panel.
+        var available = Math.Max(0, containerWidth - splitterWidth);
+        var panel1 = Math.Min(desiredPanel1Minimum, available);
+        return (panel1, Math.Min(desiredPanel2Minimum, available - panel1));
+    }
+
+    public static (int[] Widths, int TotalWidth) MeasureGroups ((int LabelWidth, int ControlWidth)[] groups, int gap)
+    {
+        var widths = groups.Select(group => Math.Max(group.LabelWidth, group.ControlWidth)).ToArray();
+        return (widths, widths.Sum() + (widths.Length + 1) * gap);
+    }
+
+    public static int CenterVertically (int rowTop, int rowHeight, int controlHeight)
+    {
+        return rowTop + (rowHeight - controlHeight) / 2;
+    }
+
+    public static Rectangle MoveTopPreservingBottom (Rectangle bounds, int top)
+    {
+        return new Rectangle(bounds.Left, top, bounds.Width, Math.Max(0, bounds.Bottom - top));
+    }
+
     /// <summary>
     /// Clamps a desired splitter distance so that neither panel shrinks below its minimum size.
     /// </summary>

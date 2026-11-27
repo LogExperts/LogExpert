@@ -572,7 +572,7 @@ namespace LogExpert.UI.Controls.LogWindow
             // 
             // pnlProFilterLabel
             // 
-            pnlProFilterLabel.BackgroundImageLayout = ImageLayout.Center;
+            pnlProFilterLabel.BackgroundImageLayout = ImageLayout.None;
             pnlProFilterLabel.Location = new Point(5, 7);
             pnlProFilterLabel.Name = "pnlProFilterLabel";
             pnlProFilterLabel.Size = new Size(60, 44);

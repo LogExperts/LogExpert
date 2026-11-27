@@ -12,6 +12,95 @@ namespace LogExpert.Tests.Controls;
 [TestFixture]
 public class FilterSplitterLayoutTests
 {
+    [TestCase(207, 300, 207)]
+    [TestCase(310, 288, 288)]
+    [TestCase(362, 310, 310)]
+    [TestCase(414, 390, 390)]
+    [TestCase(207, -10, 60)]
+    [TestCase(207, 0, 60)]
+    [TestCase(207, 30, 60)]
+    public void FitInputWidth_ReservesSpaceBeforeAlignedColumn (int desired, int available, int expected)
+    {
+        Assert.That(FilterSplitterLayout.FitInputWidth(desired, available), Is.EqualTo(expected));
+    }
+
+    [TestCase(5, 35, 13, 16)]
+    [TestCase(10, 70, 26, 32)]
+    [TestCase(10, 70, 42, 24)]
+    [TestCase(10, 70, 70, 10)]
+    public void CenterVertically_UsesSharedRowCenter (int top, int rowHeight, int height, int expected)
+    {
+        Assert.That(FilterSplitterLayout.CenterVertically(top, rowHeight, height), Is.EqualTo(expected));
+    }
+
+    [TestCase(41, 566)]
+    [TestCase(51, 556)]
+    [TestCase(700, 0)]
+    public void MoveTopPreservingBottom_ResizesPanel (int top, int expectedHeight)
+    {
+        var bounds = new Rectangle(3, 46, 1855, 561);
+        var result = FilterSplitterLayout.MoveTopPreservingBottom(bounds, top);
+        Assert.That(result, Is.EqualTo(new Rectangle(3, top, 1855, expectedHeight)));
+    }
+
+    [TestCase(160, 100, 25, 25, 74)]
+    [TestCase(160, 300, 25, 25, 160)]
+    public void TryClampSplitterDistance_AdvancedPanelFitsShortWindow (int desired, int height, int min1, int min2, int expected)
+    {
+        Assert.That(FilterSplitterLayout.TryClampSplitterDistance(desired, height, 1, min1, min2, out var distance), Is.True);
+        Assert.That(distance, Is.EqualTo(expected));
+    }
+
+    [Test]
+    public void TryClampSplitterDistance_AdvancedPanelCannotFit_SkipsAssignment ()
+    {
+        Assert.That(FilterSplitterLayout.TryClampSplitterDistance(160, 40, 1, 25, 25, out _), Is.False);
+    }
+
+    [Test]
+    public void FitPanelMinimums_ReservesInputBeforeButtons ()
+    {
+        var minimums = FilterSplitterLayout.FitPanelMinimums(165, 726, 800, 4);
+        Assert.That(minimums.Panel1, Is.EqualTo(165));
+        Assert.That(minimums.Panel2, Is.EqualTo(631));
+    }
+
+    [TestCase(165, 726, 1855, 4, 165, 726)]
+    [TestCase(265, 1452, 1200, 8, 265, 927)]
+    [TestCase(165, 726, 100, 4, 96, 0)]
+    [TestCase(165, 726, 0, 4, 0, 0)]
+    public void FitPanelMinimums_BothMinimumsFitAvailableWidth (int desired1, int desired2, int width, int splitter, int expected1, int expected2)
+    {
+        var result = FilterSplitterLayout.FitPanelMinimums(desired1, desired2, width, splitter);
+        Assert.That(result, Is.EqualTo((expected1, expected2)));
+        Assert.That(result.Panel1 + result.Panel2, Is.LessThanOrEqualTo(Math.Max(0, width - splitter)));
+    }
+
+    [Test]
+    public void MeasureGroups_IncludesWiderControlsAndGaps ()
+    {
+        var result = FilterSplitterLayout.MeasureGroups([(72, 17), (65, 80), (56, 17)], 6);
+        Assert.That(result.Widths, Is.EqualTo(new[] { 72, 80, 56 }));
+        Assert.That(result.TotalWidth, Is.EqualTo(232));
+    }
+
+    [Test]
+    [Apartment(System.Threading.ApartmentState.STA)]
+    public void PanelMinimums_CanBeAppliedDuringDpiChangeWithoutThrowing ()
+    {
+        using var split = new System.Windows.Forms.SplitContainer { Width = 800 };
+        split.Panel1MinSize = 200;
+        split.Panel2MinSize = 500;
+        var minimums = FilterSplitterLayout.FitPanelMinimums(265, 1452, split.ClientSize.Width, split.SplitterWidth);
+        Assert.DoesNotThrow(() =>
+        {
+            split.Panel1MinSize = 0;
+            split.Panel2MinSize = 0;
+            split.Panel2MinSize = minimums.Panel2;
+            split.Panel1MinSize = minimums.Panel1;
+        });
+    }
+
     [Test]
     public void TryClampSplitterDistance_DesiredWithinBounds_ReturnedUnchanged ()
     {
